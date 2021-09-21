@@ -110,11 +110,32 @@ export default defineComponent({
         )
 
         const period = {
-            start: eventDt.setLocale("ru").toLocaleString(DateTime.TIME_SIMPLE),
-            end: eventDt
-                .plus(event.value.measure_period * 1000)
-                .setLocale("ru")
-                .toLocaleString(DateTime.TIME_SIMPLE),
+            start: {
+                time: eventDt.setLocale("ru").toLocaleString({
+                    hour: "numeric",
+                    minute: "numeric",
+                }),
+                day: eventDt.setLocale("ru").toLocaleString({
+                    day: "numeric",
+                    month: "short",
+                }),
+            },
+            end: {
+                time: eventDt
+                    .plus(event.value.measure_period * 1000)
+                    .setLocale("ru")
+                    .toLocaleString({
+                        hour: "numeric",
+                        minute: "numeric",
+                    }),
+                day: eventDt
+                    .plus(event.value.measure_period * 1000)
+                    .setLocale("ru")
+                    .toLocaleString({
+                        day: "numeric",
+                        month: "short",
+                    }),
+            },
         }
 
         /** Join to the event */
@@ -374,8 +395,11 @@ export default defineComponent({
 
                 <!-- Timing -->
                 <div :class="$style.timing">
-                    {{ day }}, <span>{{ period.start }}</span> ->
-                    <span>{{ period.end }}</span>
+                    <span>{{ period.start.time }}</span> ({{
+                        period.start.day
+                    }}) -> <span>{{ period.end.time }}</span> ({{
+                        period.end.day
+                    }})
                 </div>
 
                 <!-- labels -->
@@ -603,7 +627,7 @@ export default defineComponent({
 }
 
 .name {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .name span.rise {
@@ -619,6 +643,7 @@ export default defineComponent({
     line-height: 1;
     font-weight: 500;
     color: var(--text-tertiary);
+    fill: var(--text-tertiary);
 
     margin-bottom: 16px;
 }
