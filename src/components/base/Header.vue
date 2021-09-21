@@ -38,7 +38,7 @@ export default defineComponent({
         const links = reactive([
             {
                 name: "Observe",
-                url: "/",
+                url: "/observe",
             },
             {
                 name: "Symbols",
@@ -50,9 +50,9 @@ export default defineComponent({
             },
         ])
 
-        const isActive = target => {
+        const isActive = url => {
             if (!route.name) return
-            return target.startsWith(route.name)
+            return route.path.startsWith(url)
         }
 
         const handleLogin = async () => {
@@ -113,7 +113,7 @@ export default defineComponent({
 
         <div :class="$style.base">
             <div :class="$style.left">
-                <router-link to="/"
+                <router-link to="/observe"
                     ><img src="@/assets/logo.png" :class="$style.logo"
                 /></router-link>
 
@@ -122,7 +122,7 @@ export default defineComponent({
                         v-for="link in links"
                         :key="link.name"
                         :to="link.url"
-                        :class="isActive(link.name) && $style.active"
+                        :class="isActive(link.url) && $style.active"
                         >{{ link.name }}</router-link
                     >
                 </div>

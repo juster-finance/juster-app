@@ -12,20 +12,20 @@ import Page from "@/components/base/Page"
 import SymbolsBase from "@/components/modules/symbols/SymbolsBase"
 
 export default defineComponent({
-	name: "SymbolsPage",
+    name: "SymbolsPage",
 
-	components: { Page, SymbolsBase },
+    components: { Page, SymbolsBase },
 })
 </script>
 
 <template>
-	<Page>
-		<SymbolsBase />
-	</Page>
+    <Page>
+        <SymbolsBase />
+    </Page>
 </template>
 
 <style module>
 .wrapper {
-	max-width: 1250px;
+    max-width: 1250px;
 }
 </style>

@@ -44,7 +44,7 @@ export default {
             </div>
 
             <div :class="$style.buttons">
-                <router-link to="/"
+                <router-link to="/observe"
                     ><Button type="primary" size="medium"
                         ><Icon name="spark" size="16" />Explore the
                         Juster</Button
@@ -329,7 +329,7 @@ export default {
             </p>
 
             <div :class="$style.buttons">
-                <router-link to="/"
+                <router-link to="/observe"
                     ><Button type="primary" size="medium"
                         ><Icon name="spark" size="16" />Explore the
                         Juster</Button
