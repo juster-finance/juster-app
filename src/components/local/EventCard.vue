@@ -100,43 +100,37 @@ export default defineComponent({
             return event.value?.target_dynamics * 100 - 100
         })
 
-        /** Event day */
-        const todayDt = DateTime.now()
-        const eventDt = DateTime.fromISO(event.value.bets_close_time)
-        const day = ref(
-            todayDt.hasSame(eventDt, "day")
-                ? "Today"
-                : eventDt.toLocaleString({ month: "long", day: "numeric" }),
-        )
+        const timing = computed(() => {
+            const eventDt = DateTime.fromISO(
+                event.value.bets_close_time,
+            ).setLocale("ru")
 
-        const period = {
-            start: {
-                time: eventDt.setLocale("ru").toLocaleString({
-                    hour: "numeric",
-                    minute: "numeric",
-                }),
-                day: eventDt.setLocale("ru").toLocaleString({
-                    day: "numeric",
-                    month: "short",
-                }),
-            },
-            end: {
-                time: eventDt
-                    .plus(event.value.measure_period * 1000)
-                    .setLocale("ru")
-                    .toLocaleString({
+            const endDt = eventDt.plus(event.value.measure_period * 1000)
+
+            return {
+                start: {
+                    time: eventDt.toLocaleString({
                         hour: "numeric",
                         minute: "numeric",
                     }),
-                day: eventDt
-                    .plus(event.value.measure_period * 1000)
-                    .setLocale("ru")
-                    .toLocaleString({
+                    day: eventDt.toLocaleString({
                         day: "numeric",
                         month: "short",
                     }),
-            },
-        }
+                },
+                end: {
+                    time: endDt.toLocaleString({
+                        hour: "numeric",
+                        minute: "numeric",
+                    }),
+                    day: endDt.toLocaleString({
+                        day: "numeric",
+                        month: "short",
+                    }),
+                },
+                showDay: eventDt.ordinal < endDt.ordinal,
+            }
+        })
 
         /** Join to the event */
         const handleJoin = event => {
@@ -319,8 +313,7 @@ export default defineComponent({
             showParticipantsModal,
             handleOpenEvent,
             event,
-            day,
-            period,
+            timing,
             timeLeft,
             status,
             percentage,
@@ -394,12 +387,17 @@ export default defineComponent({
                 </template>
 
                 <!-- Timing -->
-                <div :class="$style.timing">
-                    <span>{{ period.start.time }}</span> ({{
-                        period.start.day
-                    }}) -> <span>{{ period.end.time }}</span> ({{
-                        period.end.day
+                <div v-if="timing.showDay" :class="$style.timing">
+                    <span>{{ timing.start.time }}</span> ({{
+                        timing.start.day
+                    }}) -> <span>{{ timing.end.time }}</span> ({{
+                        timing.end.day
                     }})
+                </div>
+                <div v-else :class="$style.timing">
+                    {{ timing.start.day }}
+                    <span>{{ timing.start.time }}</span> ->
+                    <span>{{ timing.end.time }}</span>
                 </div>
 
                 <!-- labels -->
