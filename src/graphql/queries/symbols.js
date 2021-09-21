@@ -5,6 +5,9 @@ export const getSymbols = gql`
         juster_currencypair {
             symbol
             id
+            total_events
+            total_value_locked
+            total_volume
         }
     }
 `
@@ -14,6 +17,9 @@ export const getSymbolById = gql`
         juster_currencypair_by_pk(id: $id) {
             symbol
             id
+            total_events
+            total_value_locked
+            total_volume
         }
     }
 `
