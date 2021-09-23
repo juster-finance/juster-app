@@ -3,6 +3,10 @@ import { useAccountStore } from "@/store/account"
 
 const routes = [
     {
+        path: "/",
+        redirect: "/observe",
+    },
+    {
         path: "/error",
         name: "error",
         component: () =>
