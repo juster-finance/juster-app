@@ -9,23 +9,23 @@ import Page from "@/components/base/Page"
 /**
  * Module
  */
-import ObserveBase from "@/components/modules/observe/ObserveBase"
+import ExploreBase from "@/components/modules/explore/ExploreBase"
 
 export default defineComponent({
-	name: "ObservePage",
+    name: "ExplorePage",
 
-	components: { Page, ObserveBase },
+    components: { Page, ExploreBase },
 })
 </script>
 
 <template>
-	<Page>
-		<ObserveBase />
-	</Page>
+    <Page>
+        <ExploreBase />
+    </Page>
 </template>
 
 <style module>
 .wrapper {
-	max-width: 1250px;
+    max-width: 1250px;
 }
 </style>

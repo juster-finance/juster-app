@@ -37,8 +37,8 @@ export default defineComponent({
 
         const links = reactive([
             {
-                name: "Observe",
-                url: "/observe",
+                name: "Explore",
+                url: "/explore",
             },
             {
                 name: "Symbols",
@@ -113,7 +113,7 @@ export default defineComponent({
 
         <div :class="$style.base">
             <div :class="$style.left">
-                <router-link to="/observe"
+                <router-link to="/explore"
                     ><img src="@/assets/logo.png" :class="$style.logo"
                 /></router-link>
 

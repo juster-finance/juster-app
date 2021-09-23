@@ -4,7 +4,7 @@ import { useAccountStore } from "@/store/account"
 const routes = [
     {
         path: "/",
-        redirect: "/observe",
+        redirect: "/explore",
     },
     {
         path: "/error",
@@ -25,10 +25,10 @@ const routes = [
     },
 
     {
-        path: "/observe",
-        name: "Observe",
+        path: "/explore",
+        name: "Explore",
         component: () =>
-            import(/* webpackChunkName: "observe" */ "@/views/ObservePage"),
+            import(/* webpackChunkName: "explore" */ "@/views/ExplorePage"),
     },
 
     {
@@ -65,7 +65,7 @@ const routes = [
             if (accountStore.isLoggined) {
                 next()
             } else {
-                next({ name: "Observe" })
+                next({ name: "Explore" })
             }
         },
         component: () =>
@@ -89,7 +89,7 @@ const routes = [
             if (accountStore.isLoggined) {
                 next()
             } else {
-                next({ name: "Observe" })
+                next({ name: "Explore" })
             }
         },
         component: () =>

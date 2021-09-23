@@ -16,8 +16,8 @@ export default defineComponent({
                     <div :class="$style.column">
                         <div :class="$style.name">General</div>
 
-                        <router-link to="/observe" :class="$style.link"
-                            >Observe</router-link
+                        <router-link to="/explore" :class="$style.link"
+                            >Explore</router-link
                         >
                         <router-link to="/symbols" :class="$style.link"
                             >Symbols</router-link

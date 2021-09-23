@@ -19,7 +19,7 @@ import { fetchTopEvents } from "@/api/events"
 import { useMarketStore } from "@/store/market"
 
 export default defineComponent({
-    name: "ObserveBase",
+    name: "ExploreBase",
 
     setup() {
         const marketStore = useMarketStore()
@@ -32,7 +32,7 @@ export default defineComponent({
 
         /** Meta */
         useMeta({
-            title: "Observe",
+            title: "Explore",
             description:
                 "Juster is an on-chain smart contract platform allowing users to take part in an automated betting market by creating events, providing liquidity to them, and making bets.",
         })

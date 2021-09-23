@@ -31,10 +31,10 @@ export default {
             <span>help@juster.fi</span>.
         </div>
 
-        <router-link to="/observe">
+        <router-link to="/explore">
             <Button type="tertiary" size="small" :class="$style.back_btn"
                 ><Icon name="back" size="16" /> Back to
-                <span>Observe</span></Button
+                <span>Explore</span></Button
             ></router-link
         >
     </Page>

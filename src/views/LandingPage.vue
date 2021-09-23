@@ -44,7 +44,7 @@ export default {
             </div>
 
             <div :class="$style.buttons">
-                <router-link to="/observe"
+                <router-link to="/explore"
                     ><Button type="primary" size="medium"
                         ><Icon name="spark" size="16" />Explore the
                         Juster</Button
@@ -67,7 +67,7 @@ export default {
 
             <div :class="$style.hint">
                 <Icon name="help" size="14" />
-                <span>Observe Page</span> — explore available markets, top
+                <span>Explore Page</span> — explore available markets, top
                 events, market-influencing news, etc.
             </div>
         </div>
@@ -114,7 +114,7 @@ export default {
             <h2>Three easy steps</h2>
             <p>
                 Immediately after logging into your account, you can use the
-                <span>Observe page</span>. Choose among the top events or on the
+                <span>Explore page</span>. Choose among the top events or on the
                 currency pair page.
             </p>
 
@@ -179,12 +179,12 @@ export default {
             <h2>The right approach to betting</h2>
             <p>
                 Immediately after logging into your account, you can use the
-                <span>Observe page</span>. Choose among the top events or on the
+                <span>Explore page</span>. Choose among the top events or on the
                 currency pair page.
             </p>
             <p>
                 Immediately after logging into your account, you can use the
-                <span>Observe page</span>. Choose among the top events or on the
+                <span>Explore page</span>. Choose among the top events or on the
                 currency pair page.
             </p>
 
@@ -241,7 +241,7 @@ export default {
             <h2>Key features</h2>
             <p>
                 Immediately after logging into your account, you can use the
-                Observe page. Choose among the top events or on the currency
+                Explore page. Choose among the top events or on the currency
                 pair page.
             </p>
 
@@ -324,12 +324,12 @@ export default {
             <h2>Are you ready?</h2>
             <p>
                 Immediately after logging into your account, you can use the
-                Observe page. Choose among the top events or on the currency
+                Explore page. Choose among the top events or on the currency
                 pair page.
             </p>
 
             <div :class="$style.buttons">
-                <router-link to="/observe"
+                <router-link to="/explore"
                     ><Button type="primary" size="medium"
                         ><Icon name="spark" size="16" />Explore the
                         Juster</Button
