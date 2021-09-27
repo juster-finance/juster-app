@@ -56,7 +56,6 @@ export default defineComponent({
 <style module>
 .wrapper {
     width: 100%;
-    height: 300px;
 
     display: flex;
     justify-content: center;
@@ -74,6 +73,7 @@ export default defineComponent({
 .content {
     display: flex;
     justify-content: space-between;
+    gap: 60px;
 }
 
 .content img {
@@ -86,14 +86,16 @@ export default defineComponent({
 
 .columns {
     display: flex;
+    flex-wrap: wrap;
+    gap: 150px;
+
+    margin-right: 150px;
 }
 
 .column {
     display: flex;
     flex-direction: column;
     gap: 12px;
-
-    margin-right: 150px;
 }
 
 .name {
@@ -119,5 +121,19 @@ export default defineComponent({
     color: var(--text-tertiary);
 
     margin-top: 40px;
+}
+
+@media (max-width: 850px) {
+    .columns {
+        margin-right: 100px;
+        gap: 100px;
+    }
+}
+
+@media (max-width: 680px) {
+    .columns {
+        gap: 50px;
+        margin-right: 40px;
+    }
 }
 </style>
