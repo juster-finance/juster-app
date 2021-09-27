@@ -118,4 +118,10 @@ export default defineComponent({
 
     margin-top: 24px;
 }
+
+@media (max-width: 420px) {
+    .items {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
 </style>
