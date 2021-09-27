@@ -45,8 +45,17 @@ export default defineComponent({
             if (side.value == "Higher" || side.value == "Lower")
                 return event.value.pool_above_eq
 
-            if (side.value == "Liquidity")
-                return event.value.pool_above_eq + userAmount.value
+            if (side.value == "Liquidity") {
+                const maxPool = Math.max(
+                    event.value.pool_above_eq,
+                    event.value.pool_below,
+                )
+                const newAboveEq =
+                    event.value.pool_above_eq +
+                    (event.value.pool_above_eq / maxPool) * userAmount.value
+
+                return newAboveEq
+            }
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
@@ -78,8 +87,17 @@ export default defineComponent({
             if (side.value == "Higher" || side.value == "Lower")
                 return event.value.pool_below
 
-            if (side.value == "Liquidity")
-                return event.value.pool_below + userAmount.value
+            if (side.value == "Liquidity") {
+                const maxPool = Math.max(
+                    event.value.pool_above_eq,
+                    event.value.pool_below,
+                )
+                const newBelow =
+                    event.value.pool_below +
+                    (event.value.pool_below / maxPool) * userAmount.value
+
+                return newBelow
+            }
         })
 
         return { abovePercent, aboveAmount, belowPercent, belowAmount }
