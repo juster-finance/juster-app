@@ -44,7 +44,7 @@ export default defineComponent({
 }
 
 .wrapper p {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.6;
     color: var(--text-secondary);
 
@@ -68,7 +68,7 @@ export default defineComponent({
 }
 
 .wrapper ul li {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.6;
     color: var(--text-secondary);
 
@@ -85,7 +85,7 @@ export default defineComponent({
 }
 
 .wrapper ol li {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.6;
     color: var(--text-secondary);
 

@@ -37,6 +37,9 @@ export default defineComponent({
                         sections.value[article.section.title].push(article)
                     }
                 })
+
+            /** pre-selected article */
+            selectedArticle.value = sections.value[allSections[0].title][0]
         })
 
         const selectArticle = article => {
@@ -99,12 +102,13 @@ export default defineComponent({
 }
 
 .title {
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1;
     font-weight: 600;
     color: var(--text-tertiary);
+    text-transform: uppercase;
 
-    margin-bottom: 14px;
+    margin-bottom: 8px;
 }
 
 .link {
