@@ -32,7 +32,6 @@ export default defineComponent({
 
 <style module>
 .wrapper {
-    max-width: 600px;
 }
 
 .wrapper h1 {
@@ -40,7 +39,27 @@ export default defineComponent({
 }
 
 .wrapper h2 {
+    cursor: pointer;
     margin-bottom: 24px;
+}
+
+.wrapper h2::after {
+    content: "";
+    position: relative;
+    top: 2px;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: url("~@/assets/icons/anchor.svg") no-repeat;
+    background-size: 100% 100%;
+    margin-left: 8px;
+    opacity: 0;
+
+    transition: opacity 0.2s ease;
+}
+
+.wrapper h2:hover::after {
+    opacity: 0.5;
 }
 
 .wrapper p {

@@ -1,5 +1,6 @@
 <script>
 import { defineComponent, onMounted, ref, computed } from "vue"
+import Markdown from "markdown-it"
 
 import ArticleContent from "./ArticleContent"
 
@@ -15,6 +16,8 @@ export default defineComponent({
         const sections = ref({})
 
         const selectedArticle = ref({})
+
+        const anchors = ref([])
 
         onMounted(async () => {
             const allSections = await fetchSections()
@@ -39,7 +42,7 @@ export default defineComponent({
                 })
 
             /** pre-selected article */
-            selectedArticle.value = sections.value[allSections[0].title][0]
+            selectArticle(sections.value[allSections[0].title][0])
         })
 
         const nextArticle = computed(() => {
@@ -65,6 +68,18 @@ export default defineComponent({
 
         const selectArticle = article => {
             selectedArticle.value = article
+
+            /** find content */
+            const md = new Markdown()
+            const body = md.render(article.Body)
+            const regex = /(<h2>.+)/g
+            const content = body.match(regex)
+
+            anchors.value =
+                content &&
+                content.map(anchor =>
+                    anchor.replaceAll("<h2>", "").replaceAll("</h2>", ""),
+                )
         }
 
         const handleNextPage = () => {
@@ -82,6 +97,7 @@ export default defineComponent({
             handleNextPage,
             selectedArticle,
             nextArticle,
+            anchors,
         }
     },
 
@@ -130,6 +146,17 @@ export default defineComponent({
                 </div>
 
                 <Icon name="arrowright" size="16" />
+            </div>
+        </div>
+
+        <div v-if="anchors" :class="$style.anchors">
+            <span :class="$style.anchors_title">Content</span>
+            <div
+                v-for="(anchor, index) in anchors"
+                :key="index"
+                :class="$style.anchor"
+            >
+                {{ anchor }}
             </div>
         </div>
     </div>
@@ -190,6 +217,7 @@ export default defineComponent({
 
 .base {
     flex: 1;
+    max-width: 600px;
 
     margin: 50px 0 0 80px;
 }
@@ -236,5 +264,36 @@ export default defineComponent({
 
 .next_btn svg {
     fill: var(--icon);
+}
+
+.anchors {
+    height: fit-content;
+    position: sticky;
+    top: 130px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    margin: 0 0 0 100px;
+}
+
+.anchors span {
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+.anchor {
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--text-secondary);
+
+    transition: color 0.2s ease;
+}
+
+.anchor:hover {
+    color: var(--text-primary);
 }
 </style>
