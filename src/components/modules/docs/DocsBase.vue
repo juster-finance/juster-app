@@ -13,10 +13,10 @@ export default defineComponent({
     name: "DocsBase",
 
     setup() {
+        const expandMenu = ref(false)
+
         const sections = ref({})
-
         const selectedArticle = ref({})
-
         const anchors = ref([])
 
         onMounted(async () => {
@@ -98,6 +98,7 @@ export default defineComponent({
             selectedArticle,
             nextArticle,
             anchors,
+            expandMenu,
         }
     },
 
@@ -107,7 +108,7 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
-        <div :class="$style.nav">
+        <div :class="[$style.nav, expandMenu && $style.expanded]">
             <div
                 v-for="(section, index) in sections"
                 :key="section"
@@ -159,18 +160,27 @@ export default defineComponent({
                 {{ anchor }}
             </div>
         </div>
+
+        <Icon
+            @click="expandMenu = !expandMenu"
+            :name="expandMenu ? 'close' : 'menu'"
+            size="20"
+            :class="$style.menu_btn"
+        />
     </div>
 </template>
 
 <style module>
 .wrapper {
     display: flex;
+    position: relative;
 }
 
 .nav {
     width: 200px;
     padding-top: 50px;
     border-right: 1px solid var(--border);
+    background: var(--app-background);
 }
 
 .section {
@@ -295,5 +305,62 @@ export default defineComponent({
 
 .anchor:hover {
     color: var(--text-primary);
+}
+
+.menu_btn {
+    display: none;
+    position: absolute;
+    top: 32px;
+    left: 0;
+    cursor: pointer;
+    background: var(--btn-secondary-bg);
+    box-sizing: content-box;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+
+    fill: var(--icon);
+}
+
+@media (max-width: 850px) {
+    .base {
+        margin: 32px 0 0 32px;
+    }
+
+    .anchors {
+        margin-left: 40px;
+    }
+}
+
+@media (max-width: 700px) {
+    .anchors {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .menu_btn {
+        display: initial;
+    }
+
+    .nav {
+        position: absolute;
+        left: -250px;
+        top: 0;
+        bottom: 0;
+
+        padding-top: 100px;
+
+        transition: left 0.15s ease;
+    }
+
+    .nav.expanded {
+        left: 0;
+    }
+
+    .base {
+        margin-left: 0;
+        margin-top: 80px;
+    }
 }
 </style>
