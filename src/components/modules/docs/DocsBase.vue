@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onMounted, ref } from "vue"
+import { defineComponent, onMounted, ref, computed } from "vue"
 
 import ArticleContent from "./ArticleContent"
 
@@ -42,11 +42,47 @@ export default defineComponent({
             selectedArticle.value = sections.value[allSections[0].title][0]
         })
 
+        const nextArticle = computed(() => {
+            if (!selectedArticle.value.section) return
+
+            const currentSection = selectedArticle.value.section.title
+            const selectedArticleIndex = sections.value[currentSection].indexOf(
+                selectedArticle.value,
+            )
+
+            if (sections.value[currentSection][selectedArticleIndex + 1]) {
+                return sections.value[currentSection][selectedArticleIndex + 1]
+            } else {
+                const allSections = Object.keys(sections.value)
+                const currentSectionIndex = allSections.indexOf(currentSection)
+
+                return (
+                    sections.value[allSections[currentSectionIndex + 1]] &&
+                    sections.value[allSections[currentSectionIndex + 1]][0]
+                )
+            }
+        })
+
         const selectArticle = article => {
             selectedArticle.value = article
         }
 
-        return { sections, selectArticle, selectedArticle }
+        const handleNextPage = () => {
+            selectedArticle.value = nextArticle.value
+
+            document.getElementById("app").scrollTo({
+                top: 0,
+                behavior: "smooth",
+            })
+        }
+
+        return {
+            sections,
+            selectArticle,
+            handleNextPage,
+            selectedArticle,
+            nextArticle,
+        }
     },
 
     components: { ArticleContent },
@@ -82,6 +118,19 @@ export default defineComponent({
                 v-if="selectedArticle.Body"
                 :source="selectedArticle.Body"
             />
+
+            <div
+                v-if="nextArticle"
+                @click="handleNextPage"
+                :class="$style.next_btn"
+            >
+                <div :class="$style.next_txt">
+                    <span>Next Page</span>
+                    <span>{{ nextArticle.title }}</span>
+                </div>
+
+                <Icon name="arrowright" size="16" />
+            </div>
         </div>
     </div>
 </template>
@@ -143,5 +192,49 @@ export default defineComponent({
     flex: 1;
 
     margin: 50px 0 0 80px;
+}
+
+.next_btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    cursor: pointer;
+    max-width: 600px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    height: 68px;
+
+    padding: 0 16px;
+    margin-bottom: 150px;
+
+    transition: border 0.2s ease;
+}
+
+.next_btn:hover {
+    border: 1px solid var(--border-highlight);
+}
+
+.next_txt {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.next_btn span:first-child {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-tertiary);
+}
+
+.next_btn span:last-child {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.next_btn svg {
+    fill: var(--icon);
 }
 </style>
