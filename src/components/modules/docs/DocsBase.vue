@@ -1,43 +1,84 @@
 <script>
-export default {
+import { defineComponent, onMounted, ref } from "vue"
+
+import ArticleContent from "./ArticleContent"
+
+/**
+ * API
+ */
+import { fetchArticles, fetchSections } from "@/api/sanity"
+
+export default defineComponent({
     name: "DocsBase",
-}
+
+    setup() {
+        const sections = ref({})
+
+        const selectedArticle = ref({})
+
+        onMounted(async () => {
+            const allSections = await fetchSections()
+            const articles = await fetchArticles()
+
+            /** Sections */
+            allSections
+                .sort((a, b) => a.position - b.position)
+                .forEach(section => {
+                    if (!sections.value[section.title]) {
+                        sections.value[section.title] = []
+                    }
+                })
+
+            /** Sort articles */
+            articles
+                .sort((a, b) => a.position - b.position)
+                .forEach(article => {
+                    if (sections.value[article.section.title]) {
+                        sections.value[article.section.title].push(article)
+                    }
+                })
+        })
+
+        const selectArticle = article => {
+            selectedArticle.value = article
+        }
+
+        return { sections, selectArticle, selectedArticle }
+    },
+
+    components: { ArticleContent },
+})
 </script>
 
 <template>
     <div :class="$style.wrapper">
         <div :class="$style.nav">
-            <div :class="$style.nav_block">
-                <div :class="$style.nav_title">General</div>
+            <div
+                v-for="(section, index) in sections"
+                :key="section"
+                :class="$style.section"
+            >
+                <div :class="$style.title">{{ index }}</div>
 
-                <div :class="$style.nav_link">Introduction</div>
-                <div :class="$style.nav_link">Getting Started</div>
-                <div :class="$style.nav_link">Roadmap</div>
-            </div>
-            <div :class="$style.nav_block">
-                <div :class="$style.nav_title">Betting</div>
-
-                <div :class="$style.nav_link">Markets</div>
-                <div :class="$style.nav_link">Betting</div>
-                <div :class="$style.nav_link">Symbols</div>
-                <div :class="$style.nav_link">Event Page</div>
-            </div>
-            <div :class="$style.nav_block">
-                <div :class="$style.nav_title">Liquidity</div>
-
-                <div :class="$style.nav_link">Adding Liquidity</div>
-                <div :class="$style.nav_link">Earn fees</div>
-            </div>
-            <div :class="$style.nav_block">
-                <div :class="$style.nav_title">Profile</div>
-
-                <div :class="$style.nav_link">Statistics</div>
-                <div :class="$style.nav_link">My submissions</div>
+                <div
+                    v-for="article in section"
+                    :key="article._id"
+                    @click="selectArticle(article)"
+                    :class="[
+                        $style.link,
+                        selectedArticle == article && $style.active,
+                    ]"
+                >
+                    {{ article.title }}
+                </div>
             </div>
         </div>
 
         <div :class="$style.base">
-            Work In Progress
+            <ArticleContent
+                v-if="selectedArticle.Body"
+                :source="selectedArticle.Body"
+            />
         </div>
     </div>
 </template>
@@ -53,11 +94,11 @@ export default {
     border-right: 1px solid var(--border);
 }
 
-.nav_block {
+.section {
     margin-bottom: 48px;
 }
 
-.nav_title {
+.title {
     font-size: 14px;
     line-height: 1;
     font-weight: 600;
@@ -66,7 +107,7 @@ export default {
     margin-bottom: 14px;
 }
 
-.nav_link {
+.link {
     display: flex;
     align-items: center;
 
@@ -83,12 +124,15 @@ export default {
     transition: all 0.2s ease;
 }
 
-.nav_link:hover {
+.link:hover {
     background: var(--opacity-05);
 }
 
-.nav_link.active {
+.link.active {
     color: var(--text-primary);
+    background: var(--opacity-10);
+
+    border-right: 3px solid var(--blue);
 }
 
 .base {

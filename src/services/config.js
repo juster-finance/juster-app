@@ -10,3 +10,7 @@ export const supportedSymbols = {
     "XTZ-USD": { description: "Tezos / Dollar" },
     "BTC-USD": { description: "Bitcoin / Dollar" },
 }
+
+export const sanity = {
+    id: "7iinpn2j",
+}
