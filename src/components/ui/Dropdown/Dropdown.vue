@@ -21,7 +21,7 @@ export default defineComponent({
         forceOpen: Boolean,
     },
 
-    setup(props) {
+    setup(props, context) {
         const { forceOpen } = toRefs(props)
 
         const trigger = ref(null)
@@ -41,6 +41,8 @@ export default defineComponent({
             if (event) event.stopPropagation()
 
             isOpen.value = false
+
+            context.emit("onClose")
         }
 
         const dropdownStyles = reactive({

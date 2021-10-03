@@ -269,8 +269,8 @@ export default defineComponent({
         const contextMenuHandler = e => {
             e.preventDefault()
 
-            contextMenuStyles.top = `${e.layerY}px`
-            contextMenuStyles.left = `${e.layerX}px`
+            contextMenuStyles.top = `${e.clientY}px`
+            contextMenuStyles.left = `${e.clientX}px`
 
             openContextMenu.value = !openContextMenu.value
         }
@@ -392,6 +392,7 @@ export default defineComponent({
 
         <Dropdown
             :forceOpen="openContextMenu"
+            @onClose="openContextMenu = false"
             :class="$style.dropdown"
             :style="{ ...contextMenuStyles }"
         >
@@ -622,8 +623,6 @@ export default defineComponent({
 
 <style module>
 .wrapper {
-    position: relative;
-
     background: var(--card-bg);
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -644,6 +643,7 @@ export default defineComponent({
 
 .header {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
 }
 
@@ -715,10 +715,6 @@ export default defineComponent({
 }
 
 .actions {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-
     display: flex;
     align-items: center;
     gap: 6px;
