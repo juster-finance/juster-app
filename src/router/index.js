@@ -122,6 +122,14 @@ const routes = [
         name: "Docs",
         component: () =>
             import(/* webpackChunkName: "docs" */ "@/views/DocsPage"),
+        children: [
+            {
+                path: ":slug",
+                name: "Doc",
+                component: () =>
+                    import(/* webpackChunkName: "doc" */ "@/views/DocPage"),
+            },
+        ],
     },
 ]
 
