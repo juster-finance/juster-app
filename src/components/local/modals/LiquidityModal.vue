@@ -12,6 +12,7 @@ import { juster } from "@/services/tools"
  */
 import EventPreview from "@/components/local/EventPreview"
 import SplittedPool from "@/components/local/SplittedPool"
+import SlippageSelector from "@/components/local/SlippageSelector"
 
 /**
  * UI
@@ -51,18 +52,7 @@ export default defineComponent({
 
         /** User inputs */
         const amount = reactive({ value: 0, error: "" })
-        const slippage = ref("3")
-        const showCustomSlippage = ref(false)
-        const availableSlippage = reactive(["0.5", "1", "3"])
-
-        const selectSlippage = value => {
-            slippage.value = value
-        }
-        const handleInputSlippage = e => {
-            if (slippage.value > 30) {
-                slippage.value = 30
-            }
-        }
+        const slippage = ref(2.5)
 
         const sendingBet = ref(false)
 
@@ -163,10 +153,6 @@ export default defineComponent({
             countdownStatus,
             amount,
             slippage,
-            showCustomSlippage,
-            handleInputSlippage,
-            availableSlippage,
-            selectSlippage,
             sendingBet,
             liquidityRatio,
             shares,
@@ -176,6 +162,7 @@ export default defineComponent({
         }
     },
 
+    emits: ["switch"],
     components: {
         Modal,
         Input,
@@ -185,6 +172,7 @@ export default defineComponent({
         Tooltip,
         EventPreview,
         SplittedPool,
+        SlippageSelector,
     },
 })
 </script>
@@ -204,6 +192,8 @@ export default defineComponent({
                 :event="event"
                 :countdown="countdownText"
                 :status="countdownStatus"
+                type="liquidity"
+                @switch="$emit('switch')"
                 :class="$style.preview"
             />
 
@@ -237,71 +227,24 @@ export default defineComponent({
                 :class="$style.pool"
             />
 
+            <SlippageSelector
+                v-model="slippage"
+                :class="$style.slippage_block"
+            />
+
             <div :class="$style.stats">
-                <Stat name="Slippage">
-                    <div :class="$style.slippage_cfg">
-                        <div
-                            v-for="item in availableSlippage"
-                            :key="item"
-                            @click="selectSlippage(item)"
-                            :class="[
-                                $style.slippage,
-                                slippage == item && $style.selected,
-                            ]"
-                        >
-                            {{ item }}%
-                        </div>
-
-                        <input
-                            type="number"
-                            v-if="showCustomSlippage"
-                            v-model="slippage"
-                            @input="handleInputSlippage"
-                            @keydown="
-                                $event.key == '-' && $event.preventDefault()
-                            "
-                            placeholder="30%"
-                        />
-                        <Icon
-                            @click="showCustomSlippage = !showCustomSlippage"
-                            :name="showCustomSlippage ? 'close' : 'edit'"
-                            size="12"
-                            :class="$style.edit_slippage"
-                        />
-                    </div>
-                </Stat>
-
                 <Stat name="Reward for providing">
                     {{ event.liquidity_percent * 100 }}%
                 </Stat>
 
-                <Stat v-if="ratio" name="Ratio">
-                    <Tooltip position="bottom" side="right">
-                        <div :class="$style.ratio">
-                            <Icon
-                                name="close"
-                                size="14"
-                                :class="$style.cup_icon"
-                            />{{ (1 + ratio).toFixed(2) }}
-                        </div>
-
-                        <template v-slot:content>
-                            <span>Ratio after bet:</span>
-                            {{ (1 + ratioAfterBet).toFixed(2) }}
-                        </template>
-                    </Tooltip>
-                </Stat>
-
                 <Stat v-if="liquidityRatio" name="Ratio"
-                    ><Icon name="close" size="14" :class="$style.cup_icon" />{{
-                        (1 + liquidityRatio.min).toFixed(2)
-                    }}
-                    - {{ (1 + liquidityRatio.max).toFixed(2) }}</Stat
+                    ><Icon
+                        name="close"
+                        size="14"
+                        :class="$style.ratio_icon"
+                    />{{ (1 + liquidityRatio.min).toFixed(2) }} -
+                    {{ (1 + liquidityRatio.max).toFixed(2) }}</Stat
                 >
-
-                <Stat name="Shares">
-                    {{ shares.toFixed(0) }}
-                </Stat>
             </div>
 
             <Button
@@ -395,64 +338,11 @@ export default defineComponent({
     margin-bottom: 24px;
 }
 
-.slippage_cfg {
-    display: flex;
-    align-items: center;
+.slippage_block {
+    margin-bottom: 24px;
 }
 
-.slippage_cfg input {
-    width: 40px;
-    height: 22px;
-    text-align: end;
-
-    color: var(--text-primary);
-
-    margin-left: 8px;
-}
-
-.slippage_cfg input::-webkit-outer-spin-button,
-.slippage_cfg input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.edit_slippage {
-    fill: var(--icon);
-    padding: 4px;
-    box-sizing: content-box;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-    cursor: pointer;
-
-    margin-left: 8px;
-
-    transition: all 0.2s ease;
-}
-
-.edit_slippage:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.slippage {
-    cursor: pointer;
-    color: var(--text-tertiary);
-
-    margin-left: 8px;
-
-    transition: color 0.2s ease;
-}
-
-.slippage.selected {
-    color: var(--blue);
-}
-
-.cup_icon {
+.ratio_icon {
     fill: var(--opacity-40);
-}
-
-.ratio {
-    display: flex;
-    align-items: center;
-    gap: 4px;
 }
 </style>

@@ -9,9 +9,9 @@ import { supportedSymbols } from "@/services/config"
 
 export default defineComponent({
     name: "EventPreview",
-    props: { event: Object, countdown: String, status: String },
+    props: { event: Object, countdown: String, status: String, type: String },
 
-    setup(props) {
+    setup(props, context) {
         const { event, countdown, status } = toRefs(props)
 
         // eslint-disable-next-line vue/return-in-computed-property
@@ -37,47 +37,63 @@ export default defineComponent({
                 .toLocaleString(DateTime.TIME_SIMPLE),
         }
 
-        return { name, day, period, countdown, status }
+        const handleSwitch = () => {
+            context.emit("switch")
+        }
+
+        return { name, day, period, countdown, status, handleSwitch }
     },
 })
 </script>
 
 <template>
     <div :class="$style.wrapper">
-        <div :class="$style.left">
-            <div :class="$style.name">
-                {{ name }}
+        <div :class="$style.base">
+            <div :class="$style.left">
+                <div :class="$style.name">
+                    {{ name }}
+                </div>
+
+                <div :class="$style.timing">
+                    {{ day }}, <span>{{ period.start }}</span> ->
+                    <span>{{ period.end }}</span>
+                </div>
             </div>
 
-            <div :class="$style.timing">
-                {{ day }}, <span>{{ period.start }}</span> ->
-                <span>{{ period.end }}</span>
+            <div :class="$style.timer">
+                <span>Closing in</span>
+
+                <div v-if="status == 'In progress'" :class="$style.time">
+                    <Icon name="time" size="12" /> {{ countdown }}
+                </div>
+                <div v-else-if="status == 'Finished'" :class="$style.time">
+                    Event closed
+                </div>
             </div>
         </div>
 
-        <div :class="$style.timer">
-            <span>Closing in</span>
-
-            <div v-if="status == 'In progress'" :class="$style.time">
-                <Icon name="time" size="12" /> {{ countdown }}
+        <div :class="$style.actions">
+            <div @click="handleSwitch" :class="$style.action">
+                {{ type == "liquidity" ? "Make a bet" : "Provide liquidity" }}
             </div>
-            <div v-else-if="status == 'Finished'" :class="$style.time">
-                Event closed
-            </div>
+            <router-link :to="`/events/${event.id}`" :class="$style.action">
+                Open event
+            </router-link>
         </div>
     </div>
 </template>
 
 <style module>
 .wrapper {
+    border-radius: 8px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+}
+
+.base {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    height: 62px;
-    border-radius: 8px;
-    padding: 0 16px;
-    border: 1px solid var(--border);
 }
 
 .left {
@@ -127,5 +143,21 @@ export default defineComponent({
     font-weight: 600;
     color: var(--text-primary);
     fill: var(--opacity-40);
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+
+    margin-top: 16px;
+}
+
+.action {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--blue);
 }
 </style>

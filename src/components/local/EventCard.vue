@@ -275,6 +275,11 @@ export default defineComponent({
             openContextMenu.value = !openContextMenu.value
         }
 
+        const handleSwitch = () => {
+            showBetModal.value = !showBetModal.value
+            showLiquidityModal.value = !showLiquidityModal.value
+        }
+
         onMounted(async () => {
             card.value.addEventListener("contextmenu", contextMenuHandler)
 
@@ -354,6 +359,7 @@ export default defineComponent({
             handleLiquidity,
             handleWithdraw,
             copy,
+            handleSwitch,
         }
     },
 
@@ -377,11 +383,13 @@ export default defineComponent({
         <BetModal
             :show="showBetModal"
             :event="event"
+            @switch="handleSwitch"
             @onClose="showBetModal = false"
         />
         <LiquidityModal
             :show="showLiquidityModal"
             :event="event"
+            @switch="handleSwitch"
             @onClose="showLiquidityModal = false"
         />
         <ParticipantsModal

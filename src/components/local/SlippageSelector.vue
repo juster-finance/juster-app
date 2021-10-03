@@ -99,7 +99,7 @@ export default defineComponent({
 
     border-radius: 8px;
     border: 1px solid var(--border);
-    height: 44px;
+    height: 36px;
     padding: 0 14px;
 }
 
@@ -139,7 +139,7 @@ export default defineComponent({
 
     border-radius: 8px;
     border: 1px solid var(--border);
-    height: 44px;
+    height: 36px;
     padding: 0 14px;
 }
 

@@ -13,7 +13,7 @@ import { juster } from "@/services/tools"
  */
 import EventPreview from "@/components/local/EventPreview"
 import SplittedPool from "@/components/local/SplittedPool"
-import SplippageSelector from "@/components/local/SlippageSelector"
+import SlippageSelector from "@/components/local/SlippageSelector"
 
 /**
  * UI
@@ -61,15 +61,16 @@ export default defineComponent({
         /**
          * Ratio
          */
-        const ratio = computed(
-            () =>
-                (side.value == "Higher" &&
+        const ratio = computed(() => {
+            return {
+                higher:
                     event.value.pool_below /
-                        (event.value.pool_above_eq + amount.value)) ||
-                (side.value == "Lower" &&
+                    (event.value.pool_above_eq + amount.value),
+                lower:
                     event.value.pool_above_eq /
-                        (event.value.pool_below + amount.value)),
-        )
+                    (event.value.pool_below + amount.value),
+            }
+        })
         const ratioBeforeBet = computed(
             () =>
                 (side.value == "Higher" &&
@@ -99,9 +100,12 @@ export default defineComponent({
         )
 
         /** Reward */
-        const winDelta = computed(() =>
-            (amount.value * ratio.value * (1 - fee.value)).toFixed(2),
-        )
+        const winDelta = computed(() => {
+            const selectedRatio =
+                side.value == "Higher" ? ratio.value.higher : ratio.value.lower
+
+            return (amount.value * selectedRatio * (1 - fee.value)).toFixed(2)
+        })
         const reward = computed(
             () => parseFloat(winDelta.value) + parseFloat(amount.value),
         )
@@ -159,10 +163,6 @@ export default defineComponent({
             if (sendingBet.value) return "Accepting your bet.."
 
             switch (side.value) {
-                case "Liquidity":
-                    if (!amount.value) return "Type the bet amount"
-                    if (amount.value) return "Provide"
-
                 case "Higher":
                 case "Lower":
                     if (!amount.value) return "Type the bet amount"
@@ -174,72 +174,40 @@ export default defineComponent({
             if (!amount.value) return
             if (countdownStatus.value !== "In progress") return
 
-            if (side.value == "Liquidity") {
-                sendingBet.value = true
-                juster
-                    .provideLiquidity(
-                        event.value.id,
-                        new BigNumber(event.value.pool_above_eq),
-                        new BigNumber(event.value.pool_below),
-                        new BigNumber(slippage.value / 100),
-                        new BigNumber(amount.value),
-                    )
-                    .then(op => {
-                        sendingBet.value = false
+            let betType
+            if (side.value == "Higher") betType = "aboveEq"
+            if (side.value == "Lower") betType = "below"
 
-                        /** slow notification to get attention */
-                        setTimeout(() => {
-                            notificationsStore.create({
-                                notification: {
-                                    type: "success",
-                                    title: "Your liquidity has been accepted",
-                                    description:
-                                        "We need to process your bet, it will take ~30 seconds",
-                                    autoDestroy: true,
-                                },
-                            })
-                        }, 700)
+            sendingBet.value = true
+            juster
+                .bet(
+                    event.value.id,
+                    betType,
+                    BigNumber(amount.value),
+                    BigNumber(minReward.value),
+                )
+                .then(op => {
+                    console.log(`H: ${op.opHash}`)
+                    sendingBet.value = false
 
-                        context.emit("onClose")
-                    })
-                    .catch(err => console.log(err))
-            } else {
-                let betType
-                if (side.value == "Higher") betType = "aboveEq"
-                if (side.value == "Lower") betType = "below"
-                if (side.value == "Liquidity") return
+                    /** slow notification to get attention */
+                    setTimeout(() => {
+                        notificationsStore.create({
+                            notification: {
+                                type: "success",
+                                title: "Your bet has been accepted",
+                                description:
+                                    "We need to process your bet, it will take ~30 seconds",
+                                autoDestroy: true,
+                            },
+                        })
+                    }, 700)
 
-                sendingBet.value = true
-                juster
-                    .bet(
-                        event.value.id,
-                        betType,
-                        BigNumber(amount.value),
-                        BigNumber(minReward.value),
-                    )
-                    .then(op => {
-                        console.log(`H: ${op.opHash}`)
-                        sendingBet.value = false
-
-                        /** slow notification to get attention */
-                        setTimeout(() => {
-                            notificationsStore.create({
-                                notification: {
-                                    type: "success",
-                                    title: "Your bet has been accepted",
-                                    description:
-                                        "We need to process your bet, it will take ~30 seconds",
-                                    autoDestroy: true,
-                                },
-                            })
-                        }, 700)
-
-                        context.emit("onClose")
-                    })
-                    .catch(err => {
-                        sendingBet.value = false
-                    })
-            }
+                    context.emit("onClose")
+                })
+                .catch(err => {
+                    sendingBet.value = false
+                })
         }
 
         /** Login */
@@ -272,6 +240,7 @@ export default defineComponent({
         }
     },
 
+    emits: ["switch"],
     components: {
         Modal,
         Input,
@@ -281,7 +250,7 @@ export default defineComponent({
         Tooltip,
         EventPreview,
         SplittedPool,
-        SplippageSelector,
+        SlippageSelector,
     },
 })
 </script>
@@ -301,6 +270,8 @@ export default defineComponent({
                 :event="event"
                 :countdown="countdownText"
                 :status="countdownStatus"
+                type="bet"
+                @switch="$emit('switch')"
                 :class="$style.preview"
             />
 
@@ -311,13 +282,26 @@ export default defineComponent({
                     @click="selectTab('Higher')"
                     :class="[$style.tab, side == 'Higher' && $style.higher]"
                 >
-                    <Icon name="higher" size="16" />Rise
+                    <div :class="$style.tab_left">
+                        <Icon name="higher" size="16" />Rise
+                    </div>
+                    <div :class="$style.tab_ratio">
+                        <Icon name="close" size="10" />
+                        {{ (1 + ratio.higher).toFixed(2) }}
+                    </div>
                 </div>
                 <div
                     @click="selectTab('Lower')"
                     :class="[$style.tab, side == 'Lower' && $style.lower]"
                 >
-                    <Icon name="lower" size="16" />Fall
+                    <div :class="$style.tab_ratio">
+                        <Icon name="close" size="10" />
+                        {{ (1 + ratio.lower).toFixed(2) }}
+                    </div>
+
+                    <div :class="$style.tab_left">
+                        <Icon name="lower" size="16" />Fall
+                    </div>
                 </div>
             </div>
 
@@ -352,36 +336,12 @@ export default defineComponent({
                     :class="$style.pool"
                 />
 
-                <SplippageSelector
+                <SlippageSelector
                     v-model="slippage"
                     :class="$style.slippage_block"
                 />
 
                 <div :class="$style.stats">
-                    <Stat
-                        v-if="side == 'Liquidity'"
-                        name="Reward for providing"
-                    >
-                        {{ event.liquidity_percent * 100 }}%
-                    </Stat>
-
-                    <Stat v-if="ratio" name="Ratio">
-                        <Tooltip position="bottom" side="right">
-                            <div :class="$style.ratio">
-                                <Icon
-                                    name="close"
-                                    size="14"
-                                    :class="$style.ratio_icon"
-                                />{{ (1 + ratio).toFixed(2) }}
-                            </div>
-
-                            <template v-slot:content>
-                                <span>Ratio after bet:</span>
-                                {{ (1 + ratioAfterBet).toFixed(2) }}
-                            </template>
-                        </Tooltip>
-                    </Stat>
-
                     <Stat name="Reward">
                         {{ rewardText }}
                         <span>XTZ</span></Stat
@@ -468,9 +428,8 @@ export default defineComponent({
 
 .tab {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
 
     font-size: 14px;
     line-height: 1;
@@ -480,7 +439,8 @@ export default defineComponent({
     background: var(--btn-secondary-bg);
     border-radius: 8px;
     width: 100%;
-    height: 44px;
+    height: 42px;
+    padding: 14px;
 
     transition: all 0.15s ease;
 }
@@ -489,7 +449,25 @@ export default defineComponent({
     background: var(--btn-secondary-bg-hover);
 }
 
-.tab svg {
+.tab_left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tab_ratio {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    fill: var(--text-tertiary);
+}
+
+.tab_left svg {
     fill: var(--text-white);
     transition: fill 0.15s ease;
 }
@@ -499,8 +477,13 @@ export default defineComponent({
     color: var(--text-black);
 }
 
-.tab.higher svg {
+.tab.higher .tab_left svg {
     fill: var(--text-black);
+}
+
+.tab.higher .tab_ratio {
+    color: rgba(0, 0, 0, 0.6);
+    fill: rgba(0, 0, 0, 0.6);
 }
 
 .tab.lower {
@@ -508,17 +491,13 @@ export default defineComponent({
     color: var(--text-black);
 }
 
-.tab.lower svg {
+.tab.lower .tab_left svg {
     fill: var(--text-black);
 }
 
-.tab.liquidity {
-    background: var(--blue);
-    color: var(--text-black);
-}
-
-.tab.liquidity svg {
-    fill: var(--text-black);
+.tab.lower .tab_ratio {
+    color: rgba(0, 0, 0, 0.6);
+    fill: rgba(0, 0, 0, 0.6);
 }
 
 .amount_input {
