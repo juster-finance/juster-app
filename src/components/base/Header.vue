@@ -10,12 +10,12 @@ import { juster } from "@/services/tools"
 /**
  * UI
  */
+import Button from "@/components/ui/Button"
 import {
     Dropdown,
     DropdownItem,
     DropdownDivider,
 } from "@/components/ui/Dropdown"
-import Button from "@/components/ui/Button"
 import Tooltip from "@/components/ui/Tooltip"
 import TheSettingsModal from "@/components/local/modals/Settings/TheSettingsModal"
 

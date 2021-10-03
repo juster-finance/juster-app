@@ -1,11 +1,14 @@
 <script>
-import { defineComponent, onBeforeMount } from "vue"
+import { defineComponent, onBeforeMount, ref, watch } from "vue"
 
 /**
  * Base
  */
 import Header from "./components/base/Header"
 import Footer from "@/components/base/Footer"
+
+/** Local */
+import TheWelcomeScreen from "@/components/local/onboarding/TheWelcomeScreen"
 
 /**
  * UI
@@ -49,10 +52,19 @@ export default defineComponent({
         const { setupMarket, status } = useMarket()
         setupMarket()
 
-        return { status }
+        /** Onboarding */
+        const showWelcomeScreen = ref(false)
+        accountStore.$subscribe((mutation, state) => {
+            if (state.pkh && !localStorage.isOnboardingShown) {
+                localStorage.isOnboardingShown = true
+                showWelcomeScreen.value = true
+            }
+        })
+
+        return { status, showWelcomeScreen }
     },
 
-    components: { Header, Notifications, Footer },
+    components: { Header, Notifications, Footer, TheWelcomeScreen },
 })
 </script>
 
@@ -60,9 +72,18 @@ export default defineComponent({
     <div id="modal" />
     <Notifications />
 
-    <Header />
-    <router-view />
-    <Footer class="footer" />
+    <transition name="popup">
+        <TheWelcomeScreen
+            v-if="showWelcomeScreen"
+            @skip="showWelcomeScreen = false"
+        />
+
+        <div v-else>
+            <Header />
+            <router-view />
+            <Footer class="footer" />
+        </div>
+    </transition>
 </template>
 
 <style>
