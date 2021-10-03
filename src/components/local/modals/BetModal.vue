@@ -408,11 +408,6 @@ export default defineComponent({
                     size="16"
                 />{{ buttonText }}</Button
             >
-
-            <div :class="$style.hint">
-                The commission for the bet depends on the time before the start
-                of the calculation. Fee: {{ (fee * 100).toFixed(2) }}%
-            </div>
         </template>
 
         <template v-else>
@@ -568,17 +563,5 @@ export default defineComponent({
     display: flex;
     align-items: center;
     gap: 4px;
-}
-
-.hint {
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.6;
-    color: var(--text-tertiary);
-    text-align: center;
-    max-width: 330px;
-
-    margin: 0 auto;
-    margin-top: 16px;
 }
 </style>

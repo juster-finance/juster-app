@@ -1,5 +1,14 @@
 <script>
-import { defineComponent, ref, reactive, watch, nextTick } from "vue"
+import {
+    defineComponent,
+    ref,
+    reactive,
+    watch,
+    nextTick,
+    toRefs,
+    onMounted,
+    onUnmounted,
+} from "vue"
 
 /**
  * Composable
@@ -8,11 +17,20 @@ import { useOnOutsidePress } from "@/composable/onOutside"
 
 export default defineComponent({
     name: "Dropdown",
+    props: {
+        forceOpen: Boolean,
+    },
 
-    setup() {
+    setup(props) {
+        const { forceOpen } = toRefs(props)
+
         const trigger = ref(null)
         const dropdown = ref(null)
         const isOpen = ref(false)
+
+        watch(forceOpen, () => {
+            isOpen.value = forceOpen.value
+        })
 
         const toggleDropdown = event => {
             event.stopPropagation()
@@ -20,7 +38,7 @@ export default defineComponent({
             isOpen.value = !isOpen.value
         }
         const close = event => {
-            event.stopPropagation()
+            if (event) event.stopPropagation()
 
             isOpen.value = false
         }
@@ -34,7 +52,11 @@ export default defineComponent({
         watch(isOpen, () => {
             if (!isOpen.value) {
                 removeOutside()
+
+                dropdown.value.removeEventListener("keydown", onKeydown)
             } else {
+                document.addEventListener("keydown", onKeydown)
+
                 const triggerHeight = trigger.value.getBoundingClientRect()
                     .height
 
@@ -45,6 +67,10 @@ export default defineComponent({
                 })
             }
         })
+
+        const onKeydown = event => {
+            if (event.key == "Escape") close()
+        }
 
         return {
             trigger,

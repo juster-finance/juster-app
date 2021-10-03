@@ -2,9 +2,11 @@
 import {
     defineComponent,
     onMounted,
+    onBeforeUnmount,
     onUnmounted,
     toRefs,
     ref,
+    reactive,
     computed,
     watch,
 } from "vue"
@@ -66,6 +68,9 @@ export default defineComponent({
         const notificationsStore = useNotificationsStore()
         const accountStore = useAccountStore()
         const marketStore = useMarketStore()
+
+        const card = ref(null)
+        const openContextMenu = ref(false)
 
         const router = useRouter()
         const handleOpenEvent = () => {
@@ -132,10 +137,14 @@ export default defineComponent({
             }
         })
 
-        /** Join to the event */
+        /** Join to the event & Liquidity */
         const handleJoin = event => {
             event.stopPropagation()
             showBetModal.value = true
+        }
+        const handleLiquidity = event => {
+            event.stopPropagation()
+            showLiquidityModal.value = true
         }
 
         /** Withdraw */
@@ -252,7 +261,23 @@ export default defineComponent({
               <animate id="ac3" attributeType="CSS" attributeName="opacity" begin="1s;ac3.end+2s"  dur="1.5s" from="1" to="0" />`)
         }
 
+        /** Context menu */
+        const contextMenuStyles = reactive({
+            top: 0,
+            left: 0,
+        })
+        const contextMenuHandler = e => {
+            e.preventDefault()
+
+            contextMenuStyles.top = `${e.layerY}px`
+            contextMenuStyles.left = `${e.layerX}px`
+
+            openContextMenu.value = !openContextMenu.value
+        }
+
         onMounted(async () => {
+            card.value.addEventListener("contextmenu", contextMenuHandler)
+
             if (quotes.value.length) draw()
 
             /** Subscription, TODO: refactor */
@@ -301,6 +326,10 @@ export default defineComponent({
             if (quotes.value.length) draw()
         })
 
+        onBeforeUnmount(() => {
+            card.value.removeEventListener("contextmenu", contextMenuHandler)
+        })
+
         onUnmounted(() => {
             if (!subscription.value?.closed) subscription.value.unsubscribe()
 
@@ -308,6 +337,9 @@ export default defineComponent({
         })
 
         return {
+            card,
+            openContextMenu,
+            contextMenuStyles,
             showBetModal,
             showLiquidityModal,
             showParticipantsModal,
@@ -319,6 +351,7 @@ export default defineComponent({
             symbol,
             percentage,
             handleJoin,
+            handleLiquidity,
             handleWithdraw,
             copy,
         }
@@ -340,7 +373,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <div @click="handleOpenEvent" :class="$style.wrapper">
+    <div @click="handleOpenEvent" ref="card" :class="$style.wrapper">
         <BetModal
             :show="showBetModal"
             :event="event"
@@ -356,6 +389,39 @@ export default defineComponent({
             @onClose="showParticipantsModal = false"
             :event="event"
         />
+
+        <Dropdown
+            :forceOpen="openContextMenu"
+            :class="$style.dropdown"
+            :style="{ ...contextMenuStyles }"
+        >
+            <template v-slot:dropdown>
+                <router-link :to="`/events/${event.id}`">
+                    <DropdownItem
+                        ><Icon name="open" size="16" />Open Event
+                        page</DropdownItem
+                    >
+                </router-link>
+
+                <DropdownDivider />
+
+                <DropdownItem @click="showParticipantsModal = true"
+                    ><Icon name="users" size="16" />View participants
+                </DropdownItem>
+                <DropdownItem disabled
+                    ><Icon name="notifications" size="16" />Notifiy me
+                </DropdownItem>
+
+                <DropdownDivider />
+
+                <DropdownItem @click="copy('id')"
+                    ><Icon name="copy" size="16" />Copy ID
+                </DropdownItem>
+                <DropdownItem @click="copy('url')"
+                    ><Icon name="copy" size="16" />Copy URL
+                </DropdownItem>
+            </template>
+        </Dropdown>
 
         <div :class="[$style.header, !chart && $style.mg]">
             <div :class="$style.info">
@@ -489,47 +555,6 @@ export default defineComponent({
             </div>
 
             <div :class="$style.actions">
-                <Dropdown>
-                    <template v-slot:trigger>
-                        <Button type="tertiary" size="small" icon="dots" />
-                    </template>
-
-                    <template v-slot:dropdown>
-                        <router-link :to="`/events/${event.id}`">
-                            <DropdownItem
-                                ><Icon name="open" size="16" />Open Event
-                                page</DropdownItem
-                            >
-                        </router-link>
-
-                        <DropdownDivider />
-
-                        <DropdownItem
-                            @click="showLiquidityModal = true"
-                            :disabled="
-                                event.status !== 'NEW' &&
-                                    status !== 'In progress'
-                            "
-                            ><Icon name="liquidity" size="16" />Add liquidity
-                        </DropdownItem>
-                        <DropdownItem @click="showParticipantsModal = true"
-                            ><Icon name="users" size="16" />View participants
-                        </DropdownItem>
-                        <DropdownItem disabled
-                            ><Icon name="notifications" size="16" />Notifiy me
-                        </DropdownItem>
-
-                        <DropdownDivider />
-
-                        <DropdownItem @click="copy('id')"
-                            ><Icon name="copy" size="16" />Copy ID
-                        </DropdownItem>
-                        <DropdownItem @click="copy('url')"
-                            ><Icon name="copy" size="16" />Copy URL
-                        </DropdownItem>
-                    </template>
-                </Dropdown>
-
                 <Button
                     v-if="event.status == 'FINISHED' && won"
                     @click="handleWithdraw"
@@ -540,15 +565,17 @@ export default defineComponent({
                     >Withdraw</Button
                 >
 
-                <Button
+                <!-- todo: new component ButtonGroup -->
+                <div
                     v-else-if="event.status == 'NEW' && status == 'In progress'"
-                    @click="handleJoin"
-                    type="secondary"
-                    size="small"
-                    :disabled="event.total_liquidity_provided == 0"
-                    :class="$style.action"
-                    >Join</Button
+                    :class="$style.button_group"
                 >
+                    <div @click="handleJoin" :class="$style.button">Join</div>
+                    <div :class="$style.group_divider" />
+                    <div @click="handleLiquidity" :class="$style.button">
+                        <Icon name="liquidity" size="16" />
+                    </div>
+                </div>
 
                 <router-link
                     v-else-if="event.status == 'NEW' && status == 'Finished'"
@@ -609,6 +636,10 @@ export default defineComponent({
 
 .wrapper:hover {
     border: 1px solid var(--border-highlight);
+}
+
+.dropdown {
+    position: absolute;
 }
 
 .header {
@@ -686,10 +717,53 @@ export default defineComponent({
 .actions {
     position: absolute;
     top: 20px;
-    right: 24px;
+    right: 20px;
 
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+.button_group {
+    display: flex;
+    align-items: center;
+
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--btn-secondary-bg);
+    padding: 0 2px;
+
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-primary);
+
+    transition: all 0.2s ease;
+}
+
+.button_group:hover {
+    background: var(--btn-secondary-bg-hover);
+}
+
+.button_group:active {
+    transform: translateY(1px);
+}
+
+.button {
+    display: flex;
+    align-items: center;
+
+    padding: 0 10px;
+    height: 28px;
+}
+
+.button svg {
+    fill: var(--text-primary);
+}
+
+.group_divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
 }
 </style>
