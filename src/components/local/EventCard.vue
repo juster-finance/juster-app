@@ -316,6 +316,7 @@ export default defineComponent({
             timing,
             timeLeft,
             status,
+            symbol,
             percentage,
             handleJoin,
             handleWithdraw,
@@ -359,32 +360,23 @@ export default defineComponent({
         <div :class="[$style.header, !chart && $style.mg]">
             <div :class="$style.info">
                 <!-- Name -->
-                <template
-                    v-if="
-                        event.target_dynamics == 1 || event.target_dynamics == 0
-                    "
-                >
-                    <h3 v-if="event.target_dynamics == 1" :class="$style.name">
-                        The price will rise
-                    </h3>
-                    <h3 v-if="event.target_dynamics == 0" :class="$style.name">
-                        The price will fall
-                    </h3>
-                </template>
-                <template v-else>
-                    <h3 v-if="percentage > 0" :class="$style.name">
-                        The price will rise by
-                        <span :class="$style.rise"
-                            >{{ Math.abs(percentage) }}%</span
-                        >
-                    </h3>
-                    <h3 v-if="percentage < 0" :class="$style.name">
-                        The price will fall by
-                        <span :class="$style.fall"
-                            >{{ Math.abs(percentage) }}%</span
-                        >
-                    </h3>
-                </template>
+                <h3 :class="$style.name">
+                    <img
+                        v-if="symbol.split('-')[0] == 'XTZ'"
+                        src="@/assets/symbols/tz.png"
+                    />
+                    <img
+                        v-if="symbol.split('-')[0] == 'ETH'"
+                        src="@/assets/symbols/eth.png"
+                    />
+                    <img
+                        v-if="symbol.split('-')[0] == 'BTC'"
+                        src="@/assets/symbols/btc.png"
+                    />
+
+                    {{ symbol.split("-")[0] }}
+                    <span>will rise</span>
+                </h3>
 
                 <!-- Timing -->
                 <div v-if="timing.showDay" :class="$style.timing">
@@ -625,15 +617,25 @@ export default defineComponent({
 }
 
 .name {
-    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+
+    margin-bottom: 12px;
 }
 
-.name span.rise {
-    color: var(--green);
+.name img {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    opacity: 0.7;
+
+    margin-right: 10px;
 }
 
-.name span.fall {
-    color: var(--red);
+.name span {
+    color: var(--text-tertiary);
+
+    margin-left: 6px;
 }
 
 .timing {
