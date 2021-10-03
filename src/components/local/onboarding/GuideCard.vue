@@ -29,7 +29,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <router-link to="/docs" :class="$style.wrapper">
+    <router-link :to="guide.link" :class="$style.wrapper">
         <img :src="getIconByTitle()" :class="$style[guide.color]" />
 
         <div :class="$style.base">

@@ -117,8 +117,8 @@ export default defineComponent({
 
         <div :class="$style.base">
             <div :class="$style.left">
-                <router-link to="/explore"
-                    ><img src="@/assets/logo.png" :class="$style.logo"
+                <router-link to="/explore" :class="$style.logo"
+                    ><img src="@/assets/logo.png"
                 /></router-link>
 
                 <div :class="$style.links">
@@ -259,6 +259,10 @@ export default defineComponent({
 }
 
 .logo {
+    display: flex;
+}
+
+.logo img {
     cursor: pointer;
     width: 32px;
     height: 32px;

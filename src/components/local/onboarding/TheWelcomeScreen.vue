@@ -23,21 +23,25 @@ export default defineComponent({
                 type: "Basic",
                 title: "Getting Started",
                 color: "blue",
+                link: "/docs/getting-started",
             },
             {
                 type: "Basic",
                 title: "Explore Markets",
                 color: "orange",
+                link: "/docs/explore-markets",
             },
             {
                 type: "Liquidity",
                 title: "Earn as a provider",
                 color: "green",
+                link: "/docs/adding-liquidity",
             },
             {
                 type: "Betting",
                 title: "How to make a bet",
                 color: "yellow",
+                link: "/docs/how-to-bet",
             },
         ]
 

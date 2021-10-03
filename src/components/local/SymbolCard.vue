@@ -3,6 +3,16 @@ import { defineComponent, toRefs, onMounted, computed, watch, ref } from "vue"
 import * as d3 from "d3"
 
 /**
+ * UI
+ */
+import Button from "@/components/ui/Button"
+
+/**
+ * Local
+ */
+import SymbolStatus from "./SymbolStatus"
+
+/**
  * Services
  */
 import { prepareQuotesForD3 } from "@/services/utils/quotes"
@@ -205,15 +215,19 @@ export default defineComponent({
             selectedQuote,
         }
     },
+
+    components: { SymbolStatus, Button },
 })
 </script>
 
 <template>
-    <router-link :to="`/symbols/${symbol.id}`" :class="$style.wrapper">
+    <div :class="$style.wrapper">
         <div :class="$style.header">
             <div :class="$style.left">
                 <h3 :class="$style.symbol">
                     {{ symbol.symbol }}
+
+                    <SymbolStatus />
                 </h3>
                 <div :class="$style.description">
                     {{ supportedSymbols[symbol.symbol].description }}
@@ -268,9 +282,13 @@ export default defineComponent({
                 <div :class="$style.stat">Open: <span>TBA</span></div>
             </div>
 
-            <div :class="$style.timer">1m</div>
+            <router-link :to="`/symbols/${symbol.id}`">
+                <Button type="tertiary" size="small" :class="$style.action"
+                    >Open symbol</Button
+                ></router-link
+            >
         </div>
-    </router-link>
+    </div>
 </template>
 
 <style module>
@@ -280,17 +298,17 @@ export default defineComponent({
     border: 1px solid var(--border);
 
     padding: 24px 24px 20px 24px;
-
-    transition: border 0.2s ease;
-}
-
-.wrapper:hover {
-    border: 1px solid var(--border-highlight);
 }
 
 .header {
     display: flex;
     justify-content: space-between;
+}
+
+.symbol {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .description {

@@ -1,14 +1,5 @@
 <script>
-import {
-    defineComponent,
-    ref,
-    reactive,
-    watch,
-    nextTick,
-    toRefs,
-    onMounted,
-    onUnmounted,
-} from "vue"
+import { defineComponent, ref, reactive, watch, nextTick, toRefs } from "vue"
 
 /**
  * Composable
@@ -20,6 +11,7 @@ export default defineComponent({
     props: {
         forceOpen: Boolean,
     },
+    emits: ["onClose"],
 
     setup(props, context) {
         const { forceOpen } = toRefs(props)
@@ -55,7 +47,7 @@ export default defineComponent({
             if (!isOpen.value) {
                 removeOutside()
 
-                dropdown.value.removeEventListener("keydown", onKeydown)
+                document.removeEventListener("keydown", onKeydown)
             } else {
                 document.addEventListener("keydown", onKeydown)
 

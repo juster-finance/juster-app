@@ -38,6 +38,7 @@ import { useCountdown } from "@/composable/date"
 export default defineComponent({
     name: "LiquidityModal",
     props: { show: Boolean, event: Object },
+    emits: ["onClose"],
 
     setup(props, context) {
         const { event, show } = toRefs(props)
