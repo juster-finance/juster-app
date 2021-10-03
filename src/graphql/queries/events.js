@@ -31,6 +31,40 @@ export const getEventById = gql`
     }
 `
 
+export const getAllEvents = gql`
+    query getAllEvents($status: String) {
+        juster_event(
+            where: { status: { _eq: $status } }
+            order_by: { created_time: desc }
+        ) {
+            id
+            status
+            bets_close_time
+            currency_pair {
+                symbol
+            }
+            bets {
+                amount
+                side
+            }
+            pool_above_eq
+            pool_below
+            total_bets_amount
+            total_liquidity_provided
+            total_liquidity_shares
+            total_value_locked
+            liquidity_percent
+            measure_period
+            closed_oracle_time
+            created_time
+            start_rate
+            closed_rate
+            winner_bets
+            target_dynamics
+        }
+    }
+`
+
 export const getEventsBySymbol = gql`
     query getEventsBySymbol($id: Int, $status: String) {
         juster_event(

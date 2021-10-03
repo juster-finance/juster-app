@@ -32,6 +32,12 @@ const routes = [
     },
 
     {
+        path: "/events",
+        name: "Events",
+        component: () =>
+            import(/* webpackChunkName: "events" */ "@/views/EventsPage"),
+    },
+    {
         path: "/events/:id",
         name: "Event",
         component: () =>

@@ -4,11 +4,28 @@ import { apollo } from "@/apollo"
  * GQL: Queries
  */
 import {
+    getAllEvents,
     getTopEvents,
     getEventById,
     getEventsBySymbol,
     getEventParticipants,
 } from "@/graphql/queries/events"
+
+export const fetchAllEvents = async ({ status }) => {
+    try {
+        const { data } = await apollo.query({
+            query: getAllEvents,
+            variables: { status },
+        })
+
+        return data.juster_event
+    } catch (error) {
+        console.error(
+            `Error during fetching all events \n\n ${error.name}: ${error.message}`,
+        )
+        return []
+    }
+}
 
 export const fetchEventsBySymbol = async ({ id, status }) => {
     try {

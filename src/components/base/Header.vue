@@ -41,6 +41,10 @@ export default defineComponent({
                 url: "/explore",
             },
             {
+                name: "Events",
+                url: "/events",
+            },
+            {
                 name: "Symbols",
                 url: "/symbols",
             },
@@ -322,8 +326,8 @@ export default defineComponent({
     padding: 2px;
     box-sizing: content-box;
 
-    background: var(--opacity-10);
-    border-radius: 8px;
+    background: var(--opacity-05);
+    border-radius: 50px;
 
     transition: all 0.2s ease;
 }

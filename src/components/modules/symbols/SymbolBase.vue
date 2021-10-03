@@ -218,7 +218,7 @@ export default defineComponent({
                             selectedTab == 'Finished' && $style.active,
                         ]"
                     >
-                        <Icon name="check" size="12" />Finished
+                        <Icon name="checkcircle" size="12" />Finished
                     </div>
                 </div>
             </div>
