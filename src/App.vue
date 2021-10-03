@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onBeforeMount } from "vue"
+import { defineComponent, onBeforeMount, onMounted } from "vue"
 
 /**
  * Base
@@ -15,7 +15,7 @@ import Notifications from "@/components/local/Notifications"
 /**
  * Services
  */
-import { juster, tezos } from "@/services/tools"
+import { juster } from "@/services/tools"
 
 /**
  * Store
@@ -27,280 +27,296 @@ import { useAccountStore } from "@/store/account"
  */
 import { useMarket } from "@/composable/market"
 
+/**
+ * API
+ */
+import { fetchUserPositionsForWithdrawal } from "@/api/positions"
+
 export default defineComponent({
-    setup() {
-        /**
-         * Setup account
-         */
-        const accountStore = useAccountStore()
+	setup() {
+		/**
+		 * Setup account
+		 */
+		const accountStore = useAccountStore()
 
-        onBeforeMount(() => {
-            juster._provider.client.getActiveAccount().then(account => {
-                if (!account) return
+		onBeforeMount(() => {
+			juster._provider.client.getActiveAccount().then((account) => {
+				if (!account) return
 
-                accountStore.setPkh(account.address)
-                accountStore.updateBalance()
-            })
-        })
+				accountStore.setPkh(account.address)
+				accountStore.updateBalance()
+			})
+		})
 
-        /**
-         * Setup Market (Symbols & Quotes)
-         */
-        const { setupMarket, status } = useMarket()
-        setupMarket()
+		/**
+		 * Setup Market (Symbols & Quotes)
+		 */
+		const { setupMarket, status } = useMarket()
+		setupMarket()
 
-        return { status }
-    },
+		/** check for won positions */
+		onMounted(async () => {
+			const wonPositions = await fetchUserPositionsForWithdrawal({
+				address: accountStore.pkh,
+			})
 
-    components: { Header, Notifications, Footer },
+			if (wonPositions.length) {
+				accountStore.hasWonPositions = true
+			}
+		})
+
+		return { status }
+	},
+
+	components: { Header, Notifications, Footer },
 })
 </script>
 
 <template>
-    <div id="modal" />
-    <Notifications />
+	<div id="modal" />
+	<Notifications />
 
-    <Header />
-    <router-view />
-    <Footer class="footer" />
+	<Header />
+	<router-view />
+	<Footer class="footer" />
 </template>
 
 <style>
 html {
-    font-family: "Inter", sans-serif;
-    word-spacing: 1px;
-    text-rendering: optimizelegibility;
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    box-sizing: border-box;
+	font-family: "Inter", sans-serif;
+	word-spacing: 1px;
+	text-rendering: optimizelegibility;
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	box-sizing: border-box;
 
-    background: var(--app-background);
+	background: var(--app-background);
 }
 
 #app {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    overflow-y: auto;
-    overflow-x: hidden;
+	overflow-y: auto;
+	overflow-x: hidden;
 
-    height: 100vh;
+	height: 100vh;
 }
 
 :root {
-    /** Application */
-    --app-background: #1b1b1b;
+	/** Application */
+	--app-background: #1b1b1b;
 
-    /** General */
-    --blue: #457ee8;
-    --red: #e05c43;
-    --orange: #ef8456;
-    --green: #1aa168;
-    --yellow: #f5b72b;
+	/** General */
+	--blue: #457ee8;
+	--red: #e05c43;
+	--orange: #ef8456;
+	--green: #1aa168;
+	--yellow: #f5b72b;
 
-    /** Button */
-    --btn-success-bg: #1aa168;
-    --btn-success-bg-hover: #24af75;
+	/** Button */
+	--btn-success-bg: #1aa168;
+	--btn-success-bg-hover: #24af75;
 
-    --btn-primary-bg: #276ef1;
-    --btn-primary-bg-hover: #3e7ef5;
+	--btn-primary-bg: #276ef1;
+	--btn-primary-bg-hover: #3e7ef5;
 
-    --btn-secondary-bg: #252628;
-    --btn-secondary-bg-hover: #2d2f31;
+	--btn-secondary-bg: #252628;
+	--btn-secondary-bg-hover: #2d2f31;
 
-    /** Text */
-    --text-primary: rgba(255, 255, 255, 0.9);
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --text-tertiary: rgba(255, 255, 255, 0.4);
-    --text-white: rgba(255, 255, 255, 0.95);
-    --text-black: rgba(0, 0, 0, 0.9);
+	/** Text */
+	--text-primary: rgba(255, 255, 255, 0.9);
+	--text-secondary: rgba(255, 255, 255, 0.7);
+	--text-tertiary: rgba(255, 255, 255, 0.4);
+	--text-white: rgba(255, 255, 255, 0.95);
+	--text-black: rgba(0, 0, 0, 0.9);
 
-    /** Icon */
-    --icon: #bbbfc9;
-    --icon-high: #fff;
+	/** Icon */
+	--icon: #bbbfc9;
+	--icon-high: #fff;
 
-    /** Card */
-    --card-bg: #171717;
+	/** Card */
+	--card-bg: #171717;
 
-    /** Notification */
-    --notification-bg: rgba(38, 38, 38, 0.85);
+	/** Notification */
+	--notification-bg: rgba(38, 38, 38, 0.85);
 
-    /** Settings */
-    --settings-nav-bg: rgba(0, 0, 0, 0.4);
+	/** Settings */
+	--settings-nav-bg: rgba(0, 0, 0, 0.4);
 
-    /** Label */
-    --label-bg: #222222;
+	/** Label */
+	--label-bg: #222222;
 
-    /** Opacity */
-    --opacity-80: rgba(255, 255, 255, 0.8);
-    --opacity-60: rgba(255, 255, 255, 0.6);
-    --opacity-40: rgba(255, 255, 255, 0.4);
-    --opacity-20: rgba(255, 255, 255, 0.2);
-    --opacity-10: rgba(255, 255, 255, 0.1);
-    --opacity-05: rgba(255, 255, 255, 0.05);
+	/** Opacity */
+	--opacity-80: rgba(255, 255, 255, 0.8);
+	--opacity-60: rgba(255, 255, 255, 0.6);
+	--opacity-40: rgba(255, 255, 255, 0.4);
+	--opacity-20: rgba(255, 255, 255, 0.2);
+	--opacity-10: rgba(255, 255, 255, 0.1);
+	--opacity-05: rgba(255, 255, 255, 0.05);
 
-    /** Other */
-    --border: rgba(255, 255, 255, 0.1);
-    --border-highlight: rgba(255, 255, 255, 0.2);
-    --dot: rgba(255, 255, 255, 0.06);
+	/** Other */
+	--border: rgba(255, 255, 255, 0.1);
+	--border-highlight: rgba(255, 255, 255, 0.2);
+	--dot: rgba(255, 255, 255, 0.06);
 }
 
 [theme="light"] {
-    /** Application */
-    --app-background: #f6f6f6;
+	/** Application */
+	--app-background: #f6f6f6;
 
-    /** General */
-    --blue: #276ef1;
-    --red: #e05c43;
-    --orange: #ef8456;
-    --green: #1aa168;
-    --yellow: #f5b72b;
+	/** General */
+	--blue: #276ef1;
+	--red: #e05c43;
+	--orange: #ef8456;
+	--green: #1aa168;
+	--yellow: #f5b72b;
 
-    /** Button */
-    --btn-primary-bg: #276ef1;
-    --btn-primary-bg-hover: #3e7ef5;
+	/** Button */
+	--btn-primary-bg: #276ef1;
+	--btn-primary-bg-hover: #3e7ef5;
 
-    --btn-secondary-bg: #e5e7ea;
-    --btn-secondary-bg-hover: #d3d7db;
+	--btn-secondary-bg: #e5e7ea;
+	--btn-secondary-bg-hover: #d3d7db;
 
-    /** Text */
-    --text-primary: rgba(0, 0, 0, 0.9);
-    --text-secondary: rgba(0, 0, 0, 0.7);
-    --text-tertiary: rgba(0, 0, 0, 0.3);
-    --text-white: rgba(255, 255, 255, 0.95);
-    --text-black: rgba(0, 0, 0, 0.9);
+	/** Text */
+	--text-primary: rgba(0, 0, 0, 0.9);
+	--text-secondary: rgba(0, 0, 0, 0.7);
+	--text-tertiary: rgba(0, 0, 0, 0.3);
+	--text-white: rgba(255, 255, 255, 0.95);
+	--text-black: rgba(0, 0, 0, 0.9);
 
-    /** Icon */
-    --icon: #39393c;
-    --icon-high: #202020;
+	/** Icon */
+	--icon: #39393c;
+	--icon-high: #202020;
 
-    /** Card */
-    --card-bg: #ffffff;
+	/** Card */
+	--card-bg: #ffffff;
 
-    /** Notification */
-    --notification-bg: rgba(255, 255, 255, 0.9);
+	/** Notification */
+	--notification-bg: rgba(255, 255, 255, 0.9);
 
-    /** Settings */
-    --settings-nav-bg: rgba(0, 0, 0, 0.1);
+	/** Settings */
+	--settings-nav-bg: rgba(0, 0, 0, 0.1);
 
-    /** Label */
-    --label-bg: #fff;
+	/** Label */
+	--label-bg: #fff;
 
-    /** Opacity */
-    --opacity-80: rgba(0, 0, 0, 0.8);
-    --opacity-60: rgba(0, 0, 0, 0.6);
-    --opacity-40: rgba(0, 0, 0, 0.4);
-    --opacity-20: rgba(0, 0, 0, 0.2);
-    --opacity-10: rgba(0, 0, 0, 0.1);
-    --opacity-05: rgba(255, 255, 255, 0.05);
+	/** Opacity */
+	--opacity-80: rgba(0, 0, 0, 0.8);
+	--opacity-60: rgba(0, 0, 0, 0.6);
+	--opacity-40: rgba(0, 0, 0, 0.4);
+	--opacity-20: rgba(0, 0, 0, 0.2);
+	--opacity-10: rgba(0, 0, 0, 0.1);
+	--opacity-05: rgba(255, 255, 255, 0.05);
 
-    /** Other */
-    --border: rgba(0, 0, 0, 0.1);
-    --border-highlight: rgba(0, 0, 0, 0.15);
-    --dot: rgba(0, 0, 0, 0.08);
+	/** Other */
+	--border: rgba(0, 0, 0, 0.1);
+	--border-highlight: rgba(0, 0, 0, 0.15);
+	--dot: rgba(0, 0, 0, 0.08);
 }
 
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
-    margin: 0;
+	box-sizing: border-box;
+	margin: 0;
 }
 
 * {
-    touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
 }
 
 *::-webkit-scrollbar {
-    width: 3px;
+	width: 3px;
 }
 
 *::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+	box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 *::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0);
-    border-radius: 50px;
+	background-color: rgba(255, 255, 255, 0);
+	border-radius: 50px;
 }
 
 body:hover *::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
+	background-color: rgba(255, 255, 255, 0.3);
 }
 
 body {
-    overscroll-behavior-x: none;
-    overscroll-behavior-y: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    overflow: hidden;
+	overscroll-behavior-x: none;
+	overscroll-behavior-y: none;
+	user-select: none;
+	-webkit-tap-highlight-color: transparent;
+	overflow: hidden;
 }
 
 button {
-    font: inherit;
-    padding: 0;
-    border: none;
-    outline: none;
+	font: inherit;
+	padding: 0;
+	border: none;
+	outline: none;
 }
 
 input {
-    font: inherit;
-    border: none;
-    outline: none;
-    background: transparent;
+	font: inherit;
+	border: none;
+	outline: none;
+	background: transparent;
 }
 
 a {
-    color: inherit;
-    text-decoration: none;
+	color: inherit;
+	text-decoration: none;
 }
 
 a,
 button {
-    touch-action: manipulation;
+	touch-action: manipulation;
 }
 
 h1 {
-    font-size: 24px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 24px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
 }
 
 h2 {
-    font-size: 20px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 20px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
 }
 
 h3 {
-    font-size: 17px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 17px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
 }
 
 .popup-enter-active,
 .popup-leave-active {
-    transition: all 0.07s ease-out;
+	transition: all 0.07s ease-out;
 }
 
 .popup-enter-from,
 .popup-leave-active {
-    opacity: 0;
-    transform: scale(0.95);
+	opacity: 0;
+	transform: scale(0.95);
 }
 
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.35s ease;
+	transition: opacity 0.35s ease;
 }
 
 .fade-enter-from,
 .fade-leave-active {
-    opacity: 0;
+	opacity: 0;
 }
 </style>
