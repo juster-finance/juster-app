@@ -141,7 +141,7 @@ html {
 	--card-bg: #171717;
 
 	/** Notification */
-	--notification-bg: rgba(38, 38, 38, 0.85);
+	--notification-bg: rgba(32, 32, 32, 0.85);
 
 	/** Settings */
 	--settings-nav-bg: rgba(0, 0, 0, 0.4);
