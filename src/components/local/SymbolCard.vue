@@ -276,17 +276,17 @@ export default defineComponent({
         </div>
 
         <div :class="$style.bottom">
-            <div :class="$style.stats">
-                <div :class="$style.stat">High: <span>TBA</span></div>
-                <div :class="$style.stat">Low: <span>TBA</span></div>
-                <div :class="$style.stat">Open: <span>TBA</span></div>
+            <div :class="$style.actions">
+                <router-link
+                    :to="`/symbols/${symbol.id}`"
+                    :class="$style.action"
+                    >Open symbol</router-link
+                >
             </div>
 
-            <router-link :to="`/symbols/${symbol.id}`">
-                <Button type="tertiary" size="small" :class="$style.action"
-                    >Open symbol</Button
-                ></router-link
-            >
+            <div :class="$style.timeframe">
+                <Icon name="bolt" size="12" />Last 30m
+            </div>
         </div>
     </div>
 </template>
@@ -297,7 +297,7 @@ export default defineComponent({
     border-radius: 10px;
     border: 1px solid var(--border);
 
-    padding: 24px 24px 20px 24px;
+    padding: 20px;
 }
 
 .header {
@@ -387,31 +387,10 @@ export default defineComponent({
     position: relative;
 
     height: 140px;
-    margin: 12px 0;
+    margin: 12px 0 0 0;
 
     background-image: radial-gradient(var(--dot) 1.5px, transparent 0px);
     background-size: 10px 10px;
-}
-
-.bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.stats {
-    display: flex;
-    gap: 16px;
-}
-
-.stat {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-tertiary);
-}
-
-.stat span {
-    color: var(--text-secondary);
 }
 
 .timer {
@@ -426,6 +405,59 @@ export default defineComponent({
     fill: var(--opacity-20);
 }
 
+.wrapper:hover .actions {
+    opacity: 1;
+}
+
+.bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 16px;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    opacity: 0.5;
+
+    transition: opacity 0.2s ease;
+}
+
+.action {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--blue);
+    cursor: pointer;
+}
+
+.timeframe {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 4px 6px 4px 4px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+.timeframe svg {
+    fill: var(--opacity-20);
+}
+
 .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--border);
 }
 </style>
