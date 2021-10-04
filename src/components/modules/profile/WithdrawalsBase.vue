@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, reactive, onMounted, ref } from "vue"
+import { defineComponent, onMounted, ref } from "vue"
 import { useMeta } from "vue-meta"
 
 /**
@@ -78,15 +78,9 @@ export default defineComponent({
             <div :class="$style.withdrawboard">
                 <table v-if="withdrawals.length">
                     <tr>
-                        <th>
-                            withdraw
-                        </th>
-                        <th>
-                            amount
-                        </th>
-                        <th>
-                            event
-                        </th>
+                        <th>withdraw</th>
+                        <th>amount</th>
+                        <th>event</th>
                         <th>type</th>
                     </tr>
 
@@ -209,6 +203,7 @@ export default defineComponent({
 .withdrawboard {
     border-radius: 8px;
     border: 1px solid var(--border);
+    background: var(--card-bg);
 }
 
 .withdrawboard table {

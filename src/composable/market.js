@@ -21,11 +21,9 @@ import { useMarketStore } from "@/store/market"
 export const useMarket = () => {
     const marketStore = useMarketStore()
 
-    const status = ref("Initialization")
     const symbols = reactive([])
 
     const setupMarket = async () => {
-        status.value = "Fetching symbols"
         const allSymbols = await fetchSymbols()
 
         /** only available */
@@ -39,8 +37,6 @@ export const useMarket = () => {
         marketStore.isSymbolsLoaded = true
 
         /** quotes */
-        status.value = "Fetching quotes"
-
         const prevWeekDt = DateTime.now()
             .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
             .minus({ day: 7 })
@@ -93,5 +89,5 @@ export const useMarket = () => {
         })
     }
 
-    return { setupMarket, symbols }
+    return { setupMarket, symbols, status }
 }

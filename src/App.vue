@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onBeforeMount, ref, watch } from "vue"
+import { defineComponent, onBeforeMount, onMounted, ref, watch } from "vue"
 
 /**
  * Base
@@ -18,7 +18,7 @@ import Notifications from "@/components/local/Notifications"
 /**
  * Services
  */
-import { juster, tezos } from "@/services/tools"
+import { juster } from "@/services/tools"
 
 /**
  * Store
@@ -29,6 +29,11 @@ import { useAccountStore } from "@/store/account"
  * Composable
  */
 import { useMarket } from "@/composable/market"
+
+/**
+ * API
+ */
+import { fetchUserPositionsForWithdrawal } from "@/api/positions"
 
 export default defineComponent({
     setup() {
@@ -49,7 +54,7 @@ export default defineComponent({
         /**
          * Setup Market (Symbols & Quotes)
          */
-        const { setupMarket, status } = useMarket()
+        const { setupMarket } = useMarket()
         setupMarket()
 
         /** Onboarding */
@@ -61,7 +66,18 @@ export default defineComponent({
             }
         })
 
-        return { status, showWelcomeScreen }
+        /** check for won positions */
+        onMounted(async () => {
+            const wonPositions = await fetchUserPositionsForWithdrawal({
+                address: accountStore.pkh,
+            })
+
+            if (wonPositions.length) {
+                accountStore.hasWonPositions = true
+            }
+        })
+
+        return { showWelcomeScreen }
     },
 
     components: { Header, Notifications, Footer, TheWelcomeScreen },
@@ -146,7 +162,7 @@ html {
     --card-bg: #171717;
 
     /** Notification */
-    --notification-bg: rgba(38, 38, 38, 0.85);
+    --notification-bg: rgba(32, 32, 32, 0.85);
 
     /** Settings */
     --settings-nav-bg: rgba(0, 0, 0, 0.4);

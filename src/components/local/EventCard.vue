@@ -585,33 +585,6 @@ export default defineComponent({
                         <Icon name="liquidity" size="16" />
                     </div>
                 </div>
-
-                <router-link
-                    v-else-if="event.status == 'NEW' && status == 'Finished'"
-                    :to="`/events/${event.id}`"
-                >
-                    <Button type="tertiary" size="small" :class="$style.action"
-                        >View</Button
-                    ></router-link
-                >
-                <router-link
-                    v-else-if="
-                        event.status == 'STARTED' && status == 'Finished'
-                    "
-                    :to="`/events/${event.id}`"
-                >
-                    <Button type="tertiary" size="small" :class="$style.action"
-                        >View</Button
-                    ></router-link
-                >
-                <router-link
-                    v-else-if="event.status == 'FINISHED'"
-                    :to="`/events/${event.id}`"
-                >
-                    <Button type="tertiary" size="small" :class="$style.action"
-                        >View</Button
-                    ></router-link
-                >
             </div>
         </div>
 

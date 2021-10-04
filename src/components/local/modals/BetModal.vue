@@ -18,11 +18,11 @@ import SlippageSelector from "@/components/local/SlippageSelector"
 /**
  * UI
  */
+import Spin from "@/components/ui/Spin"
 import Modal from "@/components/ui/Modal"
 import Input from "@/components/ui/Input"
 import Stat from "@/components/ui/Stat"
 import Button from "@/components/ui/Button"
-import Spin from "@/components/ui/Spin"
 import Tooltip from "@/components/ui/Tooltip"
 
 /**

@@ -8,6 +8,11 @@ import { useRoute, useRouter } from "vue-router"
 import { juster } from "@/services/tools"
 
 /**
+ * Local
+ */
+import AppStatus from "@/components/local/AppStatus"
+
+/**
  * UI
  */
 import Button from "@/components/ui/Button"
@@ -94,12 +99,14 @@ export default defineComponent({
             handleLogout,
             pkh,
             showSettingsModal,
+            accountStore,
         }
     },
 
     components: {
         TheSettingsModal,
         Tooltip,
+        AppStatus,
         Button,
         Dropdown,
         DropdownItem,
@@ -133,6 +140,8 @@ export default defineComponent({
             </div>
 
             <div :class="$style.right">
+                <AppStatus :class="$style.app_status" />
+
                 <Tooltip v-if="pkh" position="left">
                     <Icon
                         name="Warning"
@@ -164,13 +173,18 @@ export default defineComponent({
 
                     <Dropdown>
                         <template v-slot:trigger>
-                            <img
-                                v-if="pkh"
-                                :src="
-                                    `https://services.tzkt.io/v1/avatars/${pkh}`
-                                "
-                                :class="$style.avatar"
-                            />
+                            <div :class="$style.avatar">
+                                <img
+                                    v-if="pkh"
+                                    :src="
+                                        `https://services.tzkt.io/v1/avatars/${pkh}`
+                                    "
+                                />
+                                <div
+                                    v-if="accountStore.hasWonPositions"
+                                    :class="$style.indicator"
+                                />
+                            </div>
                         </template>
 
                         <template v-slot:dropdown>
@@ -181,10 +195,16 @@ export default defineComponent({
                                 ></router-link
                             >
                             <router-link to="/withdrawals">
-                                <DropdownItem
-                                    ><Icon name="money" size="16" />
-                                    Withdrawals</DropdownItem
-                                >
+                                <DropdownItem>
+                                    <div :class="$style.dropdown_icon">
+                                        <Icon name="money" size="16" />
+                                        <div
+                                            v-if="accountStore.hasWonPositions"
+                                            :class="$style.dropdown_indicator"
+                                        />
+                                    </div>
+                                    Withdrawals
+                                </DropdownItem>
                             </router-link>
                             <DropdownItem disabled
                                 ><Icon name="settings" size="16" />
@@ -251,6 +271,10 @@ export default defineComponent({
 .right {
     display: flex;
     align-items: center;
+}
+
+.app_status {
+    margin-right: 40px;
 }
 
 .left {
@@ -325,6 +349,20 @@ export default defineComponent({
 }
 
 .avatar {
+    position: relative;
+}
+
+.indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+}
+
+.avatar img {
     display: flex;
     width: 28px;
     padding: 2px;
@@ -336,12 +374,27 @@ export default defineComponent({
     transition: all 0.2s ease;
 }
 
-.avatar:hover {
-    background: var(--opacity-20);
+.avatar:hover img {
+    background: var(--opacity-10);
 }
 
-.avatar:active {
+.avatar:active img {
     transform: translateY(1px);
+}
+
+.dropdown_icon {
+    position: relative;
+}
+
+.dropdown_indicator {
+    position: absolute;
+    top: 0;
+    right: 8px;
+
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--red);
 }
 
 @media (max-width: 600px) {
