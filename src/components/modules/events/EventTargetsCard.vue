@@ -18,20 +18,51 @@ export default defineComponent({
                 return "TBD"
             }
             if (event.value.status == "FINISHED") {
-                return event.winner_bets == "ABOVE_EQ" ? "Up" : "Down"
+                return event.value.winner_bets == "ABOVE_EQ" ? "Up" : "Down"
             }
         })
 
         const change = computed(() => {
             const startRate = event.value.start_rate * 100
-            const percent =
-                (100 * Math.abs(price.value.rate - startRate)) /
-                ((price.value.rate + startRate) / 2)
+            const closedRate = event.value.closed_rate * 100
 
-            return { diff: price.value.rate - startRate, percent }
+            const percent =
+                event.value.status == "FINISHED"
+                    ? (100 * Math.abs(closedRate - startRate)) /
+                      ((closedRate + startRate) / 2)
+                    : (100 * Math.abs(price.value.rate - startRate)) /
+                      ((price.value.rate + startRate) / 2)
+
+            const diff =
+                event.value.status == "FINISHED"
+                    ? closedRate - startRate
+                    : price.value.rate - startRate
+
+            return { diff, percent }
         })
 
-        return { wonSide, change }
+        const status = computed(() => {
+            if (event.value.status == "NEW") {
+                return {
+                    title: "New",
+                    description: "Accepting submissions",
+                }
+            }
+            if (event.value.status == "STARTED") {
+                return {
+                    title: "Active",
+                    description: "Bets closed, price calculation",
+                }
+            }
+            if (event.value.status == "FINISHED") {
+                return {
+                    title: "Finished",
+                    description: "The winning side is chosen",
+                }
+            }
+        })
+
+        return { wonSide, change, status }
     },
 
     components: { Spin },
@@ -103,11 +134,16 @@ export default defineComponent({
             </div>
             <div :class="$style.param">
                 <span>Difference</span>
-                <span v-if="price.rate"
-                    >{{ change.diff.toFixed(2) }} ({{
-                        change.percent.toFixed(2)
-                    }}%)</span
-                ><Spin size="16" v-else />
+                <Spin size="16" v-if="!price.rate" />
+                <span v-else-if="event.status == 'NEW'">TBD</span>
+                <span
+                    v-else
+                    :class="change.diff > 0 ? $style.green : $style.red"
+                    ><Icon name="carret" size="12" />{{
+                        Math.abs(change.diff).toFixed(2)
+                    }}
+                    ({{ change.percent.toFixed(2) }}%)</span
+                >
             </div>
             <div :class="$style.param">
                 <span>Winning side</span>
@@ -121,6 +157,25 @@ export default defineComponent({
                     {{ wonSide }}</span
                 ><Spin size="16" v-else />
             </div>
+        </div>
+
+        <div :class="$style.status">
+            <div :class="$style.status_base">
+                <Icon
+                    :name="
+                        (status.title == 'New' && 'bolt') ||
+                            (status.title == 'Active' && 'time') ||
+                            (status.title == 'Finished' && 'flag')
+                    "
+                    size="16"
+                />
+
+                <span>{{ status.title }}</span>
+                <div :class="$style.dot" />
+                <span>{{ status.description }}</span>
+            </div>
+
+            <Icon name="help" size="14" :class="$style.help_icon" />
         </div>
     </div>
 </template>
@@ -224,6 +279,7 @@ export default defineComponent({
 
 .param {
     display: flex;
+    align-items: center;
     flex-direction: column;
     gap: 10px;
 }
@@ -246,6 +302,20 @@ export default defineComponent({
     color: var(--text-primary);
 }
 
+.param span:nth-child(2).green {
+    color: var(--green);
+    fill: var(--green);
+}
+
+.param span:nth-child(2).red {
+    color: var(--red);
+    fill: var(--red);
+}
+
+.param span:nth-child(2).red svg {
+    transform: rotate(180deg);
+}
+
 .up {
     fill: var(--green);
 }
@@ -253,5 +323,54 @@ export default defineComponent({
 .down {
     transform: rotate(180deg);
     fill: var(--red);
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: var(--opacity-05);
+    height: 40px;
+    border-radius: 8px;
+    margin-top: 28px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+}
+
+.status_base {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status_base svg:nth-child(1) {
+    fill: var(--opacity-40);
+}
+
+.help_icon {
+    fill: var(--opacity-10);
+}
+
+.status_base span {
+    font-size: 13px;
+    line-height: 1.1;
+}
+
+.status_base span:nth-child(2) {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.status_base span:last-child {
+    color: var(--text-tertiary);
+    font-weight: 500;
+}
+
+.dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--border);
 }
 </style>

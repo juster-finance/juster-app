@@ -77,7 +77,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <router-link :to="`/symbols/${symbol.id}`" :class="$style.wrapper">
+    <router-link :to="`/symbols/${symbol.symbol}`" :class="$style.wrapper">
         <div :class="$style.base">
             <div :class="$style.name">
                 {{ symbol.symbol }},

@@ -49,7 +49,7 @@ export default defineComponent({
         const symbol = computed(() => {
             return Object.keys(marketStore.symbols)
                 .map(item => marketStore.symbols[item])
-                .find(item => item.id == route.params.id)
+                .find(item => item.symbol == route.params.name)
         })
         const price = computed(
             () => marketStore.symbols[symbol.value?.symbol]?.quotes[0]?.price,
@@ -83,7 +83,7 @@ export default defineComponent({
         if (symbol.value) {
             breadcrumbs.push({
                 name: symbol.value.symbol,
-                path: `/symbols/${symbol.value.id}`,
+                path: `/symbols/${symbol.value.symbol}`,
             })
 
             getEvents({ status: "NEW" })
@@ -93,7 +93,7 @@ export default defineComponent({
 
             breadcrumbs.push({
                 name: symbol.value.symbol,
-                path: `/symbols/${symbol.value.id}`,
+                path: `/symbols/${symbol.value.symbol}`,
             })
 
             getEvents({ status: "NEW" })

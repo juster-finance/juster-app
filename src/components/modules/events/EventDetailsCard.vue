@@ -22,10 +22,6 @@ export default {
                 <span>Highest ratio</span>
                 <span><Icon name="close" size="12" />{{ highestRatio }}</span>
             </div>
-            <div :class="$style.param">
-                <span>Recommendation</span>
-                <span><Icon name="higher" size="12" />Up</span>
-            </div>
         </div>
 
         <div :class="$style.params">
@@ -41,10 +37,6 @@ export default {
             <div :class="$style.param">
                 <span>Liquidity percent</span>
                 <span>{{ event.liquidity_percent * 100 }}%</span>
-            </div>
-            <div :class="$style.param">
-                <span>Total shares</span>
-                <span>{{ event.total_liquidity_shares }}</span>
             </div>
         </div>
     </div>

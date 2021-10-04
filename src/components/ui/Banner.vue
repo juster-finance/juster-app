@@ -15,7 +15,8 @@ export default defineComponent({
             :name="
                 (type == 'warning' && 'help') ||
                     (type == 'success' && 'checkcircle') ||
-                    (type == 'error' && 'close')
+                    (type == 'error' && 'close') ||
+                    (type == 'info' && 'help')
             "
             size="14"
         />
@@ -41,6 +42,12 @@ export default defineComponent({
     font-size: 12px;
     line-height: 1.6;
     font-weight: 600;
+}
+
+.wrapper.info {
+    fill: var(--text-secondary);
+    color: var(--text-secondary);
+    background: var(--opacity-10);
 }
 
 .wrapper.warning {

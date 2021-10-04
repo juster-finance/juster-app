@@ -11,6 +11,7 @@ import {
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
 import { useRouter } from "vue-router"
+import { cloneDeep } from "lodash"
 
 /**
  * UI
@@ -20,6 +21,7 @@ import Button from "@/components/ui/Button"
 import Label from "@/components/ui/Label"
 import Spin from "@/components/ui/Spin"
 import Tooltip from "@/components/ui/Tooltip"
+import Banner from "@/components/ui/Banner"
 import {
     Dropdown,
     DropdownItem,
@@ -32,11 +34,12 @@ import {
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
 import LiquidityModal from "@/components/local/modals/LiquidityModal"
 import BetModal from "@/components/local/modals/BetModal"
-import EventChartCard from "./EventChartCard"
+import EventSymbolCard from "./EventSymbolCard"
 import EventDetailsCard from "./EventDetailsCard"
 import EventPoolCard from "./EventPoolCard"
 import EventTargetsCard from "./EventTargetsCard"
-import SubmissionCard from "./SubmissionCard"
+import BetCard from "./BetCard"
+import DepositCard from "./DepositCard"
 
 /**
  * Composable
@@ -47,7 +50,8 @@ import { useCountdown } from "@/composable/date"
  * API
  */
 import { fetchEventById, fetchEventParticipants } from "@/api/events"
-import { fetchBetsByUser } from "@/api/bets"
+import { fetchDepositsByEvent } from "@/api/deposits"
+import { fetchBetsByEvent } from "@/api/bets"
 
 /**
  * Store
@@ -61,12 +65,6 @@ import { useNotificationsStore } from "@/store/notifications"
  */
 import { numberWithSymbol } from "@/services/utils/amounts"
 import { toClipboard } from "@/services/utils/global"
-
-const StatusState = {
-    NOT_STARTED: "not_started",
-    IN_PROGRESS: "in_progress",
-    COMPLETED: "completed",
-}
 
 export default defineComponent({
     name: "EventBase",
@@ -89,6 +87,19 @@ export default defineComponent({
         const showLiquidityModal = ref(false)
         const showParticipantsModal = ref(false)
 
+        const handleSwitch = () => {
+            showBetModal.value = !showBetModal.value
+            showLiquidityModal.value = !showLiquidityModal.value
+        }
+
+        const filters = reactive({
+            bets: "my",
+            liquidity: "all",
+        })
+        const handleSelectFilter = ({ target, value }) => {
+            filters[target] = value
+        }
+
         const event = ref(null)
         const getEvent = async () => {
             if (event.value) return
@@ -103,8 +114,6 @@ export default defineComponent({
             })
         }
 
-        const submissions = ref([])
-
         /** Countdown setup */
         const { status: countdownStatus, time, stop } = useCountdown(event)
 
@@ -117,6 +126,8 @@ export default defineComponent({
                 return { num: time.m, suffix: time.m > 1 ? "mins" : "min" }
             }
         })
+
+        const symbol = computed(() => event.value.currency_pair.symbol)
 
         const price = computed(() => {
             return {
@@ -140,6 +151,30 @@ export default defineComponent({
         })
 
         const participants = ref(0)
+
+        const deposits = ref([])
+        const bets = ref([])
+
+        const filteredDeposits = computed(() => {
+            if (filters.liquidity == "all") {
+                return deposits.value
+            } else {
+                return deposits.value.filter(
+                    deposit => deposit.user_id == accountStore.pkh,
+                )
+            }
+        })
+        const filteredBets = computed(() => {
+            if (filters.bets == "all") {
+                return bets.value
+            } else {
+                return bets.value.filter(bet => bet.user_id == accountStore.pkh)
+            }
+        })
+
+        const userBets = computed(() =>
+            bets.value.filter(bet => bet.user_id == accountStore.pkh),
+        )
 
         const highestRatio = computed(() => {
             const hRatio =
@@ -180,99 +215,6 @@ export default defineComponent({
             }
         })
 
-        const statuses = reactive([
-            {
-                name: "Created",
-                icon: "flag",
-                time: null,
-                state: StatusState.COMPLETED,
-            },
-            {
-                name: "Bets time",
-                icon: "bolt",
-                time: null,
-                state: StatusState.NOT_STARTED,
-            },
-            {
-                name: "Started",
-                icon: "time",
-                time: null,
-                state: StatusState.NOT_STARTED,
-            },
-            {
-                name: "Finished",
-                icon: "flag",
-                time: null,
-                state: StatusState.NOT_STARTED,
-            },
-        ])
-        const updateStatuses = () => {
-            for (let i = 0; i < statuses.length; i++) {
-                const status = statuses[i]
-
-                if (status.name == "Created") {
-                    status.time = DateTime.fromISO(
-                        event.value?.created_time,
-                    ).toLocaleString({
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                        hourCycle: "h23",
-                    })
-                }
-                if (status.name == "Bets time") {
-                    if (
-                        countdownStatus.value == "In progress" &&
-                        event.value?.status == "NEW"
-                    ) {
-                        status.state = StatusState.IN_PROGRESS
-                    } else if (countdownStatus.value == "Finished") {
-                        status.state = StatusState.COMPLETED
-                        status.time = DateTime.fromISO(
-                            event.value?.bets_close_time,
-                        ).toLocaleString({
-                            month: "short",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                            hourCycle: "h23",
-                        })
-                    }
-                }
-                if (status.name == "Started") {
-                    if (event.value?.status == "STARTED") {
-                        status.state = StatusState.IN_PROGRESS
-                    } else if (event.value?.status == "FINISHED") {
-                        status.state = StatusState.COMPLETED
-                        status.time = DateTime.fromISO(
-                            event.value?.closed_oracle_time,
-                        ).toLocaleString({
-                            month: "short",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                            hourCycle: "h23",
-                        })
-                    }
-                }
-                if (status.name == "Finished") {
-                    if (event.value?.status == "FINISHED") {
-                        status.state = StatusState.COMPLETED
-                        status.time = DateTime.fromISO(
-                            event.value?.closed_oracle_time,
-                        ).toLocaleString({
-                            month: "short",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                            hourCycle: "h23",
-                        })
-                    }
-                }
-            }
-        }
-
         const handleJoin = event => {
             event.stopPropagation()
             showBetModal.value = true
@@ -307,26 +249,29 @@ export default defineComponent({
 
         watch(event, async () => {
             await getEvent()
-            updateStatuses()
-        })
-
-        watch(countdownStatus, () => {
-            updateStatuses()
         })
 
         onMounted(async () => {
             await getEvent()
-            updateStatuses()
 
+            /** Participants */
             const eventParticipants = await fetchEventParticipants({
                 id: event.value.id,
             })
             participants.value = eventParticipants.length
 
-            submissions.value = await fetchBetsByUser({
+            /** All submissions */
+            const allDeposits = await fetchDepositsByEvent({
                 event_id: event.value.id,
-                address: accountStore.pkh,
             })
+            deposits.value = cloneDeep(allDeposits).sort(
+                (a, b) => new Date(b.created_time) - new Date(a.created_time),
+            )
+
+            const allBets = await fetchBetsByEvent({ event_id: event.value.id })
+            bets.value = cloneDeep(allBets).sort(
+                (a, b) => new Date(b.created_time) - new Date(a.created_time),
+            )
         })
 
         onUnmounted(() => {
@@ -345,20 +290,28 @@ export default defineComponent({
             marketStore,
             accountStore,
             event,
-            submissions,
+            handleSelectFilter,
+            filters,
+            deposits,
+            bets,
+            filteredDeposits,
+            filteredBets,
+            userBets,
             timeLeft,
             price,
+            symbol,
             participants,
+            deposits,
+            bets,
             highestRatio,
             percentage,
             countdownStatus,
             day,
             period,
-            statuses,
-            StatusState,
             showBetModal,
             showLiquidityModal,
             showParticipantsModal,
+            handleSwitch,
             handleJoin,
             copy,
         }
@@ -368,6 +321,7 @@ export default defineComponent({
         Breadcrumbs,
         Button,
         Label,
+        Banner,
         Spin,
         Tooltip,
         Dropdown,
@@ -376,8 +330,9 @@ export default defineComponent({
         ParticipantsModal,
         LiquidityModal,
         BetModal,
-        EventChartCard,
-        SubmissionCard,
+        EventSymbolCard,
+        BetCard,
+        DepositCard,
         EventDetailsCard,
         EventPoolCard,
         EventTargetsCard,
@@ -397,12 +352,14 @@ export default defineComponent({
             v-if="event"
             :show="showBetModal"
             :event="event"
+            @switch="handleSwitch"
             @onClose="showBetModal = false"
         />
         <LiquidityModal
             v-if="event"
             :show="showLiquidityModal"
             :event="event"
+            @switch="handleSwitch"
             @onClose="showLiquidityModal = false"
         />
         <ParticipantsModal
@@ -420,39 +377,23 @@ export default defineComponent({
                     <div :class="$style.header">
                         <div :class="$style.info">
                             <!-- Name -->
-                            <template
-                                v-if="
-                                    event.target_dynamics == 1 ||
-                                        event.target_dynamics == 0
-                                "
-                            >
-                                <h3
-                                    v-if="event.target_dynamics == 1"
-                                    :class="$style.name"
-                                >
-                                    The price will rise
-                                </h3>
-                                <h3
-                                    v-if="event.target_dynamics == 0"
-                                    :class="$style.name"
-                                >
-                                    The price will fall
-                                </h3>
-                            </template>
-                            <template v-else>
-                                <h3 v-if="percentage > 0" :class="$style.name">
-                                    The price will rise by
-                                    <span :class="$style.rise"
-                                        >{{ Math.abs(percentage) }}%</span
-                                    >
-                                </h3>
-                                <h3 v-if="percentage < 0" :class="$style.name">
-                                    The price will fall by
-                                    <span :class="$style.fall"
-                                        >{{ Math.abs(percentage) }}%</span
-                                    >
-                                </h3>
-                            </template>
+                            <h3 :class="$style.name">
+                                <img
+                                    v-if="symbol.split('-')[0] == 'XTZ'"
+                                    src="@/assets/symbols/tz.png"
+                                />
+                                <img
+                                    v-if="symbol.split('-')[0] == 'ETH'"
+                                    src="@/assets/symbols/eth.png"
+                                />
+                                <img
+                                    v-if="symbol.split('-')[0] == 'BTC'"
+                                    src="@/assets/symbols/btc.png"
+                                />
+
+                                {{ symbol.split("-")[0] }}
+                                <span>will rise</span>
+                            </h3>
 
                             <!-- Timing -->
                             <div :class="$style.timing">
@@ -534,16 +475,6 @@ export default defineComponent({
                                 </Tooltip>
 
                                 <Tooltip position="bottom" side="left">
-                                    <Label icon="money" color="yellow">{{
-                                        event.currency_pair.symbol
-                                    }}</Label>
-
-                                    <template v-slot:content>
-                                        Currency pair for which the event took
-                                        place
-                                    </template>
-                                </Tooltip>
-                                <Tooltip position="bottom" side="left">
                                     <Label icon="money" color="green"
                                         ><span>{{
                                             event.total_value_locked
@@ -556,7 +487,7 @@ export default defineComponent({
                                     </template>
                                 </Tooltip>
                                 <Tooltip position="bottom" side="left">
-                                    <Label icon="money" color="yellow"
+                                    <Label icon="time" color="yellow"
                                         >Duration&nbsp;
                                         <span>{{
                                             event.measure_period / 3600
@@ -596,16 +527,6 @@ export default defineComponent({
                                     <DropdownDivider />
 
                                     <DropdownItem
-                                        @click="showLiquidityModal = true"
-                                        :disabled="
-                                            event.status !== 'NEW' &&
-                                                countdownStatus !==
-                                                    'In progress'
-                                        "
-                                        ><Icon name="liquidity" size="16" />Add
-                                        liquidity
-                                    </DropdownItem>
-                                    <DropdownItem
                                         @click="showParticipantsModal = true"
                                         ><Icon name="users" size="16" />View
                                         participants
@@ -638,107 +559,102 @@ export default defineComponent({
                                 >Withdraw</Button
                             >
 
-                            <Button
+                            <template
                                 v-else-if="
                                     event.status == 'NEW' &&
                                         countdownStatus == 'In progress'
                                 "
-                                @click="handleJoin"
-                                type="secondary"
-                                size="small"
-                                :disabled="event.total_liquidity_provided == 0"
-                                :class="$style.action"
-                                >Join</Button
                             >
-                        </div>
-                    </div>
-                </div>
-
-                <div :class="$style.statuses">
-                    <div
-                        v-for="(status, index) in statuses"
-                        :key="index"
-                        :class="[
-                            $style.status,
-                            status.state == StatusState.NOT_STARTED &&
-                                $style.opacity,
-                        ]"
-                    >
-                        <div :class="$style.status_icon">
-                            <Icon
-                                v-if="status.state !== StatusState.IN_PROGRESS"
-                                :name="status.icon"
-                                size="14"
-                            />
-                            <Spin v-else size="16" />
-                        </div>
-
-                        <div :class="$style.status_base">
-                            <div :class="$style.status_name">
-                                {{ status.name }}
-                            </div>
-
-                            <div
-                                v-if="status.state == StatusState.COMPLETED"
-                                :class="$style.status_time"
-                            >
-                                {{ status.time }}
-                            </div>
-                            <div
-                                v-else-if="
-                                    status.state == StatusState.IN_PROGRESS
-                                "
-                                :class="$style.status_time"
-                            >
-                                In progress
-                            </div>
-                            <div
-                                v-else-if="
-                                    status.state == StatusState.NOT_STARTED
-                                "
-                                :class="$style.status_time"
-                            >
-                                Not started
-                            </div>
-                        </div>
-
-                        <div
-                            v-if="index !== statuses.length - 1"
-                            :class="$style.dots"
-                        >
-                            <div :class="$style.dot" />
-                            <div :class="$style.dot" />
-                            <div :class="$style.dot" />
+                                <Button
+                                    @click="showLiquidityModal = true"
+                                    type="secondary"
+                                    size="small"
+                                    :disabled="
+                                        event.total_liquidity_provided == 0
+                                    "
+                                    :class="$style.action"
+                                    ><Icon name="liquidity" size="16" />Provide
+                                    liquidity</Button
+                                >
+                                <Button
+                                    @click="handleJoin"
+                                    type="primary"
+                                    size="small"
+                                    :disabled="
+                                        event.total_liquidity_provided == 0
+                                    "
+                                    :class="$style.action"
+                                    >Make a bet</Button
+                                >
+                            </template>
                         </div>
                     </div>
                 </div>
 
                 <div :class="$style.block">
-                    <div :class="$style.title">My submissions</div>
+                    <div :class="$style.title">Bets</div>
                     <div :class="$style.description">
-                        List of your bets & liquidity for the event
+                        All bets for all users and with filtering only your
+                        claims
                     </div>
 
-                    <div v-if="submissions.length" :class="$style.submissions">
-                        <SubmissionCard
-                            v-for="submission in submissions"
-                            :key="submission.id"
-                            :submission="submission"
+                    <div :class="$style.filters">
+                        <div
+                            @click="
+                                handleSelectFilter({
+                                    target: 'bets',
+                                    value: 'my',
+                                })
+                            "
+                            :class="[
+                                $style.filter,
+                                filters.bets == 'my' && $style.active,
+                            ]"
+                        >
+                            My bets
+                        </div>
+                        <div :class="$style.dot" />
+                        <div
+                            @click="
+                                handleSelectFilter({
+                                    target: 'bets',
+                                    value: 'all',
+                                })
+                            "
+                            :class="[
+                                $style.filter,
+                                filters.bets == 'all' && $style.active,
+                            ]"
+                        >
+                            All bets
+                        </div>
+                    </div>
+
+                    <!-- todo: new component BetsTable -->
+                    <div v-if="filteredBets.length" :class="$style.bets_head">
+                        <span>TYPE</span>
+                        <span>SIDE</span>
+                        <span>AMOUNT</span>
+                        <span>REWARD</span>
+                    </div>
+                    <div v-if="filteredBets.length" :class="$style.bets">
+                        <BetCard
+                            v-for="bet in filteredBets"
+                            :key="bet.id"
+                            :bet="bet"
                         />
                     </div>
-                    <div v-else-if="accountStore.pkh" :class="$style.empty">
-                        <Icon name="help" size="16" /> You do not have any
-                        submissions for this event
-                    </div>
-                    <div v-else :class="$style.empty">
-                        <Icon name="help" size="16" /> Login to see your
-                        submissions for this event
-                    </div>
+                    <Banner v-else type="info">{{
+                        filters.bets == "all"
+                            ? `There are no bets for this event yet. Make your first
+                        bet and get a profitable ratio`
+                            : `You have not placed any bets for this event. If you have done, but do not see it - wait for the transaction confirmation`
+                    }}</Banner>
 
-                    <div v-if="submissions.length" :class="$style.params">
+                    <div v-if="userBets.length" :class="$style.params">
                         <div :class="$style.param">
-                            Total submissions:
-                            <span>{{ submissions.length }}</span>
+                            Total bets:
+                            <span>{{ userBets.length }}</span>
                         </div>
 
                         <div :class="$style.dot" />
@@ -746,7 +662,7 @@ export default defineComponent({
                         <div :class="$style.param">
                             Summary:
                             <span>{{
-                                submissions
+                                userBets
                                     .reduce(
                                         (acc, { amount }) => acc + amount,
                                         0,
@@ -761,7 +677,7 @@ export default defineComponent({
                         <div :class="[$style.param, $style.green]">
                             Potential reward:
                             <span>{{
-                                submissions
+                                bets
                                     .reduce(
                                         (acc, { reward }) => acc + reward,
                                         0,
@@ -774,25 +690,77 @@ export default defineComponent({
                 </div>
 
                 <div :class="$style.block">
-                    <div :class="$style.title">Discussions</div>
+                    <div :class="$style.title">Liquidity</div>
                     <div :class="$style.description">
-                        Discuss this event with other users
+                        All liquidity for all users and with filtering only your
+                        claims
                     </div>
 
-                    <div :class="$style.empty">
-                        <Icon name="help" size="16" /> Currently unavailable
+                    <div :class="$style.filters">
+                        <div
+                            @click="
+                                handleSelectFilter({
+                                    target: 'liquidity',
+                                    value: 'my',
+                                })
+                            "
+                            :class="[
+                                $style.filter,
+                                filters.liquidity == 'my' && $style.active,
+                            ]"
+                        >
+                            My liquidity
+                        </div>
+                        <div :class="$style.dot" />
+                        <div
+                            @click="
+                                handleSelectFilter({
+                                    target: 'liquidity',
+                                    value: 'all',
+                                })
+                            "
+                            :class="[
+                                $style.filter,
+                                filters.liquidity == 'all' && $style.active,
+                            ]"
+                        >
+                            All liquidity
+                        </div>
                     </div>
+
+                    <div
+                        v-if="filteredDeposits.length"
+                        :class="$style.bets_head"
+                    >
+                        <span>TYPE</span>
+                        <span>ABOVE</span>
+                        <span>BELOW</span>
+                        <span>SHARES</span>
+                    </div>
+                    <div v-if="filteredDeposits.length" :class="$style.bets">
+                        <DepositCard
+                            v-for="deposit in filteredDeposits"
+                            :key="deposit.id"
+                            :deposit="deposit"
+                        />
+                    </div>
+                    <Banner v-else type="info">{{
+                        filters.liquidity == "all"
+                            ? `This event has not yet received initial liquidity. You
+                        need to wait a couple of minutes`
+                            : `You did not provide liquidity for this event. Provide and earn as a provider`
+                    }}</Banner>
                 </div>
             </div>
 
             <div v-if="event" :class="$style.side">
                 <EventTargetsCard :event="event" :price="price" />
 
-                <!-- <EventChartCard
+                <EventSymbolCard
                     v-if="event && price.integer"
                     :event="event"
                     :price="price"
-                /> -->
+                />
 
                 <EventPoolCard :event="event" />
 
@@ -806,7 +774,7 @@ export default defineComponent({
                     <Button type="tertiary" size="small" disabled
                         ><Icon name="flag" size="16" />Report this event</Button
                     >
-                    <router-link to="/docs">
+                    <router-link to="/docs/how-to-bet">
                         <Button type="tertiary" size="small"
                             ><Icon name="book" size="16" /><span
                                 >Read how to</span
@@ -848,7 +816,7 @@ export default defineComponent({
     background: var(--card-bg);
     border-radius: 8px;
     border: 1px solid var(--border);
-    padding: 24px 0 24px 0;
+    padding: 20px 0 20px 0;
     flex: 1;
 }
 
@@ -857,7 +825,7 @@ export default defineComponent({
     justify-content: space-between;
     align-items: flex-start;
 
-    padding: 0 24px;
+    padding: 0 20px;
 }
 
 .info {
@@ -866,15 +834,25 @@ export default defineComponent({
 }
 
 .name {
-    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+
+    margin-bottom: 12px;
 }
 
-.name span.rise {
-    color: var(--green);
+.name img {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    opacity: 0.7;
+
+    margin-right: 10px;
 }
 
-.name span.fall {
-    color: var(--red);
+.name span {
+    color: var(--text-tertiary);
+
+    margin-left: 6px;
 }
 
 .timing {
@@ -908,82 +886,10 @@ export default defineComponent({
     gap: 6px;
 }
 
-.statuses {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-
-    border-radius: 8px;
-    height: 60px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-
-    margin-top: 8px;
-    margin-bottom: 40px;
-}
-
-.dots {
-    display: flex;
-    gap: 8px;
-
-    margin-left: 24px;
-}
-
-.dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--opacity-20);
-}
-
-.status {
-    display: flex;
-    align-items: center;
-
-    transition: opacity 0.2s ease;
-}
-
-.status.opacity {
-    opacity: 0.5;
-}
-
-.status_icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 24px;
-    height: 24px;
-    box-sizing: content-box;
-    border-radius: 50%;
-    background: var(--opacity-10);
-    fill: var(--icon);
-    margin-right: 12px;
-}
-
-.status_base {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.status_name {
-    font-size: 13px;
-    line-height: 1.1;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.status_time {
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-tertiary);
-}
-
 .block {
-    margin-bottom: 40px;
+    position: relative;
+
+    margin-top: 40px;
 }
 
 .block .title {
@@ -1015,7 +921,38 @@ export default defineComponent({
     fill: var(--text-tertiary);
 }
 
-.submissions {
+.bets_head {
+    display: flex;
+    align-items: center;
+
+    padding: 0 16px;
+    margin-bottom: 8px;
+}
+
+.bets_head span {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--text-tertiary);
+}
+
+.bets_head span:nth-child(1) {
+    flex: 2;
+}
+
+.bets_head span:nth-child(2) {
+    flex: 1;
+}
+
+.bets_head span:nth-child(3) {
+    flex: 1;
+}
+
+.bets_head span:nth-child(4) {
+    flex: 1;
+}
+
+.bets {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -1030,7 +967,7 @@ export default defineComponent({
 }
 
 .param {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1;
     font-weight: 600;
     color: var(--text-tertiary);
@@ -1047,5 +984,55 @@ export default defineComponent({
 .additional_buttons {
     display: flex;
     justify-content: space-between;
+}
+
+.filters {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    width: max-content;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--btn-secondary-bg);
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+    height: 32px;
+    padding: 0 12px;
+}
+
+.filters .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--opacity-10);
+}
+
+.filter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    fill: var(--text-tertiary);
+
+    transition: all 0.2s ease;
+}
+
+.filter:hover {
+    fill: var(--text-primary);
+    color: var(--text-primary);
+}
+
+.filter.active {
+    fill: var(--blue);
+    color: var(--text-primary);
 }
 </style>

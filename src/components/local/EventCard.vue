@@ -60,7 +60,6 @@ export default defineComponent({
         event: Object,
         chart: Boolean,
         won: Boolean,
-        showSymbol: Boolean,
     },
 
     setup(props) {
@@ -196,71 +195,6 @@ export default defineComponent({
             }
         }
 
-        /** Chart */
-        const draw = () => {
-            const margin = { top: 20, right: 20, bottom: 20, left: 0 },
-                width = 500 - margin.left - margin.right,
-                height = 140 - margin.top - margin.bottom
-
-            d3.select(`#chart_${event.value.id} > *`).remove()
-
-            const svg = d3
-                .select(`#chart_${event.value.id}`)
-                .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-                .append("g")
-                .attr("transform", `translate(${margin.left},${margin.top})`)
-
-            const data = prepareQuotesForD3({ quotes: quotes.value })
-
-            const x = d3
-                .scaleTime()
-                .domain(d3.extent(data, d => d.date))
-                .range([0, width])
-
-            const y = d3
-                .scaleLinear()
-                .domain([
-                    d3.min(data, d => +d.value),
-                    d3.max(data, d => +d.value),
-                ])
-                .range([height, 0])
-
-            svg.append("path")
-                .datum(data)
-                .attr("fill", "none")
-                .attr("stroke", "#1aa168")
-                .attr("stroke-width", 1.5)
-                .attr(
-                    "d",
-                    d3
-                        .line()
-                        .x(d => x(d.date))
-                        .y(d => y(d.value)),
-                )
-
-            svg.append("circle")
-                .attr("cx", x(data[data.length - 1].date))
-                .attr("cy", y(data[data.length - 1].value))
-                .attr("r", 2)
-                .attr("fill", "#fff")
-
-            /** animated circle */
-            svg.append("circle")
-                .attr("id", "animated_circle")
-                .attr("cx", x(data[data.length - 1].date))
-                .attr("cy", y(data[data.length - 1].value))
-                .attr("fill", "rgba(255,255,255,0.07)")
-                .attr("stroke", "rgba(255,255,255, 0.5)")
-                .attr("stroke-width", "2px")
-
-            svg.select("#animated_circle")
-                .html(`<animate id="ac1" attributeType="SVG" attributeName="r" begin="1s;ac1.end+2s" dur="1.5s" from="1%" to="10%" />
-              <animate id="ac2" attributeType="CSS" attributeName="stroke-width" begin="1s;ac2.end+2s"  dur="1.5s" from="2px" to="0px" />
-              <animate id="ac3" attributeType="CSS" attributeName="opacity" begin="1s;ac3.end+2s"  dur="1.5s" from="1" to="0" />`)
-        }
-
         /** Context menu */
         const contextMenuStyles = reactive({
             top: 0,
@@ -282,8 +216,6 @@ export default defineComponent({
 
         onMounted(async () => {
             card.value.addEventListener("contextmenu", contextMenuHandler)
-
-            if (quotes.value.length) draw()
 
             /** Subscription, TODO: refactor */
 
@@ -325,10 +257,6 @@ export default defineComponent({
                     },
                     error: console.error,
                 })
-        })
-
-        watch(quotes, () => {
-            if (quotes.value.length) draw()
         })
 
         onBeforeUnmount(() => {
@@ -434,37 +362,72 @@ export default defineComponent({
 
         <div :class="[$style.header, !chart && $style.mg]">
             <div :class="$style.info">
-                <!-- Name -->
-                <h3 :class="$style.name">
-                    <img
-                        v-if="symbol.split('-')[0] == 'XTZ'"
-                        src="@/assets/symbols/tz.png"
-                    />
-                    <img
-                        v-if="symbol.split('-')[0] == 'ETH'"
-                        src="@/assets/symbols/eth.png"
-                    />
-                    <img
-                        v-if="symbol.split('-')[0] == 'BTC'"
-                        src="@/assets/symbols/btc.png"
-                    />
+                <div :class="$style.top">
+                    <div :class="$style.top_left">
+                        <!-- Name -->
+                        <h3 :class="$style.name">
+                            <img
+                                v-if="symbol.split('-')[0] == 'XTZ'"
+                                src="@/assets/symbols/tz.png"
+                            />
+                            <img
+                                v-if="symbol.split('-')[0] == 'ETH'"
+                                src="@/assets/symbols/eth.png"
+                            />
+                            <img
+                                v-if="symbol.split('-')[0] == 'BTC'"
+                                src="@/assets/symbols/btc.png"
+                            />
 
-                    {{ symbol.split("-")[0] }}
-                    <span>will rise</span>
-                </h3>
+                            {{ symbol.split("-")[0] }}
+                            <span>will rise</span>
+                        </h3>
 
-                <!-- Timing -->
-                <div v-if="timing.showDay" :class="$style.timing">
-                    <span>{{ timing.start.time }}</span> ({{
-                        timing.start.day
-                    }}) -> <span>{{ timing.end.time }}</span> ({{
-                        timing.end.day
-                    }})
-                </div>
-                <div v-else :class="$style.timing">
-                    {{ timing.start.day }}
-                    <span>{{ timing.start.time }}</span> ->
-                    <span>{{ timing.end.time }}</span>
+                        <!-- Timing -->
+                        <div v-if="timing.showDay" :class="$style.timing">
+                            <span>{{ timing.start.time }}</span> ({{
+                                timing.start.day
+                            }}) -> <span>{{ timing.end.time }}</span> ({{
+                                timing.end.day
+                            }})
+                        </div>
+                        <div v-else :class="$style.timing">
+                            {{ timing.start.day }}
+                            <span>{{ timing.start.time }}</span> ->
+                            <span>{{ timing.end.time }}</span>
+                        </div>
+                    </div>
+
+                    <div :class="$style.actions">
+                        <Button
+                            v-if="event.status == 'FINISHED' && won"
+                            @click="handleWithdraw"
+                            type="success"
+                            size="small"
+                            :disabled="event.total_liquidity_provided == 0"
+                            :class="$style.action"
+                            >Withdraw</Button
+                        >
+
+                        <!-- todo: new component ButtonGroup -->
+                        <div
+                            v-else-if="
+                                event.status == 'NEW' && status == 'In progress'
+                            "
+                            :class="$style.button_group"
+                        >
+                            <div @click="handleJoin" :class="$style.button">
+                                Join
+                            </div>
+                            <div :class="$style.group_divider" />
+                            <div
+                                @click="handleLiquidity"
+                                :class="$style.button"
+                            >
+                                <Icon name="liquidity" size="16" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- labels -->
@@ -531,15 +494,6 @@ export default defineComponent({
                         </template>
                     </Tooltip>
 
-                    <Tooltip v-if="showSymbol" position="bottom" side="left">
-                        <Label icon="money" color="yellow">{{
-                            event.currency_pair.symbol
-                        }}</Label>
-
-                        <template v-slot:content>
-                            Currency pair for which the event took place
-                        </template>
-                    </Tooltip>
                     <Tooltip position="bottom" side="left">
                         <Label icon="money" color="green"
                             ><span>{{ event.total_value_locked }}</span
@@ -562,41 +516,7 @@ export default defineComponent({
                     </Tooltip>
                 </div>
             </div>
-
-            <div :class="$style.actions">
-                <Button
-                    v-if="event.status == 'FINISHED' && won"
-                    @click="handleWithdraw"
-                    type="success"
-                    size="small"
-                    :disabled="event.total_liquidity_provided == 0"
-                    :class="$style.action"
-                    >Withdraw</Button
-                >
-
-                <!-- todo: new component ButtonGroup -->
-                <div
-                    v-else-if="event.status == 'NEW' && status == 'In progress'"
-                    :class="$style.button_group"
-                >
-                    <div @click="handleJoin" :class="$style.button">Join</div>
-                    <div :class="$style.group_divider" />
-                    <div @click="handleLiquidity" :class="$style.button">
-                        <Icon name="liquidity" size="16" />
-                    </div>
-                </div>
-            </div>
         </div>
-
-        <div v-if="chart" :class="$style.chart">
-            <div
-                :id="`chart_${event.id}`"
-                @mousemove="onMouseMove"
-                @mouseleave="onMouseLeave"
-            />
-        </div>
-
-        <div v-if="chart" :class="$style.divider" />
 
         <Pool :event="event" :class="$style.pool" />
     </div>
@@ -611,11 +531,15 @@ export default defineComponent({
 
     padding: 20px;
 
-    transition: border 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .wrapper:hover {
     border: 1px solid var(--border-highlight);
+}
+
+.wrapper:active {
+    transform: translateY(1px);
 }
 
 .dropdown {
@@ -623,16 +547,30 @@ export default defineComponent({
 }
 
 .header {
+    width: 100%;
     display: flex;
     align-items: flex-start;
+}
+
+.info {
+    width: 100%;
+}
+
+.top {
+    display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+}
+
+.top_left {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .name {
     display: flex;
     align-items: center;
-
-    margin-bottom: 12px;
 }
 
 .name img {
@@ -667,28 +605,6 @@ export default defineComponent({
 .labels {
     display: flex;
     gap: 6px;
-}
-
-.chart {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    overflow: hidden;
-
-    position: relative;
-
-    height: 140px;
-    margin: 20px 24px 16px 24px;
-
-    background-image: radial-gradient(var(--dot) 1.5px, transparent 0px);
-    background-size: 10px 10px;
-}
-
-.divider {
-    width: 100%;
-    height: 1px;
-    background: var(--border);
 }
 
 .pool {

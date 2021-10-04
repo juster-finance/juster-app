@@ -1,6 +1,6 @@
 <script>
 import { defineComponent, onMounted, ref } from "vue"
-import { useRouter } from "vue-router"
+import { useRouter, useRoute } from "vue-router"
 import Markdown from "markdown-it"
 
 /**
@@ -18,6 +18,7 @@ export default defineComponent({
 
     setup() {
         const router = useRouter()
+        const route = useRoute()
 
         const docsStore = useDocsStore()
 
@@ -29,26 +30,56 @@ export default defineComponent({
             const allSections = await fetchSections()
             const articles = await fetchArticles()
 
-            /** Sections */
-            allSections
-                .sort((a, b) => a.position - b.position)
-                .forEach(section => {
-                    if (!docsStore.sections[section.title]) {
-                        docsStore.sections[section.title] = []
-                    }
+            if (docsStore.article.title) {
+                let articleBySlug
+
+                Object.keys(docsStore.sections).forEach(section => {
+                    docsStore.sections[section].forEach(article => {
+                        if (article.slug.current == route.params.slug) {
+                            articleBySlug = article
+                        }
+                    })
                 })
 
-            /** Sort articles */
-            articles
-                .sort((a, b) => a.position - b.position)
-                .forEach(article => {
-                    if (docsStore.sections[article.section.title]) {
-                        docsStore.sections[article.section.title].push(article)
-                    }
-                })
+                selectArticle(articleBySlug)
+            } else {
+                /** Sections */
+                allSections
+                    .sort((a, b) => a.position - b.position)
+                    .forEach(section => {
+                        if (!docsStore.sections[section.title]) {
+                            docsStore.sections[section.title] = []
+                        }
+                    })
 
-            /** pre-selected article */
-            selectArticle(docsStore.sections[allSections[0].title][0])
+                /** Sort articles */
+                articles
+                    .sort((a, b) => a.position - b.position)
+                    .forEach(article => {
+                        if (docsStore.sections[article.section.title]) {
+                            docsStore.sections[article.section.title].push(
+                                article,
+                            )
+                        }
+                    })
+
+                /** pre-selected article */
+                if (route.params.slug) {
+                    let articleBySlug
+
+                    Object.keys(docsStore.sections).forEach(section => {
+                        docsStore.sections[section].forEach(article => {
+                            if (article.slug.current == route.params.slug) {
+                                articleBySlug = article
+                            }
+                        })
+                    })
+
+                    selectArticle(articleBySlug)
+                } else {
+                    selectArticle(docsStore.sections[allSections[0].title][0])
+                }
+            }
         })
 
         const selectArticle = article => {

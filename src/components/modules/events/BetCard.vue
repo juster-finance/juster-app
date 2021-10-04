@@ -1,18 +1,26 @@
 <script>
 import { computed, defineComponent, toRefs } from "vue"
+import { DateTime } from "luxon"
+
+/**
+ * Store
+ */
+import { useAccountStore } from "@/store/account"
 
 export default defineComponent({
-    name: "SubmissionCard",
-    props: { submission: Object },
+    name: "BetCard",
+    props: { bet: Object },
 
     setup(props) {
-        const { submission } = toRefs(props)
+        const { bet } = toRefs(props)
+
+        const accountStore = useAccountStore()
 
         const side = computed(() =>
-            submission.value.side == "ABOVE_EQ" ? "Up" : "Down",
+            bet.value.side == "ABOVE_EQ" ? "Up" : "Down",
         )
 
-        return { side }
+        return { side, DateTime, pkh: accountStore.pkh }
     },
 })
 </script>
@@ -22,11 +30,26 @@ export default defineComponent({
         <div :class="$style.base">
             <div :class="$style.icon">
                 <Icon name="bet" size="16" />
+
+                <router-link
+                    :to="`/profile/${bet.user_id}`"
+                    :class="$style.user_avatar"
+                >
+                    <img
+                        :src="
+                            `https://services.tzkt.io/v1/avatars/${bet.user_id}`
+                        "
+                    />
+                </router-link>
             </div>
 
             <div :class="$style.info">
-                <div :class="$style.title">Bid</div>
-                <div :class="$style.time">3 min ago</div>
+                <div :class="$style.title">
+                    {{ pkh == bet.user_id ? "My" : "" }} Bet
+                </div>
+                <div :class="$style.time">
+                    {{ DateTime.fromISO(bet.created_time).toRelative() }}
+                </div>
             </div>
         </div>
 
@@ -34,12 +57,10 @@ export default defineComponent({
             <Icon name="higher" size="12" />{{ side }}
         </div>
 
-        <div :class="$style.param">
-            {{ submission.amount }}&nbsp;<span>XTZ</span>
-        </div>
+        <div :class="$style.param">{{ bet.amount }}&nbsp;<span>XTZ</span></div>
 
         <div :class="$style.param">
-            {{ submission.reward.toFixed(2) }}&nbsp;<span>XTZ</span>
+            {{ bet.reward.toFixed(2) }}&nbsp;<span>XTZ</span>
         </div>
     </div>
 </template>
@@ -69,17 +90,30 @@ export default defineComponent({
 }
 
 .icon {
+    position: relative;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: 8px;
     background: var(--opacity-10);
     fill: var(--icon);
 
     margin-right: 16px;
+}
+
+.user_avatar img {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+
+    width: 20px;
+    height: 20px;
+    background: var(--card-bg);
+    border-radius: 50%;
 }
 
 .info {

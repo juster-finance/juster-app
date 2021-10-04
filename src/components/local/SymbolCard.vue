@@ -15,8 +15,8 @@ import SymbolStatus from "./SymbolStatus"
 /**
  * Services
  */
-import { prepareQuotesForD3 } from "@/services/utils/quotes"
 import { supportedSymbols } from "@/services/config"
+import { prepareQuotesForD3 } from "@/services/utils/quotes"
 import { numberWithSymbol, calcChange } from "@/services/utils/amounts"
 
 /**
@@ -278,7 +278,7 @@ export default defineComponent({
         <div :class="$style.bottom">
             <div :class="$style.actions">
                 <router-link
-                    :to="`/symbols/${symbol.id}`"
+                    :to="`/symbols/${symbol.symbol}`"
                     :class="$style.action"
                     >Open symbol</router-link
                 >

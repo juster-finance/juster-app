@@ -51,7 +51,7 @@ const routes = [
             import(/* webpackChunkName: "symbols" */ "@/views/SymbolsPage"),
     },
     {
-        path: "/symbols/:id",
+        path: "/symbols/:name",
         name: "Symbol",
         component: () =>
             import(/* webpackChunkName: "symbol" */ "@/views/SymbolPage"),
