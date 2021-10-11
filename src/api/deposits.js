@@ -5,14 +5,14 @@ import { apollo } from "@/apollo"
  */
 import { getDepositsByEvent } from "@/graphql/queries/deposits"
 
-export const fetchDepositsByEvent = async ({ event_id }) => {
+export const fetchDepositsByEvent = async ({ eventId }) => {
     try {
         const { data } = await apollo.query({
             query: getDepositsByEvent,
-            variables: { event_id },
+            variables: { eventId },
         })
 
-        return data.juster_deposit
+        return data.deposit
     } catch (error) {
         console.error(
             `Error during fetching deposits by event \n\n ${error.name}: ${error.message}`,

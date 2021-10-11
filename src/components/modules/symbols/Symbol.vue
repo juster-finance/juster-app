@@ -115,21 +115,21 @@ export default defineComponent({
             <div :class="$style.info">
                 <div :class="$style.param">
                     <span>Events:</span>
-                    <span>{{ symbol.total_events }}</span>
+                    <span>{{ symbol.totalEvents }}</span>
                 </div>
 
                 <div :class="$style.dot" />
 
                 <div :class="$style.param">
                     <span>TVL:</span>
-                    <span>{{ symbol.total_value_locked.toFixed(0) }} XTZ</span>
+                    <span>{{ symbol.totalValueLocked.toFixed(0) }} XTZ</span>
                 </div>
 
                 <div :class="$style.dot" />
 
                 <div :class="$style.param">
                     <span>Volume (24h):</span>
-                    <span>{{ symbol.total_volume.toFixed(0) }} XTZ</span>
+                    <span>{{ symbol.totalVolume.toFixed(0) }} XTZ</span>
                 </div>
             </div>
         </div>

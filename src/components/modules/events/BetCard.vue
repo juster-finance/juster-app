@@ -32,12 +32,12 @@ export default defineComponent({
                 <Icon name="bet" size="16" />
 
                 <router-link
-                    :to="`/profile/${bet.user_id}`"
+                    :to="`/profile/${bet.userId}`"
                     :class="$style.user_avatar"
                 >
                     <img
                         :src="
-                            `https://services.tzkt.io/v1/avatars/${bet.user_id}`
+                            `https://services.tzkt.io/v1/avatars/${bet.userId}`
                         "
                     />
                 </router-link>
@@ -45,10 +45,10 @@ export default defineComponent({
 
             <div :class="$style.info">
                 <div :class="$style.title">
-                    {{ pkh == bet.user_id ? "My" : "" }} Bet
+                    {{ pkh == bet.userId ? "My" : "" }} Bet
                 </div>
                 <div :class="$style.time">
-                    {{ DateTime.fromISO(bet.created_time).toRelative() }}
+                    {{ DateTime.fromISO(bet.createdTime).toRelative() }}
                 </div>
             </div>
         </div>

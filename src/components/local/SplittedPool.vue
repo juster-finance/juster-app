@@ -19,23 +19,23 @@ export default defineComponent({
         // eslint-disable-next-line vue/return-in-computed-property
         const abovePercent = computed(() => {
             if (!userAmount.value || side.value == "Liquidity") {
-                if (!event.value.pool_above_eq && !event.value.pool_below)
+                if (!event.value.poolAboveEq && !event.value.poolBelow)
                     return 0
 
                 return Math.floor(
-                    (event.value.pool_above_eq * 100) /
-                        (event.value.pool_above_eq + event.value.pool_below),
+                    (event.value.poolAboveEq * 100) /
+                        (event.value.poolAboveEq + event.value.poolBelow),
                 )
             } else {
                 if (side.value == "Higher") {
-                    const below = event.value.pool_below
-                    const above = event.value.pool_above_eq + userAmount.value
+                    const below = event.value.poolBelow
+                    const above = event.value.poolAboveEq + userAmount.value
 
                     return Math.floor((above * 100) / (above + below))
                 }
                 if (side.value == "Lower") {
-                    const below = event.value.pool_below + userAmount.value
-                    const above = event.value.pool_above_eq
+                    const below = event.value.poolBelow + userAmount.value
+                    const above = event.value.poolAboveEq
 
                     return Math.floor((above * 100) / (above + below))
                 }
@@ -43,16 +43,16 @@ export default defineComponent({
         })
         const aboveAmount = computed(() => {
             if (side.value == "Higher" || side.value == "Lower")
-                return event.value.pool_above_eq
+                return event.value.poolAboveEq
 
             if (side.value == "Liquidity") {
                 const maxPool = Math.max(
-                    event.value.pool_above_eq,
-                    event.value.pool_below,
+                    event.value.poolAboveEq,
+                    event.value.poolBelow,
                 )
                 const newAboveEq =
-                    event.value.pool_above_eq +
-                    (event.value.pool_above_eq / maxPool) * userAmount.value
+                    event.value.poolAboveEq +
+                    (event.value.poolAboveEq / maxPool) * userAmount.value
 
                 return newAboveEq
             }
@@ -61,23 +61,23 @@ export default defineComponent({
         // eslint-disable-next-line vue/return-in-computed-property
         const belowPercent = computed(() => {
             if (!userAmount.value || side.value == "Liquidity") {
-                if (!event.value.pool_above_eq && !event.value.pool_below)
+                if (!event.value.poolAboveEq && !event.value.poolBelow)
                     return 0
 
                 return Math.ceil(
-                    (event.value.pool_below * 100) /
-                        (event.value.pool_above_eq + event.value.pool_below),
+                    (event.value.poolBelow * 100) /
+                        (event.value.poolAboveEq + event.value.poolBelow),
                 )
             } else {
                 if (side.value == "Higher") {
-                    const below = event.value.pool_below
-                    const above = event.value.pool_above_eq + userAmount.value
+                    const below = event.value.poolBelow
+                    const above = event.value.poolAboveEq + userAmount.value
 
                     return Math.ceil((below * 100) / (above + below))
                 }
                 if (side.value == "Lower") {
-                    const below = event.value.pool_below + userAmount.value
-                    const above = event.value.pool_above_eq
+                    const below = event.value.poolBelow + userAmount.value
+                    const above = event.value.poolAboveEq
 
                     return Math.ceil((below * 100) / (above + below))
                 }
@@ -85,16 +85,16 @@ export default defineComponent({
         })
         const belowAmount = computed(() => {
             if (side.value == "Higher" || side.value == "Lower")
-                return event.value.pool_below
+                return event.value.poolBelow
 
             if (side.value == "Liquidity") {
                 const maxPool = Math.max(
-                    event.value.pool_above_eq,
-                    event.value.pool_below,
+                    event.value.poolAboveEq,
+                    event.value.poolBelow,
                 )
                 const newBelow =
-                    event.value.pool_below +
-                    (event.value.pool_below / maxPool) * userAmount.value
+                    event.value.poolBelow +
+                    (event.value.poolBelow / maxPool) * userAmount.value
 
                 return newBelow
             }

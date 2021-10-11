@@ -29,7 +29,7 @@ export default defineComponent({
                     >XTZ-USD
                     <span>{{
                         events.filter(
-                            event => event.currency_pair.symbol == "XTZ-USD",
+                            event => event.currencyPair.symbol == "XTZ-USD",
                         ).length
                     }}</span></Checkbox
                 >
@@ -37,7 +37,7 @@ export default defineComponent({
                     >BTC-USD
                     <span>{{
                         events.filter(
-                            event => event.currency_pair.symbol == "BTC-USD",
+                            event => event.currencyPair.symbol == "BTC-USD",
                         ).length
                     }}</span></Checkbox
                 >
@@ -45,7 +45,7 @@ export default defineComponent({
                     >ETH-USD
                     <span>{{
                         events.filter(
-                            event => event.currency_pair.symbol == "ETH-USD",
+                            event => event.currencyPair.symbol == "ETH-USD",
                         ).length
                     }}</span></Checkbox
                 >

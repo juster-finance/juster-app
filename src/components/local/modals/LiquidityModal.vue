@@ -58,7 +58,7 @@ export default defineComponent({
         const sendingBet = ref(false)
 
         const liquidityRatio = computed(() => {
-            const abRatio = event.value.pool_below / event.value.pool_above_eq
+            const abRatio = event.value.poolBelow / event.value.poolAboveEq
             const slippageMultiplier = 1 + slippage.value / 100
 
             return {
@@ -68,12 +68,12 @@ export default defineComponent({
         })
         const shares = computed(() => {
             const bigPool = Math.max(
-                event.value.pool_below,
-                event.value.pool_above_eq,
+                event.value.poolBelow,
+                event.value.poolAboveEq,
             )
 
             return (
-                (event.value.total_liquidity_shares *
+                (event.value.totalLiquidityShares *
                     parseFloat(!amount.value ? 0 : amount.value)) /
                 bigPool
             )
@@ -112,8 +112,8 @@ export default defineComponent({
             juster
                 .provideLiquidity(
                     event.value.id,
-                    new BigNumber(event.value.pool_above_eq),
-                    new BigNumber(event.value.pool_below),
+                    new BigNumber(event.value.poolAboveEq),
+                    new BigNumber(event.value.poolBelow),
                     new BigNumber(slippage.value / 100),
                     new BigNumber(amount.value),
                 )
@@ -235,7 +235,7 @@ export default defineComponent({
 
             <div :class="$style.stats">
                 <Stat name="Reward for providing">
-                    {{ event.liquidity_percent * 100 }}%
+                    {{ event.liquidityPercent * 100 }}%
                 </Stat>
 
                 <Stat v-if="liquidityRatio" name="Ratio"

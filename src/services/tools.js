@@ -12,6 +12,6 @@ const gql = createClient({
     subscription: { url: dipdup.uri.subscription },
 })
 
-const tezos = new TezosToolkit("https://florencenet.smartpy.io")
+const tezos = new TezosToolkit("https://granadanet.smartpy.io")
 
 export { juster, gql, tezos }

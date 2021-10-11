@@ -44,7 +44,7 @@ export default defineComponent({
                         autoDestroy: true,
                     },
                 })
-                toClipboard(user.value.user_id)
+                toClipboard(user.value.userId)
             }
             if (target == "url") {
                 notificationsStore.create({
@@ -56,7 +56,7 @@ export default defineComponent({
                     },
                 })
                 toClipboard(
-                    `https://app.juster.fi/profile/${user.value.user_id}`,
+                    `https://app.juster.fi/profile/${user.value.userId}`,
                 )
             }
         }
@@ -73,17 +73,17 @@ export default defineComponent({
         <div :class="$style.left">
             <div :class="$style.avatar">
                 <img
-                    :src="`https://services.tzkt.io/v1/avatars/${user.user_id}`"
+                    :src="`https://services.tzkt.io/v1/avatars/${user.userId}`"
                 />
             </div>
 
             <div :class="$style.base">
                 <div @click="handleCopy('address')" :class="$style.address">
-                    <template v-if="user.user_id !== accountStore.pkh">
+                    <template v-if="user.userId !== accountStore.pkh">
                         {{
-                            `${user.user_id.slice(0, 8)}..${user.user_id.slice(
-                                user.user_id.length - 3,
-                                user.user_id.length,
+                            `${user.userId.slice(0, 8)}..${user.userId.slice(
+                                user.userId.length - 3,
+                                user.userId.length,
                             )}`
                         }}
                     </template>
@@ -102,8 +102,8 @@ export default defineComponent({
                         <span
                             >{{
                                 (
-                                    user.liquidity_provided_below +
-                                    user.liquidity_provided_above_eq
+                                    user.liquidityProvidedBelow +
+                                    user.liquidityProvidedAboveEq
                                 ).toFixed(2)
                             }}
                             XTZ</span
@@ -119,7 +119,7 @@ export default defineComponent({
             </template>
 
             <template v-slot:dropdown>
-                <router-link :to="`/profile/${user.user_id}`">
+                <router-link :to="`/profile/${user.userId}`">
                     <DropdownItem
                         ><Icon name="open" size="16" />Open User
                         profile</DropdownItem
@@ -129,7 +129,7 @@ export default defineComponent({
                 </router-link>
 
                 <a
-                    :href="`https://florencenet.tzkt.io/${user.user_id}`"
+                    :href="`https://granadanet.tzkt.io/${user.userId}`"
                     target="_blank"
                 >
                     <DropdownItem

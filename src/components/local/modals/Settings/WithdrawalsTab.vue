@@ -86,7 +86,7 @@ export default defineComponent({
 
                     <div :class="$style.right">
                         <div :class="$style.when">
-                            {{ formatWhen(withdraw.event.closed_oracle_time) }}
+                            {{ formatWhen(withdraw.event.closedOracleTime) }}
                         </div>
                         <div :class="$style.dot" />
                         <div :class="$style.event_link">Event</div>

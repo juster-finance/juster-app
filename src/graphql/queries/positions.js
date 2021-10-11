@@ -2,8 +2,8 @@ import gql from "graphql-tag"
 
 export const getAllUserPositions = gql`
     query getAllUserPositions($address: String) {
-        juster_position(
-            where: { user_id: { _eq: $address } }
+        position(
+            where: { userId: { _eq: $address } }
             order_by: { id: desc }
         ) {
             id
@@ -12,25 +12,25 @@ export const getAllUserPositions = gql`
             event {
                 id
                 status
-                bets_close_time
-                currency_pair {
+                betsCloseTime
+                currencyPair {
                     symbol
                 }
                 bets {
                     amount
                     side
                 }
-                pool_above_eq
-                pool_below
-                total_bets_amount
-                total_liquidity_provided
-                total_liquidity_shares
-                total_value_locked
-                liquidity_percent
-                measure_period
-                closed_oracle_time
-                created_time
-                target_dynamics
+                poolAboveEq
+                poolBelow
+                totalBetsAmount
+                totalLiquidityProvided
+                totalLiquidityShares
+                totalValueLocked
+                liquidityPercent
+                measurePeriod
+                closedOracleTime
+                createdTime
+                targetDynamics
             }
         }
     }
@@ -38,9 +38,9 @@ export const getAllUserPositions = gql`
 
 export const getUserPositionsForWithdrawal = gql`
     query getUserPositionsForWithdrawal($address: String) {
-        juster_position(
+        position(
             where: {
-                user_id: { _eq: $address }
+                userId: { _eq: $address }
                 withdrawn: { _eq: false }
                 value: { _gt: 0 }
                 event: { status: { _eq: "FINISHED" } }
@@ -50,30 +50,30 @@ export const getUserPositionsForWithdrawal = gql`
             id
             value
             withdrawn
-            reward_above_eq
-            reward_below
+            rewardAboveEq
+            rewardBelow
             event {
                 id
                 status
-                bets_close_time
-                currency_pair {
+                betsCloseTime
+                currencyPair {
                     symbol
                 }
                 bets {
                     amount
                     side
                 }
-                pool_above_eq
-                pool_below
-                total_bets_amount
-                total_liquidity_provided
-                total_liquidity_shares
-                total_value_locked
-                liquidity_percent
-                measure_period
-                closed_oracle_time
-                created_time
-                target_dynamics
+                poolAboveEq
+                poolBelow
+                totalBetsAmount
+                totalLiquidityProvided
+                totalLiquidityShares
+                totalValueLocked
+                liquidityPercent
+                measurePeriod
+                closedOracleTime
+                createdTime
+                targetDynamics
             }
         }
     }

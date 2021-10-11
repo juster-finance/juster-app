@@ -11,7 +11,7 @@ export const fetchUser = async ({ address }) => {
             query: getUser,
             variables: { address },
         })
-        return data.juster_user[0]
+        return data.user[0]
     } catch (error) {
         console.error(
             `Error during fetching user \n\n ${error.name}: ${error.message}`,
@@ -26,7 +26,7 @@ export const fetchUserWithdrawals = async ({ address }) => {
             query: getUserWithdrawals,
             variables: { address },
         })
-        return data.juster_withdrawal
+        return data.withdrawal
     } catch (error) {
         console.error(
             `Error during fetching user withdrawals \n\n ${error.name}: ${error.message}`,

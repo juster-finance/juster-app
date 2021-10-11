@@ -127,23 +127,23 @@ export default defineComponent({
             }
         })
 
-        const symbol = computed(() => event.value.currency_pair.symbol)
+        const symbol = computed(() => event.value.currencyPair.symbol)
 
         const price = computed(() => {
             return {
                 rate:
-                    marketStore.symbols[event.value?.currency_pair.symbol]
+                    marketStore.symbols[event.value?.currencyPair.symbol]
                         ?.quotes[0]?.price,
                 integer: numberWithSymbol(
                     marketStore.symbols[
-                        event.value?.currency_pair.symbol
+                        event.value?.currencyPair.symbol
                     ]?.quotes[0]?.price
                         .toString()
                         .split(".")[0],
                     ",",
                 ),
                 fraction: marketStore.symbols[
-                    event.value?.currency_pair.symbol
+                    event.value?.currencyPair.symbol
                 ]?.quotes[0]?.price
                     .toString()
                     .split(".")[1],
@@ -160,7 +160,7 @@ export default defineComponent({
                 return deposits.value
             } else {
                 return deposits.value.filter(
-                    deposit => deposit.user_id == accountStore.pkh,
+                    deposit => deposit.userId == accountStore.pkh,
                 )
             }
         })
@@ -168,31 +168,31 @@ export default defineComponent({
             if (filters.bets == "all") {
                 return bets.value
             } else {
-                return bets.value.filter(bet => bet.user_id == accountStore.pkh)
+                return bets.value.filter(bet => bet.userId == accountStore.pkh)
             }
         })
 
         const userBets = computed(() =>
-            bets.value.filter(bet => bet.user_id == accountStore.pkh),
+            bets.value.filter(bet => bet.userId == accountStore.pkh),
         )
 
         const highestRatio = computed(() => {
             const hRatio =
-                event.value?.pool_below / event.value?.pool_above_eq + 1
+                event.value?.poolBelow / event.value?.poolAboveEq + 1
             const lRatio =
-                event.value?.pool_above_eq / event.value?.pool_below + 1
+                event.value?.poolAboveEq / event.value?.poolBelow + 1
 
             return Math.max(hRatio, lRatio).toFixed(2)
         })
 
         const percentage = computed(() => {
-            return event.value?.target_dynamics * 100 - 100
+            return event.value?.targetDynamics * 100 - 100
         })
 
         /** Event day */
         const todayDt = DateTime.now()
         const eventDt = computed(() =>
-            DateTime.fromISO(event.value?.bets_close_time),
+            DateTime.fromISO(event.value?.betsCloseTime),
         )
         const day = computed(() =>
             todayDt.hasSame(eventDt.value, "day")
@@ -209,7 +209,7 @@ export default defineComponent({
                     .setLocale("ru")
                     .toLocaleString(DateTime.TIME_SIMPLE),
                 end: eventDt.value
-                    .plus(event.value?.measure_period * 1000)
+                    .plus(event.value?.measurePeriod * 1000)
                     .setLocale("ru")
                     .toLocaleString(DateTime.TIME_SIMPLE),
             }
@@ -262,15 +262,15 @@ export default defineComponent({
 
             /** All submissions */
             const allDeposits = await fetchDepositsByEvent({
-                event_id: event.value.id,
+                eventId: event.value.id,
             })
             deposits.value = cloneDeep(allDeposits).sort(
-                (a, b) => new Date(b.created_time) - new Date(a.created_time),
+                (a, b) => new Date(b.createdTime) - new Date(a.createdTime),
             )
 
-            const allBets = await fetchBetsByEvent({ event_id: event.value.id })
+            const allBets = await fetchBetsByEvent({ eventId: event.value.id })
             bets.value = cloneDeep(allBets).sort(
-                (a, b) => new Date(b.created_time) - new Date(a.created_time),
+                (a, b) => new Date(b.createdTime) - new Date(a.createdTime),
             )
         })
 
@@ -477,7 +477,7 @@ export default defineComponent({
                                 <Tooltip position="bottom" side="left">
                                     <Label icon="money" color="green"
                                         ><span>{{
-                                            event.total_value_locked
+                                            event.totalValueLocked
                                         }}</span
                                         >XTZ</Label
                                     >
@@ -490,10 +490,10 @@ export default defineComponent({
                                     <Label icon="time" color="yellow"
                                         >Duration&nbsp;
                                         <span>{{
-                                            event.measure_period / 3600
+                                            event.measurePeriod / 3600
                                         }}</span
                                         >{{
-                                            event.measure_period / 3600 == 1
+                                            event.measurePeriod / 3600 == 1
                                                 ? "hour"
                                                 : "hours"
                                         }}
@@ -554,7 +554,7 @@ export default defineComponent({
                                 @click="handleWithdraw"
                                 type="success"
                                 size="small"
-                                :disabled="event.total_liquidity_provided == 0"
+                                :disabled="event.totalLiquidityProvided == 0"
                                 :class="$style.action"
                                 >Withdraw</Button
                             >
@@ -570,7 +570,7 @@ export default defineComponent({
                                     type="secondary"
                                     size="small"
                                     :disabled="
-                                        event.total_liquidity_provided == 0
+                                        event.totalLiquidityProvided == 0
                                     "
                                     :class="$style.action"
                                     ><Icon name="liquidity" size="16" />Provide
@@ -581,7 +581,7 @@ export default defineComponent({
                                     type="primary"
                                     size="small"
                                     :disabled="
-                                        event.total_liquidity_provided == 0
+                                        event.totalLiquidityProvided == 0
                                     "
                                     :class="$style.action"
                                     >Make a bet</Button

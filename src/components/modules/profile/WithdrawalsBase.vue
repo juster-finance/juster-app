@@ -101,7 +101,7 @@ export default defineComponent({
                                     <div :class="$style.tier">
                                         {{
                                             new Date(
-                                                withdraw.event.closed_oracle_time,
+                                                withdraw.event.closedOracleTime,
                                             ).toLocaleDateString()
                                         }}
                                     </div>

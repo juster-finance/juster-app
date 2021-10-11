@@ -76,7 +76,7 @@ export default defineComponent({
             marketStore.symbols[symbol.value.symbol].events = cloneDeep(
                 allEvents,
             ).sort(
-                (a, b) => new Date(b.created_time) - new Date(a.created_time),
+                (a, b) => new Date(b.createdTime) - new Date(a.createdTime),
             )
         }
 

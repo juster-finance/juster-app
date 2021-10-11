@@ -2,24 +2,24 @@ import gql from "graphql-tag"
 
 export const getSymbols = gql`
     query getSymbols {
-        juster_currencypair {
+        currencypair {
             symbol
             id
-            total_events
-            total_value_locked
-            total_volume
+            totalEvents
+            totalValueLocked
+            totalVolume
         }
     }
 `
 
 export const getSymbolById = gql`
     query getSymbolById($id: Int!) {
-        juster_currencypair_by_pk(id: $id) {
+        currencypairByPk(id: $id) {
             symbol
             id
-            total_events
-            total_value_locked
-            total_volume
+            totalEvents
+            totalValueLocked
+            totalVolume
         }
     }
 `

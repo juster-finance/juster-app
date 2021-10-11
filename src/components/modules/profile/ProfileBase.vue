@@ -222,21 +222,21 @@ export default defineComponent({
 						<div :class="$style.stat">
 							<div :class="$style.key">Liquidity provided</div>
 							<div :class="$style.value">
-								{{ user.total_liquidity_provided }}
+								{{ user.totalLiquidityProvided }}
 								<span>XTZ</span>
 							</div>
 						</div>
 						<div :class="$style.stat">
 							<div :class="$style.key">Net return</div>
 							<div :class="$style.value">
-								{{ user.total_provider_reward.toFixed(2) }}
+								{{ user.totalProviderReward.toFixed(2) }}
 								<span>XTZ</span>
 							</div>
 						</div>
 						<div :class="$style.stat">
 							<div :class="$style.key">Fees collected</div>
 							<div :class="$style.value">
-								{{ user.total_fees_collected.toFixed(0) }}
+								{{ user.totalFeesCollected.toFixed(0) }}
 								<span>XTZ</span>
 							</div>
 						</div>
@@ -252,20 +252,20 @@ export default defineComponent({
 						<div :class="$style.stat">
 							<div :class="$style.key">Bets value</div>
 							<div :class="$style.value">
-								{{ user.total_bets_amount }} <span>XTZ</span>
+								{{ user.totalBetsAmount }} <span>XTZ</span>
 							</div>
 						</div>
-						<div v-if="user.total_withdrawn" :class="$style.stat">
+						<div v-if="user.totalWithdrawn" :class="$style.stat">
 							<div :class="$style.key">Withdrawn</div>
 							<div :class="$style.value">
-								{{ user.total_withdrawn.toFixed(2) }}
+								{{ user.totalWithdrawn.toFixed(2) }}
 								<span>XTZ</span>
 							</div>
 						</div>
 						<div :class="$style.stat">
 							<div :class="$style.key">Bets</div>
 							<div :class="$style.value">
-								{{ user.total_bets_count }}
+								{{ user.totalBetsCount }}
 							</div>
 						</div>
 						<div :class="$style.stat">
@@ -279,7 +279,7 @@ export default defineComponent({
 					<div :class="$style.additional">
 						<div :class="$style.left">
 							<a
-								:href="`https://florencenet.tzkt.io/${address}`"
+								:href="`https://granadanet.tzkt.io/${address}`"
 								target="_blank"
 							>
 								<Button type="tertiary" size="small"

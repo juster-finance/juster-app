@@ -65,36 +65,36 @@ export default defineComponent({
         const ratio = computed(() => {
             return {
                 higher:
-                    event.value.pool_below /
-                    (event.value.pool_above_eq + amount.value),
+                    event.value.poolBelow /
+                    (event.value.poolAboveEq + amount.value),
                 lower:
-                    event.value.pool_above_eq /
-                    (event.value.pool_below + amount.value),
+                    event.value.poolAboveEq /
+                    (event.value.poolBelow + amount.value),
             }
         })
         const ratioBeforeBet = computed(
             () =>
                 (side.value == "Higher" &&
-                    event.value.pool_below / event.value.pool_above_eq) ||
+                    event.value.poolBelow / event.value.poolAboveEq) ||
                 (side.value == "Lower" &&
-                    event.value.pool_above_eq / event.value.pool_below),
+                    event.value.poolAboveEq / event.value.poolBelow),
         )
         const ratioAfterBet = computed(
             () =>
                 (side.value == "Higher" &&
-                    (event.value.pool_below - winDelta.value) /
-                        (event.value.pool_above_eq + amount.value)) ||
+                    (event.value.poolBelow - winDelta.value) /
+                        (event.value.poolAboveEq + amount.value)) ||
                 (side.value == "Lower" &&
-                    (event.value.pool_above_eq - winDelta.value) /
-                        (event.value.pool_below + amount.value)),
+                    (event.value.poolAboveEq - winDelta.value) /
+                        (event.value.poolBelow + amount.value)),
         )
 
         const fee = computed(() =>
             estimateFeeMultiplier(
                 {
-                    betsCloseTime: new Date(event.value.bets_close_time),
-                    createdTime: new Date(event.value.created_time),
-                    liquidityPercent: event.value.liquidity_percent,
+                    betsCloseTime: new Date(event.value.betsCloseTime),
+                    createdTime: new Date(event.value.createdTime),
+                    liquidityPercent: event.value.liquidityPercent,
                 },
                 new Date(),
             ),

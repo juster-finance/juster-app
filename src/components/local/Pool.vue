@@ -13,16 +13,16 @@ export default defineComponent({
         // eslint-disable-next-line vue/return-in-computed-property
         const abovePercent = computed(() => {
             return Math.floor(
-                (event.value.pool_above_eq * 100) /
-                    (event.value.pool_above_eq + event.value.pool_below),
+                (event.value.poolAboveEq * 100) /
+                    (event.value.poolAboveEq + event.value.poolBelow),
             )
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
         const belowPercent = computed(() => {
             return Math.ceil(
-                (event.value.pool_below * 100) /
-                    (event.value.pool_above_eq + event.value.pool_below),
+                (event.value.poolBelow * 100) /
+                    (event.value.poolAboveEq + event.value.poolBelow),
             )
         })
 

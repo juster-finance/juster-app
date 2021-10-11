@@ -87,7 +87,7 @@ export default defineComponent({
                 ].filter(Boolean)
 
                 events = events.filter(event =>
-                    symbols.includes(event.currency_pair.symbol),
+                    symbols.includes(event.currencyPair.symbol),
                 )
             }
 
@@ -104,7 +104,7 @@ export default defineComponent({
 
                 if (periods.length) {
                     events = events.filter(event =>
-                        periods.includes(event.measure_period),
+                        periods.includes(event.measurePeriod),
                     )
                 }
             }
@@ -118,7 +118,7 @@ export default defineComponent({
             })
 
             allEvents.value = cloneDeep(allNewEvents).sort(
-                (a, b) => new Date(b.created_time) - new Date(a.created_time),
+                (a, b) => new Date(b.createdTime) - new Date(a.createdTime),
             )
         })
 
