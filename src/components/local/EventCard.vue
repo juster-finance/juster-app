@@ -82,7 +82,7 @@ export default defineComponent({
 
         const subscription = ref({})
 
-        const symbol = computed(() => event.value.currency_pair.symbol)
+        const symbol = computed(() => event.value.currencyPair.symbol)
         const quotes = computed(() => {
             return marketStore.symbols[symbol.value].quotes.slice(0, 30)
         })
@@ -101,15 +101,15 @@ export default defineComponent({
         })
 
         const percentage = computed(() => {
-            return event.value?.target_dynamics * 100 - 100
+            return event.value?.targetDynamics * 100 - 100
         })
 
         const timing = computed(() => {
             const eventDt = DateTime.fromISO(
-                event.value.bets_close_time,
+                event.value.betsCloseTime,
             ).setLocale("ru")
 
-            const endDt = eventDt.plus(event.value.measure_period * 1000)
+            const endDt = eventDt.plus(event.value.measurePeriod * 1000)
 
             return {
                 start: {
@@ -221,34 +221,34 @@ export default defineComponent({
 
             subscription.value = await gql
                 .subscription({
-                    juster_event: [
+                    event: [
                         {
                             where: { id: { _eq: event.value.id } },
                         },
                         {
                             id: true,
-                            pool_above_eq: true,
-                            pool_below: true,
-                            total_liquidity_shares: true,
-                            total_value_locked: true,
-                            total_liquidity_provided: true,
-                            created_time: true,
-                            bets_close_time: true,
-                            liquidity_percent: true,
+                            poolAboveEq: true,
+                            poolBelow: true,
+                            totalLiquidityShares: true,
+                            totalValueLocked: true,
+                            totalLiquidityProvided: true,
+                            createdTime: true,
+                            betsCloseTime: true,
+                            liquidityPercent: true,
                             status: true,
-                            start_rate: true,
-                            closed_rate: true,
-                            winner_bets: true,
+                            startRate: true,
+                            closedRate: true,
+                            winnerBets: true,
                             bets: {
                                 amount: true,
-                                user_id: true,
+                                userId: true,
                             },
                         },
                     ],
                 })
                 .subscribe({
                     next: data => {
-                        const { juster_event: newEvent } = data
+                        const { event: newEvent } = data
 
                         marketStore.updateEvent({
                             target: symbol.value,
@@ -404,7 +404,7 @@ export default defineComponent({
                             @click="handleWithdraw"
                             type="success"
                             size="small"
-                            :disabled="event.total_liquidity_provided == 0"
+                            :disabled="event.totalLiquidityProvided == 0"
                             :class="$style.action"
                             >Withdraw</Button
                         >
@@ -496,7 +496,7 @@ export default defineComponent({
 
                     <Tooltip position="bottom" side="left">
                         <Label icon="money" color="green"
-                            ><span>{{ event.total_value_locked }}</span
+                            ><span>{{ event.totalValueLocked }}</span
                             >XTZ</Label
                         >
 
@@ -506,7 +506,7 @@ export default defineComponent({
                     </Tooltip>
                     <Tooltip position="bottom" side="left">
                         <Label icon="money" color="yellow"
-                            ><span>{{ event.measure_period / 3600 }}</span
+                            ><span>{{ event.measurePeriod / 3600 }}</span
                             >h</Label
                         >
 

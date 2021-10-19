@@ -32,23 +32,23 @@ export default defineComponent({
         const marketStore = useMarketStore()
 
         const quotes = computed(() => {
-            return marketStore.symbols[event.value.currency_pair.symbol].quotes
+            return marketStore.symbols[event.value.currencyPair.symbol].quotes
         })
-        const symbol = computed(() => event.value.currency_pair.symbol)
+        const symbol = computed(() => event.value.currencyPair.symbol)
 
         const color = ref("grey")
         const change = computed(() => {
             if (!quotes.value) return
 
             if (
-                !marketStore.symbols[event.value.currency_pair.symbol]
+                !marketStore.symbols[event.value.currencyPair.symbol]
                     .historyPrice
             )
                 return "Loading"
 
             const { diff, percent, isIncreased } = calcChange(
                 quotes.value[0].price,
-                marketStore.symbols[event.value.currency_pair.symbol]
+                marketStore.symbols[event.value.currencyPair.symbol]
                     .historyPrice,
             )
             color.value = isIncreased ? "green" : "red"
@@ -83,7 +83,7 @@ export default defineComponent({
                 <img
                     v-if="symbol.split('-')[0] == 'BTC'"
                     src="@/assets/symbols/btc.png"/>
-                {{ event.currency_pair.symbol }} <SymbolStatus
+                {{ event.currencyPair.symbol }} <SymbolStatus
             /></span>
 
             <span>{{ supportedSymbols[symbol].description }}</span>

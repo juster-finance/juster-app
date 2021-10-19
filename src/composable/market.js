@@ -62,23 +62,23 @@ export const useMarket = () => {
 
             /** subscription */
             gql.subscription({
-                juster_quotes_wma: [
+                quotesWma: [
                     {
                         where: {
-                            currency_pair_id: { _eq: symbol.id },
+                            currencyPairId: { _eq: symbol.id },
                         },
                         order_by: { timestamp: "desc" },
                         limit: 1,
                     },
                     {
-                        currency_pair_id: true,
+                        currencyPairId: true,
                         price: true,
                         timestamp: true,
                     },
                 ],
             }).subscribe({
                 next: data => {
-                    const quote = data.juster_quotes_wma[0]
+                    const quote = data.quotesWma[0]
                     marketStore.updateQuotes({
                         target: symbol.symbol,
                         quote,

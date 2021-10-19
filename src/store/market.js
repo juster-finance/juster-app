@@ -59,14 +59,14 @@ export const useMarketStore = defineStore({
             } else {
                 this.symbols[target].events[indexOfEvent] = {
                     ...event,
-                    winner_bets: newEvent.winner_bets,
-                    start_rate: newEvent.start_rate,
-                    closed_rate: newEvent.closed_rate,
-                    pool_below: newEvent.pool_below,
-                    pool_above_eq: newEvent.pool_above_eq,
-                    total_liquidity_provided: newEvent.total_liquidity_provided,
-                    total_liquidity_shares: newEvent.total_liquidity_shares,
-                    total_value_locked: newEvent.total_value_locked,
+                    winnerBets: newEvent.winnerBets,
+                    startRate: newEvent.startRate,
+                    closedRate: newEvent.closedRate,
+                    poolBelow: newEvent.poolBelow,
+                    poolAboveEq: newEvent.poolAboveEq,
+                    totalLiquidityProvided: newEvent.totalLiquidityProvided,
+                    totalLiquidityShares: newEvent.totalLiquidityShares,
+                    totalValueLocked: newEvent.totalValueLocked,
                 }
             }
         },

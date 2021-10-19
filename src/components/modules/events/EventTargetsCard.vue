@@ -18,13 +18,13 @@ export default defineComponent({
                 return "TBD"
             }
             if (event.value.status == "FINISHED") {
-                return event.value.winner_bets == "ABOVE_EQ" ? "Up" : "Down"
+                return event.value.winnerBets == "ABOVE_EQ" ? "Up" : "Down"
             }
         })
 
         const change = computed(() => {
-            const startRate = event.value.start_rate * 100
-            const closedRate = event.value.closed_rate * 100
+            const startRate = event.value.startRate * 100
+            const closedRate = event.value.closedRate * 100
 
             const percent =
                 event.value.status == "FINISHED"
@@ -98,7 +98,7 @@ export default defineComponent({
                         {{
                             event.status == "NEW"
                                 ? "TBD"
-                                : `$ ${(event.start_rate * 100).toFixed(2)}`
+                                : `$ ${(event.startRate * 100).toFixed(2)}`
                         }}
                     </div>
                 </div>
@@ -118,7 +118,7 @@ export default defineComponent({
                         <Icon v-else name="flag" size="14" />
                         {{
                             event.status == "FINISHED"
-                                ? `$ ${(event.closed_rate * 100).toFixed(2)}`
+                                ? `$ ${(event.closedRate * 100).toFixed(2)}`
                                 : "TBD"
                         }}
                     </div>

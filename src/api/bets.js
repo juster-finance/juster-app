@@ -5,14 +5,14 @@ import { apollo } from "@/apollo"
  */
 import { getBetsByEvent, getBetsByUser } from "@/graphql/queries/bets"
 
-export const fetchBetsByEvent = async ({ event_id }) => {
+export const fetchBetsByEvent = async ({ eventId }) => {
     try {
         const { data } = await apollo.query({
             query: getBetsByEvent,
-            variables: { event_id },
+            variables: { eventId },
         })
 
-        return data.juster_bet
+        return data.bet
     } catch (error) {
         console.error(
             `Error during fetching bets by event \n\n ${error.name}: ${error.message}`,
@@ -21,14 +21,14 @@ export const fetchBetsByEvent = async ({ event_id }) => {
     }
 }
 
-export const fetchBetsByUser = async ({ event_id, address }) => {
+export const fetchBetsByUser = async ({ eventId, address }) => {
     try {
         const { data } = await apollo.query({
             query: getBetsByUser,
-            variables: { event_id, address },
+            variables: { eventId, address },
         })
 
-        return data.juster_bet
+        return data.bet
     } catch (error) {
         console.error(
             `Error during fetching bets by user \n\n ${error.name}: ${error.message}`,

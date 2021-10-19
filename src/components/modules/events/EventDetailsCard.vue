@@ -30,13 +30,13 @@ export default {
                 <span>Total provided</span>
                 <span
                     ><Icon name="liquidity" size="12" />{{
-                        event.total_liquidity_provided
+                        event.totalLiquidityProvided
                     }}</span
                 >
             </div>
             <div :class="$style.param">
                 <span>Liquidity percent</span>
-                <span>{{ event.liquidity_percent * 100 }}%</span>
+                <span>{{ event.liquidityPercent * 100 }}%</span>
             </div>
         </div>
     </div>

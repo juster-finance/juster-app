@@ -16,13 +16,13 @@ export default defineComponent({
 
         // eslint-disable-next-line vue/return-in-computed-property
         const name = computed(() => {
-            return supportedSymbols[event.value.currency_pair.symbol]
+            return supportedSymbols[event.value.currencyPair.symbol]
                 .description
         })
 
         /** Event day */
         const todayDt = DateTime.now()
-        const eventDt = DateTime.fromISO(event.value.bets_close_time)
+        const eventDt = DateTime.fromISO(event.value.betsCloseTime)
         const day = ref(
             todayDt.hasSame(eventDt, "day")
                 ? "Today"
@@ -32,7 +32,7 @@ export default defineComponent({
         const period = {
             start: eventDt.setLocale("ru").toLocaleString(DateTime.TIME_SIMPLE),
             end: eventDt
-                .plus(event.value.measure_period * 1000)
+                .plus(event.value.measurePeriod * 1000)
                 .setLocale("ru")
                 .toLocaleString(DateTime.TIME_SIMPLE),
         }

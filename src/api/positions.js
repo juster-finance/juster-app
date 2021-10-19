@@ -15,7 +15,7 @@ export const fetchAllUserPositions = async ({ address }) => {
             variables: { address },
         })
 
-        return data.juster_position
+        return data.position
     } catch (error) {
         console.error(
             `Error during fetching all user positions \n\n ${error.name}: ${error.message}`,
@@ -31,7 +31,7 @@ export const fetchUserPositionsForWithdrawal = async ({ address }) => {
             variables: { address },
         })
 
-        return data.juster_position
+        return data.position
     } catch (error) {
         console.error(
             `Error during fetching user positions \n\n ${error.name}: ${error.message}`,

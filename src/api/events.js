@@ -18,7 +18,7 @@ export const fetchAllEvents = async ({ status }) => {
             variables: { status },
         })
 
-        return data.juster_event
+        return data.event
     } catch (error) {
         console.error(
             `Error during fetching all events \n\n ${error.name}: ${error.message}`,
@@ -34,7 +34,7 @@ export const fetchEventsBySymbol = async ({ id, status }) => {
             variables: { id, status },
         })
 
-        return data.juster_event
+        return data.event
     } catch (error) {
         console.error(
             `Error during fetching events by id \n\n ${error.name}: ${error.message}`,
@@ -50,7 +50,7 @@ export const fetchEventById = async ({ id }) => {
             variables: { id },
         })
 
-        return data.juster_event_by_pk
+        return data.eventByPk
     } catch (error) {
         console.error(
             `Error during fetching event by id \n\n ${error.name}: ${error.message}`,
@@ -66,7 +66,7 @@ export const fetchEventParticipants = async ({ id }) => {
             variables: { id },
         })
 
-        return data.juster_event[0].positions
+        return data.event[0].positions
     } catch (error) {
         console.error(
             `Error during fetching event participant \n\n ${error.name}: ${error.message}`,
@@ -81,7 +81,7 @@ export const fetchTopEvents = async () => {
             query: getTopEvents,
         })
 
-        return data.juster_event
+        return data.event
     } catch (error) {
         console.error(
             `Error during fetching top events \n\n ${error.name}: ${error.message}`,

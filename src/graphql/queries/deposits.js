@@ -1,14 +1,14 @@
 import gql from "graphql-tag"
 
 export const getDepositsByEvent = gql`
-    query getDepositsByEvent($event_id: Int) {
-        juster_deposit(where: { event_id: { _eq: $event_id } }) {
-            amount_above_eq
-            amount_below
-            event_id
+    query getDepositsByEvent($eventId: Int) {
+        deposit(where: { eventId: { _eq: $eventId } }) {
+            amountAboveEq
+            amountBelow
+            eventId
             id
-            user_id
-            created_time
+            userId
+            createdTime
             shares
         }
     }

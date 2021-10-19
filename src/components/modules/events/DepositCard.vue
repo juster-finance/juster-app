@@ -26,36 +26,36 @@ export default defineComponent({
                 <Icon name="liquidity" size="16" />
 
                 <router-link
-                    :to="`/profile/${deposit.user_id}`"
+                    :to="`/profile/${deposit.userId}`"
                     :class="$style.user_avatar"
                 >
                     <img
                         :src="
-                            `https://services.tzkt.io/v1/avatars/${deposit.user_id}`
+                            `https://services.tzkt.io/v1/avatars/${deposit.userId}`
                         "
                 /></router-link>
             </div>
 
             <div :class="$style.info">
                 <div :class="$style.title">
-                    {{ pkh == deposit.user_id ? "My" : "" }} Liquidity
+                    {{ pkh == deposit.userId ? "My" : "" }} Liquidity
                 </div>
                 <div :class="$style.time">
-                    {{ DateTime.fromISO(deposit.created_time).toRelative() }}
+                    {{ DateTime.fromISO(deposit.createdTime).toRelative() }}
                 </div>
             </div>
         </div>
 
         <div :class="[$style.param, $style.up]">
             <Icon name="higher" size="12" />{{
-                deposit.amount_above_eq.toFixed(2)
+                deposit.amountAboveEq.toFixed(2)
             }}
             &nbsp;<span>XTZ</span>
         </div>
 
         <div :class="[$style.param, $style.down]">
             <Icon name="higher" size="12" />{{
-                deposit.amount_below.toFixed(2)
+                deposit.amountBelow.toFixed(2)
             }}
             &nbsp;<span>XTZ</span>
         </div>

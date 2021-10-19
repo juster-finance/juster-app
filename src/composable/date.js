@@ -13,7 +13,7 @@ export const useCountdown = event => {
     let countdownInterval
 
     const start = () => {
-        const target = new Date(event.value?.bets_close_time).getTime()
+        const target = new Date(event.value?.betsCloseTime).getTime()
 
         const { h, m, s, d } = countdown({
             target,

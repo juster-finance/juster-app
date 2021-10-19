@@ -23,7 +23,7 @@ export const fetchQuotesBySymbol = async ({ id, ts, limit }) => {
             query: getQuotesBySymbol,
             variables: { id, ts, limit },
         })
-        return data.juster_quotes_wma
+        return data.quotesWma
     } catch (error) {
         console.error(
             `Error during fetching quotes by id \n\n ${error.name}: ${error.message}`,
@@ -39,7 +39,7 @@ export const fetchQuoteByTimestamp = async ({ id, ts }) => {
             variables: { id, ts },
         })
 
-        return data.juster_quotes_wma
+        return data.quotesWma
     } catch (error) {
         console.error(
             `Error during fetching quote by ts & id \n\n ${error.name}: ${error.message}`,

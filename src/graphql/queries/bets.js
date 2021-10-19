@@ -1,29 +1,29 @@
 import gql from "graphql-tag"
 
 export const getBetsByEvent = gql`
-    query getBetsByEvent($event_id: Int) {
-        juster_bet(where: { event_id: { _eq: $event_id } }) {
+    query getBetsByEvent($eventId: Int) {
+        bet(where: { eventId: { _eq: $eventId } }) {
             id
             side
             reward
             amount
-            created_time
-            user_id
+            createdTime
+            userId
         }
     }
 `
 
 export const getBetsByUser = gql`
-    query getBetsByUser($event_id: Int, $address: String) {
-        juster_bet(
-            where: { event_id: { _eq: $event_id }, user_id: { _eq: $address } }
+    query getBetsByUser($eventId: Int, $address: String) {
+        bet(
+            where: { eventId: { _eq: $eventId }, userId: { _eq: $address } }
         ) {
             id
             side
             reward
             amount
-            created_time
-            user_id
+            createdTime
+            userId
         }
     }
 `

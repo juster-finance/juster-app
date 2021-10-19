@@ -150,7 +150,7 @@ export default defineComponent({
                     />
 
                     <template v-slot:content>
-                        Florence Testnet in use.
+                        Granada Testnet in use.
                         <span>You can change the network in the settings</span>
                     </template>
                 </Tooltip>
