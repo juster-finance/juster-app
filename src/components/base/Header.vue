@@ -143,11 +143,14 @@ export default defineComponent({
                 <AppStatus :class="$style.app_status" />
 
                 <Tooltip v-if="pkh" position="left">
-                    <Icon
-                        name="Warning"
-                        size="20"
-                        :class="$style.warning_icon"
-                    />
+                    <div :class="$style.testnet_warning">
+                        <Icon
+                            name="Warning"
+                            size="16"
+                            :class="$style.warning_icon"
+                        />
+                        Granada Testnet
+                    </div>
 
                     <template v-slot:content>
                         Granada Testnet in use.
@@ -277,6 +280,27 @@ export default defineComponent({
     margin-right: 40px;
 }
 
+.testnet_warning {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 6px;
+    background: rgba(245, 183, 43, 0.2);
+    height: 28px;
+    padding: 0 8px 0 6px;
+
+    font-size: 12px;
+    line-height: 1px;
+    font-weight: 600;
+    color: var(--yellow);
+
+    transition: all 0.2s ease;
+}
+
+.testnet_warning svg {
+    fill: var(--yellow);
+}
+
 .left {
     display: flex;
     align-items: center;
@@ -315,19 +339,6 @@ export default defineComponent({
 
 .links a:hover {
     color: var(--text-primary);
-}
-
-.warning_icon {
-    fill: var(--yellow);
-    padding: 6px;
-    box-sizing: content-box;
-    border-radius: 8px;
-
-    transition: all 0.2s ease;
-}
-
-.warning_icon:hover {
-    background: var(--opacity-10);
 }
 
 .notifications_icon {

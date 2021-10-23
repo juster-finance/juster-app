@@ -64,7 +64,7 @@ import { useNotificationsStore } from "@/store/notifications"
  * Services
  */
 import { numberWithSymbol } from "@/services/utils/amounts"
-import { toClipboard } from "@/services/utils/global"
+import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
 
 export default defineComponent({
     name: "EventBase",
@@ -177,10 +177,8 @@ export default defineComponent({
         )
 
         const highestRatio = computed(() => {
-            const hRatio =
-                event.value?.poolBelow / event.value?.poolAboveEq + 1
-            const lRatio =
-                event.value?.poolAboveEq / event.value?.poolBelow + 1
+            const hRatio = event.value?.poolBelow / event.value?.poolAboveEq + 1
+            const lRatio = event.value?.poolAboveEq / event.value?.poolBelow + 1
 
             return Math.max(hRatio, lRatio).toFixed(2)
         })
@@ -314,6 +312,7 @@ export default defineComponent({
             handleSwitch,
             handleJoin,
             copy,
+            getCurrencyIcon,
         }
     },
 
@@ -379,16 +378,7 @@ export default defineComponent({
                             <!-- Name -->
                             <h3 :class="$style.name">
                                 <img
-                                    v-if="symbol.split('-')[0] == 'XTZ'"
-                                    src="@/assets/symbols/tz.png"
-                                />
-                                <img
-                                    v-if="symbol.split('-')[0] == 'ETH'"
-                                    src="@/assets/symbols/eth.png"
-                                />
-                                <img
-                                    v-if="symbol.split('-')[0] == 'BTC'"
-                                    src="@/assets/symbols/btc.png"
+                                    :src="getCurrencyIcon(symbol.split('-')[0])"
                                 />
 
                                 {{ symbol.split("-")[0] }}

@@ -92,4 +92,8 @@ export default defineComponent({
     fill: var(--yellow);
     background: rgba(245, 183, 43, 0.2);
 }
+.wrapper.red svg {
+    fill: var(--red);
+    background: rgba(224, 92, 67, 0.2);
+}
 </style>

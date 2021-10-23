@@ -98,17 +98,9 @@ export default defineComponent({
 
         <div :class="$style.right">
             <div :class="$style.actions">
-                <Button size="medium" type="tertiary" disabled>
-                    <Icon name="chart" size="16" />
-                    View chart
-                </Button>
-                <Button size="medium" type="tertiary" disabled>
-                    <Icon name="liquidity" size="16" />
-                    Liquidity
-                </Button>
                 <Button @click="handleJoin" size="medium" type="secondary">
-                    <Icon name="bolt" size="16" />
-                    Join the event
+                    <Icon name="collection" size="16" />
+                    View events
                 </Button>
             </div>
 

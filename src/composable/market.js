@@ -89,5 +89,5 @@ export const useMarket = () => {
         })
     }
 
-    return { setupMarket, symbols, status }
+    return { setupMarket, symbols }
 }

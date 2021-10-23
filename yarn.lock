@@ -1008,28 +1008,28 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@juster-finance/gql-client@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@juster-finance/gql-client/-/gql-client-0.0.1.tgz#37eb4ea3ecca1f35d9575e30b948b98ecda05fc6"
-  integrity sha512-PF9oGaMv/5GoUtRQVsZGopWV/FiT7geQQG06F6FdO29OXOMl2YjRXwyRNUHZg/FDCQTp69KRwzMruIqpsTLNHg==
+"@juster-finance/gql-client@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@juster-finance/gql-client/-/gql-client-0.0.5.tgz#fc6c446d5a562d233b1601664c1504e4a1cbaaa0"
+  integrity sha512-Qqresg12ls9nldnL//oVo0LcoOpfwwZsJnXjjPEpnCXxDo84De+Ix6d0WzkjngaHxaR/x8rNmdLkfUQGKVTGnw==
   dependencies:
     "@genql/runtime" "2.6.0"
     graphql "^15.5.0"
 
-"@juster-finance/gql-client@^0.0.3":
+"@juster-finance/gql-client@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@juster-finance/gql-client/-/gql-client-0.0.6.tgz#3e7bdb9dc3133fa587fb7a07e075a0e363d290f5"
+  integrity sha512-aS2uhpESvAIybnEjcxaA6rLL6AUexFKmWXmNxqq11TL6kO6Y2uHv55R9sjk+tbbOIEXjrbbem7+ZkVtDhVqWZQ==
+  dependencies:
+    "@genql/runtime" "2.6.0"
+    graphql "^15.5.0"
+
+"@juster-finance/sdk@^0.0.3":
   version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@juster-finance/gql-client/-/gql-client-0.0.3.tgz#55b8f996788ae6dc9ed90da68c06ef090a0476c0"
-  integrity sha512-EW0QABl9Q/XaahjcdBiITvxr+Z7fs6A16wgkXv7Pt+UV43QRkrZBgvwn21UCFYObqpmDFSzzYYYm9+LSdEg/oQ==
+  resolved "https://registry.yarnpkg.com/@juster-finance/sdk/-/sdk-0.0.3.tgz#90679f143c91a62981417b28dc01b059c00d6fea"
+  integrity sha512-olGukNH+jY5EmGTdtGDYoqzOLmSWLcMfXy94NHQAWcwNM0pyu1uqn4cpg6TpPh9rBPsjSMTtsDa4VTDOrAh1sQ==
   dependencies:
-    "@genql/runtime" "2.6.0"
-    graphql "^15.5.0"
-
-"@juster-finance/sdk@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@juster-finance/sdk/-/sdk-0.0.1.tgz#8801c03611f93991276f63b2a549b6ea19a92ad8"
-  integrity sha512-Hv4aauF4MNJhZBoZ0qjApCfLlTBXyhzzshNWLyBaHbc6VGVym8BbbBwlsKvu363j9SkKor6XmVqUywr4o5gCaw==
-  dependencies:
-    "@juster-finance/gql-client" "^0.0.1"
+    "@juster-finance/gql-client" "^0.0.5"
     "@taquito/beacon-wallet" "^9.1.1"
     "@taquito/taquito" "^9.1.0"
     bignumber.js "^9.0.1"

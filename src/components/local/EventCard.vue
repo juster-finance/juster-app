@@ -8,9 +8,7 @@ import {
     ref,
     reactive,
     computed,
-    watch,
 } from "vue"
-import * as d3 from "d3"
 import { DateTime } from "luxon"
 import { useRouter } from "vue-router"
 import { gql } from "@/services/tools"
@@ -38,8 +36,7 @@ import Pool from "@/components/local/Pool"
 /**
  * Services
  */
-import { prepareQuotesForD3 } from "@/services/utils/quotes"
-import { toClipboard } from "@/services/utils/global"
+import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
 import { juster } from "@/services/tools"
 
 /**
@@ -218,7 +215,6 @@ export default defineComponent({
             card.value.addEventListener("contextmenu", contextMenuHandler)
 
             /** Subscription, TODO: refactor */
-
             subscription.value = await gql
                 .subscription({
                     event: [
@@ -288,6 +284,7 @@ export default defineComponent({
             handleWithdraw,
             copy,
             handleSwitch,
+            getCurrencyIcon,
         }
     },
 
@@ -366,30 +363,41 @@ export default defineComponent({
                     <div :class="$style.top_left">
                         <!-- Name -->
                         <h3 :class="$style.name">
-                            <img
-                                v-if="symbol.split('-')[0] == 'XTZ'"
-                                src="@/assets/symbols/tz.png"
-                            />
-                            <img
-                                v-if="symbol.split('-')[0] == 'ETH'"
-                                src="@/assets/symbols/eth.png"
-                            />
-                            <img
-                                v-if="symbol.split('-')[0] == 'BTC'"
-                                src="@/assets/symbols/btc.png"
-                            />
+                            <div :class="$style.symbol_image">
+                                <img
+                                    :src="getCurrencyIcon(symbol.split('-')[0])"
+                                />
+
+                                <Icon
+                                    v-if="event.winnerBets"
+                                    name="higher"
+                                    size="16"
+                                    :class="
+                                        event.winnerBets == 'ABOVE_EQ'
+                                            ? $style.higher
+                                            : $style.lower
+                                    "
+                                />
+                            </div>
 
                             {{ symbol.split("-")[0] }}
-                            <span>will rise</span>
+
+                            <span v-if="!event.winnerBets">will rise</span>
+                            <span v-else-if="event.winnerBets == 'ABOVE_EQ'"
+                                >went up
+                            </span>
+                            <span v-else-if="event.winnerBets == 'BELOW'"
+                                >went down
+                            </span>
                         </h3>
 
                         <!-- Timing -->
                         <div v-if="timing.showDay" :class="$style.timing">
-                            <span>{{ timing.start.time }}</span> ({{
-                                timing.start.day
-                            }}) -> <span>{{ timing.end.time }}</span> ({{
-                                timing.end.day
-                            }})
+                            {{ timing.start.day }}
+                            <span>{{ timing.start.time }}</span>
+                            ->
+                            {{ timing.end.day }}
+                            <span>{{ timing.end.time }}</span>
                         </div>
                         <div v-else :class="$style.timing">
                             {{ timing.start.day }}
@@ -487,7 +495,7 @@ export default defineComponent({
                         position="bottom"
                         side="left"
                     >
-                        <Label icon="check">Done</Label>
+                        <Label icon="check">Finished</Label>
 
                         <template v-slot:content>
                             The event is over, the winners are determined
@@ -573,13 +581,34 @@ export default defineComponent({
     align-items: center;
 }
 
-.name img {
+.symbol_image {
+    position: relative;
+
+    margin-right: 10px;
+}
+
+.symbol_image svg {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+
+    background: var(--card-bg);
+    border-radius: 50%;
+}
+
+.symbol_image svg.higher {
+    fill: var(--green);
+}
+
+.symbol_image svg.lower {
+    fill: var(--red);
+}
+
+.symbol_image img {
     width: 24px;
     height: 24px;
     border-radius: 6px;
     opacity: 0.7;
-
-    margin-right: 10px;
 }
 
 .name span {

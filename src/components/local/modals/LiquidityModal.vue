@@ -100,7 +100,7 @@ export default defineComponent({
                 return "Acceptance of bets is closed"
             if (sendingBet.value) return "Accepting your liquidity.."
 
-            if (!amount.value) return "Type the bet amount"
+            if (!amount.value) return "Type the liquidity amount"
             if (amount.value) return "Provide liquidity"
         })
 
@@ -202,7 +202,7 @@ export default defineComponent({
                 type="number"
                 :limit="10000"
                 label="Amount"
-                placeholder="Bet amount"
+                placeholder="Liquidity amount"
                 subtext="XTZ"
                 v-model="amount.value"
                 :error="amount.error"
