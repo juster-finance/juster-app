@@ -161,7 +161,7 @@ export default defineComponent({
 
             if (countdownStatus.value !== "In progress")
                 return "Acceptance of bets is closed"
-            if (sendingBet.value) return "Accepting your bet.."
+            if (sendingBet.value) return "Awaiting confirmation.."
 
             switch (side.value) {
                 case "Higher":
@@ -188,7 +188,6 @@ export default defineComponent({
                     BigNumber(minReward.value),
                 )
                 .then(op => {
-                    console.log(`H: ${op.opHash}`)
                     sendingBet.value = false
 
                     /** slow notification to get attention */
@@ -204,7 +203,11 @@ export default defineComponent({
                         })
                     }, 700)
 
-                    context.emit("onClose")
+                    context.emit("onBet", {
+                        side: betType == "aboveEq" ? "ABOVE_EQ" : "BELOW",
+                        amount: amount.value,
+                        reward: minReward.value,
+                    })
                 })
                 .catch(err => {
                     sendingBet.value = false
@@ -241,7 +244,7 @@ export default defineComponent({
         }
     },
 
-    emits: ["switch"],
+    emits: ["switch", "onBet"],
     components: {
         Modal,
         Input,

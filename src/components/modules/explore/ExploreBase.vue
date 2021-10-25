@@ -1,12 +1,19 @@
 <script>
 import { defineComponent, ref, onMounted } from "vue"
+import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
+import { cloneDeep } from "lodash"
 
 /**
  * Local
  */
 import SymbolCard from "@/components/local/SymbolCard"
 import EventCard from "@/components/local/EventCard"
+
+/**
+ * UI
+ */
+import Button from "@/components/ui/Button"
 
 /**
  * API
@@ -22,13 +29,23 @@ export default defineComponent({
     name: "ExploreBase",
 
     setup() {
+        const router = useRouter()
+
         const marketStore = useMarketStore()
 
-        const topEvents = ref([])
+        const events = ref([])
 
         onMounted(async () => {
-            topEvents.value = await fetchTopEvents()
+            const topEvents = await fetchTopEvents({ limit: 3 })
+
+            events.value = cloneDeep(topEvents).sort(
+                (a, b) => b.bets.length - a.bets.length,
+            )
         })
+
+        const handleViewTopEvents = () => {
+            router.push("/events/top")
+        }
 
         /** Meta */
         useMeta({
@@ -39,11 +56,12 @@ export default defineComponent({
 
         return {
             marketStore,
-            topEvents,
+            events,
+            handleViewTopEvents,
         }
     },
 
-    components: { SymbolCard, EventCard },
+    components: { SymbolCard, EventCard, Button },
 })
 </script>
 
@@ -74,14 +92,27 @@ export default defineComponent({
 
             <!-- Top events -->
             <div :class="$style.block">
-                <h1>Top events</h1>
-                <div :class="$style.description">
-                    Events that are currently active and in demand
+                <div :class="$style.head">
+                    <div :class="$style.left">
+                        <h1>Top events</h1>
+                        <div :class="$style.description">
+                            Events that are currently active and in demand
+                        </div>
+                    </div>
+
+                    <Button
+                        @click="handleViewTopEvents"
+                        size="small"
+                        type="secondary"
+                    >
+                        <Icon name="collection" size="16" />
+                        View top events
+                    </Button>
                 </div>
 
-                <div v-if="topEvents.length" :class="$style.items">
+                <div v-if="events.length" :class="$style.items">
                     <EventCard
-                        v-for="event in topEvents.slice(0, 3)"
+                        v-for="event in events.slice(0, 3)"
                         :key="event.id"
                         :event="event"
                     />
@@ -101,6 +132,11 @@ export default defineComponent({
 
 .block:last-child {
     margin-bottom: 0;
+}
+
+.head {
+    display: flex;
+    justify-content: space-between;
 }
 
 .description {

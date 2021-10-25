@@ -9,7 +9,11 @@ import Button from "@/components/ui/Button"
 /**
  * Services
  */
-import { numberWithSymbol, calcChange } from "@/services/utils/amounts"
+import {
+    numberWithSymbol,
+    calcChange,
+    abbreviateNumber,
+} from "@/services/utils/amounts"
 import { supportedSymbols } from "@/services/config"
 
 /**
@@ -69,6 +73,7 @@ export default defineComponent({
             price,
             supportedSymbols,
             handleJoin,
+            abbreviateNumber,
         }
     },
 
@@ -114,14 +119,24 @@ export default defineComponent({
 
                 <div :class="$style.param">
                     <span>TVL:</span>
-                    <span>{{ symbol.totalValueLocked.toFixed(0) }} XTZ</span>
+                    <span
+                        >{{
+                            abbreviateNumber(symbol.totalValueLocked.toFixed(0))
+                        }}
+                        XTZ</span
+                    >
                 </div>
 
                 <div :class="$style.dot" />
 
                 <div :class="$style.param">
                     <span>Volume (24h):</span>
-                    <span>{{ symbol.totalVolume.toFixed(0) }} XTZ</span>
+                    <span
+                        >{{
+                            abbreviateNumber(symbol.totalVolume.toFixed(0))
+                        }}
+                        XTZ</span
+                    >
                 </div>
             </div>
         </div>

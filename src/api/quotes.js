@@ -8,12 +8,11 @@ import {
     getQuoteByTimestamp,
 } from "@/graphql/queries/quotes"
 
-export const fetchQuotesBySymbol = async ({ id, ts, limit }) => {
+export const fetchQuotesBySymbol = async ({ id, limit, offset }) => {
     try {
-        if (!id || !ts || !limit)
+        if (!id || !limit)
             throw new Error(
                 `${(id == undefined && "ID") ||
-                    (ts == undefined && "TS (timestamp)") ||
                     (limit == undefined && "limit")} is required`,
             )
         if (typeof id !== "number") throw new Error("ID must be a Number")
@@ -21,7 +20,7 @@ export const fetchQuotesBySymbol = async ({ id, ts, limit }) => {
 
         const { data } = await apollo.query({
             query: getQuotesBySymbol,
-            variables: { id, ts, limit },
+            variables: { id, limit, offset },
         })
         return data.quotesWma
     } catch (error) {

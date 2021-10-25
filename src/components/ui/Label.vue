@@ -49,7 +49,7 @@ export default defineComponent({
     white-space: nowrap;
 
     background: var(--label-bg);
-    border-radius: 50px;
+    border-radius: 8px;
     border: 1px solid var(--border);
     padding: 4px 12px 4px 4px;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
@@ -64,7 +64,7 @@ export default defineComponent({
 .wrapper svg {
     box-sizing: content-box;
     padding: 4px;
-    border-radius: 50px;
+    border-radius: 6px;
 
     margin-right: 8px;
 }

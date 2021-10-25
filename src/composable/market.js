@@ -45,7 +45,6 @@ export const useMarket = () => {
         symbols.value.forEach(async symbol => {
             const quotes = await fetchQuotesBySymbol({
                 id: symbol.id,
-                ts: DateTime.now().toISO(),
                 limit: 100,
             })
             marketStore.setQuotes({ target: symbol.symbol, quotes })

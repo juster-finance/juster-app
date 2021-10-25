@@ -98,7 +98,7 @@ export default defineComponent({
         const buttonText = computed(() => {
             if (countdownStatus.value !== "In progress")
                 return "Acceptance of bets is closed"
-            if (sendingBet.value) return "Accepting your liquidity.."
+            if (sendingBet.value) return "Awaiting confirmation.."
 
             if (!amount.value) return "Type the liquidity amount"
             if (amount.value) return "Provide liquidity"

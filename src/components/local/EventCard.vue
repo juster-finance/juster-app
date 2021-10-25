@@ -38,6 +38,7 @@ import Pool from "@/components/local/Pool"
  */
 import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
 import { juster } from "@/services/tools"
+import { abbreviateNumber } from "@/services/utils/amounts"
 
 /**
  * Composable
@@ -80,9 +81,6 @@ export default defineComponent({
         const subscription = ref({})
 
         const symbol = computed(() => event.value.currencyPair.symbol)
-        const quotes = computed(() => {
-            return marketStore.symbols[symbol.value].quotes.slice(0, 30)
-        })
 
         /** Countdown setup */
         const { status, time, stop } = useCountdown(event)
@@ -285,6 +283,7 @@ export default defineComponent({
             copy,
             handleSwitch,
             getCurrencyIcon,
+            abbreviateNumber,
         }
     },
 
@@ -504,7 +503,9 @@ export default defineComponent({
 
                     <Tooltip position="bottom" side="left">
                         <Label icon="money" color="green"
-                            ><span>{{ event.totalValueLocked }}</span
+                            ><span>{{
+                                abbreviateNumber(event.totalValueLocked)
+                            }}</span
                             >XTZ</Label
                         >
 
@@ -602,6 +603,7 @@ export default defineComponent({
 
 .symbol_image svg.lower {
     fill: var(--red);
+    transform: rotate(180deg);
 }
 
 .symbol_image img {

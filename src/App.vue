@@ -43,11 +43,20 @@ export default defineComponent({
         const accountStore = useAccountStore()
 
         onBeforeMount(() => {
-            juster._provider.client.getActiveAccount().then(account => {
+            juster._provider.client.getActiveAccount().then(async account => {
                 if (!account) return
 
                 accountStore.setPkh(account.address)
                 accountStore.updateBalance()
+
+                /** check for won positions */
+                const wonPositions = await fetchUserPositionsForWithdrawal({
+                    address: accountStore.pkh,
+                })
+
+                if (wonPositions.length) {
+                    accountStore.wonPositions = wonPositions
+                }
             })
         })
 
@@ -63,17 +72,6 @@ export default defineComponent({
             if (state.pkh && !localStorage.isOnboardingShown) {
                 localStorage.isOnboardingShown = true
                 showWelcomeScreen.value = true
-            }
-        })
-
-        /** check for won positions */
-        onMounted(async () => {
-            const wonPositions = await fetchUserPositionsForWithdrawal({
-                address: accountStore.pkh,
-            })
-
-            if (wonPositions.length) {
-                accountStore.hasWonPositions = true
             }
         })
 

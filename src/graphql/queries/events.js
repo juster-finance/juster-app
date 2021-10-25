@@ -24,8 +24,21 @@ export const getEventById = gql`
                 symbol
             }
             bets {
-                amount
+                id
                 side
+                reward
+                amount
+                createdTime
+                userId
+            }
+            deposits {
+                amountAboveEq
+                amountBelow
+                eventId
+                id
+                userId
+                createdTime
+                shares
             }
         }
     }
@@ -100,11 +113,11 @@ export const getEventsBySymbol = gql`
 `
 
 export const getTopEvents = gql`
-    query getTopEvents {
+    query getTopEvents($limit: Int) {
         event(
-            where: { totalValueLocked: { _eq: "1" }, status: { _eq: "NEW" } }
+            where: { status: { _eq: "NEW" } }
             order_by: { id: desc }
-            limit: 3
+            limit: $limit
         ) {
             id
             status

@@ -1,15 +1,34 @@
 <script>
+import { computed, defineComponent, toRefs } from "vue"
+
 /**
  * Local
  */
 import Pool from "@/components/local/Pool"
 
-export default {
+export default defineComponent({
     name: "EventDetailsCard",
     props: { event: Object },
 
+    setup(props) {
+        const { event } = toRefs(props)
+
+        const risePool = computed(() =>
+            event.value.bets
+                .filter(bet => bet.side == "ABOVE_EQ")
+                .reduce((acc, { amount }) => acc + amount, 0),
+        )
+        const fallPool = computed(() =>
+            event.value.bets
+                .filter(bet => bet.side == "BELOW")
+                .reduce((acc, { amount }) => acc + amount, 0),
+        )
+
+        return { risePool, fallPool }
+    },
+
     components: { Pool },
-}
+})
 </script>
 
 <template>
@@ -21,8 +40,9 @@ export default {
         <Pool :event="event" />
 
         <div :class="$style.hint">
-            Users bet <span>0 XTZ</span> for the fact that the price will rise
-            and <span>0 XTZ</span> for a fall. Make your choice.
+            Users bet <span>{{ risePool }} XTZ</span> for the fact that the
+            price will rise and <span>{{ fallPool }} XTZ</span> for a fall. Make
+            your choice.
         </div>
     </div>
 </template>

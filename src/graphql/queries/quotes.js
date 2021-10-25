@@ -1,11 +1,12 @@
 import gql from "graphql-tag"
 
 export const getQuotesBySymbol = gql`
-    query getQuotesBySymbol($id: Int, $ts: timestamptz, $limit: Int) {
+    query getQuotesBySymbol($id: Int, $limit: Int, $offset: Int) {
         quotesWma(
-            where: { currencyPairId: { _eq: $id }, timestamp: { _lt: $ts } }
+            where: { currencyPairId: { _eq: $id } }
             order_by: { timestamp: desc }
             limit: $limit
+            offset: $offset
         ) {
             currencyPairId
             price
@@ -13,6 +14,7 @@ export const getQuotesBySymbol = gql`
         }
     }
 `
+
 export const getQuoteByTimestamp = gql`
     query getQuoteByTimestamp($id: Int, $ts: timestamptz) {
         quotesWma(

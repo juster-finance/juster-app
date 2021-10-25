@@ -13,7 +13,7 @@ export const useAccountStore = defineStore({
             pkh: "",
             balance: 0,
 
-            hasWonPositions: false,
+            wonPositions: [],
         }
     },
     actions: {

@@ -3,13 +3,18 @@ import { computed, defineComponent, toRefs } from "vue"
 import { DateTime } from "luxon"
 
 /**
+ * UI
+ */
+import Spin from "@/components/ui/Spin"
+
+/**
  * Store
  */
 import { useAccountStore } from "@/store/account"
 
 export default defineComponent({
     name: "BetCard",
-    props: { bet: Object },
+    props: { bet: Object, pending: Boolean, won: Boolean },
 
     setup(props) {
         const { bet } = toRefs(props)
@@ -22,14 +27,17 @@ export default defineComponent({
 
         return { side, DateTime, pkh: accountStore.pkh }
     },
+
+    components: { Spin },
 })
 </script>
 
 <template>
     <div :class="$style.wrapper">
         <div :class="$style.base">
-            <div :class="$style.icon">
-                <Icon name="bet" size="16" />
+            <div :class="[$style.icon, won && $style.won]">
+                <Icon v-if="!pending" :name="won ? 'check' : 'bet'" size="16" />
+                <Spin v-else size="16" />
 
                 <router-link
                     :to="`/profile/${bet.userId}`"
@@ -37,18 +45,27 @@ export default defineComponent({
                 >
                     <img
                         :src="
-                            `https://services.tzkt.io/v1/avatars/${bet.userId}`
+                            `https://services.tzkt.io/v1/avatars/${
+                                pending ? pkh : bet.userId
+                            }`
                         "
                     />
                 </router-link>
             </div>
 
             <div :class="$style.info">
-                <div :class="$style.title">
+                <div v-if="!pending" :class="$style.title">
                     {{ pkh == bet.userId ? "My" : "" }} Bet
                 </div>
-                <div :class="$style.time">
+                <div v-else :class="$style.title">
+                    Pending Bet
+                </div>
+
+                <div v-if="!pending" :class="$style.time">
                     {{ DateTime.fromISO(bet.createdTime).toRelative() }}
+                </div>
+                <div v-else :class="$style.time">
+                    Just now
                 </div>
             </div>
         </div>
@@ -103,6 +120,11 @@ export default defineComponent({
     fill: var(--icon);
 
     margin-right: 16px;
+}
+
+.icon.won {
+    background: rgba(26, 161, 104, 0.2);
+    fill: var(--green);
 }
 
 .user_avatar img {

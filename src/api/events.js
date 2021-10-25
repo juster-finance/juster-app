@@ -75,10 +75,11 @@ export const fetchEventParticipants = async ({ id }) => {
     }
 }
 
-export const fetchTopEvents = async () => {
+export const fetchTopEvents = async ({ limit }) => {
     try {
         const { data } = await apollo.query({
             query: getTopEvents,
+            variables: { limit },
         })
 
         return data.event

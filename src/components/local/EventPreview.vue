@@ -16,8 +16,7 @@ export default defineComponent({
 
         // eslint-disable-next-line vue/return-in-computed-property
         const name = computed(() => {
-            return supportedSymbols[event.value.currencyPair.symbol]
-                .description
+            return supportedSymbols[event.value.currencyPair.symbol].description
         })
 
         /** Event day */
@@ -72,7 +71,7 @@ export default defineComponent({
             </div>
         </div>
 
-        <div :class="$style.actions">
+        <div v-if="type" :class="$style.actions">
             <div @click="handleSwitch" :class="$style.action">
                 {{ type == "liquidity" ? "Make a bet" : "Provide liquidity" }}
             </div>
