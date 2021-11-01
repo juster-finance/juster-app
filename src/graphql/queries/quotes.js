@@ -15,6 +15,22 @@ export const getQuotesBySymbol = gql`
     }
 `
 
+export const getQuoteByRange = gql`
+    query getQuoteByRange($id: Int, $tsLt: timestamptz, $tsGt: timestamptz) {
+        quotesWma(
+            where: {
+                timestamp: { _gte: $tsGt, _lte: $tsLt }
+                currencyPairId: { _eq: $id }
+            }
+            order_by: { timestamp: desc }
+        ) {
+            currencyPairId
+            price
+            timestamp
+        }
+    }
+`
+
 export const getQuoteByTimestamp = gql`
     query getQuoteByTimestamp($id: Int, $ts: timestamptz) {
         quotesWma(

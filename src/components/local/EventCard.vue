@@ -39,6 +39,7 @@ import Pool from "@/components/local/Pool"
 import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
 import { juster } from "@/services/tools"
 import { abbreviateNumber } from "@/services/utils/amounts"
+import { supportedSymbols } from "@/services/config"
 
 /**
  * Composable
@@ -284,6 +285,7 @@ export default defineComponent({
             handleSwitch,
             getCurrencyIcon,
             abbreviateNumber,
+            supportedSymbols,
         }
     },
 
@@ -379,15 +381,7 @@ export default defineComponent({
                                 />
                             </div>
 
-                            {{ symbol.split("-")[0] }}
-
-                            <span v-if="!event.winnerBets">will rise</span>
-                            <span v-else-if="event.winnerBets == 'ABOVE_EQ'"
-                                >went up
-                            </span>
-                            <span v-else-if="event.winnerBets == 'BELOW'"
-                                >went down
-                            </span>
+                            {{ supportedSymbols[symbol].description }}
                         </h3>
 
                         <!-- Timing -->
@@ -424,14 +418,14 @@ export default defineComponent({
                             :class="$style.button_group"
                         >
                             <div @click="handleJoin" :class="$style.button">
-                                Join
+                                Bet
                             </div>
                             <div :class="$style.group_divider" />
                             <div
                                 @click="handleLiquidity"
                                 :class="$style.button"
                             >
-                                <Icon name="liquidity" size="16" />
+                                Liquidity
                             </div>
                         </div>
                     </div>
@@ -514,7 +508,7 @@ export default defineComponent({
                         </template>
                     </Tooltip>
                     <Tooltip position="bottom" side="left">
-                        <Label icon="money" color="yellow"
+                        <Label icon="time" color="yellow"
                             ><span>{{ event.measurePeriod / 3600 }}</span
                             >h</Label
                         >
@@ -574,7 +568,9 @@ export default defineComponent({
 .top_left {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
+
+    margin-bottom: 16px;
 }
 
 .name {
@@ -625,8 +621,6 @@ export default defineComponent({
     font-weight: 500;
     color: var(--text-tertiary);
     fill: var(--text-tertiary);
-
-    margin-bottom: 16px;
 }
 
 .timing span {
@@ -652,33 +646,44 @@ export default defineComponent({
     display: flex;
     align-items: center;
 
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid var(--border);
     background: var(--btn-secondary-bg);
-    padding: 0 2px;
 
     font-size: 13px;
     line-height: 1.1;
     font-weight: 600;
     color: var(--text-primary);
-
-    transition: all 0.2s ease;
-}
-
-.button_group:hover {
-    background: var(--btn-secondary-bg-hover);
 }
 
 .button_group:active {
     transform: translateY(1px);
 }
 
+.button_group:hover .group_divider {
+    opacity: 0;
+}
+
 .button {
     display: flex;
     align-items: center;
 
-    padding: 0 10px;
+    padding: 0 12px;
     height: 28px;
+
+    transition: background 0.2s ease;
+}
+
+.button:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+.button:last-child {
+    border-radius: 0 6px 6px 0;
+}
+
+.button:hover {
+    background: var(--btn-secondary-bg-hover);
 }
 
 .button svg {
@@ -689,5 +694,7 @@ export default defineComponent({
     width: 1px;
     height: 20px;
     background: var(--border);
+
+    transition: all 0.2s ease;
 }
 </style>

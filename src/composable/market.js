@@ -45,7 +45,7 @@ export const useMarket = () => {
         symbols.value.forEach(async symbol => {
             const quotes = await fetchQuotesBySymbol({
                 id: symbol.id,
-                limit: 100,
+                limit: 1000,
             })
             marketStore.setQuotes({ target: symbol.symbol, quotes })
 

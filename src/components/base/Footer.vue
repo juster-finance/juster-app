@@ -37,7 +37,12 @@ export default defineComponent({
                     <div :class="$style.column">
                         <div :class="$style.name">Other</div>
 
-                        <div :class="$style.link">Contact us</div>
+                        <a
+                            href="https://discord.com/channels/846362414039695391/857661534862966805"
+                            target="_blank"
+                            :class="$style.link"
+                            >Contact us</a
+                        >
                         <router-link to="/terms" :class="$style.link"
                             >Terms of Use</router-link
                         >

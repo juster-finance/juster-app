@@ -13,16 +13,18 @@ export default defineComponent({
         // eslint-disable-next-line vue/return-in-computed-property
         const abovePercent = computed(() => {
             return Math.floor(
-                (event.value.poolAboveEq * 100) /
-                    (event.value.poolAboveEq + event.value.poolBelow),
+                (parseFloat(event.value.poolAboveEq) * 100) /
+                    (parseFloat(event.value.poolAboveEq) +
+                        parseFloat(event.value.poolBelow)),
             )
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
         const belowPercent = computed(() => {
             return Math.ceil(
-                (event.value.poolBelow * 100) /
-                    (event.value.poolAboveEq + event.value.poolBelow),
+                (parseFloat(event.value.poolBelow) * 100) /
+                    (parseFloat(event.value.poolAboveEq) +
+                        parseFloat(event.value.poolBelow)),
             )
         })
 
@@ -35,13 +37,13 @@ export default defineComponent({
     <div :class="$style.wrapper">
         <div :class="$style.head">
             <div :class="[$style.name, $style.rise]">
-                <Icon name="carret" size="12" />Higher<span v-if="abovePercent">
+                <Icon name="carret" size="12" />Rise<span v-if="abovePercent">
                     {{ abovePercent }}%</span
                 >
             </div>
 
             <div :class="[$style.name, $style.fall]">
-                <span v-if="belowPercent">{{ belowPercent }}% </span>Lower
+                <span v-if="belowPercent">{{ belowPercent }}% </span>Fall
                 <Icon name="carret" size="12" />
             </div>
         </div>

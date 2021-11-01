@@ -47,16 +47,18 @@ export default defineComponent({
                 return "Loading"
 
             const { diff, percent, isIncreased } = calcChange(
-                quotes.value[0].price,
-                marketStore.symbols[event.value.currencyPair.symbol]
-                    .historyPrice,
+                parseFloat(quotes.value[0].price),
+                parseFloat(
+                    marketStore.symbols[event.value.currencyPair.symbol]
+                        .historyPrice,
+                ),
             )
             color.value = isIncreased ? "green" : "red"
 
             return `${numberWithSymbol(
                 diff.toFixed(2),
                 " ",
-            )}, ${percent.toFixed(2)}%`
+            )}, ${percent.toFixed(2)}%, 1W`
         })
 
         const openSymbol = () => {

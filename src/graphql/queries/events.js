@@ -22,6 +22,7 @@ export const getEventById = gql`
             targetDynamics
             currencyPair {
                 symbol
+                id
             }
             bets {
                 id
@@ -55,6 +56,7 @@ export const getAllEvents = gql`
             betsCloseTime
             currencyPair {
                 symbol
+                id
             }
             bets {
                 amount
@@ -89,6 +91,7 @@ export const getEventsBySymbol = gql`
             betsCloseTime
             currencyPair {
                 symbol
+                id
             }
             bets {
                 amount
@@ -124,6 +127,7 @@ export const getTopEvents = gql`
             betsCloseTime
             currencyPair {
                 symbol
+                id
             }
             bets {
                 amount

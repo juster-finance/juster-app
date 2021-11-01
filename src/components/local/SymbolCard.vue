@@ -35,7 +35,7 @@ export default defineComponent({
         const marketStore = useMarketStore()
 
         const quotes = computed(() => {
-            return marketStore.symbols[symbol.value.symbol]?.quotes.slice(0, 30)
+            return marketStore.symbols[symbol.value.symbol]?.quotes
         })
 
         const price = computed(() => {
@@ -55,8 +55,8 @@ export default defineComponent({
             if (!symbol.value.historyPrice) return { text: "Loading" }
 
             const { diff, percent, isIncreased } = calcChange(
-                quotes.value[0].price,
-                symbol.value.historyPrice,
+                parseFloat(quotes.value[0].price),
+                parseFloat(symbol.value.historyPrice),
             )
             color.value = isIncreased ? "green" : "red"
 
@@ -64,7 +64,7 @@ export default defineComponent({
                 text: `${numberWithSymbol(
                     diff.toFixed(2),
                     ",",
-                )} (${percent.toFixed(2)}%)`,
+                )}, ${percent.toFixed(2)}%, 1W`,
                 trend: isIncreased ? "rise" : "fall",
             }
         })

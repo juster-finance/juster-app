@@ -6,6 +6,7 @@ import { apollo } from "@/apollo"
 import {
     getQuotesBySymbol,
     getQuoteByTimestamp,
+    getQuoteByRange,
 } from "@/graphql/queries/quotes"
 
 export const fetchQuotesBySymbol = async ({ id, limit, offset }) => {
@@ -26,6 +27,22 @@ export const fetchQuotesBySymbol = async ({ id, limit, offset }) => {
     } catch (error) {
         console.error(
             `Error during fetching quotes by id \n\n ${error.name}: ${error.message}`,
+        )
+        return []
+    }
+}
+
+export const fetchQuoteByRange = async ({ id, tsGt, tsLt }) => {
+    try {
+        const { data } = await apollo.query({
+            query: getQuoteByRange,
+            variables: { id, tsGt, tsLt },
+        })
+
+        return data.quotesWma
+    } catch (error) {
+        console.error(
+            `Error during fetching quote by range ts & id \n\n ${error.name}: ${error.message}`,
         )
         return []
     }

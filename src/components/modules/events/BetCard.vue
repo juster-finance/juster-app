@@ -74,10 +74,12 @@ export default defineComponent({
             <Icon name="higher" size="12" />{{ side }}
         </div>
 
-        <div :class="$style.param">{{ bet.amount }}&nbsp;<span>XTZ</span></div>
+        <div :class="$style.param">
+            {{ parseFloat(bet.amount) }}&nbsp;<span>XTZ</span>
+        </div>
 
         <div :class="$style.param">
-            {{ bet.reward.toFixed(2) }}&nbsp;<span>XTZ</span>
+            {{ parseFloat(bet.reward).toFixed(2) }}&nbsp;<span>XTZ</span>
         </div>
     </div>
 </template>

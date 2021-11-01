@@ -417,7 +417,7 @@ export default defineComponent({
 .subtitle {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
 
     margin-bottom: 12px;
 }

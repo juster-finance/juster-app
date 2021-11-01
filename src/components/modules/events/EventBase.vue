@@ -65,8 +65,8 @@ import { useNotificationsStore } from "@/store/notifications"
  */
 import { numberWithSymbol, abbreviateNumber } from "@/services/utils/amounts"
 import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
-import { juster } from "@/services/tools"
-import { gql } from "@/services/tools"
+import { supportedSymbols } from "@/services/config"
+import { juster, gql } from "@/services/tools"
 
 export default defineComponent({
     name: "EventBase",
@@ -130,11 +130,13 @@ export default defineComponent({
                 path: `/events/${event.value.id}`,
             })
         }
-        const won = computed(() =>
-            accountStore.wonPositions.some(
+        const won = computed(() => {
+            if (!event.value) return
+
+            return accountStore.wonPositions.some(
                 position => position.event.id == event.value.id,
-            ),
-        )
+            )
+        })
 
         /** Countdown setup */
         const { status: countdownStatus, time, stop } = useCountdown(event)
@@ -362,6 +364,7 @@ export default defineComponent({
                             winnerBets: true,
                             targetDynamics: true,
                             currencyPair: {
+                                id: true,
                                 symbol: true,
                             },
                             bets: {
@@ -450,6 +453,7 @@ export default defineComponent({
             getCurrencyIcon,
             abbreviateNumber,
             cloneDeep,
+            supportedSymbols,
         }
     },
 
@@ -542,15 +546,7 @@ export default defineComponent({
                                     />
                                 </div>
 
-                                {{ symbol.split("-")[0] }}
-
-                                <span v-if="!event.winnerBets">will rise</span>
-                                <span v-else-if="event.winnerBets == 'ABOVE_EQ'"
-                                    >went up
-                                </span>
-                                <span v-else-if="event.winnerBets == 'BELOW'"
-                                    >went down
-                                </span>
+                                {{ supportedSymbols[symbol].description }}
                             </h3>
 
                             <!-- Timing -->
@@ -632,7 +628,7 @@ export default defineComponent({
                                     position="bottom"
                                     side="left"
                                 >
-                                    <Label icon="check">Done</Label>
+                                    <Label icon="check">Finished</Label>
 
                                     <template v-slot:content>
                                         The event is over, the winners are
@@ -750,7 +746,7 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <EventChart :event="event" />
+                <EventChart v-if="event" :event="event" />
 
                 <div :class="$style.block">
                     <div :class="$style.title">Bets</div>
@@ -834,12 +830,12 @@ export default defineComponent({
                         <div :class="$style.param">
                             Summary:
                             <span>{{
-                                userBets
-                                    .reduce(
+                                parseFloat(
+                                    userBets.reduce(
                                         (acc, { amount }) => acc + amount,
                                         0,
-                                    )
-                                    .toFixed(2)
+                                    ),
+                                ).toFixed(2)
                             }}</span>
                             XTZ
                         </div>
@@ -849,12 +845,12 @@ export default defineComponent({
                         <div :class="[$style.param, $style.green]">
                             Potential reward:
                             <span>{{
-                                userBets
-                                    .reduce(
+                                parseFloat(
+                                    userBets.reduce(
                                         (acc, { reward }) => acc + reward,
                                         0,
-                                    )
-                                    .toFixed(2)
+                                    ),
+                                ).toFixed(2)
                             }}</span>
                             XTZ
                         </div>
@@ -907,7 +903,6 @@ export default defineComponent({
                         <span>TYPE</span>
                         <span>ABOVE</span>
                         <span>BELOW</span>
-                        <span>SHARES</span>
                     </div>
                     <div v-if="filteredDeposits.length" :class="$style.bets">
                         <DepositCard
@@ -938,13 +933,13 @@ export default defineComponent({
                         <div :class="$style.param">
                             Summary:
                             <span>{{
-                                filteredDeposits
-                                    .reduce(
+                                parseFloat(
+                                    filteredDeposits.reduce(
                                         (acc, { amountBelow }) =>
                                             acc + amountBelow,
                                         0,
-                                    )
-                                    .toFixed(2)
+                                    ),
+                                ).toFixed(2)
                             }}</span>
                             XTZ
                         </div>
@@ -1226,7 +1221,7 @@ export default defineComponent({
     border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--btn-secondary-bg);
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
     height: 32px;
     padding: 0 12px;
 }

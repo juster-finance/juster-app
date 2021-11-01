@@ -2,11 +2,11 @@
 import {
     defineComponent,
     ref,
-    onMounted,
+    reactive,
     onBeforeUnmount,
     toRefs,
     useCssModule,
-    watch,
+    onMounted,
 } from "vue"
 import { DateTime } from "luxon"
 import * as d3 from "d3"
@@ -14,12 +14,13 @@ import * as d3 from "d3"
 /**
  * API
  */
-import { fetchQuotesBySymbol } from "@/api/quotes"
+import { fetchQuotesBySymbol, fetchQuoteByRange } from "@/api/quotes"
 
 /**
  * Services
  */
 import { prepareQuotesForD3 } from "@/services/utils/quotes"
+import { gql } from "@/services/tools"
 
 export default defineComponent({
     name: "EventChart",
@@ -32,10 +33,20 @@ export default defineComponent({
 
         const isOpen = ref(true)
 
-        const quotes = ref([])
+        const symbol = reactive({ quotes: [] })
+        const subscription = ref({})
+
+        /**
+         * Chart
+         */
+        const scale = reactive({
+            x: null,
+            y: null,
+        })
+        const startData = ref([])
 
         const draw = () => {
-            const margin = { top: 20, right: 20, bottom: 30, left: 0 },
+            const margin = { top: 20, right: 100, bottom: 30, left: 0 },
                 width = 784 - margin.left - margin.right,
                 height = 190 - margin.top - margin.bottom
 
@@ -51,24 +62,14 @@ export default defineComponent({
                 .append("g")
                 .attr("transform", `translate(${margin.left},${margin.top})`)
 
-            const data = prepareQuotesForD3({ quotes: quotes.value })
+            const data = prepareQuotesForD3({ quotes: symbol.quotes })
 
-            // const test = []
-            // let startFromDt = DateTime.fromISO(
-            //     event.value.betsCloseTime,
-            // ).minus({ hour: 5 })
-            // for (let index = 0; index < 10; index++) {
-            //     test.push(startFromDt.toJSDate())
-            //     startFromDt = startFromDt.plus({ minute: 30 })
-            // }
-            // console.log(test)
-
-            const xScale = d3
+            scale.x = d3
                 .scaleTime()
                 .domain(d3.extent(data, d => d.date))
                 .range([0, width])
 
-            const yScale = d3
+            scale.y = d3
                 .scaleLinear()
                 .domain([
                     d3.min(data, d => +d.value),
@@ -76,17 +77,43 @@ export default defineComponent({
                 ])
                 .range([height, 0])
 
+            /** Price line */
+            startData.value = data.find(
+                d =>
+                    new Date(d.date).getTime() ==
+                    new Date(event.value.betsCloseTime).getTime(),
+            )
+
+            const startLine = canvas
+                .append("g")
+                .attr(
+                    "transform",
+                    `translate(${scale.x(
+                        new Date(event.value.betsCloseTime),
+                    )}, ${scale.y(startData.value.value) + margin.top})`,
+                )
+
+            startLine
+                .append("line")
+                .attr("x1", `100%`)
+                .attr("class", classes.start_price_line)
+
             /** Ticks */
-            xScale.ticks(10).forEach(tick => {
+            scale.x.ticks(10).forEach(tick => {
                 const tickG = canvas
                     .append("g")
-                    .attr("transform", `translate(${xScale(tick)}, 0)`)
+                    .attr("transform", `translate(${scale.x(tick)}, 0)`)
 
-                tickG.append("line").attr("y2", 170)
+                tickG
+                    .append("line")
+                    .attr("y2", 170)
+                    .attr("class", classes.time_line)
 
                 const format = d3.timeFormat("%H:%M")
 
                 if (
+                    DateTime.fromISO(event.value.betsCloseTime).ordinal ==
+                        DateTime.fromJSDate(tick).ordinal &&
                     DateTime.fromISO(event.value.betsCloseTime).hour ==
                         DateTime.fromJSDate(tick).hour &&
                     DateTime.fromJSDate(tick).minute == 0
@@ -98,6 +125,10 @@ export default defineComponent({
                         .attr("y", 190)
                         .text("Start")
                 } else if (
+                    DateTime.fromJSDate(tick).ordinal ==
+                        DateTime.fromISO(event.value.betsCloseTime).plus({
+                            hour: event.value.measurePeriod / 3600,
+                        }).ordinal &&
                     DateTime.fromJSDate(tick).hour ==
                         DateTime.fromISO(event.value.betsCloseTime).plus({
                             hour: event.value.measurePeriod / 3600,
@@ -123,71 +154,129 @@ export default defineComponent({
                 .append("path")
                 .datum(data)
                 .attr("fill", "none")
-                .attr("stroke", "#1aa168")
+                .attr(
+                    "stroke",
+                    event.value.winnerBets == "ABOVE_EQ"
+                        ? "#1aa168"
+                        : "#e05c43",
+                )
                 .attr("stroke-width", 1.5)
                 .attr(
                     "d",
                     d3
                         .line()
-                        .x(d => xScale(d.date))
-                        .y(d => yScale(d.value)),
+                        .x(d => scale.x(d.date))
+                        .y(d => scale.y(d.value)),
                 )
 
+            /** Circle - Current Price */
             chart
                 .append("circle")
-                .attr("cx", xScale(data[data.length - 1].date))
-                .attr("cy", yScale(data[data.length - 1].value))
+                .attr("cx", scale.x(data[data.length - 1].date))
+                .attr("cy", scale.y(data[data.length - 1].value))
                 .attr("r", 2)
                 .attr("fill", "#fff")
 
-            /** animated circle */
-            chart
-                .append("circle")
-                .attr("id", "animated_circle")
-                .attr("cx", xScale(data[data.length - 1].date))
-                .attr("cy", yScale(data[data.length - 1].value))
-                .attr("fill", "rgba(255,255,255,0.07)")
-                .attr("stroke", "rgba(255,255,255, 0.5)")
-                .attr("stroke-width", "2px")
+            const currentData = data.find(
+                d =>
+                    new Date(d.date).getTime() ==
+                    new Date(symbol.quotes[0].timestamp).getTime(),
+            )
 
-            chart.select("#animated_circle")
-                .html(`<animate id="ac1" attributeType="SVG" attributeName="r" begin="1s;ac1.end+2s" dur="1.5s" from="1%" to="5%" />
+            canvas
+                .append("line")
+                .attr("x1", `100%`)
+                .attr("class", classes.current_price_line)
+                .attr(
+                    "transform",
+                    `translate(0, ${scale.y(currentData.value) + 20})`,
+                )
+
+            /** animated circle */
+            if (event.value.status !== "FINISHED") {
+                chart
+                    .append("circle")
+                    .attr("id", "animated_circle")
+                    .attr("cx", scale.x(data[data.length - 1].date))
+                    .attr("cy", scale.y(data[data.length - 1].value))
+                    .attr("fill", "rgba(255,255,255,0.07)")
+                    .attr("stroke", "rgba(255,255,255, 0.5)")
+                    .attr("stroke-width", "2px")
+
+                chart.select("#animated_circle")
+                    .html(`<animate id="ac1" attributeType="SVG" attributeName="r" begin="1s;ac1.end+2s" dur="1.5s" from="1%" to="5%" />
               <animate id="ac2" attributeType="CSS" attributeName="stroke-width" begin="1s;ac2.end+2s"  dur="1.5s" from="2px" to="0px" />
               <animate id="ac3" attributeType="CSS" attributeName="opacity" begin="1s;ac3.end+2s"  dur="1.5s" from="1" to="0" />`)
+            }
         }
 
         onMounted(async () => {
-            const test1 = await fetchQuotesBySymbol({ id: 4, limit: 100 })
-            const test2 = await fetchQuotesBySymbol({
-                id: 4,
-                limit: 100,
-                offset: 100,
-            })
-            const test3 = await fetchQuotesBySymbol({
-                id: 4,
-                limit: 100,
-                offset: 200,
-            })
-            const test4 = await fetchQuotesBySymbol({
-                id: 4,
-                limit: 100,
-                offset: 300,
+            const quotes = await fetchQuoteByRange({
+                id: event.value.currencyPair.id,
+                tsGt: DateTime.fromISO(event.value.betsCloseTime)
+                    .minus({ hour: 1, minute: 30 })
+                    .toJSDate(),
+                tsLt: DateTime.fromISO(event.value.betsCloseTime)
+                    .plus({
+                        hour: parseInt(event.value.measurePeriod) / 3600 + 1,
+                    })
+                    .toJSDate(),
             })
 
-            quotes.value = [...test1, ...test2, ...test3, ...test4]
+            symbol.quotes = [...quotes]
 
-            if (event.value) draw()
-        })
+            draw()
 
-        watch(event, () => {
-            if (quotes.value.length) draw()
+            if (event.value.status !== "FINISHED") {
+                subscription.value = await gql
+                    .subscription({
+                        quotesWma: [
+                            {
+                                where: {
+                                    currencyPairId: {
+                                        _eq: event.value.currencyPair.id,
+                                    },
+                                },
+                                order_by: { timestamp: "desc" },
+                                limit: 1,
+                            },
+                            {
+                                currencyPairId: true,
+                                price: true,
+                                timestamp: true,
+                            },
+                        ],
+                    })
+                    .subscribe({
+                        next: data => {
+                            const newQuote = data.quotesWma[0]
+
+                            if (
+                                !symbol.quotes.some(
+                                    quote =>
+                                        quote.timestamp == newQuote.timestamp,
+                                )
+                            ) {
+                                symbol.quotes.unshift(newQuote)
+                                draw()
+                            }
+                        },
+                        error: console.error,
+                    })
+            }
         })
 
         onBeforeUnmount(() => {
-            quotes.value = []
+            if (
+                subscription.value.hasOwnProperty("closed") &&
+                !subscription.value?.closed
+            ) {
+                subscription.value.unsubscribe()
+                d3.select(`#chart > *`).remove()
+            }
         })
 
-        return { isOpen }
+        return { isOpen, scale, symbol, startData }
     },
 })
 </script>
@@ -201,7 +290,35 @@ export default defineComponent({
         </div>
 
         <div v-show="isOpen" :class="$style.base">
-            <div id="chart" :class="$style.chart"></div>
+            <div id="chart" :class="$style.chart">
+                <div v-if="scale.x" :class="$style.chart_elements">
+                    <!-- Current Price -->
+                    <div
+                        :class="$style.price_badge"
+                        :style="{
+                            top: `${scale.y(symbol.quotes[0].price) +
+                                20 -
+                                25 / 2}px`,
+                        }"
+                    >
+                        <div :class="$style.dot" />
+                        $
+                        {{ parseFloat(symbol.quotes[0].price).toFixed(2) }}
+                    </div>
+
+                    <!-- Start Price -->
+                    <div
+                        :class="$style.price_badge"
+                        :style="{
+                            top: `${scale.y(startData.value) + 20 - 25 / 2}px`,
+                        }"
+                    >
+                        <Icon name="go" size="10" />
+                        $
+                        {{ (parseFloat(event.startRate) * 100).toFixed(2) }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -252,12 +369,52 @@ export default defineComponent({
 }
 
 .chart {
-    height: 190px;
+    position: relative;
+    min-height: 190px;
 }
 
-.chart line {
+.chart_elements {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.price_badge {
+    position: absolute;
+    top: 20px;
+    right: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    width: fit-content;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    padding: 4px 6px;
+    border-radius: 6px;
+
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.price_badge svg {
+    fill: var(--green);
+}
+
+.price_badge .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--blue);
+}
+
+.time_line {
     stroke: rgba(255, 255, 255, 0.1);
-    stroke-dasharray: 6, 6;
+    stroke-dasharray: 8, 8;
     stroke-width: 1;
 }
 
@@ -271,10 +428,23 @@ export default defineComponent({
 }
 
 .start text {
-    fill: var(--blue);
+    fill: rgba(255, 255, 255, 0.8);
 }
 
 .start line {
-    stroke: var(--blue);
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-width: 1.5;
+}
+
+.start_price_line {
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-dasharray: 8, 8;
+    stroke-width: 1.5;
+}
+
+.current_price_line {
+    stroke: #fff;
+    stroke-dasharray: 8, 8;
+    stroke-width: 1;
 }
 </style>

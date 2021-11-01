@@ -2,7 +2,7 @@ import gql from "graphql-tag"
 
 export const getSymbols = gql`
     query getSymbols {
-        currencypair {
+        currencyPair {
             symbol
             id
             totalEvents
@@ -14,7 +14,7 @@ export const getSymbols = gql`
 
 export const getSymbolById = gql`
     query getSymbolById($id: Int!) {
-        currencypairByPk(id: $id) {
+        currencyPairByPk(id: $id) {
             symbol
             id
             totalEvents

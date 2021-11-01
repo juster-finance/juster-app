@@ -2,7 +2,7 @@ module.exports = {
     client: {
         service: {
             name: "Juster",
-            url: "https://api.granadanet.juster.fi/v1/graphql",
+            url: "https://juster-staging.dipdup.net/v1/graphql",
         },
         includes: ["src/**/*.vue", "src/**/*.js"],
     },

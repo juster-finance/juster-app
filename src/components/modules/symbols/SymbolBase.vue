@@ -27,6 +27,7 @@ import { useMarketStore } from "@/store/market"
 import Button from "@/components/ui/Button"
 import Pagination from "@/components/ui/Pagination"
 import Breadcrumbs from "@/components/ui/Breadcrumbs"
+import { parse } from "graphql"
 
 export default defineComponent({
     name: "SymbolBase",
@@ -75,9 +76,7 @@ export default defineComponent({
 
             marketStore.symbols[symbol.value.symbol].events = cloneDeep(
                 allEvents,
-            ).sort(
-                (a, b) => new Date(b.createdTime) - new Date(a.createdTime),
-            )
+            ).sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime))
         }
 
         if (symbol.value) {
@@ -125,7 +124,9 @@ export default defineComponent({
         })
 
         if (price.value) {
-            meta.title = `${symbol.value.symbol} • ${price.value.toFixed(2)}`
+            meta.title = `${symbol.value.symbol} • ${parseFloat(
+                price.value,
+            ).toFixed(2)}`
         }
 
         watch(symbol, () => {
@@ -136,9 +137,9 @@ export default defineComponent({
             () => marketStore.symbols,
             () => {
                 if (price.value)
-                    meta.title = `${
-                        symbol.value.symbol
-                    } • ${price.value.toFixed(2)}`
+                    meta.title = `${symbol.value.symbol}, ${parseFloat(
+                        price.value,
+                    ).toFixed(2)}`
             },
             { deep: true },
         )

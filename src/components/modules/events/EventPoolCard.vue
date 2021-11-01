@@ -16,12 +16,12 @@ export default defineComponent({
         const risePool = computed(() =>
             event.value.bets
                 .filter(bet => bet.side == "ABOVE_EQ")
-                .reduce((acc, { amount }) => acc + amount, 0),
+                .reduce((acc, { amount }) => acc + parseFloat(amount), 0),
         )
         const fallPool = computed(() =>
             event.value.bets
                 .filter(bet => bet.side == "BELOW")
-                .reduce((acc, { amount }) => acc + amount, 0),
+                .reduce((acc, { amount }) => acc + parseFloat(amount), 0),
         )
 
         return { risePool, fallPool }

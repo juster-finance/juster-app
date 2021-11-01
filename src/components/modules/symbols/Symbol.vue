@@ -50,15 +50,15 @@ export default defineComponent({
             if (!symbol.value.historyPrice) return "Loading"
 
             const { diff, percent, isIncreased } = calcChange(
-                quotes.value[0].price,
-                symbol.value.historyPrice,
+                parseFloat(quotes.value[0].price),
+                parseFloat(symbol.value.historyPrice),
             )
             color.value = isIncreased ? "green" : "red"
 
             return `${numberWithSymbol(
                 diff.toFixed(2),
                 " ",
-            )} • ${percent.toFixed(2)}%`
+            )}, ${percent.toFixed(2)}%, 1W`
         })
 
         const handleJoin = () => {
@@ -121,7 +121,9 @@ export default defineComponent({
                     <span>TVL:</span>
                     <span
                         >{{
-                            abbreviateNumber(symbol.totalValueLocked.toFixed(0))
+                            abbreviateNumber(
+                                parseFloat(symbol.totalValueLocked).toFixed(0),
+                            )
                         }}
                         XTZ</span
                     >
@@ -133,7 +135,9 @@ export default defineComponent({
                     <span>Volume (24h):</span>
                     <span
                         >{{
-                            abbreviateNumber(symbol.totalVolume.toFixed(0))
+                            abbreviateNumber(
+                                parseFloat(symbol.totalVolume).toFixed(0),
+                            )
                         }}
                         XTZ</span
                     >

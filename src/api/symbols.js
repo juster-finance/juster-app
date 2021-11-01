@@ -8,7 +8,7 @@ import { getSymbols, getSymbolById } from "@/graphql/queries/symbols"
 export const fetchSymbols = async () => {
     try {
         const { data } = await apollo.query({ query: getSymbols })
-        return data.currencypair
+        return data.currencyPair
     } catch (error) {
         console.error(
             `Error during fetching symbols \n\n ${error.name}: ${error.message}`,
@@ -26,7 +26,7 @@ export const fetchSymbolById = async ({ id }) => {
             query: getSymbolById,
             variables: { id: id },
         })
-        return data.currencypairByPk
+        return data.currencyPairByPk
     } catch (error) {
         console.error(
             `Error during fetching symbol by id \n\n ${error.name}: ${error.message}`,

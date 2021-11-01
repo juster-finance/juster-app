@@ -14,10 +14,10 @@ export default defineComponent({
         const { event, price } = toRefs(props)
 
         const wonSide = computed(() => {
-            if (["NEW", "STARTED"].includes(event.value.status)) {
+            if (event.value.status == "NEW") {
                 return "TBD"
             }
-            if (event.value.status == "FINISHED") {
+            if (["FINISHED", "STARTED"].includes(event.value.status)) {
                 return event.value.winnerBets == "ABOVE_EQ" ? "Up" : "Down"
             }
         })
@@ -31,7 +31,7 @@ export default defineComponent({
                     ? (100 * Math.abs(closedRate - startRate)) /
                       ((closedRate + startRate) / 2)
                     : (100 * Math.abs(price.value.rate - startRate)) /
-                      ((price.value.rate + startRate) / 2)
+                      ((parseFloat(price.value.rate) + startRate) / 2)
 
             const diff =
                 event.value.status == "FINISHED"
@@ -127,11 +127,22 @@ export default defineComponent({
         </div>
 
         <div :class="$style.params">
-            <div :class="$style.param">
-                <span>Current rate</span>
-                <span v-if="price.rate">$ {{ price.rate.toFixed(2) }}</span>
+            <div v-if="event.status == 'FINISHED'" :class="$style.param">
+                <span>Closed Rate</span>
+                <span v-if="price.rate"
+                    >$ {{ (event.closedRate * 100).toFixed(2) }}</span
+                >
                 <Spin size="16" v-else />
             </div>
+            <div v-else :class="$style.param">
+                <span>Current Rate</span>
+                <span v-if="price.rate"
+                    ><div :class="$style.price_dot" />
+                    $ {{ parseFloat(price.rate).toFixed(2) }}</span
+                >
+                <Spin size="16" v-else />
+            </div>
+
             <div :class="$style.param">
                 <span>Difference</span>
                 <Spin size="16" v-if="!price.rate" />
@@ -146,7 +157,7 @@ export default defineComponent({
                 >
             </div>
             <div :class="$style.param">
-                <span>Winning side</span>
+                <span>Winning Side</span>
                 <span v-if="price.rate">
                     <Icon
                         v-if="event.status == 'FINISHED'"
@@ -372,5 +383,12 @@ export default defineComponent({
     height: 4px;
     border-radius: 50%;
     background: var(--border);
+}
+
+.price_dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--blue);
 }
 </style>
