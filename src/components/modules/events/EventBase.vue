@@ -1003,7 +1003,8 @@ export default defineComponent({
     flex-direction: column;
     gap: 8px;
 
-    width: 384px;
+    min-width: 384px;
+    max-width: 384px;
 }
 
 .banner {

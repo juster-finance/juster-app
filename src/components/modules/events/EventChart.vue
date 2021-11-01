@@ -47,15 +47,15 @@ export default defineComponent({
 
         const draw = () => {
             const margin = { top: 20, right: 100, bottom: 30, left: 0 },
-                width = 784 - margin.left - margin.right,
-                height = 190 - margin.top - margin.bottom
+                width = `100%`,
+                height = 194 - margin.top - margin.bottom
 
             d3.select(`#chart > *`).remove()
 
             const canvas = d3
                 .select(`#chart`)
                 .append("svg")
-                .attr("width", width + margin.left + margin.right)
+                .attr("width", width)
                 .attr("height", height + margin.top + margin.bottom)
 
             const chart = canvas
@@ -67,7 +67,7 @@ export default defineComponent({
             scale.x = d3
                 .scaleTime()
                 .domain(d3.extent(data, d => d.date))
-                .range([0, width])
+                .range([0, canvas.node().getBoundingClientRect().width - 130])
 
             scale.y = d3
                 .scaleLinear()
@@ -184,6 +184,7 @@ export default defineComponent({
             )
 
             canvas
+                .append("g")
                 .append("line")
                 .attr("x1", `100%`)
                 .attr("class", classes.current_price_line)
@@ -208,6 +209,51 @@ export default defineComponent({
               <animate id="ac2" attributeType="CSS" attributeName="stroke-width" begin="1s;ac2.end+2s"  dur="1.5s" from="2px" to="0px" />
               <animate id="ac3" attributeType="CSS" attributeName="opacity" begin="1s;ac3.end+2s"  dur="1.5s" from="1" to="0" />`)
             }
+        }
+
+        /**
+         * Mouse Handler
+         */
+        let selectedQuote = ref({})
+        const onMouseMove = ({ layerX, layerY }) => {
+            const data = prepareQuotesForD3({ quotes: symbol.quotes })
+
+            const exactDate = scale.x.invert(layerX)
+            const diffs = data.map(d => Math.abs(d.date - exactDate))
+            const snapIndex = diffs.indexOf(Math.min(...diffs))
+
+            selectedQuote.value = data[snapIndex]
+
+            const circles = d3.selectAll(`#chart > svg > #mouse_line`)
+            circles.remove()
+
+            const svg = d3
+                .select(`#chart > svg`)
+                .append("g")
+                .attr("id", "mouse_line")
+            svg.append("line")
+                .attr("x1", layerX)
+                .attr("x2", layerX)
+                .attr("y1", 170)
+                .attr("y2", 0)
+                .attr("stroke", "rgba(255,255,255, 0.8)")
+                .attr("stroke-width", 1)
+                .attr("stroke-dasharray", "4 4")
+
+            svg.append("line")
+                .attr("x1", `100%`)
+                .attr("x2", 0)
+                .attr("y1", layerY)
+                .attr("y2", layerY)
+                .attr("stroke", "rgba(255,255,255, 0.8)")
+                .attr("stroke-width", 1)
+                .attr("stroke-dasharray", "4 4")
+        }
+        const onMouseLeave = () => {
+            selectedQuote.value = {}
+
+            const circles = d3.selectAll(`#chart > svg > #mouse_line`)
+            circles.remove()
         }
 
         onMounted(async () => {
@@ -276,7 +322,7 @@ export default defineComponent({
             }
         })
 
-        return { isOpen, scale, symbol, startData }
+        return { isOpen, scale, symbol, startData, onMouseMove, onMouseLeave }
     },
 })
 </script>
@@ -290,33 +336,40 @@ export default defineComponent({
         </div>
 
         <div v-show="isOpen" :class="$style.base">
-            <div id="chart" :class="$style.chart">
-                <div v-if="scale.x" :class="$style.chart_elements">
-                    <!-- Current Price -->
-                    <div
-                        :class="$style.price_badge"
-                        :style="{
-                            top: `${scale.y(symbol.quotes[0].price) +
-                                20 -
-                                25 / 2}px`,
-                        }"
-                    >
-                        <div :class="$style.dot" />
-                        $
-                        {{ parseFloat(symbol.quotes[0].price).toFixed(2) }}
-                    </div>
+            <!-- Chart -->
+            <div
+                @mousemove="onMouseMove"
+                @mouseleave="onMouseLeave"
+                id="chart"
+                :class="$style.chart"
+            />
 
-                    <!-- Start Price -->
-                    <div
-                        :class="$style.price_badge"
-                        :style="{
-                            top: `${scale.y(startData.value) + 20 - 25 / 2}px`,
-                        }"
-                    >
-                        <Icon name="go" size="10" />
-                        $
-                        {{ (parseFloat(event.startRate) * 100).toFixed(2) }}
-                    </div>
+            <!-- Elements -->
+            <div v-if="scale.x" :class="$style.price_axis">
+                <!-- Current Price -->
+                <div
+                    :class="$style.price_badge"
+                    :style="{
+                        top: `${scale.y(symbol.quotes[0].price) +
+                            20 -
+                            25 / 2}px`,
+                    }"
+                >
+                    <div :class="$style.dot" />
+                    $
+                    {{ parseFloat(symbol.quotes[0].price).toFixed(2) }}
+                </div>
+
+                <!-- Start Price -->
+                <div
+                    :class="$style.price_badge"
+                    :style="{
+                        top: `${scale.y(startData.value) + 20 - 25 / 2}px`,
+                    }"
+                >
+                    <Icon name="go" size="10" />
+                    $
+                    {{ (parseFloat(event.startRate) * 100).toFixed(2) }}
                 </div>
             </div>
         </div>
@@ -365,19 +418,22 @@ export default defineComponent({
 }
 
 .base {
-    padding: 16px;
+    display: flex;
+    position: relative;
+
+    margin: 16px;
 }
 
 .chart {
     position: relative;
+    width: 100%;
     min-height: 190px;
 }
 
-.chart_elements {
+.price_axis {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 0;
     right: 0;
 }
 
@@ -399,6 +455,7 @@ export default defineComponent({
     font-size: 12px;
     font-weight: 600;
     color: var(--text-primary);
+    white-space: nowrap;
 }
 
 .price_badge svg {

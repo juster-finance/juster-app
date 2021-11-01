@@ -34,7 +34,7 @@ export default defineComponent({
 
     padding: 0 14px;
 
-    height: 40px;
+    min-height: 40px;
     border-radius: 8px;
 }
 
