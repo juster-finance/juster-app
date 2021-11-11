@@ -19,29 +19,47 @@ export default defineComponent({
                         <router-link to="/explore" :class="$style.link"
                             >Explore</router-link
                         >
+                        <router-link to="/events" :class="$style.link"
+                            >Events</router-link
+                        >
                         <router-link to="/symbols" :class="$style.link"
                             >Symbols</router-link
                         >
-                        <router-link to="/rating" :class="$style.link"
+                        <!-- <router-link to="/rating" :class="$style.link"
                             >Rating</router-link
-                        >
+                        > -->
                     </div>
                     <div :class="$style.column">
-                        <div :class="$style.name">Socials</div>
-
-                        <div :class="$style.link">Discord</div>
-                        <div :class="$style.link">Twitter</div>
-                        <div :class="$style.link">Facebook</div>
-                        <div :class="$style.link">Telegram</div>
-                    </div>
-                    <div :class="$style.column">
-                        <div :class="$style.name">Other</div>
-
+                        <div :class="$style.name">Contact us</div>
                         <a
                             href="https://discord.com/channels/846362414039695391/857661534862966805"
                             target="_blank"
+                            rel="nofolow noreferrer"
                             :class="$style.link"
-                            >Contact us</a
+                            >Discord</a
+                        >
+                        <a
+                            href="https://twitter.com/TezosBakingBad"
+                            target="_blank"
+                            rel="nofolow noreferrer"
+                            :class="$style.link"
+                            >Twitter</a
+                        ><a
+                            href="https://t.me/baking_bad_chat"
+                            target="_blank"
+                            rel="nofolow noreferrer"
+                            :class="$style.link"
+                            >Telegram</a
+                        >
+                    </div>
+                    <div :class="$style.column">
+                        <div :class="$style.name">Other</div>
+                        <a
+                            href="https://github.com/juster-finance"
+                            target="_blank"
+                            rel="nofolow noreferrer"
+                            :class="$style.link"
+                            >GitHub</a
                         >
                         <router-link to="/terms" :class="$style.link"
                             >Terms of Use</router-link

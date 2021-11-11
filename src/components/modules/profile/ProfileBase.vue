@@ -242,10 +242,10 @@ export default defineComponent({
                                 <span>XTZ</span>
                             </div>
                         </div>
-                        <div :class="$style.stat">
+                        <!-- <div :class="$style.stat">
                             <div :class="$style.key">Rating</div>
                             <div :class="$style.value">TBD</div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div :class="$style.divider" />

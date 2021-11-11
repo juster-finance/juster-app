@@ -1,7 +1,7 @@
 export const dipdup = {
     uri: {
-        graphq: `https://juster-staging.dipdup.net/v1/graphql`,
-        subscription: "wss://juster-staging.dipdup.net/v1/graphql",
+        graphq: `https://api.granadanet.juster.fi/v1/graphql`,
+        subscription: "wss://api.granadanet.juster.fi/v1/graphql",
     },
 }
 
