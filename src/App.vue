@@ -9,6 +9,7 @@ import Footer from "@/components/base/Footer"
 
 /** Local */
 import TheWelcomeScreen from "@/components/local/onboarding/TheWelcomeScreen"
+import LandingPage from "@/views/LandingPage"
 
 /**
  * UI
