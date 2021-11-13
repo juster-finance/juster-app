@@ -14,7 +14,7 @@ export default defineComponent({
 
                 <div :class="$style.columns">
                     <div :class="$style.column">
-                        <div :class="$style.name">General</div>
+                        <div :class="$style.name">Juster</div>
 
                         <router-link to="/explore" :class="$style.link"
                             >Explore</router-link
@@ -30,7 +30,7 @@ export default defineComponent({
                         > -->
                     </div>
                     <div :class="$style.column">
-                        <div :class="$style.name">Contact us</div>
+                        <div :class="$style.name">Follow us</div>
                         <a
                             href="https://discord.com/channels/846362414039695391/857661534862966805"
                             target="_blank"
@@ -51,15 +51,18 @@ export default defineComponent({
                             :class="$style.link"
                             >Telegram</a
                         >
-                    </div>
-                    <div :class="$style.column">
-                        <div :class="$style.name">Other</div>
                         <a
                             href="https://github.com/juster-finance"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
                             >GitHub</a
+                        >
+                    </div>
+                    <div :class="$style.column">
+                        <div :class="$style.name">Learn</div>
+                        <router-link to="/docs" :class="$style.link"
+                            >Documentation</router-link
                         >
                         <router-link to="/terms" :class="$style.link"
                             >Terms of Use</router-link
