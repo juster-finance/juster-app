@@ -47,11 +47,9 @@ export default defineComponent({
                 return "Loading"
 
             const { diff, percent, isIncreased } = calcChange(
-                parseFloat(quotes.value[0].price),
-                parseFloat(
-                    marketStore.symbols[event.value.currencyPair.symbol]
-                        .historyPrice,
-                ),
+                quotes.value[0].price,
+                marketStore.symbols[event.value.currencyPair.symbol]
+                    .historyPrice,
             )
             color.value = isIncreased ? "green" : "red"
 

@@ -69,6 +69,11 @@ export default defineComponent({
         /** Onboarding */
         const showWelcomeScreen = ref(false)
         accountStore.$subscribe((mutation, state) => {
+            /** forced display */
+            if (state.showOnboarding) {
+                showWelcomeScreen.value = true
+            }
+
             if (state.pkh && !localStorage.isOnboardingShown) {
                 localStorage.isOnboardingShown = true
                 showWelcomeScreen.value = true
@@ -92,7 +97,7 @@ export default defineComponent({
             @skip="showWelcomeScreen = false"
         />
 
-        <div v-else>
+        <div v-else :class="$style.wrapper">
             <Header />
             <router-view />
             <Footer class="footer" />
@@ -100,7 +105,7 @@ export default defineComponent({
     </transition>
 </template>
 
-<style>
+<style module>
 html {
     font-family: "Inter", sans-serif;
     word-spacing: 1px;
@@ -121,6 +126,12 @@ html {
     overflow-y: auto;
     overflow-x: hidden;
 
+    height: 100vh;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
     height: 100vh;
 }
 
@@ -151,6 +162,7 @@ html {
     --text-tertiary: rgba(255, 255, 255, 0.4);
     --text-white: rgba(255, 255, 255, 0.95);
     --text-black: rgba(0, 0, 0, 0.9);
+    --text-blue: #6d9cf3;
 
     /** Icon */
     --icon: #bbbfc9;
@@ -270,7 +282,6 @@ body {
     overscroll-behavior-y: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    overflow: hidden;
 }
 
 button {

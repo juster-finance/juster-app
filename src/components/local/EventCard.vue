@@ -22,7 +22,7 @@ import {
     DropdownDivider,
 } from "@/components/ui/Dropdown"
 import Button from "@/components/ui/Button"
-import Label from "@/components/ui/Label"
+import Badge from "@/components/ui/Badge"
 import Tooltip from "@/components/ui/Tooltip"
 
 /**
@@ -31,7 +31,6 @@ import Tooltip from "@/components/ui/Tooltip"
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
 import LiquidityModal from "@/components/local/modals/LiquidityModal"
 import BetModal from "@/components/local/modals/BetModal"
-import Pool from "@/components/local/Pool"
 
 /**
  * Services
@@ -70,11 +69,6 @@ export default defineComponent({
         const card = ref(null)
         const openContextMenu = ref(false)
 
-        const router = useRouter()
-        const handleOpenEvent = () => {
-            router.push(`/events/${event.value.id}`)
-        }
-
         const showBetModal = ref(false)
         const showLiquidityModal = ref(false)
         const showParticipantsModal = ref(false)
@@ -83,16 +77,58 @@ export default defineComponent({
 
         const symbol = computed(() => event.value.currencyPair.symbol)
 
-        /** Countdown setup */
-        const { status, time, stop } = useCountdown(event)
+        /** Countdown setup: Time to start */
+        const startDt = computed(() =>
+            new Date(event.value?.betsCloseTime).getTime(),
+        )
+        const {
+            status: startStatus,
+            time: startTime,
+            stop: startStopCb,
+        } = useCountdown(startDt)
 
         // eslint-disable-next-line vue/return-in-computed-property
-        const timeLeft = computed(() => {
-            if (time.h > 0) {
-                return { num: time.h, suffix: time.h > 1 ? "hrs" : "hr" }
+        const timeToStart = computed(() => {
+            if (startTime.h > 0) {
+                return {
+                    num: startTime.h,
+                    suffix: startTime.h > 1 ? "hours" : "hour",
+                }
             }
-            if (time.h == 0) {
-                return { num: time.m, suffix: time.m > 1 ? "mins" : "min" }
+            if (startTime.h == 0) {
+                return {
+                    num: startTime.m,
+                    suffix: startTime.m > 1 ? "mins" : "min",
+                }
+            }
+        })
+
+        /** Countdown setup: Time to finish */
+        const finishDt = computed(() =>
+            DateTime.fromISO(event.value.betsCloseTime)
+                .plus({ second: event.value.measurePeriod })
+                .toJSDate()
+                .getTime(),
+        )
+        const {
+            status: finishStatus,
+            time: finishTime,
+            stop: finishStopCb,
+        } = useCountdown(finishDt)
+
+        // eslint-disable-next-line vue/return-in-computed-property
+        const timeToFinish = computed(() => {
+            if (finishTime.h > 0) {
+                return {
+                    num: finishTime.h,
+                    suffix: finishTime.h > 1 ? "hours" : "hour",
+                }
+            }
+            if (finishTime.h == 0) {
+                return {
+                    num: finishTime.m,
+                    suffix: finishTime.m > 1 ? "mins" : "min",
+                }
             }
         })
 
@@ -115,8 +151,8 @@ export default defineComponent({
                     }),
                     day: eventDt.toLocaleString({
                         day: "numeric",
-                        month: "short",
                     }),
+                    month: eventDt.toLocaleString({ month: "short" }),
                 },
                 end: {
                     time: endDt.toLocaleString({
@@ -125,27 +161,65 @@ export default defineComponent({
                     }),
                     day: endDt.toLocaleString({
                         day: "numeric",
-                        month: "short",
                     }),
+                    month: endDt.toLocaleString({ month: "short" }),
                 },
                 showDay: eventDt.ordinal < endDt.ordinal,
             }
         })
 
+        const liquidityLevel = computed(() => {
+            if (event.value.totalLiquidityProvided < 1000) return "Low"
+            if (event.value.totalLiquidityProvided == 1000) return "Medium"
+            if (event.value.totalLiquidityProvided > 1000) return "High"
+            if (event.value.totalLiquidityProvided > 5000) return "Ultra"
+        })
+
+        const participantsAvatars = computed(() => {
+            let avatars = [
+                ...event.value.bets.map(bet => bet.userId),
+                ...event.value.deposits.map(deposit => deposit.userId),
+            ]
+
+            /** remove duplicates */
+            avatars = [...new Set(avatars)]
+
+            return avatars
+        })
+
+        const userTVL = computed(() => {
+            let tvl = 0
+
+            tvl += event.value.deposits
+                .filter(deposit => deposit.userId == accountStore.pkh)
+                .reduce((a, { amountBelow }) => a + amountBelow, 0)
+            tvl += event.value.bets
+                .filter(bet => bet.userId == accountStore.pkh)
+                .reduce((a, { amount }) => a + amount, 0)
+
+            return tvl
+        })
+
         /** Join to the event & Liquidity */
         const handleJoin = event => {
-            event.stopPropagation()
+            /** disable Bet / Liquidity right after betsCloseTime */
+            if (startStatus == "Finished") return
+
+            event.stopImmediatePropagation()
+
             showBetModal.value = true
         }
         const handleLiquidity = event => {
-            event.stopPropagation()
+            /** disable Bet / Liquidity right after betsCloseTime */
+            if (startStatus == "Finished") return
+
+            event.stopImmediatePropagation()
+
             showLiquidityModal.value = true
         }
 
         /** Withdraw */
         const handleWithdraw = e => {
-            e.stopPropagation()
-
             juster
                 .withdraw(event.value.id, accountStore.pkh)
                 .then(op => {
@@ -235,8 +309,21 @@ export default defineComponent({
                             closedRate: true,
                             winnerBets: true,
                             bets: {
+                                id: true,
+                                side: true,
+                                reward: true,
                                 amount: true,
+                                createdTime: true,
                                 userId: true,
+                            },
+                            deposits: {
+                                amountAboveEq: true,
+                                amountBelow: true,
+                                eventId: true,
+                                id: true,
+                                userId: true,
+                                createdTime: true,
+                                shares: true,
                             },
                         },
                     ],
@@ -261,22 +348,29 @@ export default defineComponent({
         onUnmounted(() => {
             if (!subscription.value?.closed) subscription.value.unsubscribe()
 
-            stop()
+            startStopCb()
+            finishStopCb()
         })
 
         return {
+            DateTime,
+            accountStore,
             card,
             openContextMenu,
             contextMenuStyles,
             showBetModal,
             showLiquidityModal,
             showParticipantsModal,
-            handleOpenEvent,
             event,
             timing,
-            timeLeft,
-            status,
+            timeToStart,
+            startStatus,
+            timeToFinish,
+            finishStatus,
             symbol,
+            liquidityLevel,
+            participantsAvatars,
+            userTVL,
             percentage,
             handleJoin,
             handleLiquidity,
@@ -291,8 +385,7 @@ export default defineComponent({
 
     components: {
         Button,
-        Label,
-        Pool,
+        Badge,
         Tooltip,
         Dropdown,
         DropdownItem,
@@ -305,224 +398,331 @@ export default defineComponent({
 </script>
 
 <template>
-    <div @click="handleOpenEvent" ref="card" :class="$style.wrapper">
-        <BetModal
-            :show="showBetModal"
-            :event="event"
-            @switch="handleSwitch"
-            @onClose="showBetModal = false"
-        />
-        <LiquidityModal
-            :show="showLiquidityModal"
-            :event="event"
-            @switch="handleSwitch"
-            @onClose="showLiquidityModal = false"
-        />
-        <ParticipantsModal
-            :show="showParticipantsModal"
-            @onClose="showParticipantsModal = false"
-            :event="event"
-        />
+    <router-link :to="`/events/${event.id}`">
+        <div ref="card" :class="$style.wrapper">
+            <BetModal
+                :show="showBetModal"
+                :event="event"
+                @switch="handleSwitch"
+                @onBet="showBetModal = false"
+                @onClose="showBetModal = false"
+            />
+            <LiquidityModal
+                :show="showLiquidityModal"
+                :event="event"
+                @switch="handleSwitch"
+                @onClose="showLiquidityModal = false"
+            />
+            <ParticipantsModal
+                :show="showParticipantsModal"
+                @onClose="showParticipantsModal = false"
+                :event="event"
+            />
 
-        <Dropdown
-            :forceOpen="openContextMenu"
-            @onClose="openContextMenu = false"
-            :class="$style.dropdown"
-            :style="{ ...contextMenuStyles }"
-        >
-            <template v-slot:dropdown>
-                <router-link :to="`/events/${event.id}`">
-                    <DropdownItem
-                        ><Icon name="open" size="16" />Open Event
-                        page</DropdownItem
-                    >
-                </router-link>
+            <Dropdown
+                :forceOpen="openContextMenu"
+                @onClose="openContextMenu = false"
+                :class="$style.dropdown"
+                :style="{ ...contextMenuStyles }"
+            >
+                <template v-slot:dropdown>
+                    <router-link :to="`/events/${event.id}`">
+                        <DropdownItem
+                            ><Icon name="open" size="16" />Open Event
+                            page</DropdownItem
+                        >
+                    </router-link>
 
-                <DropdownDivider />
+                    <DropdownDivider />
 
-                <DropdownItem @click="showParticipantsModal = true"
-                    ><Icon name="users" size="16" />View participants
-                </DropdownItem>
-                <DropdownItem disabled
-                    ><Icon name="notifications" size="16" />Notifiy me
-                </DropdownItem>
+                    <DropdownItem @click="showParticipantsModal = true"
+                        ><Icon name="users" size="16" />View participants
+                    </DropdownItem>
+                    <DropdownItem disabled
+                        ><Icon name="notifications" size="16" />Notifiy me
+                    </DropdownItem>
 
-                <DropdownDivider />
+                    <DropdownDivider />
 
-                <DropdownItem @click="copy('id')"
-                    ><Icon name="copy" size="16" />Copy ID
-                </DropdownItem>
-                <DropdownItem @click="copy('url')"
-                    ><Icon name="copy" size="16" />Copy URL
-                </DropdownItem>
-            </template>
-        </Dropdown>
+                    <DropdownItem @click="copy('id')"
+                        ><Icon name="copy" size="16" />Copy ID
+                    </DropdownItem>
+                    <DropdownItem @click="copy('url')"
+                        ><Icon name="copy" size="16" />Copy URL
+                    </DropdownItem>
+                </template>
+            </Dropdown>
 
-        <div :class="[$style.header, !chart && $style.mg]">
-            <div :class="$style.info">
-                <div :class="$style.top">
-                    <div :class="$style.top_left">
-                        <!-- Name -->
-                        <h3 :class="$style.name">
-                            <div :class="$style.symbol_image">
-                                <img
-                                    :src="getCurrencyIcon(symbol.split('-')[0])"
-                                />
+            <div :class="$style.header">
+                <div :class="$style.symbol_imgs">
+                    <img :src="getCurrencyIcon(symbol.split('-')[0])" />
+                    <img :src="getCurrencyIcon('USD')" />
+                </div>
 
-                                <Icon
-                                    v-if="event.winnerBets"
-                                    name="higher"
-                                    size="16"
-                                    :class="
-                                        event.winnerBets == 'ABOVE_EQ'
-                                            ? $style.higher
-                                            : $style.lower
-                                    "
-                                />
-                            </div>
-
-                            {{ supportedSymbols[symbol].description }}
-                        </h3>
-
-                        <!-- Timing -->
-                        <div v-if="timing.showDay" :class="$style.timing">
-                            {{ timing.start.day }}
-                            <span>{{ timing.start.time }}</span>
-                            ->
-                            {{ timing.end.day }}
-                            <span>{{ timing.end.time }}</span>
-                        </div>
-                        <div v-else :class="$style.timing">
-                            {{ timing.start.day }}
-                            <span>{{ timing.start.time }}</span> ->
-                            <span>{{ timing.end.time }}</span>
-                        </div>
+                <Tooltip position="bottom" side="right">
+                    <div :class="$style.participants">
+                        <img
+                            v-for="participantAvatar in participantsAvatars.slice(
+                                0,
+                                3,
+                            )"
+                            :key="participantAvatar"
+                            :src="
+                                `https://services.tzkt.io/v1/avatars/${participantAvatar}`
+                            "
+                            :class="$style.image"
+                        />
                     </div>
 
-                    <div :class="$style.actions">
-                        <Button
-                            v-if="event.status == 'FINISHED' && won"
-                            @click="handleWithdraw"
-                            type="success"
-                            size="small"
-                            :disabled="event.totalLiquidityProvided == 0"
-                            :class="$style.action"
-                            >Withdraw</Button
-                        >
+                    <template v-slot:content>
+                        Participants ({{ participantsAvatars.length }})
+                    </template>
+                </Tooltip>
+            </div>
 
-                        <!-- todo: new component ButtonGroup -->
-                        <div
-                            v-else-if="
-                                event.status == 'NEW' && status == 'In progress'
+            <div :class="$style.title">
+                <img
+                    v-if="event.winnerBets == 'ABOVE_EQ'"
+                    :src="require('@/assets/icons/higher_won.svg')"
+                />
+                <img
+                    v-else-if="event.winnerBets == 'BELOW'"
+                    :src="require('@/assets/icons/lower_won.svg')"
+                />
+                <Icon v-else name="sides" size="16" />
+
+                {{
+                    supportedSymbols[symbol] &&
+                        supportedSymbols[symbol].description
+                }}
+                <span>price event</span>
+            </div>
+
+            <div :class="$style.timing">
+                <div :class="$style.days">
+                    {{
+                        `${timing.start.day} ${
+                            timing.showDay ? `- ${timing.end.day}` : ``
+                        } ${timing.start.month}`
+                    }}
+                </div>
+
+                <div :class="$style.dot" />
+
+                <div :class="$style.hrs">
+                    {{ timing.start.time }}
+                    ->
+                    {{ timing.end.time }}
+
+                    <span>({{ event.measurePeriod / 3600 }}h)</span>
+                </div>
+            </div>
+
+            <div :class="$style.badges">
+                <Tooltip
+                    v-if="event.status == 'NEW'"
+                    position="bottom"
+                    side="left"
+                >
+                    <Badge color="green" :class="$style.main_badge"
+                        ><Icon name="bolt" size="12" />Bets time</Badge
+                    >
+
+                    <template v-slot:content>
+                        The event is available for betting and providing
+                        liquidity
+                    </template>
+                </Tooltip>
+                <Tooltip
+                    v-else-if="event.status == 'STARTED'"
+                    position="bottom"
+                    side="left"
+                >
+                    <Badge color="yellow" :class="$style.main_badge"
+                        ><Icon name="time" size="12" />In progress</Badge
+                    >
+                    <template v-slot:content>
+                        Betting is closed. The end of the event is pending
+                    </template>
+                </Tooltip>
+                <Tooltip
+                    v-else-if="event.status == 'FINISHED'"
+                    position="bottom"
+                    side="left"
+                >
+                    <Badge color="gray" :class="$style.main_badge"
+                        ><Icon name="checkcircle" size="12" />Finished</Badge
+                    >
+                    <template v-slot:content>
+                        The event is closed, winning side determined
+                    </template>
+                </Tooltip>
+
+                <Badge
+                    v-if="participantsAvatars.length >= 3"
+                    color="red"
+                    :class="$style.badge"
+                    ><Icon name="hot" size="12"
+                /></Badge>
+
+                <Tooltip position="bottom" side="left">
+                    <Badge color="gray" :class="$style.badge"
+                        ><Icon name="infinite" size="12"
+                    /></Badge>
+
+                    <template v-slot:content>
+                        Repeatable, created automatically
+                    </template>
+                </Tooltip>
+
+                <Tooltip position="bottom" side="right">
+                    <Badge v-if="userTVL" color="gray" :class="$style.badge">
+                        <img
+                            :src="
+                                `https://services.tzkt.io/v1/avatars/${accountStore.pkh}`
                             "
-                            :class="$style.button_group"
+                            :class="$style.user_avatar"
+                        />
+
+                        {{ abbreviateNumber(userTVL) }} XTZ
+                    </Badge>
+
+                    <template v-slot:content>
+                        My TVL: Bets + Liquidity
+                    </template>
+                </Tooltip>
+            </div>
+
+            <div :class="$style.hints">
+                <div
+                    v-if="startStatus == 'In progress'"
+                    :class="[$style.hint, $style.gray]"
+                >
+                    <Icon name="time" size="14" />
+                    <div>
+                        Starting in
+                        <span
+                            >{{
+                                timeToStart.num == 0 ? "<1" : timeToStart.num
+                            }}
+                            {{ timeToStart.suffix }}</span
                         >
-                            <div @click="handleJoin" :class="$style.button">
-                                Bet
-                            </div>
-                            <div :class="$style.group_divider" />
-                            <div
-                                @click="handleLiquidity"
-                                :class="$style.button"
-                            >
-                                Liquidity
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- labels -->
-                <div :class="$style.labels">
-                    <Tooltip
-                        v-if="status == 'In progress'"
-                        position="bottom"
-                        side="left"
-                    >
-                        <Label icon="flag" color="orange"
-                            ><span>{{
-                                timeLeft.num == 0 ? "<1" : timeLeft.num
-                            }}</span>
-                            {{ timeLeft.suffix }}</Label
+                <div
+                    v-else-if="
+                        startStatus == 'Finished' && event.status == 'NEW'
+                    "
+                    :class="[$style.hint, $style.gray]"
+                >
+                    <Icon name="time" size="14" />
+                    <div>
+                        Starting soon
+                    </div>
+                </div>
+
+                <div
+                    v-else-if="
+                        startStatus == 'Finished' && event.status == 'STARTED'
+                    "
+                    :class="[$style.hint, $style.yellow]"
+                >
+                    <Icon name="time" size="14" />
+                    <div>
+                        Ending in
+                        <span
+                            >{{
+                                timeToFinish.num == 0 ? "<1" : timeToFinish.num
+                            }}
+                            {{ timeToFinish.suffix }}</span
                         >
+                    </div>
+                </div>
 
-                        <template v-slot:content>
-                            Time until the end of accepting bets
-                        </template>
-                    </Tooltip>
+                <div
+                    v-else-if="event.status == 'FINISHED'"
+                    :class="[$style.hint, $style.gray]"
+                >
+                    <Icon name="time" size="14" />
+                    <div>
+                        Ended
 
-                    <Tooltip
-                        v-else-if="
-                            status == 'Finished' && event.status == 'NEW'
+                        <span>{{
+                            DateTime.fromISO(event.betsCloseTime)
+                                .plus({ second: event.measurePeriod })
+                                .toRelative()
+                        }}</span>
+                    </div>
+                </div>
+
+                <div
+                    v-if="event.status !== 'FINISHED'"
+                    :class="[
+                        $style.hint,
+                        liquidityLevel == 'Low' && $style.red,
+                        liquidityLevel == 'Medium' && $style.yellow,
+                        liquidityLevel == 'High' && $style.green,
+                        liquidityLevel == 'Ultra' && $style.red,
+                    ]"
+                >
+                    <Icon
+                        :name="
+                            (liquidityLevel == 'Low' && 'liquidity_low') ||
+                                (liquidityLevel == 'Medium' &&
+                                    'liquidity_medium') ||
+                                (liquidityLevel == 'High' &&
+                                    'liquidity_high') ||
+                                (liquidityLevel == 'Ultra' && 'liquidity_ultra')
                         "
-                        position="bottom"
-                        side="left"
-                    >
-                        <Label icon="flag" color="orange">Soon</Label>
+                        size="14"
+                    />
 
-                        <template v-slot:content>
-                            Acceptance of bets is over, the event will start
-                            soon
-                        </template>
-                    </Tooltip>
+                    <div>
+                        <span>{{ liquidityLevel }}</span>
 
-                    <Tooltip
-                        v-else-if="
-                            status == 'Finished' && event.status == 'STARTED'
-                        "
-                        position="bottom"
-                        side="left"
-                    >
-                        <Label icon="time" color="orange" loading
-                            >In process</Label
-                        >
+                        liquidity
+                    </div>
+                </div>
 
-                        <template v-slot:content>
-                            Measuring period in progress
-                        </template>
-                    </Tooltip>
+                <div
+                    v-if="event.winnerBets == 'BELOW'"
+                    :class="[$style.hint, $style.red]"
+                >
+                    <Icon name="lower" size="14" />
+                    <div><span>Fall</span> won</div>
+                </div>
+                <div
+                    v-if="event.winnerBets == 'ABOVE_EQ'"
+                    :class="[$style.hint, $style.green]"
+                >
+                    <Icon name="higher" size="14" />
+                    <div><span>Rise</span> won</div>
+                </div>
+            </div>
 
-                    <Tooltip
-                        v-else-if="
-                            status == 'Finished' && event.status == 'FINISHED'
-                        "
-                        position="bottom"
-                        side="left"
-                    >
-                        <Label icon="check">Finished</Label>
-
-                        <template v-slot:content>
-                            The event is over, the winners are determined
-                        </template>
-                    </Tooltip>
-
-                    <Tooltip position="bottom" side="left">
-                        <Label icon="money" color="green"
-                            ><span>{{
-                                abbreviateNumber(event.totalValueLocked)
-                            }}</span
-                            >XTZ</Label
-                        >
-
-                        <template v-slot:content>
-                            Total value locked: Liquidity + Bets
-                        </template>
-                    </Tooltip>
-                    <Tooltip position="bottom" side="left">
-                        <Label icon="time" color="yellow"
-                            ><span>{{ event.measurePeriod / 3600 }}</span
-                            >h</Label
-                        >
-
-                        <template v-slot:content>
-                            Measure period (h - Hour, m - Minute)
-                        </template>
-                    </Tooltip>
+            <div
+                :class="[
+                    $style.buttons,
+                    startStatus == 'Finished' && $style.disabled,
+                ]"
+            >
+                <div
+                    @click.prevent="handleJoin"
+                    :class="[$style.button, $style.green]"
+                >
+                    <Icon name="plus" size="16" /> Bet
+                </div>
+                <div :class="$style.divider" />
+                <div
+                    @click.prevent="handleLiquidity"
+                    :class="[$style.button, $style.blue]"
+                >
+                    <Icon name="liquidity_ultra" size="16" /> Liquidity
                 </div>
             </div>
         </div>
-
-        <Pool :event="event" :class="$style.pool" />
-    </div>
+    </router-link>
 </template>
 
 <style module>
@@ -530,7 +730,7 @@ export default defineComponent({
     background: var(--card-bg);
     border-radius: 10px;
     border: 1px solid var(--border);
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.3);
 
     padding: 20px;
 
@@ -550,151 +750,239 @@ export default defineComponent({
 }
 
 .header {
-    width: 100%;
     display: flex;
-    align-items: flex-start;
-}
-
-.info {
-    width: 100%;
-}
-
-.top {
-    display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: flex-start;
+
+    margin-bottom: 20px;
 }
 
-.top_left {
+.symbol_imgs {
+    position: relative;
+
+    width: 30px;
+    height: 30px;
+}
+
+.symbol_imgs img {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+}
+
+.symbol_imgs img:first-child {
+    position: absolute;
+    z-index: 1;
+}
+
+.symbol_imgs img:last-child {
+    position: absolute;
+    top: 10px;
+    right: 0;
+}
+
+.participants {
     display: flex;
-    flex-direction: column;
+}
+
+.participants img {
+    width: 30px;
+    height: 30px;
+
+    background: #121212;
+    border-radius: 50px;
+
+    margin-left: -12px;
+
+    padding: 2px;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+
+    height: 20px;
+
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+
+    margin-bottom: 6px;
+}
+
+.title img {
+    display: flex;
+
+    width: 16px;
+    height: 16px;
+
+    margin-right: 6px;
+}
+
+.title svg {
+    display: flex;
+
+    fill: var(--text-tertiary);
+
+    margin-right: 6px;
+}
+
+.title span {
+    color: var(--text-tertiary);
+
+    margin-left: 4px;
+}
+
+.timing {
+    display: flex;
+    align-items: center;
     gap: 8px;
+
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--text-secondary);
 
     margin-bottom: 16px;
 }
 
-.name {
+.days {
+    color: var(--text-tertiary);
+}
+
+.hrs span {
+    color: var(--text-tertiary);
+}
+
+.dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--border);
+}
+
+.badges {
     display: flex;
     align-items: center;
+
+    margin-bottom: 24px;
 }
 
-.symbol_image {
-    position: relative;
-
-    margin-right: 10px;
+.main_badge {
+    margin-right: 12px;
 }
 
-.symbol_image svg {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-
-    background: var(--card-bg);
-    border-radius: 50%;
+.badge {
+    margin-right: 4px;
 }
 
-.symbol_image svg.higher {
+.hints {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    height: 40px;
+
+    margin-bottom: 24px;
+}
+
+.hint {
+    display: flex;
+    align-items: center;
+
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--text-tertiary);
+}
+
+.hint.red svg {
+    fill: var(--red);
+}
+
+.hint.yellow svg {
+    fill: var(--yellow);
+}
+
+.hint.green svg {
     fill: var(--green);
 }
 
-.symbol_image svg.lower {
-    fill: var(--red);
-    transform: rotate(180deg);
-}
-
-.symbol_image img {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    opacity: 0.7;
-}
-
-.name span {
-    color: var(--text-tertiary);
-
-    margin-left: 6px;
-}
-
-.timing {
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-tertiary);
-    fill: var(--text-tertiary);
-}
-
-.timing span {
+.hint span {
     color: var(--text-secondary);
 }
 
-.labels {
-    display: flex;
-    gap: 6px;
+.hint svg {
+    margin-right: 8px;
 }
 
-.pool {
-    margin-top: 24px;
+.hint.yellow {
+    fill: var(--yellow);
 }
 
-.actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.hint.green {
+    fill: var(--green);
 }
 
-.button_group {
-    display: flex;
-    align-items: center;
+.hint.red {
+    fill: var(--red);
+}
 
+.hint.gray {
+    fill: var(--text-secondary);
+}
+
+.user_avatar {
+    width: 16px;
+    height: 16px;
+}
+
+.buttons {
+    display: flex;
+
+    height: 26px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--btn-secondary-bg);
-
-    font-size: 13px;
-    line-height: 1.1;
-    font-weight: 600;
-    color: var(--text-primary);
+    outline: 1px solid var(--border);
+    overflow: hidden;
 }
 
-.button_group:active {
-    transform: translateY(1px);
-}
-
-.button_group:hover .group_divider {
-    opacity: 0;
+.buttons.disabled {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 .button {
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 8px;
 
-    padding: 0 12px;
-    height: 28px;
+    font-size: 12px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-primary);
+
+    width: 100%;
+    background: var(--btn-secondary-bg);
 
     transition: background 0.2s ease;
 }
 
-.button:first-child {
-    border-radius: 6px 0 0 6px;
+.button.blue {
+    fill: var(--blue);
 }
 
-.button:last-child {
-    border-radius: 0 6px 6px 0;
+.button.green {
+    fill: var(--green);
 }
 
 .button:hover {
     background: var(--btn-secondary-bg-hover);
 }
 
-.button svg {
-    fill: var(--text-primary);
-}
-
-.group_divider {
-    width: 1px;
-    height: 20px;
+.divider {
+    width: 2px;
+    height: 100%;
     background: var(--border);
-
-    transition: all 0.2s ease;
 }
 </style>

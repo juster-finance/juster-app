@@ -27,7 +27,6 @@ import { useMarketStore } from "@/store/market"
 import Button from "@/components/ui/Button"
 import Pagination from "@/components/ui/Pagination"
 import Breadcrumbs from "@/components/ui/Breadcrumbs"
-import { parse } from "graphql"
 
 export default defineComponent({
     name: "SymbolBase",
@@ -124,9 +123,7 @@ export default defineComponent({
         })
 
         if (price.value) {
-            meta.title = `${symbol.value.symbol} • ${parseFloat(
-                price.value,
-            ).toFixed(2)}`
+            meta.title = `${symbol.value.symbol} • ${price.value.toFixed(2)}`
         }
 
         watch(symbol, () => {
@@ -137,9 +134,9 @@ export default defineComponent({
             () => marketStore.symbols,
             () => {
                 if (price.value)
-                    meta.title = `${symbol.value.symbol}, ${parseFloat(
-                        price.value,
-                    ).toFixed(2)}`
+                    meta.title = `${symbol.value.symbol}, ${price.value.toFixed(
+                        2,
+                    )}`
             },
             { deep: true },
         )
@@ -160,6 +157,7 @@ export default defineComponent({
     components: {
         Symbol,
         Breadcrumbs,
+        EventCard,
         EventCard,
         Pagination,
         Button,
@@ -235,8 +233,8 @@ export default defineComponent({
             <div v-if="events" :class="$style.events">
                 <EventCard
                     v-for="event in events.slice(
-                        (currentPage - 1) * 9,
-                        currentPage * 9,
+                        (currentPage - 1) * 8,
+                        currentPage * 8,
                     )"
                     :key="event.id"
                     :event="event"
@@ -245,10 +243,10 @@ export default defineComponent({
         </transition>
 
         <Pagination
-            v-if="events && events.length > 9"
+            v-if="events && events.length > 8"
             v-model="currentPage"
             :total="events.length"
-            :limit="9"
+            :limit="8"
             :class="$style.pagination"
         />
     </div>
@@ -342,7 +340,7 @@ export default defineComponent({
 
 .events {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-gap: 16px;
 
     margin-top: 20px;

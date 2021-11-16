@@ -107,7 +107,7 @@ export default defineComponent({
          * Filters
          */
         const filters = reactive({
-            bets: "my",
+            bets: "all",
             liquidity: "all",
         })
         const handleSelectFilter = ({ target, value }) => {
@@ -139,7 +139,12 @@ export default defineComponent({
         })
 
         /** Countdown setup */
-        const { status: countdownStatus, time, stop } = useCountdown(event)
+        const eventStartTime = computed(() =>
+            new Date(event.value?.betsCloseTime).getTime(),
+        )
+        const { status: countdownStatus, time, stop } = useCountdown(
+            eventStartTime,
+        )
 
         // eslint-disable-next-line vue/return-in-computed-property
         const timeLeft = computed(() => {
@@ -612,7 +617,7 @@ export default defineComponent({
                                     side="left"
                                 >
                                     <Label icon="time" color="orange" loading
-                                        >In process</Label
+                                        >In progress</Label
                                     >
 
                                     <template v-slot:content>
@@ -830,12 +835,12 @@ export default defineComponent({
                         <div :class="$style.param">
                             Summary:
                             <span>{{
-                                parseFloat(
-                                    userBets.reduce(
+                                userBets
+                                    .reduce(
                                         (acc, { amount }) => acc + amount,
                                         0,
-                                    ),
-                                ).toFixed(2)
+                                    )
+                                    .toFixed(2)
                             }}</span>
                             XTZ
                         </div>
@@ -845,12 +850,12 @@ export default defineComponent({
                         <div :class="[$style.param, $style.green]">
                             Potential reward:
                             <span>{{
-                                parseFloat(
-                                    userBets.reduce(
+                                userBets
+                                    .reduce(
                                         (acc, { reward }) => acc + reward,
                                         0,
-                                    ),
-                                ).toFixed(2)
+                                    )
+                                    .toFixed(2)
                             }}</span>
                             XTZ
                         </div>
@@ -933,13 +938,13 @@ export default defineComponent({
                         <div :class="$style.param">
                             Summary:
                             <span>{{
-                                parseFloat(
-                                    filteredDeposits.reduce(
+                                filteredDeposits
+                                    .reduce(
                                         (acc, { amountBelow }) =>
                                             acc + amountBelow,
                                         0,
-                                    ),
-                                ).toFixed(2)
+                                    )
+                                    .toFixed(2)
                             }}</span>
                             XTZ
                         </div>
@@ -950,11 +955,11 @@ export default defineComponent({
             <div v-if="event" :class="$style.side">
                 <EventTargetsCard :event="event" :price="price" />
 
-                <EventSymbolCard
+                <!-- <EventSymbolCard
                     v-if="event && price.integer"
                     :event="event"
                     :price="price"
-                />
+                /> -->
 
                 <EventPoolCard :event="event" />
 

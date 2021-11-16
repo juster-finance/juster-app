@@ -48,14 +48,14 @@ export default defineComponent({
 
         <div :class="[$style.param, $style.up]">
             <Icon name="higher" size="12" />{{
-                parseFloat(deposit.amountAboveEq).toFixed(0)
+                deposit.amountAboveEq.toFixed(0)
             }}
             &nbsp;<span>XTZ</span>
         </div>
 
         <div :class="[$style.param, $style.down]">
             <Icon name="higher" size="12" />{{
-                parseFloat(deposit.amountBelow).toFixed(0)
+                deposit.amountBelow.toFixed(0)
             }}
             &nbsp;<span>XTZ</span>
         </div>

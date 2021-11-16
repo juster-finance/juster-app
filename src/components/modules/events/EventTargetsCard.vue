@@ -5,6 +5,7 @@ import { computed, defineComponent, toRefs } from "vue"
  * UI
  */
 import Spin from "@/components/ui/Spin"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default defineComponent({
     name: "EventTargetsCard",
@@ -31,7 +32,7 @@ export default defineComponent({
                     ? (100 * Math.abs(closedRate - startRate)) /
                       ((closedRate + startRate) / 2)
                     : (100 * Math.abs(price.value.rate - startRate)) /
-                      ((parseFloat(price.value.rate) + startRate) / 2)
+                      ((price.value.rate + startRate) / 2)
 
             const diff =
                 event.value.status == "FINISHED"
@@ -65,7 +66,7 @@ export default defineComponent({
         return { wonSide, change, status }
     },
 
-    components: { Spin },
+    components: { Spin, Tooltip },
 })
 </script>
 
@@ -107,22 +108,32 @@ export default defineComponent({
                     <div :class="$style.line_dot" />
                 </div>
 
-                <div :class="$style.item">
-                    <div
-                        :class="[
-                            $style.target,
-                            event.status !== 'FINISHED' && $style.tbd,
-                        ]"
-                    >
-                        <Spin v-if="event.status == 'STARTED'" size="14" />
-                        <Icon v-else name="flag" size="14" />
-                        {{
-                            event.status == "FINISHED"
-                                ? `$ ${(event.closedRate * 100).toFixed(2)}`
-                                : "TBD"
-                        }}
+                <Tooltip position="bottom" side="right">
+                    <div :class="$style.item">
+                        <div
+                            :class="[
+                                $style.target,
+                                event.status !== 'FINISHED' && $style.tbd,
+                            ]"
+                        >
+                            <Spin v-if="event.status == 'STARTED'" size="14" />
+                            <Icon v-else name="flag" size="14" />
+                            {{
+                                event.status == "FINISHED"
+                                    ? `$ ${(event.closedRate * 100).toFixed(2)}`
+                                    : "TBD"
+                            }}
+                        </div>
                     </div>
-                </div>
+                    <template v-slot:content>
+                        <template v-if="event.status !== 'FINISHED'"
+                            >To Be Defined. Waiting for Closed rate...</template
+                        >
+                        <template v-else
+                            >The Closed rate has been defined</template
+                        >
+                    </template>
+                </Tooltip>
             </div>
         </div>
 
@@ -138,7 +149,7 @@ export default defineComponent({
                 <span>Current Rate</span>
                 <span v-if="price.rate"
                     ><div :class="$style.price_dot" />
-                    $ {{ parseFloat(price.rate).toFixed(2) }}</span
+                    $ {{ price.rate.toFixed(2) }}</span
                 >
                 <Spin size="16" v-else />
             </div>
@@ -170,7 +181,7 @@ export default defineComponent({
             </div>
         </div>
 
-        <div :class="$style.status">
+        <!-- <div :class="$style.status">
             <div :class="$style.status_base">
                 <Icon
                     :name="
@@ -187,7 +198,7 @@ export default defineComponent({
             </div>
 
             <Icon name="help" size="14" :class="$style.help_icon" />
-        </div>
+        </div> -->
     </div>
 </template>
 

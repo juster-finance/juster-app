@@ -1,29 +1,51 @@
 <script>
 export default {
-	name: "Badge",
+    name: "Badge",
+    props: { color: String },
 }
 </script>
 
 <template>
-	<div :class="$style.wrapper">
-		<slot />
-	</div>
+    <div :class="[$style.wrapper, $style[color]]">
+        <slot />
+    </div>
 </template>
 
 <style module>
 .wrapper {
-	display: flex;
-	align-items: center;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 
-	height: 20px;
-	border-radius: 6px;
-	background: var(--opacity-10);
+    height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
 
-	font-size: 11px;
-	font-weight: 600;
-	white-space: nowrap;
-	color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
 
-	padding: 0 6px;
+    padding: 0 8px;
+}
+
+.wrapper.green {
+    color: var(--green);
+    fill: var(--green);
+}
+
+.wrapper.yellow {
+    color: var(--yellow);
+    fill: var(--yellow);
+}
+
+.wrapper.red {
+    color: var(--red);
+    fill: var(--red);
+}
+
+.wrapper.gray {
+    color: var(--text-secondary);
+    fill: var(--text-secondary);
 }
 </style>

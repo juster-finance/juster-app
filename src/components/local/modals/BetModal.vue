@@ -48,8 +48,11 @@ export default defineComponent({
         const notificationsStore = useNotificationsStore()
 
         /** Countdown setup */
+        const eventStartTime = computed(() =>
+            new Date(event.value?.betsCloseTime).getTime(),
+        )
         const { countdownText, status: countdownStatus, stop } = useCountdown(
-            event,
+            eventStartTime,
         )
 
         /** User inputs */
@@ -105,15 +108,11 @@ export default defineComponent({
             const selectedRatio =
                 side.value == "Higher" ? ratio.value.higher : ratio.value.lower
 
-            return (amount.value * selectedRatio * (1 - fee.value)).toFixed(2)
+            return amount.value * selectedRatio * (1 - fee.value)
         })
-        const reward = computed(
-            () => parseFloat(winDelta.value) + parseFloat(amount.value),
-        )
+        const reward = computed(() => winDelta.value + amount.value)
         const minReward = computed(
-            () =>
-                parseFloat(winDelta.value) * (1 - slippage.value / 100) +
-                parseFloat(amount.value),
+            () => winDelta.value * (1 - slippage.value / 100) + amount.value,
         )
 
         // eslint-disable-next-line vue/return-in-computed-property
@@ -244,7 +243,7 @@ export default defineComponent({
         }
     },
 
-    emits: ["switch", "onBet"],
+    emits: ["switch", "onClose", "onBet"],
     components: {
         Modal,
         Input,

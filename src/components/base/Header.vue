@@ -218,17 +218,25 @@ export default defineComponent({
 
                             <DropdownDivider />
 
-                            <router-link to="/docs">
+                            <a
+                                href="https://fishy-cheque-5ae.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
+                                target="_blank"
+                            >
                                 <DropdownItem
                                     ><Icon
                                         name="book"
                                         size="16"
                                     />Documentation</DropdownItem
-                                ></router-link
+                                ></a
+                            >
+                            <DropdownItem
+                                @click="accountStore.showOnboarding = true"
+                                ><Icon name="help" size="16" />
+                                Onboarding</DropdownItem
                             >
                             <DropdownItem disabled
                                 ><Icon name="bolt" size="16" />
-                                Releases</DropdownItem
+                                Changelog</DropdownItem
                             >
 
                             <DropdownDivider />
@@ -287,7 +295,7 @@ export default defineComponent({
     align-items: center;
     gap: 8px;
     border-radius: 6px;
-    background: rgba(245, 183, 43, 0.2);
+    background: rgba(255, 255, 255, 0.05);
     height: 28px;
     padding: 0 8px 0 6px;
 

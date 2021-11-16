@@ -50,8 +50,8 @@ export default defineComponent({
             if (!symbol.value.historyPrice) return "Loading"
 
             const { diff, percent, isIncreased } = calcChange(
-                parseFloat(quotes.value[0].price),
-                parseFloat(symbol.value.historyPrice),
+                quotes.value[0].price,
+                symbol.value.historyPrice,
             )
             color.value = isIncreased ? "green" : "red"
 
@@ -121,9 +121,7 @@ export default defineComponent({
                     <span>TVL:</span>
                     <span
                         >{{
-                            abbreviateNumber(
-                                parseFloat(symbol.totalValueLocked).toFixed(0),
-                            )
+                            abbreviateNumber(symbol.totalValueLocked.toFixed(0))
                         }}
                         XTZ</span
                     >
@@ -135,9 +133,7 @@ export default defineComponent({
                     <span>Volume (24h):</span>
                     <span
                         >{{
-                            abbreviateNumber(
-                                parseFloat(symbol.totalVolume).toFixed(0),
-                            )
+                            abbreviateNumber(symbol.totalVolume.toFixed(0))
                         }}
                         XTZ</span
                     >

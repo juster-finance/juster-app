@@ -12,15 +12,12 @@ export default defineComponent({
     setup(props) {
         const { event, amount, side } = toRefs(props)
 
-        const userAmount = computed(() =>
-            amount.value ? parseFloat(amount.value) : 0,
-        )
+        const userAmount = computed(() => (amount.value ? amount.value : 0))
 
         // eslint-disable-next-line vue/return-in-computed-property
         const abovePercent = computed(() => {
             if (!userAmount.value || side.value == "Liquidity") {
-                if (!event.value.poolAboveEq && !event.value.poolBelow)
-                    return 0
+                if (!event.value.poolAboveEq && !event.value.poolBelow) return 0
 
                 return Math.floor(
                     (event.value.poolAboveEq * 100) /
@@ -61,8 +58,7 @@ export default defineComponent({
         // eslint-disable-next-line vue/return-in-computed-property
         const belowPercent = computed(() => {
             if (!userAmount.value || side.value == "Liquidity") {
-                if (!event.value.poolAboveEq && !event.value.poolBelow)
-                    return 0
+                if (!event.value.poolAboveEq && !event.value.poolBelow) return 0
 
                 return Math.ceil(
                     (event.value.poolBelow * 100) /
