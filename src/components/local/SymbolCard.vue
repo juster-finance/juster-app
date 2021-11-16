@@ -285,7 +285,7 @@ export default defineComponent({
             </div>
 
             <div :class="$style.timeframe">
-                <Icon name="bolt" size="12" />Last 30m
+                <Icon name="bolt" size="12" />Real-time
             </div>
         </div>
     </div>
