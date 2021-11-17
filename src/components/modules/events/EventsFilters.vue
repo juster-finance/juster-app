@@ -53,7 +53,7 @@ export default defineComponent({
         </div>
 
         <div :class="$style.block">
-            <div :class="$style.subtitle">Total Value Locked</div>
+            <div :class="$style.subtitle">Liquidity Provided</div>
 
             <div :class="$style.range_picker">
                 <div :class="$style.range">
@@ -63,7 +63,26 @@ export default defineComponent({
 
                 <div :class="$style.range_values">
                     <div :class="$style.range_value">1 <span>XTZ</span></div>
-                    <div :class="$style.range_value">120 <span>XTZ</span></div>
+                    <div :class="$style.range_value">50 <span>XTZ</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div :class="$style.block">
+            <div :class="$style.subtitle">Status</div>
+
+            <div :class="$style.badges">
+                <div
+                    v-for="(status, index) in filters.statuses"
+                    :key="index"
+                    @click="$emit('onSelectStatus', status)"
+                    :class="[
+                        $style.badge,
+                        $style[status.color],
+                        status.active && $style.active,
+                    ]"
+                >
+                    <Icon :name="status.icon" size="14" />{{ status.name }}
                 </div>
             </div>
         </div>
@@ -99,22 +118,6 @@ export default defineComponent({
                 </div>
                 <div :class="[$style.badge, $style.red]">
                     <Icon name="lower" size="14" />1%
-                </div>
-            </div>
-        </div>
-
-        <div :class="$style.block">
-            <div :class="$style.subtitle">Liquidity Provided</div>
-
-            <div :class="$style.range_picker">
-                <div :class="$style.range">
-                    <div :class="$style.slider" />
-                    <div :class="$style.slider" />
-                </div>
-
-                <div :class="$style.range_values">
-                    <div :class="$style.range_value">1 <span>XTZ</span></div>
-                    <div :class="$style.range_value">50 <span>XTZ</span></div>
                 </div>
             </div>
         </div>
@@ -253,6 +256,10 @@ export default defineComponent({
 
 .badge.red svg {
     fill: var(--red);
+}
+
+.badge.gray svg {
+    fill: var(--text-secondary);
 }
 
 .range_picker {

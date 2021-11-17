@@ -44,3 +44,14 @@ export const getQuoteByTimestamp = gql`
         }
     }
 `
+
+export const getTVLByEventId = gql`
+    query getTVLByEventId($id: Int) {
+        totalValueLocked(where: { eventId: { _eq: $id } }) {
+            eventId
+            cumSum
+            createdTime
+            amount
+        }
+    }
+`

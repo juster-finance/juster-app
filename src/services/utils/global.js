@@ -18,5 +18,7 @@ export const getCurrencyIcon = name => {
             return require(`@/assets/symbols/eth.png`)
         case "BTC":
             return require(`@/assets/symbols/btc.png`)
+        case "USD":
+            return require(`@/assets/symbols/usd.png`)
     }
 }

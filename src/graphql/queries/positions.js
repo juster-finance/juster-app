@@ -2,10 +2,7 @@ import gql from "graphql-tag"
 
 export const getAllUserPositions = gql`
     query getAllUserPositions($address: String) {
-        position(
-            where: { userId: { _eq: $address } }
-            order_by: { id: desc }
-        ) {
+        position(where: { userId: { _eq: $address } }, order_by: { id: desc }) {
             id
             value
             withdrawn
@@ -17,9 +14,23 @@ export const getAllUserPositions = gql`
                     symbol
                 }
                 bets {
-                    amount
+                    id
                     side
+                    reward
+                    amount
+                    createdTime
+                    userId
                 }
+                deposits {
+                    amountAboveEq
+                    amountBelow
+                    eventId
+                    id
+                    userId
+                    createdTime
+                    shares
+                }
+                winnerBets
                 poolAboveEq
                 poolBelow
                 totalBetsAmount

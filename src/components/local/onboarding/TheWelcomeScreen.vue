@@ -12,11 +12,18 @@ import GuideCard from "./GuideCard"
  */
 import Button from "@/components/ui/Button"
 
+/**
+ * Store
+ */
+import { useAccountStore } from "@/store/account"
+
 export default defineComponent({
     name: "TheWelcomeScreen",
 
     setup(props, context) {
         const router = useRouter()
+
+        const accountStore = useAccountStore()
 
         const guides = [
             {
@@ -92,11 +99,26 @@ export default defineComponent({
         }
 
         const handleOpenDocs = () => {
+            accountStore.showOnboarding = false
+
             router.push("/docs")
             context.emit("skip")
         }
 
-        return { guides, steps, currentStep, selectStep, handleOpenDocs }
+        const handleSkip = () => {
+            accountStore.showOnboarding = false
+
+            context.emit("skip")
+        }
+
+        return {
+            guides,
+            steps,
+            currentStep,
+            selectStep,
+            handleOpenDocs,
+            handleSkip,
+        }
     },
 
     components: { GuideCard, Button },
@@ -106,7 +128,7 @@ export default defineComponent({
 <template>
     <div :class="$style.wrapper">
         <div :class="$style.base">
-            <div @click="$emit('skip')" :class="$style.skip_btn">
+            <div @click="handleSkip()" :class="$style.skip_btn">
                 Skip onboarding <Icon name="logout" size="14" />
             </div>
 
@@ -322,6 +344,14 @@ export default defineComponent({
     position: relative;
 }
 
+.base {
+    overflow-y: auto;
+}
+
+.base::-webkit-scrollbar {
+    display: none;
+}
+
 .skip_btn {
     position: absolute;
     top: 140px;
@@ -501,7 +531,7 @@ export default defineComponent({
     font-weight: 500;
     color: var(--text-tertiary);
 
-    margin-top: 20px;
+    margin: 20px 0 40px;
 }
 
 .hint svg {

@@ -11,11 +11,10 @@ import {
     getEventParticipants,
 } from "@/graphql/queries/events"
 
-export const fetchAllEvents = async ({ status }) => {
+export const fetchAllEvents = async () => {
     try {
         const { data } = await apollo.query({
             query: getAllEvents,
-            variables: { status },
         })
 
         return data.event

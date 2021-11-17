@@ -47,8 +47,11 @@ export default defineComponent({
         const notificationsStore = useNotificationsStore()
 
         /** Countdown setup */
+        const eventStartTime = computed(() =>
+            new Date(event.value?.betsCloseTime).getTime(),
+        )
         const { countdownText, status: countdownStatus, stop } = useCountdown(
-            event,
+            eventStartTime,
         )
 
         /** User inputs */
@@ -74,7 +77,7 @@ export default defineComponent({
 
             return (
                 (event.value.totalLiquidityShares *
-                    parseFloat(!amount.value ? 0 : amount.value)) /
+                    (!amount.value ? 0 : amount.value)) /
                 bigPool
             )
         })
@@ -163,7 +166,7 @@ export default defineComponent({
         }
     },
 
-    emits: ["switch"],
+    emits: ["switch", "onClose"],
     components: {
         Modal,
         Input,

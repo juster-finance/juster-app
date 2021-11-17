@@ -46,21 +46,14 @@ export const getEventById = gql`
 `
 
 export const getAllEvents = gql`
-    query getAllEvents($status: String) {
-        event(
-            where: { status: { _eq: $status } }
-            order_by: { createdTime: desc }
-        ) {
+    query getAllEvents {
+        event(order_by: { createdTime: desc }) {
             id
             status
             betsCloseTime
             currencyPair {
                 symbol
                 id
-            }
-            bets {
-                amount
-                side
             }
             poolAboveEq
             poolBelow
@@ -76,6 +69,23 @@ export const getAllEvents = gql`
             closedRate
             winnerBets
             targetDynamics
+            bets {
+                id
+                side
+                reward
+                amount
+                createdTime
+                userId
+            }
+            deposits {
+                amountAboveEq
+                amountBelow
+                eventId
+                id
+                userId
+                createdTime
+                shares
+            }
         }
     }
 `
@@ -93,10 +103,6 @@ export const getEventsBySymbol = gql`
                 symbol
                 id
             }
-            bets {
-                amount
-                side
-            }
             poolAboveEq
             poolBelow
             totalBetsAmount
@@ -111,6 +117,23 @@ export const getEventsBySymbol = gql`
             closedRate
             winnerBets
             targetDynamics
+            bets {
+                id
+                side
+                reward
+                amount
+                createdTime
+                userId
+            }
+            deposits {
+                amountAboveEq
+                amountBelow
+                eventId
+                id
+                userId
+                createdTime
+                shares
+            }
         }
     }
 `
@@ -129,10 +152,6 @@ export const getTopEvents = gql`
                 symbol
                 id
             }
-            bets {
-                amount
-                side
-            }
             poolAboveEq
             poolBelow
             totalBetsAmount
@@ -147,6 +166,23 @@ export const getTopEvents = gql`
             closedRate
             winnerBets
             targetDynamics
+            bets {
+                id
+                side
+                reward
+                amount
+                createdTime
+                userId
+            }
+            deposits {
+                amountAboveEq
+                amountBelow
+                eventId
+                id
+                userId
+                createdTime
+                shares
+            }
         }
     }
 `

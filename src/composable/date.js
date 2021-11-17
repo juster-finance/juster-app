@@ -5,7 +5,7 @@ import { ref, watch, reactive } from "vue"
  */
 import { countdown } from "@/services/utils/date"
 
-export const useCountdown = event => {
+export const useCountdown = target => {
     const countdownText = ref("00:00:00")
     const status = ref("In progress")
     const time = reactive({ h: 0, m: 0 })
@@ -13,10 +13,8 @@ export const useCountdown = event => {
     let countdownInterval
 
     const start = () => {
-        const target = new Date(event.value?.betsCloseTime).getTime()
-
         const { h, m, s, d } = countdown({
-            target,
+            target: target.value,
             now: new Date().getTime(),
         })
 
@@ -34,7 +32,7 @@ export const useCountdown = event => {
 
         countdownInterval = setInterval(() => {
             const now = new Date().getTime()
-            const { h, m, s, d } = countdown({ target, now })
+            const { h, m, s, d } = countdown({ target: target.value, now })
 
             time.h = h
             time.m = m
@@ -55,10 +53,8 @@ export const useCountdown = event => {
         clearInterval(countdownInterval)
     }
 
-    if (event.value) start()
-    watch(event, () => {
-        if (event.value) start()
-    })
+    watch(target, () => start())
+    if (target.value) start()
 
     return { countdownText, status, time, stop }
 }

@@ -42,6 +42,27 @@ const defaultFilters = {
             active: false,
         },
     ],
+
+    statuses: [
+        {
+            name: "Bets time",
+            icon: "bolt",
+            color: "green",
+            active: true,
+        },
+        {
+            name: "In progress",
+            icon: "time",
+            color: "yellow",
+            active: false,
+        },
+        // {
+        //     name: "Finished",
+        //     icon: "checkcircle",
+        //     color: "gray",
+        //     active: false,
+        // },
+    ],
 }
 
 export default defineComponent({
@@ -61,6 +82,12 @@ export default defineComponent({
         const handleSelectPeriod = target => {
             filters.value.periods.forEach(period => {
                 if (target.name == period.name) period.active = !period.active
+            })
+        }
+
+        const handleSelectStatus = target => {
+            filters.value.statuses.forEach(status => {
+                if (target.name == status.name) status.active = !status.active
             })
         }
 
@@ -91,6 +118,19 @@ export default defineComponent({
                 )
             }
 
+            /** Filter by Status */
+            if (filters.value.statuses.length) {
+                const statuses = filters.value.statuses
+                    .filter(status => status.active)
+                    .map(status => {
+                        if (status.name == "Bets time") return "NEW"
+                        if (status.name == "In progress") return "STARTED"
+                        if (status.name == "Finished") return "FINISHED"
+                    })
+
+                events = events.filter(event => statuses.includes(event.status))
+            }
+
             /** Filter by Period */
             if (filters.value.periods.length) {
                 const periods = filters.value.periods
@@ -113,13 +153,9 @@ export default defineComponent({
         })
 
         onMounted(async () => {
-            let allNewEvents = await fetchAllEvents({
-                status: "NEW",
-            })
+            let allNewEvents = await fetchAllEvents()
 
-            allEvents.value = cloneDeep(allNewEvents).sort(
-                (a, b) => new Date(b.createdTime) - new Date(a.createdTime),
-            )
+            allEvents.value = cloneDeep(allNewEvents)
         })
 
         /** Meta */
@@ -134,6 +170,7 @@ export default defineComponent({
             filteredEvents,
             filters,
             handleSelectPeriod,
+            handleSelectStatus,
             handleResetFilters,
         }
     },
@@ -167,6 +204,7 @@ export default defineComponent({
                 :filters="filters"
                 :events="allEvents"
                 @onSelectPeriod="handleSelectPeriod"
+                @onSelectStatus="handleSelectStatus"
                 @onReset="handleResetFilters"
                 :class="$style.filters_block"
             />
@@ -225,7 +263,7 @@ export default defineComponent({
 
 .events {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-gap: 16px;
 }
 

@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, toRefs, watch, onMounted } from "vue"
+import { defineComponent, ref, toRefs, watch, computed, onMounted } from "vue"
 
 /**
  * Local
@@ -44,8 +44,11 @@ export default defineComponent({
         })
 
         /** Countdown setup */
+        const eventStartTime = computed(() =>
+            new Date(event.value?.betsCloseTime).getTime(),
+        )
         const { countdownText, status: countdownStatus, stop } = useCountdown(
-            event,
+            eventStartTime,
         )
 
         watch(show, () => {

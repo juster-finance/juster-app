@@ -7,6 +7,7 @@ import {
     getQuotesBySymbol,
     getQuoteByTimestamp,
     getQuoteByRange,
+    getTVLByEventId,
 } from "@/graphql/queries/quotes"
 
 export const fetchQuotesBySymbol = async ({ id, limit, offset }) => {
@@ -59,6 +60,23 @@ export const fetchQuoteByTimestamp = async ({ id, ts }) => {
     } catch (error) {
         console.error(
             `Error during fetching quote by ts & id \n\n ${error.name}: ${error.message}`,
+        )
+        return []
+    }
+}
+
+/** TVL */
+export const fetchEventTVL = async ({ id }) => {
+    try {
+        const { data } = await apollo.query({
+            query: getTVLByEventId,
+            variables: { id },
+        })
+
+        return data.totalValueLocked
+    } catch (error) {
+        console.error(
+            `Error during fetching tvl by event id \n\n ${error.name}: ${error.message}`,
         )
         return []
     }

@@ -14,6 +14,8 @@ export const useAccountStore = defineStore({
             balance: 0,
 
             wonPositions: [],
+
+            showOnboarding: false,
         }
     },
     actions: {

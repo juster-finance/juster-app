@@ -30,7 +30,7 @@ export default {
                 <span>Total provided</span>
                 <span
                     ><Icon name="liquidity" size="12" />{{
-                        parseFloat(event.totalLiquidityProvided)
+                        event.totalLiquidityProvided
                     }}</span
                 >
             </div>

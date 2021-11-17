@@ -55,8 +55,8 @@ export default defineComponent({
             if (!symbol.value.historyPrice) return { text: "Loading" }
 
             const { diff, percent, isIncreased } = calcChange(
-                parseFloat(quotes.value[0].price),
-                parseFloat(symbol.value.historyPrice),
+                quotes.value[0].price,
+                symbol.value.historyPrice,
             )
             color.value = isIncreased ? "green" : "red"
 
@@ -285,7 +285,7 @@ export default defineComponent({
             </div>
 
             <div :class="$style.timeframe">
-                <Icon name="bolt" size="12" />Last 30m
+                <Icon name="bolt" size="12" />Real-time
             </div>
         </div>
     </div>
