@@ -906,8 +906,8 @@ export default defineComponent({
                         :class="$style.bets_head"
                     >
                         <span>TYPE</span>
-                        <span>ABOVE</span>
-                        <span>BELOW</span>
+                        <span>RISE</span>
+                        <span>FALL</span>
                     </div>
                     <div v-if="filteredDeposits.length" :class="$style.bets">
                         <DepositCard
