@@ -48,9 +48,9 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
 
-    width: 16px;
-    height: 16px;
-    border-radius: 5px;
+    min-width: 16px;
+    min-height: 16px;
+    border-radius: 4px;
     fill: var(--text-primary);
 
     border: 1px solid var(--border);
@@ -67,13 +67,11 @@ export default defineComponent({
 }
 
 .base {
+    width: 100%;
+
     font-size: 14px;
     line-height: 1;
     font-weight: 600;
     color: var(--text-primary);
-}
-
-.base span {
-    color: var(--text-tertiary);
 }
 </style>

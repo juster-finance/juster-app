@@ -83,8 +83,8 @@ export default defineComponent({
         <div :class="$style.container">
             <div :class="$style.events_base">
                 <Banner type="warning"
-                    >We have temporarily disabled events with a period of 1
-                    hour. They will be available again soon.</Banner
+                    >We have temporarily disabled events with a target dynamics.
+                    They will be available again soon.</Banner
                 >
                 <div :class="$style.events">
                     <EventCard

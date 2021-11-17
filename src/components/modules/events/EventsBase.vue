@@ -1,5 +1,13 @@
 <script>
-import { defineComponent, reactive, ref, onMounted, watch, computed } from "vue"
+import {
+    defineComponent,
+    reactive,
+    ref,
+    onMounted,
+    watch,
+    computed,
+    onBeforeUnmount,
+} from "vue"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
 
@@ -18,6 +26,11 @@ import Banner from "@/components/ui/Banner"
  * Local
  */
 import EventCard from "@/components/local/EventCard"
+
+/**
+ * Store
+ */
+import { useMarketStore } from "@/store/market"
 
 import EventsFilters from "./EventsFilters"
 
@@ -56,12 +69,6 @@ const defaultFilters = {
             color: "yellow",
             active: false,
         },
-        // {
-        //     name: "Finished",
-        //     icon: "checkcircle",
-        //     color: "gray",
-        //     active: false,
-        // },
     ],
 }
 
@@ -75,6 +82,8 @@ export default defineComponent({
                 path: "/events",
             },
         ])
+
+        const marketStore = useMarketStore()
 
         /** Filters */
         let filters = ref(cloneDeep(defaultFilters))
@@ -96,10 +105,8 @@ export default defineComponent({
         }
 
         /** Events */
-        const allEvents = ref([])
-
         const filteredEvents = computed(() => {
-            let events = allEvents.value
+            let events = cloneDeep(marketStore.events)
 
             /** Filter by Symbol */
             if (
@@ -155,7 +162,10 @@ export default defineComponent({
         onMounted(async () => {
             let allNewEvents = await fetchAllEvents()
 
-            allEvents.value = cloneDeep(allNewEvents)
+            marketStore.events = cloneDeep(allNewEvents)
+        })
+        onBeforeUnmount(() => {
+            marketStore.events = []
         })
 
         /** Meta */
@@ -166,7 +176,7 @@ export default defineComponent({
 
         return {
             breadcrumbs,
-            allEvents,
+            marketStore,
             filteredEvents,
             filters,
             handleSelectPeriod,
@@ -202,7 +212,7 @@ export default defineComponent({
         <div :class="$style.container">
             <EventsFilters
                 :filters="filters"
-                :events="allEvents"
+                :events="marketStore.events"
                 @onSelectPeriod="handleSelectPeriod"
                 @onSelectStatus="handleSelectStatus"
                 @onReset="handleResetFilters"
@@ -211,8 +221,8 @@ export default defineComponent({
 
             <div :class="$style.events_base">
                 <Banner type="warning"
-                    >We have temporarily disabled events with a period of 1
-                    hour. They will be available again soon.</Banner
+                    >We have temporarily disabled events with a target dynamics.
+                    They will be available again soon.</Banner
                 >
                 <div :class="$style.events">
                     <EventCard

@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, onMounted } from "vue"
+import { defineComponent, ref, onMounted, computed, onBeforeUnmount } from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
@@ -33,19 +33,20 @@ export default defineComponent({
 
         const marketStore = useMarketStore()
 
-        const events = ref([])
+        const handleViewTopEvents = () => {
+            router.push("/events/top")
+        }
 
         onMounted(async () => {
             const topEvents = await fetchTopEvents({ limit: 3 })
 
-            events.value = cloneDeep(topEvents).sort(
+            marketStore.events = cloneDeep(topEvents).sort(
                 (a, b) => b.bets.length - a.bets.length,
             )
         })
-
-        const handleViewTopEvents = () => {
-            router.push("/events/top")
-        }
+        onBeforeUnmount(() => {
+            marketStore.events = []
+        })
 
         /** Meta */
         useMeta({
@@ -56,7 +57,6 @@ export default defineComponent({
 
         return {
             marketStore,
-            events,
             handleViewTopEvents,
         }
     },
@@ -110,9 +110,9 @@ export default defineComponent({
                     </Button>
                 </div>
 
-                <div v-if="events.length" :class="$style.items">
+                <div v-if="marketStore.events.length" :class="$style.items">
                     <EventCard
-                        v-for="event in events.slice(0, 3)"
+                        v-for="event in marketStore.events"
                         :key="event.id"
                         :event="event"
                     />

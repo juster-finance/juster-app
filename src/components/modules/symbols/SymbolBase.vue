@@ -1,5 +1,12 @@
 <script>
-import { defineComponent, ref, computed, watch, reactive } from "vue"
+import {
+    defineComponent,
+    ref,
+    computed,
+    watch,
+    reactive,
+    onBeforeUnmount,
+} from "vue"
 import { useRoute } from "vue-router"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
@@ -61,21 +68,19 @@ export default defineComponent({
             selectedTab.value = tab
         }
 
-        const events = computed(
-            () => marketStore.symbols[symbol.value.symbol].events,
-        )
+        const events = computed(() => marketStore.events)
 
         const getEvents = async ({ status }) => {
-            marketStore.symbols[symbol.value.symbol].events = []
+            marketStore.events = []
 
             let allEvents = await fetchEventsBySymbol({
                 id: symbol.value.id,
                 status,
             })
 
-            marketStore.symbols[symbol.value.symbol].events = cloneDeep(
-                allEvents,
-            ).sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime))
+            marketStore.events = cloneDeep(allEvents).sort(
+                (a, b) => new Date(b.createdTime) - new Date(a.createdTime),
+            )
         }
 
         if (symbol.value) {
@@ -140,6 +145,10 @@ export default defineComponent({
             },
             { deep: true },
         )
+
+        onBeforeUnmount(() => {
+            marketStore.events = []
+        })
 
         return {
             header,

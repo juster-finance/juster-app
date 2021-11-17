@@ -6,6 +6,9 @@ export const useMarketStore = defineStore({
     state() {
         return {
             isSymbolsLoaded: false,
+
+            events: [],
+
             symbols: {
                 "BTC-USD": {
                     events: [],
@@ -43,26 +46,17 @@ export const useMarketStore = defineStore({
             this.symbols[target].historyPrice = price
         },
 
-        updateEvent({ target, newEvent }) {
-            if (!target || !this.symbols[target].events.length) return
-
-            let event = this.symbols[target].events.find(
-                event => event.id == newEvent.id,
-            )
-            const indexOfEvent = this.symbols[target].events.indexOf(event)
-
-            /** todo: store mixed events regardless of the currency pair */
-            if (!event) return
+        updEvent(newEvent) {
+            let event = this.events.find(event => event.id == newEvent.id)
+            const indexOfEvent = this.events.indexOf(event)
 
             if (event.status !== newEvent.status) {
-                this.symbols[target].events.splice(indexOfEvent, 1)
+                this.events.splice(indexOfEvent, 1)
             } else {
-                this.symbols[target].events[indexOfEvent] = {
-                    ...event,
-                    ...newEvent,
-                }
+                this.events[indexOfEvent] = { ...event, ...newEvent }
             }
         },
+
         updateQuotes({ target, quote }) {
             if (quote.timestamp == this.symbols[target].quotes[0].timestamp)
                 return

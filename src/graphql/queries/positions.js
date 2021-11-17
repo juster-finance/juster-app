@@ -53,7 +53,6 @@ export const getUserPositionsForWithdrawal = gql`
             where: {
                 userId: { _eq: $address }
                 withdrawn: { _eq: false }
-                value: { _gt: 0 }
                 event: { status: { _eq: "FINISHED" } }
             }
             order_by: { id: desc }

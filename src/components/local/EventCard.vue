@@ -332,10 +332,7 @@ export default defineComponent({
                     next: data => {
                         const { event: newEvent } = data
 
-                        marketStore.updateEvent({
-                            target: symbol.value,
-                            newEvent: newEvent[0],
-                        })
+                        marketStore.updEvent(newEvent[0])
                     },
                     error: console.error,
                 })
@@ -520,7 +517,7 @@ export default defineComponent({
 
             <div :class="$style.badges">
                 <Tooltip
-                    v-if="event.status == 'NEW'"
+                    v-if="startStatus == 'In progress' && event.status == 'NEW'"
                     position="bottom"
                     side="left"
                 >
@@ -531,6 +528,21 @@ export default defineComponent({
                     <template v-slot:content>
                         The event is available for betting and providing
                         liquidity
+                    </template>
+                </Tooltip>
+                <Tooltip
+                    v-else-if="
+                        startStatus == 'Finished' && event.status == 'NEW'
+                    "
+                    position="bottom"
+                    side="left"
+                >
+                    <Badge color="green" :class="$style.main_badge"
+                        ><Icon name="bolt" size="12" />Starting soon</Badge
+                    >
+
+                    <template v-slot:content>
+                        Betting is closed. The event is starting
                     </template>
                 </Tooltip>
                 <Tooltip

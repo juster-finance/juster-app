@@ -26,28 +26,34 @@ export default defineComponent({
 
             <div :class="$style.symbols">
                 <Checkbox v-model="filters.symbols.xtz"
-                    >XTZ-USD
-                    <span>{{
-                        events.filter(
-                            event => event.currencyPair.symbol == "XTZ-USD",
-                        ).length
-                    }}</span></Checkbox
+                    ><div :class="$style.symbol_checkbox">
+                        XTZ-USD
+                        <span>{{
+                            events.filter(
+                                event => event.currencyPair.symbol == "XTZ-USD",
+                            ).length
+                        }}</span>
+                    </div></Checkbox
                 >
                 <Checkbox v-model="filters.symbols.btc"
-                    >BTC-USD
-                    <span>{{
-                        events.filter(
-                            event => event.currencyPair.symbol == "BTC-USD",
-                        ).length
-                    }}</span></Checkbox
+                    ><div :class="$style.symbol_checkbox">
+                        BTC-USD
+                        <span>{{
+                            events.filter(
+                                event => event.currencyPair.symbol == "BTC-USD",
+                            ).length
+                        }}</span>
+                    </div></Checkbox
                 >
                 <Checkbox v-model="filters.symbols.eth"
-                    >ETH-USD
-                    <span>{{
-                        events.filter(
-                            event => event.currencyPair.symbol == "ETH-USD",
-                        ).length
-                    }}</span></Checkbox
+                    ><div :class="$style.symbol_checkbox">
+                        ETH-USD
+                        <span>{{
+                            events.filter(
+                                event => event.currencyPair.symbol == "ETH-USD",
+                            ).length
+                        }}</span>
+                    </div></Checkbox
                 >
             </div>
         </div>
@@ -209,6 +215,16 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.symbol_checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.symbol_checkbox span {
+    color: var(--text-tertiary);
 }
 
 .badges {
