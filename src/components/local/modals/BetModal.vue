@@ -162,6 +162,8 @@ export default defineComponent({
                 return "Acceptance of bets is closed"
             if (sendingBet.value) return "Awaiting confirmation.."
 
+            if (amount.value > accountStore.balance) return "Insufficient funds"
+
             switch (side.value) {
                 case "Higher":
                 case "Lower":
@@ -324,7 +326,7 @@ export default defineComponent({
                 <div :class="$style.balance">
                     Available balance
                     <span
-                        @click="amount.value = accountStore.balance"
+                        @click="amount.value = Math.floor(accountStore.balance)"
                         @dblclick="amount.value = accountStore.balance / 2"
                         >{{ accountStore.balance.toFixed(2) }}
                     </span>
@@ -358,7 +360,11 @@ export default defineComponent({
                 type="primary"
                 block
                 :loading="sendingBet"
-                :disabled="!amount.value || countdownStatus !== 'In progress'"
+                :disabled="
+                    !amount.value ||
+                        countdownStatus !== 'In progress' ||
+                        amount.value > accountStore.balance
+                "
             >
                 <Spin v-if="sendingBet" size="16" />
                 <Icon
