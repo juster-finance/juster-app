@@ -36,7 +36,7 @@ import EventsFilters from "./EventsFilters"
 
 const defaultFilters = {
     symbols: {
-        xtz: false,
+        xtz: true,
         btc: false,
         eth: false,
     },

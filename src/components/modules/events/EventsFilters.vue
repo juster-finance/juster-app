@@ -11,8 +11,6 @@ export default defineComponent({
     name: "EventsFilters",
     props: { filters: Object, events: Array },
 
-    setup() {},
-
     components: { Button, Checkbox },
 })
 </script>
@@ -314,6 +312,8 @@ export default defineComponent({
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+
+    user-select: none;
 
     width: 8px;
     height: 8px;
