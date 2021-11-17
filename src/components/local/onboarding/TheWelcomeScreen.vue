@@ -28,59 +28,59 @@ export default defineComponent({
         const guides = [
             {
                 type: "Basic",
-                title: "Getting Started",
+                title: "Connect wallet",
                 color: "blue",
-                link: "/docs/getting-started",
+                link: "/docs/wallets",
             },
             {
                 type: "Basic",
-                title: "Explore Markets",
+                title: "Explore markets",
                 color: "orange",
                 link: "/docs/explore-markets",
             },
             {
-                type: "Liquidity",
-                title: "Earn as a provider",
-                color: "green",
-                link: "/docs/adding-liquidity",
-            },
-            {
-                type: "Betting",
-                title: "How to make a bet",
+                type: "Basic",
+                title: "Placing bets",
                 color: "yellow",
                 link: "/docs/how-to-bet",
+            },
+            {
+                type: "Advanced",
+                title: "Providing liquidity",
+                color: "green",
+                link: "/docs/adding-liquidity",
             },
         ]
 
         const steps = reactive([
             {
                 num: 1,
-                name: "Explore Markets",
+                name: "Explore markets",
                 readed: false,
             },
             {
                 num: 2,
-                name: "Symbol Page",
+                name: "Сhoose an Event",
                 readed: false,
             },
             {
                 num: 3,
-                name: "Selecting first Event",
+                name: "Connect your wallet",
                 readed: false,
             },
             {
                 num: 4,
-                name: "Make a bet",
-                readed: false,
-            },
-            {
-                num: 4.1,
-                name: "Provide a liquidity",
+                name: "Place a Bet",
                 readed: false,
             },
             {
                 num: 5,
-                name: "Withdraw",
+                name: "Track the price",
+                readed: false,
+            },
+            {
+                num: 6,
+                name: "Withdraw profit 🤑",
                 readed: false,
             },
         ])
@@ -139,32 +139,17 @@ export default defineComponent({
             </div>
 
             <div :class="$style.description">
-                We will help you and tell you how to use our application, how to
-                earn from providing liquidity, how to place bets correctly and
-                much more.
-            </div>
-
-            <div :class="$style.block">
-                <div :class="$style.block_title">Basic Guides</div>
-
-                <div :class="$style.guides">
-                    <GuideCard
-                        v-for="guide in guides"
-                        :key="guide.icon"
-                        @click="handleSkip()"
-                        :guide="guide"
-                    />
-                </div>
+                Let us guide you through the main application pages and use case
+                scenarios
             </div>
 
             <div :class="$style.block">
                 <div :class="$style.block_title">
-                    Simple Flow of use
+                    Basic Workflow
                 </div>
 
                 <div :class="$style.block_description">
-                    All info can be found in the Juster Docs, but we have chosen
-                    the main steps for you
+                    A step-by-step tutorial explaining how to work with Juster
                 </div>
 
                 <div :class="$style.flow_steps">
@@ -187,10 +172,12 @@ export default defineComponent({
                 <div v-if="currentStep == 0" :class="$style.step">
                     <div :class="$style.step_title">Explore Markets</div>
                     <div :class="$style.step_description">
-                        On this page you can choose the currency pair you are
-                        interested in or the top event. In the future, this page
-                        can be customized for yourself. It also contains
-                        important news affecting currency pairs.
+                        Currently Juster allows to bet on cryptocurrencies price
+                        dynamics (in the future we will add more interesting
+                        feeds) and at this point you can choose between
+                        <i>XTZ/USD</i>, <i>ETH/USD</i>, and
+                        <i>BTC/USD</i> depending on your goal (hedge existing
+                        position, use the leverage, catch the trend, or other).
                     </div>
 
                     <div :class="$style.step_actions">
@@ -203,14 +190,17 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <!-- Symbol Page -->
+                <!-- Choose Event -->
                 <div v-if="currentStep == 1" :class="$style.step">
-                    <div :class="$style.step_title">Symbol Page</div>
+                    <div :class="$style.step_title">Choose an Event</div>
                     <div :class="$style.step_description">
-                        On this page you can choose the currency pair you are
-                        interested in or the top event. In the future, this page
-                        can be customized for yourself. It also contains
-                        important news affecting currency pairs.
+                        Events are the core entities in Juster — they contain
+                        the specification of two possible outcomes you can bet
+                        on. They differ in the period of price measurement (e.g.
+                        1 hour or 1 day) and the time left to the end of
+                        accepting bets. <br />New events are created every time
+                        the previous ones stop accepting bets, so there's always
+                        at least one event available for betting.
                     </div>
 
                     <div :class="$style.step_actions">
@@ -223,14 +213,14 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <!-- Selecting first Event -->
+                <!-- Connect your wallet -->
                 <div v-if="currentStep == 2" :class="$style.step">
-                    <div :class="$style.step_title">Selecting first Event</div>
+                    <div :class="$style.step_title">Connect your wallet</div>
                     <div :class="$style.step_description">
-                        On this page you can choose the currency pair you are
-                        interested in or the top event. In the future, this page
-                        can be customized for yourself. It also contains
-                        important news affecting currency pairs.
+                        If you click on "Bet" or "Liquidity" button on the Event
+                        card Juster will first ask you to connect any Tezos
+                        wallet, supporting Beacon. Make sure you have one and
+                        enough funds for experimenting ;)
                     </div>
 
                     <div :class="$style.step_actions">
@@ -243,20 +233,16 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <!-- Make a bet -->
+                <!-- Place a bet -->
                 <div v-if="currentStep == 3" :class="$style.step">
-                    <div :class="$style.step_title">Make a bet</div>
+                    <div :class="$style.step_title">Place a bet</div>
                     <div :class="$style.step_description">
-                        Having chosen a suitable event, you need to decide in
-                        which direction the price will move. Depending on the
-                        chosen direction, your winnings will vary. You can
-                        double, triple your stake in just a couple of hours.
-                    </div>
-                    <div :class="$style.step_description">
-                        After placing a bet and signing a transaction, you need
-                        to wait about 30 seconds for us to accept your bet. Note
-                        that you should definitely keep an eye on the event
-                        timer.
+                        Decide whether in your opinion the price will rise or
+                        fall (during the time frame specified in the event), put
+                        the amount you want to risk, and send the order.<br />
+                        Your bet will be confirmed in approximately 30 seconds
+                        and you will be able see it in the "My bets" list on the
+                        Event page.
                     </div>
 
                     <div :class="$style.step_actions">
@@ -269,20 +255,16 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <!-- Provide a liquidity -->
+                <!-- Track the price -->
                 <div v-if="currentStep == 4" :class="$style.step">
-                    <div :class="$style.step_title">Provide a liquidity</div>
+                    <div :class="$style.step_title">Track the price</div>
                     <div :class="$style.step_description">
-                        Having chosen a suitable event, you need to decide in
-                        which direction the price will move. Depending on the
-                        chosen direction, your winnings will vary. You can
-                        double, triple your stake in just a couple of hours.
-                    </div>
-                    <div :class="$style.step_description">
-                        After placing a bet and signing a transaction, you need
-                        to wait about 30 seconds for us to accept your bet. Note
-                        that you should definitely keep an eye on the event
-                        timer.
+                        The time for accepting bets ends and the starting price
+                        is fixed. After that you can watch as the event tilts to
+                        one or the other outcome until the final price is
+                        settled. <br />Note that the price measurement may
+                        happen with 1-2 blocks delay due to how price oracles
+                        work.
                     </div>
 
                     <div :class="$style.step_actions">
@@ -295,15 +277,32 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <!-- Withdraw -->
+                <!-- Withdraw profit -->
                 <div v-if="currentStep == 5" :class="$style.step">
-                    <div :class="$style.step_title">Withdraw</div>
+                    <div :class="$style.step_title">Withdraw profit</div>
                     <div :class="$style.step_description">
-                        Having chosen a suitable event, you need to decide in
-                        which direction the price will move. Depending on the
-                        chosen direction, your winnings will vary. You can
-                        double, triple your stake in just a couple of hours.
+                        Finally, if your bet win you can withdraw the deposited
+                        amount plus gains to your wallet! Your personal stats is
+                        available in the profile section as well as the list of
+                        pending and completed withdrawals.
                     </div>
+                </div>
+            </div>
+
+            <div :class="$style.block">
+                <div :class="$style.block_title">Detailed guides</div>
+
+                <div :class="$style.block_description">
+                    Here are some useful links for the further reading
+                </div>
+
+                <div :class="$style.guides">
+                    <GuideCard
+                        v-for="guide in guides"
+                        :key="guide.icon"
+                        @click="$emit('skip')"
+                        :guide="guide"
+                    />
                 </div>
             </div>
 
@@ -312,15 +311,14 @@ export default defineComponent({
                     ><Icon name="spark" size="16" /> Start using Juster</Button
                 >
                 <Button type="secondary" size="medium" @click="handleOpenDocs"
-                    ><Icon name="book" size="16" />
-                    <span>Learn the</span> Juster Docs</Button
+                    ><Icon name="book" size="16" /> Read the Docs</Button
                 >
             </div>
 
             <div :class="$style.hint">
                 <Icon name="help" size="14" />
-                All info can be found in the <span>Juster Docs</span>, plus
-                details of the technical side of the project
+                You can always <span>return</span> to this window by clicking on
+                the question icon on the navigation bar
             </div>
         </div>
     </div>
