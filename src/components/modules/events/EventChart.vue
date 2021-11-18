@@ -108,12 +108,13 @@ export default defineComponent({
 
 .header svg {
     fill: var(--icon);
+    transform: rotate(180deg);
 
     transition: transform 0.2s ease;
 }
 
 .header svg.rotate {
-    transform: rotate(180deg);
+    transform: rotate(360deg);
 }
 
 .base {
