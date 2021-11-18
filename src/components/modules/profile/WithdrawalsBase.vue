@@ -70,7 +70,28 @@ export default defineComponent({
         </metainfo>
 
         <div :class="$style.block">
-            <h1>Your withdrawals</h1>
+            <h1>Won events</h1>
+            <div :class="$style.description">
+                List of events available for withdrawal
+            </div>
+
+            <div v-if="positionsForWithdrawal.length" :class="$style.items">
+                <EventCard
+                    v-for="position in positionsForWithdrawal"
+                    :key="position.event.id"
+                    :event="position.event"
+                    won
+                    showSymbol
+                />
+            </div>
+            <div v-else :class="$style.empty">
+                <Icon name="help" size="16" /> There are no winning events
+                available for withdrawal
+            </div>
+        </div>
+
+        <div :class="$style.block">
+            <h1>Withdrawals history</h1>
             <div :class="$style.description">
                 Detailed table with history of withdrawals
             </div>
@@ -159,27 +180,6 @@ export default defineComponent({
                 <Button type="tertiary" size="small"
                     ><Icon name="book" size="14" />Read in Juster Docs</Button
                 >
-            </div>
-        </div>
-
-        <div :class="$style.block">
-            <h1>Won events</h1>
-            <div :class="$style.description">
-                List of events available for withdrawal
-            </div>
-
-            <div v-if="positionsForWithdrawal.length" :class="$style.items">
-                <EventCard
-                    v-for="position in positionsForWithdrawal"
-                    :key="position.event.id"
-                    :event="position.event"
-                    won
-                    showSymbol
-                />
-            </div>
-            <div v-else :class="$style.empty">
-                <Icon name="help" size="16" /> There are no winning events
-                available for withdrawal
             </div>
         </div>
     </div>

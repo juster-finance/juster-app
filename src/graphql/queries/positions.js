@@ -70,9 +70,23 @@ export const getUserPositionsForWithdrawal = gql`
                     symbol
                 }
                 bets {
-                    amount
+                    id
                     side
+                    reward
+                    amount
+                    createdTime
+                    userId
                 }
+                deposits {
+                    amountAboveEq
+                    amountBelow
+                    eventId
+                    id
+                    userId
+                    createdTime
+                    shares
+                }
+                winnerBets
                 poolAboveEq
                 poolBelow
                 totalBetsAmount

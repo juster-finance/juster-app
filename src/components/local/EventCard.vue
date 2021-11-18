@@ -57,7 +57,6 @@ export default defineComponent({
     props: {
         event: Object,
         chart: Boolean,
-        won: Boolean,
     },
 
     setup(props) {
@@ -200,6 +199,12 @@ export default defineComponent({
             return tvl
         })
 
+        const isUserWon = computed(() => {
+            return accountStore.wonPositions.some(
+                position => position.event.id == event.value.id,
+            )
+        })
+
         /** Join to the event & Liquidity */
         const handleJoin = event => {
             /** disable Bet / Liquidity right after betsCloseTime */
@@ -287,6 +292,8 @@ export default defineComponent({
         onMounted(async () => {
             card.value.addEventListener("contextmenu", contextMenuHandler)
 
+            if (event.value.status === "FINISHED") return
+
             /** Subscription, TODO: refactor */
             subscription.value = await gql
                 .subscription({
@@ -343,7 +350,9 @@ export default defineComponent({
         })
 
         onUnmounted(() => {
-            if (!subscription.value?.closed) subscription.value.unsubscribe()
+            if (subscription.value.unsubscribe && !subscription.value?.closed) {
+                subscription.value.unsubscribe()
+            }
 
             startStopCb()
             finishStopCb()
@@ -368,6 +377,7 @@ export default defineComponent({
             liquidityLevel,
             participantsAvatars,
             userTVL,
+            isUserWon,
             percentage,
             handleJoin,
             handleLiquidity,
@@ -714,6 +724,7 @@ export default defineComponent({
             </div>
 
             <div
+                v-if="!isUserWon"
                 :class="[
                     $style.buttons,
                     startStatus == 'Finished' && $style.disabled,
@@ -732,6 +743,14 @@ export default defineComponent({
                 >
                     <Icon name="liquidity_ultra" size="16" /> Liquidity
                 </div>
+            </div>
+
+            <div
+                v-else
+                @click.prevent="handleWithdraw"
+                :class="$style.withdraw"
+            >
+                <Icon name="crown" size="16" /> Withdraw {{ 5 }} XTZ
             </div>
         </div>
     </router-link>
@@ -996,5 +1015,21 @@ export default defineComponent({
     width: 2px;
     height: 100%;
     background: var(--border);
+}
+
+.withdraw {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    font-size: 12px;
+    line-height: 1.1;
+    font-weight: 600;
+
+    border-radius: 6px;
+    background: var(--green);
+
+    height: 26px;
 }
 </style>
