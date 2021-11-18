@@ -19,7 +19,7 @@ export default {
 <template>
     <Page :class="$style.wrapper">
         <div :class="$style.header">
-            <a
+            <!-- <a
                 href="https://verbose-krill-7ef.notion.site/Juster-Roadmap-786c58fbd0a8435994d2890202c0ddbf"
                 target="_blank"
                 :class="$style.roadmap"
@@ -33,46 +33,56 @@ export default {
                 <div :class="$style.dot" />
 
                 <div :class="$style.roadmap_link">View our Roadmap</div>
-            </a>
+            </a> -->
 
-            <h1>The ultimate betting experience for everyone</h1>
+            <h1>Decentralized Betting Protocol</h1>
             <div :class="$style.description">
                 <span>Juster</span> is an on-chain smart contract platform
                 allowing users to take part in an automated betting market by
                 creating events, providing liquidity to them, and making bets.
-                Log in to your account and start!
             </div>
 
             <div :class="$style.buttons">
                 <router-link to="/explore"
                     ><Button type="primary" size="medium"
-                        ><Icon name="spark" size="16" />Explore the
-                        Juster</Button
+                        ><Icon name="spark" size="16" />Launch Juster app</Button
                     ></router-link
                 >
                 <router-link to="/docs">
                     <Button type="secondary" size="medium"
-                        ><Icon name="book" size="16" />Learn the Juster
-                        Docs</Button
+                        ><Icon name="book" size="16" />Read the docs</Button
                     ></router-link
                 >
             </div>
 
-            <img
+            <div :class="$style.promo">
+                <div :class="$style.promo_video">
+                    <iframe
+                        width="560"
+                        height="315"
+                        src="https://www.youtube.com/embed/rOYu2Qpbpdw?controls=0&modestbranding=1&rel=0"
+                        title="Juster promo"
+                        frameborder="0"
+                        allow=""
+                        allowfullscreen
+                    ></iframe>
+                </div>
+            </div>
+
+            <!-- <img
                 src="@/assets/landing/app.png"
                 width="1100"
                 height="734"
                 :class="$style.app_img"
-            />
+            /> -->
 
             <div :class="$style.hint">
                 <Icon name="help" size="14" />
-                <span>Explore Page</span> — explore available markets, top
-                events, market-influencing news, etc.
+                Juster is built on <span>Tezos</span> blockchain and uses <span>Harbinger</span> oracle price feed
             </div>
         </div>
 
-        <div :class="$style.block">
+        <!-- <div :class="$style.block">
             <div :class="$style.benefits">
                 <div :class="$style.benefit">
                     <img src="@/assets/landing/benefit_1.svg" />
@@ -342,7 +352,7 @@ export default {
                     ></router-link
                 >
             </div>
-        </div>
+        </div> -->
     </Page>
 </template>
 
@@ -360,7 +370,7 @@ export default {
     text-align: center;
     font-family: "Sora", sans-serif;
 
-    max-width: 600px;
+    max-width: 800px;
 
     margin-bottom: 16px;
 }
@@ -422,15 +432,15 @@ export default {
 }
 
 .description {
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1.6;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--text-tertiary);
     text-align: center;
 
     max-width: 600px;
 
-    margin-bottom: 50px;
+    margin-bottom: 40px;
 }
 
 .description span {
@@ -440,6 +450,21 @@ export default {
 .buttons {
     display: flex;
     gap: 16px;
+}
+
+.promo {
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+.promo_video {
+    position: relative;
+    padding-bottom: 56.25%;
+    background: #1b1b1b;
+    height: 0;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.7);
 }
 
 .app_img {

@@ -10,27 +10,27 @@ export default defineComponent({
     setup(props) {
         const { guide } = toRefs(props)
 
-        const getIconByTitle = () => {
-            switch (guide.value.title) {
-                case "Getting Started":
+        const getIcon = () => {
+            switch (guide.value.color) {
+                case "blue":
                     return require(`@/assets/onboarding/guide_icon_1.svg`)
-                case "Explore Markets":
+                case "orange":
                     return require(`@/assets/onboarding/guide_icon_2.svg`)
-                case "Earn as a provider":
+                case "yellow":
                     return require(`@/assets/onboarding/guide_icon_3.svg`)
-                case "How to make a bet":
+                case "green":
                     return require(`@/assets/onboarding/guide_icon_4.svg`)
             }
         }
 
-        return { getIconByTitle }
+        return { getIcon }
     },
 })
 </script>
 
 <template>
     <router-link :to="guide.link" :class="$style.wrapper">
-        <img :src="getIconByTitle()" :class="$style[guide.color]" />
+        <img :src="getIcon()" :class="$style[guide.color]" />
 
         <div :class="$style.base">
             <div :class="$style.type">
