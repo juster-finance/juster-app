@@ -522,7 +522,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="green" :class="$style.main_badge"
-                        ><Icon name="bolt" size="12" />Bets time</Badge
+                        ><Icon name="bolt" size="12" />New</Badge
                     >
 
                     <template v-slot:content>

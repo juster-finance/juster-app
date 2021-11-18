@@ -58,7 +58,7 @@ const defaultFilters = {
 
     statuses: [
         {
-            name: "Bets time",
+            name: "New",
             icon: "bolt",
             color: "green",
             active: true,
@@ -87,6 +87,23 @@ export default defineComponent({
 
         /** Filters */
         let filters = ref(cloneDeep(defaultFilters))
+
+        const liquidityRange = reactive({
+            min: 0,
+            max: 0,
+        })
+        const liquidityFilters = reactive({
+            min: 0,
+            max: 0,
+        })
+
+        const handleNewMin = value => {
+            liquidityFilters.min = value
+        }
+
+        const handleNewMax = value => {
+            liquidityFilters.max = value
+        }
 
         const handleSelectPeriod = target => {
             filters.value.periods.forEach(period => {
@@ -125,12 +142,20 @@ export default defineComponent({
                 )
             }
 
+            /** Filter by Liquidity */
+            events = events.filter(
+                event => event.totalLiquidityProvided >= liquidityFilters.min,
+            )
+            events = events.filter(
+                event => event.totalLiquidityProvided <= liquidityFilters.max,
+            )
+
             /** Filter by Status */
             if (filters.value.statuses.length) {
                 const statuses = filters.value.statuses
                     .filter(status => status.active)
                     .map(status => {
-                        if (status.name == "Bets time") return "NEW"
+                        if (status.name == "New") return "NEW"
                         if (status.name == "In progress") return "STARTED"
                         if (status.name == "Finished") return "FINISHED"
                     })
@@ -159,6 +184,20 @@ export default defineComponent({
             return events
         })
 
+        watch(
+            () => marketStore.events,
+            () => {
+                const allLiquidity = cloneDeep(marketStore.events)
+                    .filter(event => ["NEW", "STARTED"].includes(event.status))
+                    .map(event => event.totalLiquidityProvided)
+
+                liquidityRange.min = Math.min(...allLiquidity)
+                liquidityRange.max = Math.max(...allLiquidity)
+                liquidityFilters.min = Math.min(...allLiquidity)
+                liquidityFilters.max = Math.max(...allLiquidity)
+            },
+        )
+
         onMounted(async () => {
             let allNewEvents = await fetchAllEvents()
 
@@ -179,6 +218,9 @@ export default defineComponent({
             marketStore,
             filteredEvents,
             filters,
+            liquidityRange,
+            handleNewMin,
+            handleNewMax,
             handleSelectPeriod,
             handleSelectStatus,
             handleResetFilters,
@@ -212,7 +254,10 @@ export default defineComponent({
         <div :class="$style.container">
             <EventsFilters
                 :filters="filters"
+                :liquidityRange="liquidityRange"
                 :events="marketStore.events"
+                @onNewMin="handleNewMin"
+                @onNewMax="handleNewMax"
                 @onSelectPeriod="handleSelectPeriod"
                 @onSelectStatus="handleSelectStatus"
                 @onReset="handleResetFilters"

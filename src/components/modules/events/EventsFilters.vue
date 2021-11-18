@@ -1,5 +1,5 @@
 <script>
-import { defineComponent } from "vue"
+import { defineComponent, reactive, ref, toRefs, watch } from "vue"
 
 /**
  * UI
@@ -9,7 +9,111 @@ import Checkbox from "@/components/ui/Checkbox"
 
 export default defineComponent({
     name: "EventsFilters",
-    props: { filters: Object, events: Array },
+    props: { filters: Object, liquidityRange: Object, events: Array },
+
+    setup(props, context) {
+        const { liquidityRange } = toRefs(props)
+
+        const values = reactive({
+            min: 0,
+            max: 0,
+        })
+
+        const position = reactive({
+            left: 0,
+            right: 0,
+        })
+
+        const inputs = reactive({
+            min: 0,
+            max: 0,
+        })
+
+        const minInputEl = ref(null)
+        const maxInputEl = ref(null)
+
+        watch(liquidityRange.value, () => {
+            if (typeof liquidityRange.value.min == "number") {
+                values.min = liquidityRange.value.min
+                values.max = liquidityRange.value.max
+
+                inputs.min = liquidityRange.value.min
+                inputs.max = liquidityRange.value.max
+            }
+        })
+
+        watch(
+            () => inputs.min,
+            () => {
+                context.emit("onNewMin", inputs.min)
+
+                if (liquidityRange.value.min == inputs.min) {
+                    position.left = 0
+                    return
+                }
+                if (liquidityRange.value.max < inputs.min) {
+                    inputs.min = liquidityRange.value.min
+                    return
+                }
+
+                const left =
+                    ((inputs.min - liquidityRange.value.min) * 100) /
+                    (liquidityRange.value.max - liquidityRange.value.min)
+
+                position.left = left > 0 ? left : 0
+            },
+        )
+
+        watch(
+            () => inputs.max,
+            () => {
+                context.emit("onNewMax", inputs.max)
+
+                if (liquidityRange.value.max == inputs.max) {
+                    position.right = 0
+                    return
+                }
+                if (liquidityRange.value.max < inputs.max) {
+                    inputs.max = liquidityRange.value.max
+                    return
+                }
+
+                const right =
+                    ((liquidityRange.value.max - inputs.max) * 100) /
+                    (liquidityRange.value.max - liquidityRange.value.min)
+
+                position.right = right > 0 ? right : 0
+            },
+        )
+
+        const handleBlur = target => {
+            if (target == "min") {
+                if (inputs.min < liquidityRange.value.min) {
+                    inputs.min = liquidityRange.value.min
+                }
+            }
+
+            if (target == "max") {
+                if (inputs.max < liquidityRange.value.max) {
+                    inputs.max = liquidityRange.value.max
+                }
+            }
+        }
+
+        const handleKeydown = e => {
+            if (e.key === "-") e.preventDefault()
+        }
+
+        return {
+            handleKeydown,
+            handleBlur,
+            values,
+            position,
+            inputs,
+            minInputEl,
+            maxInputEl,
+        }
+    },
 
     components: { Button, Checkbox },
 })
@@ -57,17 +161,58 @@ export default defineComponent({
         </div>
 
         <div :class="$style.block">
-            <div :class="$style.subtitle">Liquidity Provided</div>
+            <div :class="$style.subtitle">Liquidity</div>
 
             <div :class="$style.range_picker">
                 <div :class="$style.range">
-                    <div :class="$style.slider" />
-                    <div :class="$style.slider" />
+                    <div
+                        :class="$style.filled_range"
+                        :style="{
+                            left: `${position.left}%`,
+                            right: `${position.right}%`,
+                        }"
+                    />
                 </div>
 
-                <div :class="$style.range_values">
-                    <div :class="$style.range_value">1 <span>XTZ</span></div>
-                    <div :class="$style.range_value">50 <span>XTZ</span></div>
+                <div :class="$style.range_inputs">
+                    <div
+                        @click="minInputEl.focus()"
+                        :class="$style.range_input"
+                    >
+                        <Icon name="download" size="12" />
+                        <input
+                            ref="minInputEl"
+                            v-model="inputs.min"
+                            type="number"
+                            step="200"
+                            @keydown="handleKeydown"
+                            @blur="handleBlur('min')"
+                            placeholder="0"
+                        />
+                        <span>XTZ</span>
+                    </div>
+
+                    <div
+                        @click="maxInputEl.focus()"
+                        :class="$style.range_input"
+                    >
+                        <span>XTZ</span>
+                        <input
+                            ref="maxInputEl"
+                            v-model="inputs.max"
+                            type="number"
+                            step="200"
+                            @keydown="handleKeydown"
+                            @blur="handleBlur('max')"
+                            placeholder="0"
+                            :class="$style.right"
+                        />
+                        <Icon
+                            name="download"
+                            size="12"
+                            :class="$style.reverse"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -279,7 +424,7 @@ export default defineComponent({
 .range_picker {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
 }
 
 .range {
@@ -291,39 +436,75 @@ export default defineComponent({
     background: var(--opacity-10);
 }
 
-.range_values {
+.filled_range {
+    position: absolute;
+
+    height: 100%;
+    background: var(--blue);
+    border-radius: 50px;
+
+    transition: all 0.2s ease;
+}
+
+.range_inputs {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.range_value {
-    font-size: 13px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+.range_input {
+    display: flex;
+    align-items: center;
+
+    cursor: text;
+
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    padding: 0 8px;
 }
 
-.range_value span {
+.range_input svg {
+    fill: var(--text-tertiary);
+
+    margin: 0 8px 0 0;
+}
+
+.range_input svg.reverse {
+    fill: var(--text-tertiary);
+
+    margin: 0 0 0 8px;
+
+    transform: rotate(180deg);
+}
+
+.range_input input {
+    width: 60px;
+
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-primary);
+
+    margin: 0 4px 0 0;
+}
+
+.range_input input.right {
+    text-align: right;
+
+    margin: 0 0 0 4px;
+}
+
+.range_input {
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 500;
     color: var(--text-tertiary);
 }
 
-.slider {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-
-    user-select: none;
-
-    width: 8px;
-    height: 8px;
-    outline: 2px solid #fff;
-    cursor: pointer;
-    border-radius: 50%;
-    background: var(--blue);
-}
-
-.slider:last-child {
-    right: 0;
+.range_input input::-webkit-outer-spin-button,
+.range_input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 </style>
