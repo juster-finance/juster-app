@@ -133,21 +133,25 @@ export default defineComponent({
                     new Date(event.value.betsCloseTime).getTime(),
             )
 
-            const startLine = canvas
-                .append("g")
-                .attr(
-                    "transform",
-                    `translate(${scale.x(
-                        new Date(event.value.betsCloseTime),
-                    )}, ${scale.y(startData.value.value) + margin.top})`,
-                )
+            if (startData.value) {
+                const startLine = canvas
+                    .append("g")
+                    .attr(
+                        "transform",
+                        `translate(${scale.x(
+                            new Date(event.value.betsCloseTime),
+                        )}, ${scale.y(startData.value.value) + margin.top})`,
+                    )
 
-            startLine
-                .append("line")
-                .attr("x1", `100%`)
-                .attr("class", classes.start_price_line)
+                startLine
+                    .append("line")
+                    .attr("x1", `100%`)
+                    .attr("class", classes.start_price_line)
+            }
 
             /** Ticks */
+            const format = d3.timeFormat("%H:%M")
+
             scale.x.ticks(10).forEach(tick => {
                 const tickG = canvas
                     .append("g")
@@ -157,8 +161,6 @@ export default defineComponent({
                     .append("line")
                     .attr("y2", 170)
                     .attr("class", classes.time_line)
-
-                const format = d3.timeFormat("%H:%M")
 
                 if (
                     DateTime.fromISO(event.value.betsCloseTime).ordinal ==
@@ -198,6 +200,52 @@ export default defineComponent({
                 }
             })
 
+            /** find Start & Finish tick for 24h */
+            if (event.value.measurePeriod == 86400) {
+                scale.x.ticks(20).forEach(tick => {
+                    const tickG = canvas
+                        .append("g")
+                        .attr("transform", `translate(${scale.x(tick)}, 0)`)
+
+                    tickG
+                        .append("line")
+                        .attr("y2", 170)
+                        .attr("class", classes.time_line_transparent)
+
+                    if (
+                        DateTime.fromISO(event.value.betsCloseTime).ordinal ==
+                            DateTime.fromJSDate(tick).ordinal &&
+                        DateTime.fromISO(event.value.betsCloseTime).hour ==
+                            DateTime.fromJSDate(tick).hour &&
+                        DateTime.fromJSDate(tick).minute == 0
+                    ) {
+                        tickG.attr("class", classes.start)
+
+                        tickG
+                            .append("text")
+                            .attr("y", 190)
+                            .text("Start")
+                    } else if (
+                        DateTime.fromJSDate(tick).ordinal ==
+                            DateTime.fromISO(event.value.betsCloseTime).plus({
+                                hour: event.value.measurePeriod / 3600,
+                            }).ordinal &&
+                        DateTime.fromJSDate(tick).hour ==
+                            DateTime.fromISO(event.value.betsCloseTime).plus({
+                                hour: event.value.measurePeriod / 3600,
+                            }).hour &&
+                        DateTime.fromJSDate(tick).minute == 0
+                    ) {
+                        tickG.attr("class", classes.start)
+
+                        tickG
+                            .append("text")
+                            .attr("y", 190)
+                            .text("Finish")
+                    }
+                })
+            }
+
             /** Chart */
             chart
                 .append("path")
@@ -225,25 +273,27 @@ export default defineComponent({
                     new Date(symbol.quotes[0].timestamp).getTime(),
             )
 
-            chart
-                .append("circle")
-                .attr("cx", scale.x(currentData.date))
-                .attr("cy", scale.y(currentData.value))
-                .attr("r", 2)
-                .attr("fill", "#fff")
+            if (currentData) {
+                chart
+                    .append("circle")
+                    .attr("cx", scale.x(currentData.date))
+                    .attr("cy", scale.y(currentData.value))
+                    .attr("r", 2)
+                    .attr("fill", "#fff")
 
-            canvas
-                .append("g")
-                .append("line")
-                .attr("x1", `100%`)
-                .attr("class", classes.current_price_line)
-                .attr(
-                    "transform",
-                    `translate(0, ${scale.y(currentData.value) + 20})`,
-                )
+                canvas
+                    .append("g")
+                    .append("line")
+                    .attr("x1", `100%`)
+                    .attr("class", classes.current_price_line)
+                    .attr(
+                        "transform",
+                        `translate(0, ${scale.y(currentData.value) + 20})`,
+                    )
+            }
 
             /** animated circle */
-            if (event.value.status !== "FINISHED") {
+            if (event.value.status !== "FINISHED" && currentData) {
                 chart
                     .append("circle")
                     .attr("id", "animated_circle")
@@ -423,6 +473,7 @@ export default defineComponent({
         <div v-if="scale.x" :class="$style.price_axis">
             <!-- Current Price -->
             <div
+                v-if="symbol.quotes[0]"
                 :class="$style.price_badge"
                 :style="{
                     top: `${scale.y(symbol.quotes[0].price) + 20 - 25 / 2}px`,
@@ -435,6 +486,7 @@ export default defineComponent({
 
             <!-- Start Price -->
             <div
+                v-if="startData"
                 :class="$style.price_badge"
                 :style="{
                     top: `${scale.y(startData.value) + 20 - 25 / 2}px`,
@@ -503,6 +555,12 @@ export default defineComponent({
     stroke-width: 1;
 }
 
+.time_line_transparent {
+    stroke: rgba(255, 255, 255, 0);
+    stroke-dasharray: 8, 8;
+    stroke-width: 1;
+}
+
 .chart text {
     font-size: 10px;
     line-height: 1;
@@ -514,6 +572,7 @@ export default defineComponent({
 
 .start text {
     fill: var(--text-blue);
+    background: var(--card-bg);
 }
 
 .start line {
