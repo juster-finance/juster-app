@@ -171,7 +171,7 @@ export default defineComponent({
             if (event.value.totalLiquidityProvided < 1000) return "Low"
             if (event.value.totalLiquidityProvided == 1000) return "Medium"
             if (event.value.totalLiquidityProvided > 1000) return "High"
-            if (event.value.totalLiquidityProvided > 5000) return "Ultra"
+            if (event.value.totalLiquidityProvided > 5000) return "Super"
         })
 
         const participantsAvatars = computed(() => {
