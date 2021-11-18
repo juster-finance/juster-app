@@ -14,10 +14,10 @@ import { useAccountStore } from "@/store/account"
 
 export default defineComponent({
     name: "BetCard",
-    props: { bet: Object, pending: Boolean, won: Boolean },
+    props: { bet: Object, pending: Boolean, event: Object },
 
     setup(props) {
-        const { bet } = toRefs(props)
+        const { bet, event } = toRefs(props)
 
         const accountStore = useAccountStore()
 
@@ -25,7 +25,9 @@ export default defineComponent({
             bet.value.side == "ABOVE_EQ" ? "Up" : "Down",
         )
 
-        return { side, DateTime, pkh: accountStore.pkh }
+        const isWon = computed(() => bet.value.side == event.value.winnerBets)
+
+        return { isWon, side, DateTime, pkh: accountStore.pkh }
     },
 
     components: { Spin },
@@ -35,8 +37,12 @@ export default defineComponent({
 <template>
     <div :class="$style.wrapper">
         <div :class="$style.base">
-            <div :class="[$style.icon, won && $style.won]">
-                <Icon v-if="!pending" :name="won ? 'check' : 'bet'" size="16" />
+            <div :class="[$style.icon, isWon && $style.won]">
+                <Icon
+                    v-if="!pending"
+                    :name="isWon ? 'check' : 'bet'"
+                    size="16"
+                />
                 <Spin v-else size="16" />
 
                 <router-link
@@ -77,7 +83,7 @@ export default defineComponent({
         <div :class="$style.param">{{ bet.amount }}&nbsp;<span>XTZ</span></div>
 
         <div :class="$style.param">
-            {{ bet.reward.toFixed(2) }}&nbsp;<span>XTZ</span>
+            {{ isWon ? bet.reward.toFixed(2) : 0 }}&nbsp;<span>XTZ</span>
         </div>
     </div>
 </template>

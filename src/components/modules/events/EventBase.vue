@@ -130,9 +130,16 @@ export default defineComponent({
                 path: `/events/${event.value.id}`,
             })
         }
+
         const won = computed(() => {
             if (!event.value) return
 
+            return !!event.value.bets
+                .filter(bet => bet.userId == accountStore.pkh)
+                .filter(bet => bet.side == event.value.winnerBets).length
+        })
+
+        const canWithdraw = computed(() => {
             return accountStore.wonPositions.some(
                 position => position.event.id == event.value.id,
             )
@@ -432,6 +439,7 @@ export default defineComponent({
             accountStore,
             event,
             won,
+            canWithdraw,
             handleSelectFilter,
             filters,
             filteredDeposits,
@@ -710,13 +718,25 @@ export default defineComponent({
                             </Dropdown>
 
                             <Button
-                                v-if="event.status == 'FINISHED' && won"
+                                v-if="
+                                    event.status == 'FINISHED' &&
+                                        won &&
+                                        canWithdraw
+                                "
                                 @click="handleWithdraw"
                                 type="success"
                                 size="small"
                                 :disabled="event.totalLiquidityProvided == 0"
                                 :class="$style.action"
                                 >Withdraw</Button
+                            >
+
+                            <Button
+                                v-if="won && !canWithdraw"
+                                type="success"
+                                size="small"
+                                disabled
+                                >Withdrawn</Button
                             >
 
                             <template
@@ -811,7 +831,7 @@ export default defineComponent({
                                     new Date(b.createdTime) -
                                     new Date(a.createdTime),
                             )"
-                            :won="won"
+                            :event="event"
                             :key="bet.id"
                             :bet="bet"
                         />

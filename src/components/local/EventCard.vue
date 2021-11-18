@@ -750,7 +750,7 @@ export default defineComponent({
                 @click.prevent="handleWithdraw"
                 :class="$style.withdraw"
             >
-                <Icon name="crown" size="16" /> Withdraw {{ 5 }} XTZ
+                <Icon name="crown" size="16" /> Withdraw
             </div>
         </div>
     </router-link>
