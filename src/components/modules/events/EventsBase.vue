@@ -64,7 +64,7 @@ const defaultFilters = {
             active: true,
         },
         {
-            name: "In progress",
+            name: "Active",
             icon: "time",
             color: "yellow",
             active: false,
@@ -156,7 +156,7 @@ export default defineComponent({
                     .filter(status => status.active)
                     .map(status => {
                         if (status.name == "New") return "NEW"
-                        if (status.name == "In progress") return "STARTED"
+                        if (status.name == "Active") return "STARTED"
                         if (status.name == "Finished") return "FINISHED"
                     })
 

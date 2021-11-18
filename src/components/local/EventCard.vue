@@ -551,7 +551,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="yellow" :class="$style.main_badge"
-                        ><Icon name="time" size="12" />In progress</Badge
+                        ><Icon name="time" size="12" />Active</Badge
                     >
                     <template v-slot:content>
                         Betting is closed. The end of the event is pending
