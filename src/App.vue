@@ -92,19 +92,21 @@ export default defineComponent({
     <div id="modal" />
     <Notifications />
 
-    <TheWelcomeScreen
-        v-if="showWelcomeScreen"
-        @skip="showWelcomeScreen = false"
-    />
+    <transition name="popup">
+        <TheWelcomeScreen
+            v-if="showWelcomeScreen"
+            @skip="showWelcomeScreen = false"
+        />
+    </transition>
 
-    <div v-else :class="$style.wrapper">
+    <div v-if="!showWelcomeScreen" class="app_wrapper">
         <Header />
         <router-view />
         <Footer class="footer" />
     </div>
 </template>
 
-<style module>
+<style>
 html {
     font-family: "Inter", sans-serif;
     word-spacing: 1px;
@@ -118,6 +120,37 @@ html {
     background: var(--app-background);
 }
 
+.popup-enter-active,
+.popup-leave-active {
+    transition: all 0.07s ease-out;
+}
+
+.popup-enter-from,
+.popup-leave-to {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.35s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.test-enter-active,
+.test-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.test-enter-from,
+.test-leave-to {
+    opacity: 0;
+}
+
 #app {
     display: flex;
     flex-direction: column;
@@ -128,7 +161,7 @@ html {
     height: 100vh;
 }
 
-.wrapper {
+.app_wrapper {
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -326,26 +359,5 @@ h3 {
     line-height: 1;
     font-weight: 600;
     color: var(--text-primary);
-}
-
-.popup-enter-active,
-.popup-leave-active {
-    transition: all 0.07s ease-out;
-}
-
-.popup-enter-from,
-.popup-leave-to {
-    opacity: 0;
-    transform: scale(0.95);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.35s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
 }
 </style>
