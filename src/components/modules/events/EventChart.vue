@@ -15,7 +15,7 @@ export default defineComponent({
         const isOpen = ref(true)
 
         const selectedTab = ref("Price")
-        const tabs = ref(["Price", "TVL", "Liquidity"])
+        const tabs = ref(["Price", "TVL"])
 
         return {
             isOpen,
