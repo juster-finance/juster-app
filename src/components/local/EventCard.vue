@@ -61,6 +61,7 @@ export default defineComponent({
 
     setup(props) {
         const { event } = toRefs(props)
+
         const notificationsStore = useNotificationsStore()
         const accountStore = useAccountStore()
         const marketStore = useMarketStore()
@@ -201,6 +202,11 @@ export default defineComponent({
 
         const isUserWon = computed(() => {
             return accountStore.wonPositions.some(
+                position => position.event.id == event.value.id,
+            )
+        })
+        const wonPosition = computed(() => {
+            return accountStore.wonPositions.find(
                 position => position.event.id == event.value.id,
             )
         })
@@ -378,6 +384,7 @@ export default defineComponent({
             participantsAvatars,
             userTVL,
             isUserWon,
+            wonPosition,
             percentage,
             handleJoin,
             handleLiquidity,
@@ -751,6 +758,7 @@ export default defineComponent({
                 :class="$style.withdraw"
             >
                 <Icon name="crown" size="16" /> Withdraw
+                {{ wonPosition.value.toFixed(0) }} XTZ
             </div>
         </div>
     </router-link>
