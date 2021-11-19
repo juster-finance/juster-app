@@ -70,19 +70,19 @@ export default defineComponent({
 
             /** 1h */
             if (event.value.measurePeriod == 3600) {
-                chartEars.hour = 0
-                chartEars.minute = 40
+                chartEars.hour = 1
+                chartEars.minute = 0
             }
 
             /** 6h */
             if (event.value.measurePeriod == 21600) {
-                chartEars.hour = 1
+                chartEars.hour = 5
                 chartEars.minute = 30
             }
 
             /** 24h */
             if (event.value.measurePeriod == 86400) {
-                chartEars.hour = 3
+                chartEars.hour = 24
                 chartEars.minute = 0
             }
 
@@ -101,8 +101,8 @@ export default defineComponent({
                 let index = 1;
                 index <=
                 event.value.measurePeriod / 60 +
-                    chartEars.hour * 60 * 2 +
-                    chartEars.minute * 2;
+                    chartEars.hour * 60 +
+                    chartEars.minute;
                 index++
             ) {
                 eventPeriod.push({
@@ -202,7 +202,7 @@ export default defineComponent({
 
             /** find Start & Finish tick for 24h */
             if (event.value.measurePeriod == 86400) {
-                scale.x.ticks(20).forEach(tick => {
+                scale.x.ticks(40).forEach(tick => {
                     const tickG = canvas
                         .append("g")
                         .attr("transform", `translate(${scale.x(tick)}, 0)`)
@@ -365,19 +365,19 @@ export default defineComponent({
 
             /** 1h */
             if (event.value.measurePeriod == 3600) {
-                chartEars.hour = 0
-                chartEars.minute = 40
+                chartEars.hour = 1
+                chartEars.minute = 0
             }
 
             /** 6h */
             if (event.value.measurePeriod == 21600) {
-                chartEars.hour = 1
+                chartEars.hour = 5
                 chartEars.minute = 30
             }
 
             /** 24h */
             if (event.value.measurePeriod == 86400) {
-                chartEars.hour = 3
+                chartEars.hour = 24
                 chartEars.minute = 0
             }
 
@@ -388,10 +388,7 @@ export default defineComponent({
                     .toJSDate(),
                 tsLt: DateTime.fromISO(event.value.betsCloseTime)
                     .plus({
-                        hour:
-                            parseInt(event.value.measurePeriod) / 3600 +
-                            chartEars.hour,
-                        minute: chartEars.minute,
+                        hour: parseInt(event.value.measurePeriod) / 3600,
                     })
                     .toJSDate(),
             })
