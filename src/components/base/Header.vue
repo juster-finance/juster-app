@@ -53,10 +53,6 @@ export default defineComponent({
                 name: "Symbols",
                 url: "/symbols",
             },
-            // {
-            //     name: "Rating",
-            //     url: "/rating",
-            // },
         ])
 
         const isActive = url => {

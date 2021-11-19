@@ -300,14 +300,14 @@ export default defineComponent({
                     <GuideCard
                         v-for="guide in guides"
                         :key="guide.icon"
-                        @click="$emit('skip')"
+                        @click="handleSkip"
                         :guide="guide"
                     />
                 </div>
             </div>
 
             <div :class="$style.onboarding_actions">
-                <Button type="primary" size="medium" @click="$emit('skip')"
+                <Button type="primary" size="medium" @click="handleSkip"
                     ><Icon name="spark" size="16" /> Start using Juster</Button
                 >
                 <Button type="secondary" size="medium" @click="handleOpenDocs"

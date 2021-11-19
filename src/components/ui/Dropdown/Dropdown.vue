@@ -84,7 +84,7 @@ export default defineComponent({
             <slot name="trigger" />
         </div>
 
-        <transition name="popup">
+        <transition name="fade" mode="out-in">
             <div
                 v-if="isOpen"
                 @click="close"

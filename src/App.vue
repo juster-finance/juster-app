@@ -92,18 +92,16 @@ export default defineComponent({
     <div id="modal" />
     <Notifications />
 
-    <transition name="popup">
-        <TheWelcomeScreen
-            v-if="showWelcomeScreen"
-            @skip="showWelcomeScreen = false"
-        />
+    <TheWelcomeScreen
+        v-if="showWelcomeScreen"
+        @skip="showWelcomeScreen = false"
+    />
 
-        <div v-else :class="$style.wrapper">
-            <Header />
-            <router-view />
-            <Footer class="footer" />
-        </div>
-    </transition>
+    <div v-else :class="$style.wrapper">
+        <Header />
+        <router-view />
+        <Footer class="footer" />
+    </div>
 </template>
 
 <style module>
@@ -336,7 +334,7 @@ h3 {
 }
 
 .popup-enter-from,
-.popup-leave-active {
+.popup-leave-to {
     opacity: 0;
     transform: scale(0.95);
 }
@@ -347,7 +345,7 @@ h3 {
 }
 
 .fade-enter-from,
-.fade-leave-active {
+.fade-leave-to {
     opacity: 0;
 }
 </style>
