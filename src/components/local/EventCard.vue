@@ -995,8 +995,13 @@ export default defineComponent({
 
     width: 100%;
     background: var(--btn-secondary-bg);
+    border-radius: 6px 0 0 6px;
 
     transition: background 0.2s ease;
+}
+
+.button:last-child {
+    border-radius: 0 6px 6px 0;
 }
 
 .button.blue {
