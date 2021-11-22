@@ -77,15 +77,15 @@ export default defineComponent({
 
         <h1>Top events</h1>
         <div :class="$style.description">
-            Here you can see all top events
+            Events that have not yet begun, but are attracting the interest of participants
         </div>
 
         <div :class="$style.container">
             <div :class="$style.events_base">
-                <Banner type="warning"
-                    >We have temporarily disabled events with a target dynamics.
-                    They will be available again soon.</Banner
-                >
+                <!-- <Banner type="warning"
+                    >We have temporarily disabled events with target dynamics.
+                    They will be available soon.</Banner
+                > -->
                 <div :class="$style.events">
                     <EventCard
                         v-for="event in topEvents"

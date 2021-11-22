@@ -79,11 +79,11 @@ export default defineComponent({
         <div :class="$style.targets">
             <div :class="$style.names">
                 <div :class="$style.name">
-                    Start rate
+                    Start price
                 </div>
 
                 <div :class="$style.name">
-                    Closed rate
+                    Close price
                 </div>
             </div>
 
@@ -127,10 +127,10 @@ export default defineComponent({
                     </div>
                     <template v-slot:content>
                         <template v-if="event.status !== 'FINISHED'"
-                            >To Be Defined. Waiting for Closed rate...</template
+                            >Waiting for event completion</template
                         >
                         <template v-else
-                            >The Closed rate has been defined</template
+                            >Close price is settled</template
                         >
                     </template>
                 </Tooltip>
@@ -139,14 +139,14 @@ export default defineComponent({
 
         <div :class="$style.params">
             <div v-if="event.status == 'FINISHED'" :class="$style.param">
-                <span>Closed Rate</span>
+                <span>Close price</span>
                 <span v-if="price.rate"
                     >$ {{ (event.closedRate * 100).toFixed(2) }}</span
                 >
                 <Spin size="16" v-else />
             </div>
             <div v-else :class="$style.param">
-                <span>Current Rate</span>
+                <span>Current price</span>
                 <span v-if="price.rate"
                     ><div :class="$style.price_dot" />
                     $ {{ price.rate.toFixed(2) }}</span
@@ -155,7 +155,7 @@ export default defineComponent({
             </div>
 
             <div :class="$style.param">
-                <span>Difference</span>
+                <span>Price dynamics</span>
                 <Spin size="16" v-if="!price.rate" />
                 <span v-else-if="event.status == 'NEW'">TBD</span>
                 <span

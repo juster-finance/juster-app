@@ -32,11 +32,18 @@ export default defineComponent({
                     <div :class="$style.column">
                         <div :class="$style.name">Follow us</div>
                         <a
-                            href="https://discord.com/channels/846362414039695391/857661534862966805"
+                            href="https://discord.gg/RfbYR2Zj"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
                             >Discord</a
+                        >                        
+                        <a
+                            href="https://github.com/juster-finance"
+                            target="_blank"
+                            rel="nofolow noreferrer"
+                            :class="$style.link"
+                            >GitHub</a
                         >
                         <a
                             href="https://twitter.com/TezosBakingBad"
@@ -44,19 +51,6 @@ export default defineComponent({
                             rel="nofolow noreferrer"
                             :class="$style.link"
                             >Twitter</a
-                        ><a
-                            href="https://t.me/baking_bad_chat"
-                            target="_blank"
-                            rel="nofolow noreferrer"
-                            :class="$style.link"
-                            >Telegram</a
-                        >
-                        <a
-                            href="https://github.com/juster-finance"
-                            target="_blank"
-                            rel="nofolow noreferrer"
-                            :class="$style.link"
-                            >GitHub</a
                         >
                     </div>
                     <div :class="$style.column">

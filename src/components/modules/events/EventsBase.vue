@@ -248,7 +248,7 @@ export default defineComponent({
 
         <h1>All events</h1>
         <div :class="$style.description">
-            Here you can see all possible events and filter
+            List of all new, active, and past events with customizable filtering
         </div>
 
         <div :class="$style.container">
@@ -265,10 +265,10 @@ export default defineComponent({
             />
 
             <div :class="$style.events_base">
-                <Banner type="warning"
+                <!-- <Banner type="warning"
                     >We have temporarily disabled events with a target dynamics.
                     They will be available again soon.</Banner
-                >
+                > -->
                 <div :class="$style.events">
                     <EventCard
                         v-for="event in filteredEvents"

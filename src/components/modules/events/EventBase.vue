@@ -594,7 +594,7 @@ export default defineComponent({
                                     >
 
                                     <template v-slot:content>
-                                        Time until the end of accepting bets
+                                        Time left to make a bet or provide liquidity
                                     </template>
                                 </Tooltip>
 
@@ -611,7 +611,7 @@ export default defineComponent({
                                     >
 
                                     <template v-slot:content>
-                                        Acceptance of bets is over, the event
+                                        Bets are no longer accepted, the event
                                         will start soon
                                     </template>
                                 </Tooltip>
@@ -629,7 +629,7 @@ export default defineComponent({
                                     >
 
                                     <template v-slot:content>
-                                        Measuring period in progress
+                                        Start price is fixed, waiting for event completion
                                     </template>
                                 </Tooltip>
 
@@ -644,7 +644,7 @@ export default defineComponent({
                                     <Label icon="check">Finished</Label>
 
                                     <template v-slot:content>
-                                        The event is over, the winners are
+                                        Event is over, winners are
                                         determined
                                     </template>
                                 </Tooltip>
@@ -677,7 +677,7 @@ export default defineComponent({
                                     </Label>
 
                                     <template v-slot:content>
-                                        Measure period
+                                        Price measurement period
                                     </template>
                                 </Tooltip>
                             </div>
@@ -776,8 +776,7 @@ export default defineComponent({
                 <div :class="$style.block">
                     <div :class="$style.title">Bets</div>
                     <div :class="$style.description">
-                        All bets for all users and with filtering only your
-                        claims
+                        All the bets placed for this event
                     </div>
 
                     <div :class="$style.filters">
@@ -839,9 +838,8 @@ export default defineComponent({
 
                     <Banner v-else type="info">{{
                         filters.bets == "all"
-                            ? `There are no bets for this event yet. Make your first
-                        bet and get a profitable ratio`
-                            : `You have not placed any bets for this event. If you have done, but do not see it - wait for the transaction confirmation`
+                            ? `Still no bets for this event, maybe yours will be the first?`
+                            : `If you have placed a bet, but it is not in this list yet — please wait for the transaction confirmation`
                     }}</Banner>
 
                     <div v-if="userBets.length" :class="$style.params">
@@ -885,8 +883,7 @@ export default defineComponent({
                 <div :class="$style.block">
                     <div :class="$style.title">Liquidity</div>
                     <div :class="$style.description">
-                        All liquidity for all users and with filtering only your
-                        claims
+                        All the liquidity provided for this event
                     </div>
 
                     <div :class="$style.filters">
@@ -942,9 +939,8 @@ export default defineComponent({
                     </div>
                     <Banner v-else type="info">{{
                         filters.liquidity == "all"
-                            ? `This event has not yet received initial liquidity. You
-                        need to wait a couple of minutes`
-                            : `You did not provide liquidity for this event. Provide and earn as a provider`
+                            ? `This event has not yet received initial liquidity, please wait for a few minutes`
+                            : `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
                     }}</Banner>
 
                     <div v-if="userBets.length" :class="$style.params">
