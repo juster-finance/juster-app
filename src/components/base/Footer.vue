@@ -32,7 +32,7 @@ export default defineComponent({
                     <div :class="$style.column">
                         <div :class="$style.name">Follow us</div>
                         <a
-                            href="https://discord.gg/RfbYR2Zj"
+                            href="https://discord.gg/FeGDCkHhnB"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
