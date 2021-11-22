@@ -600,7 +600,7 @@ export default defineComponent({
                     /></Badge>
 
                     <template v-slot:content>
-                        Repeatable, created automatically
+                        Recurring, created automatically
                     </template>
                 </Tooltip>
 
