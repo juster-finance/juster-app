@@ -262,7 +262,10 @@ export default defineComponent({
                                             }}
                                         </div>
                                         <div :class="$style.balance">
-                                            834 XTZ
+                                            {{
+                                                accountStore.balance.toFixed(0)
+                                            }}
+                                            XTZ
                                         </div>
                                     </div>
                                 </div>
