@@ -9,10 +9,15 @@ import Checkbox from "@/components/ui/Checkbox"
 
 export default defineComponent({
     name: "EventsFilters",
-    props: { filters: Object, liquidityRange: Object, events: Array },
+    props: {
+        filters: Object,
+        liquidityRange: Object,
+        liquidityFilters: Object,
+        events: Array,
+    },
 
     setup(props, context) {
-        const { liquidityRange } = toRefs(props)
+        const { liquidityRange, liquidityFilters } = toRefs(props)
 
         const values = reactive({
             min: 0,
@@ -31,6 +36,12 @@ export default defineComponent({
 
         const minInputEl = ref(null)
         const maxInputEl = ref(null)
+
+        /** watch for reset */
+        watch(liquidityFilters.value, () => {
+            inputs.min = liquidityFilters.value.min
+            inputs.max = liquidityFilters.value.max
+        })
 
         watch(liquidityRange.value, () => {
             if (typeof liquidityRange.value.min == "number") {
@@ -97,6 +108,14 @@ export default defineComponent({
                 if (inputs.max > liquidityRange.value.max) {
                     inputs.max = liquidityRange.value.max
                 }
+            }
+
+            if (inputs.min > liquidityRange.value.max) {
+                inputs.min = liquidityRange.value.max
+            }
+
+            if (inputs.max < liquidityRange.value.min) {
+                inputs.max = liquidityRange.value.min
             }
         }
 

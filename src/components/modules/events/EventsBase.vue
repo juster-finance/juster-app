@@ -119,10 +119,18 @@ export default defineComponent({
         }
 
         const handleResetFilters = () => {
+            liquidityFilters.min = liquidityRange.min
+            liquidityFilters.max = liquidityRange.max
+
             filters.value = cloneDeep(defaultFilters)
         }
 
         /** Events */
+        const availableEvents = computed(() => {
+            return marketStore.events.filter(event =>
+                ["NEW", "STARTED"].includes(event.status),
+            )
+        })
         const filteredEvents = computed(() => {
             let events = cloneDeep(marketStore.events)
 
@@ -218,8 +226,10 @@ export default defineComponent({
             breadcrumbs,
             marketStore,
             filteredEvents,
+            availableEvents,
             filters,
             liquidityRange,
+            liquidityFilters,
             handleNewMin,
             handleNewMax,
             handleSelectPeriod,
@@ -257,6 +267,7 @@ export default defineComponent({
             <EventsFilters
                 :filters="filters"
                 :liquidityRange="liquidityRange"
+                :liquidityFilters="liquidityFilters"
                 :events="marketStore.events"
                 @onNewMin="handleNewMin"
                 @onNewMax="handleNewMax"
@@ -267,9 +278,11 @@ export default defineComponent({
             />
 
             <div :class="$style.events_base">
-                <Banner type="warning"
-                    >We have temporarily disabled events with a target dynamics.
-                    They will be available again soon.</Banner
+                <Banner
+                    type="info"
+                    v-if="filteredEvents.length !== availableEvents.length"
+                    >{{ availableEvents.length - filteredEvents.length }} events
+                    hidden due to filters</Banner
                 >
 
                 <transition name="fastfade" mode="out-in">
