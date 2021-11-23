@@ -448,7 +448,7 @@ export default defineComponent({
 
                     <DropdownDivider />
 
-                    <DropdownItem @click="showParticipantsModal = true"
+                    <DropdownItem @click.prevent="showParticipantsModal = true"
                         ><Icon name="users" size="16" />View participants
                     </DropdownItem>
                     <DropdownItem disabled
@@ -457,10 +457,10 @@ export default defineComponent({
 
                     <DropdownDivider />
 
-                    <DropdownItem @click="copy('id')"
+                    <DropdownItem @click.prevent="copy('id')"
                         ><Icon name="copy" size="16" />Copy ID
                     </DropdownItem>
-                    <DropdownItem @click="copy('url')"
+                    <DropdownItem @click.prevent="copy('url')"
                         ><Icon name="copy" size="16" />Copy URL
                     </DropdownItem>
                 </template>

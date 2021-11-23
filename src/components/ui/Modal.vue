@@ -72,7 +72,7 @@ export default defineComponent({
         }
 
         const onKeydown = event => {
-            if (event.key == "Escape") handleClose()
+            if (event.key == "Escape" && show.value) handleClose()
         }
 
         return { modal, calcModalStyles, handleClose, onKeydown }
