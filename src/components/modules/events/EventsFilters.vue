@@ -94,7 +94,7 @@ export default defineComponent({
             }
 
             if (target == "max") {
-                if (inputs.max < liquidityRange.value.max) {
+                if (inputs.max > liquidityRange.value.max) {
                     inputs.max = liquidityRange.value.max
                 }
             }
