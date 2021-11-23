@@ -62,6 +62,7 @@ export default defineComponent({
     setup(props) {
         const { event } = toRefs(props)
 
+        /** Stores */
         const notificationsStore = useNotificationsStore()
         const accountStore = useAccountStore()
         const marketStore = useMarketStore()
@@ -234,8 +235,6 @@ export default defineComponent({
             juster
                 .withdraw(event.value.id, accountStore.pkh)
                 .then(op => {
-                    console.log(`Hash: ${op.opHash}`)
-
                     notificationsStore.create({
                         notification: {
                             type: "success",
@@ -449,7 +448,7 @@ export default defineComponent({
 
                     <DropdownDivider />
 
-                    <DropdownItem @click="showParticipantsModal = true"
+                    <DropdownItem @click.prevent="showParticipantsModal = true"
                         ><Icon name="users" size="16" />View participants
                     </DropdownItem>
                     <DropdownItem disabled
@@ -458,10 +457,10 @@ export default defineComponent({
 
                     <DropdownDivider />
 
-                    <DropdownItem @click="copy('id')"
+                    <DropdownItem @click.prevent="copy('id')"
                         ><Icon name="copy" size="16" />Copy ID
                     </DropdownItem>
-                    <DropdownItem @click="copy('url')"
+                    <DropdownItem @click.prevent="copy('url')"
                         ><Icon name="copy" size="16" />Copy URL
                     </DropdownItem>
                 </template>
@@ -554,7 +553,7 @@ export default defineComponent({
                     position="bottom"
                     side="left"
                 >
-                    <Badge color="green" :class="$style.main_badge"
+                    <Badge color="yellow" :class="$style.main_badge"
                         ><Icon name="bolt" size="12" />Starting soon</Badge
                     >
 
@@ -780,10 +779,6 @@ export default defineComponent({
     border: 1px solid var(--border-highlight);
 }
 
-.wrapper:active {
-    transform: translateY(1px);
-}
-
 .dropdown {
     position: absolute;
 }
@@ -812,6 +807,7 @@ export default defineComponent({
 .symbol_imgs img:first-child {
     position: absolute;
     z-index: 1;
+    outline: 3px solid var(--card-bg);
 }
 
 .symbol_imgs img:last-child {

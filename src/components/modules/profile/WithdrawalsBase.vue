@@ -70,7 +70,7 @@ export default defineComponent({
         </metainfo>
 
         <div :class="$style.block">
-            <h1>Outstanding balances</h1>
+            <h2>Outstanding balances</h2>
             <div :class="$style.description">
                 List of events holding your unclaimed profits
             </div>
@@ -90,7 +90,7 @@ export default defineComponent({
         </div>
 
         <div :class="$style.block">
-            <h1>Withdrawal history</h1>
+            <h2>Withdrawal history</h2>
             <div :class="$style.description">
                 Claimed profits
             </div>
@@ -171,7 +171,9 @@ export default defineComponent({
 
             <div>
                 <div :class="$style.hint">
-                    You can withdraw your funds manually, however if not done within 24 hours, Juster will do that for you and charge a small fee.
+                    You can withdraw your funds manually, however if not done
+                    within 24 hours, Juster will do that for you and charge a
+                    small fee.
                 </div>
 
                 <Button type="tertiary" size="small"
@@ -187,13 +189,17 @@ export default defineComponent({
     margin-bottom: 40px;
 }
 
+.block h2 {
+    font-family: "CalSans";
+}
+
 .description {
     font-size: 14px;
     line-height: 1;
     font-weight: 500;
     color: var(--text-tertiary);
 
-    margin-top: 12px;
+    margin-top: 8px;
     margin-bottom: 24px;
 }
 

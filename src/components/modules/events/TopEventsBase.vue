@@ -75,7 +75,7 @@ export default defineComponent({
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-        <h1>Top events</h1>
+        <h1 :class="$style.title">Top events</h1>
         <div :class="$style.description">
             Events that have not yet begun, but are attracting the interest of participants
         </div>
@@ -106,13 +106,17 @@ export default defineComponent({
     margin-bottom: 24px;
 }
 
+.title {
+    font-family: "Cal Sans";
+}
+
 .description {
     font-size: 14px;
     line-height: 1;
     font-weight: 500;
     color: var(--text-tertiary);
 
-    margin-top: 12px;
+    margin-top: 8px;
     margin-bottom: 24px;
 }
 

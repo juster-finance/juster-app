@@ -9,6 +9,7 @@ import { cloneDeep } from "lodash"
  */
 import SymbolCard from "@/components/local/SymbolCard"
 import EventCard from "@/components/local/EventCard"
+import EventCardLoading from "@/components/local/EventCardLoading"
 
 /**
  * UI
@@ -61,7 +62,7 @@ export default defineComponent({
         }
     },
 
-    components: { SymbolCard, EventCard, Button },
+    components: { SymbolCard, EventCard, EventCardLoading, Button },
 })
 </script>
 
@@ -90,33 +91,42 @@ export default defineComponent({
                 </div>
             </div>
 
-            <!-- Top events -->
+            <!-- Hot events -->
             <div :class="$style.block">
                 <div :class="$style.head">
                     <div :class="$style.left">
-                        <h1>Top events</h1>
+                        <h1>Hot events</h1>
                         <div :class="$style.description">
-                            Events that have not yet begun, but are attracting the interest of participants
+                            Events that have not yet begun, but are attracting
+                            the interest of participants
                         </div>
                     </div>
 
                     <Button
                         @click="handleViewTopEvents"
                         size="small"
-                        type="secondary"
+                        type="tertiary"
                     >
                         <Icon name="collection" size="16" />
-                        More events
+                        All Hot events
                     </Button>
                 </div>
 
-                <div v-if="marketStore.events.length" :class="$style.items">
-                    <EventCard
-                        v-for="event in marketStore.events"
-                        :key="event.id"
-                        :event="event"
-                    />
-                </div>
+                <transition name="fastfade" mode="out-in">
+                    <div v-if="marketStore.events.length" :class="$style.items">
+                        <EventCard
+                            v-for="event in marketStore.events"
+                            :key="event.id"
+                            :event="event"
+                        />
+                    </div>
+
+                    <div v-else :class="$style.items">
+                        <EventCardLoading />
+                        <EventCardLoading />
+                        <EventCardLoading />
+                    </div>
+                </transition>
             </div>
         </div>
     </transition>
@@ -127,11 +137,16 @@ export default defineComponent({
 }
 
 .block {
-    margin-bottom: 40px;
+    margin-bottom: 60px;
 }
 
 .block:last-child {
     margin-bottom: 0;
+}
+
+.block h1 {
+    font-family: "CalSans";
+    letter-spacing: 0.5px;
 }
 
 .head {
@@ -144,7 +159,7 @@ export default defineComponent({
     font-weight: 500;
     color: var(--text-tertiary);
 
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
 .items {

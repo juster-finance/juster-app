@@ -32,14 +32,13 @@ export default defineComponent({
                     <div :class="$style.column">
                         <div :class="$style.name">Follow us</div>
                         <a
-                            href="https://discord.gg/FeGDCkHhnB"
+                            href="https://discord.gg/RfbYR2Zj"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
                             >Discord</a
-                        >                        
-                        <a
-                            href="https://github.com/juster-finance"
+                        ><a
+                            href="https://t.me/baking_bad_chat"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
@@ -119,6 +118,8 @@ export default defineComponent({
 }
 
 .name {
+    font-family: "CalSans";
+
     font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
@@ -127,7 +128,7 @@ export default defineComponent({
 .link {
     font-size: 13px;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: var(--text-tertiary);
 
     transition: color 0.2s ease;
 }

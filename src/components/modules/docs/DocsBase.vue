@@ -138,7 +138,7 @@ export default defineComponent({
             <router-view />
         </div>
 
-        <div v-if="anchors" :class="$style.anchors">
+        <!-- <div v-if="anchors" :class="$style.anchors">
             <span :class="$style.anchors_title">Content</span>
             <div
                 v-for="(anchor, index) in anchors"
@@ -147,7 +147,7 @@ export default defineComponent({
             >
                 {{ anchor }}
             </div>
-        </div>
+        </div> -->
 
         <Icon
             @click="expandMenu = !expandMenu"

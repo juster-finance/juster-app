@@ -57,7 +57,7 @@ export default defineComponent({
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-        <h1>Available symbols</h1>
+        <h1 :class="$style.title">Available symbols</h1>
         <div :class="$style.description">
             List of all currency pairs available for betting
         </div>
@@ -76,6 +76,10 @@ export default defineComponent({
 
 <style module>
 .wrapper {
+}
+
+.title {
+    font-family: "CalSans";
 }
 
 .breadcrumbs {

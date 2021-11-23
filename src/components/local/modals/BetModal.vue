@@ -1,5 +1,13 @@
 <script>
-import { defineComponent, ref, reactive, computed, toRefs, watch } from "vue"
+import {
+    defineComponent,
+    ref,
+    reactive,
+    computed,
+    toRefs,
+    watch,
+    inject,
+} from "vue"
 import BigNumber from "bignumber.js"
 import { estimateFeeMultiplier } from "@juster-finance/sdk"
 
@@ -43,6 +51,7 @@ export default defineComponent({
 
     setup(props, context) {
         const { event, show } = toRefs(props)
+        const amplitude = inject("amplitude")
 
         const accountStore = useAccountStore()
         const notificationsStore = useNotificationsStore()
@@ -181,6 +190,7 @@ export default defineComponent({
             if (side.value == "Lower") betType = "below"
 
             sendingBet.value = true
+
             juster
                 .bet(
                     event.value.id,
@@ -203,6 +213,9 @@ export default defineComponent({
                             },
                         })
                     }, 700)
+
+                    /** analytics */
+                    amplitude.logEvent("onBet")
 
                     context.emit("onBet", {
                         side: betType == "aboveEq" ? "ABOVE_EQ" : "BELOW",
@@ -234,6 +247,7 @@ export default defineComponent({
             amount,
             slippage,
             sendingBet,
+            winDelta,
             ratio,
             ratioBeforeBet,
             ratioAfterBet,
@@ -337,6 +351,7 @@ export default defineComponent({
                 <SplittedPool
                     :event="event"
                     :amount="amount.value"
+                    :winDelta="winDelta"
                     :side="side"
                     :class="$style.pool"
                 />

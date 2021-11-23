@@ -22,7 +22,12 @@ import {
     DropdownDivider,
 } from "@/components/ui/Dropdown"
 import Tooltip from "@/components/ui/Tooltip"
+
+/**
+ * Modals
+ */
 import TheSettingsModal from "@/components/local/modals/Settings/TheSettingsModal"
+import ConnectingModal from "@/components/local/modals/ConnectingModal"
 
 /**
  * Store
@@ -36,6 +41,7 @@ export default defineComponent({
         const accountStore = useAccountStore()
 
         const showSettingsModal = ref(false)
+        const showConnectingModal = ref(false)
 
         const route = useRoute()
         const router = useRouter()
@@ -60,10 +66,46 @@ export default defineComponent({
             return route.path.startsWith(url)
         }
 
+        const address = ref("")
         const handleLogin = async () => {
             await juster.sync()
             juster.getPkh().then(pkh => {
-                accountStore.setPkh(pkh)
+                if (!localStorage["connectingModal"]) {
+                    showConnectingModal.value = true
+                    address.value = pkh
+                } else {
+                    accountStore.pkh = pkh
+                }
+            })
+        }
+
+        const handleAgree = () => {
+            showConnectingModal.value = false
+
+            localStorage["connectingModal"] = true
+
+            accountStore.pkh = address.value
+            address.value = ""
+        }
+        const handleDisagree = () => {
+            showConnectingModal.value = false
+
+            address.value = ""
+
+            juster._provider.client.clearActiveAccount().then(async () => {
+                await juster._provider.client.getActiveAccount()
+                accountStore.setPkh("")
+                router.push("/")
+
+                notificationsStore.create({
+                    notification: {
+                        type: "success",
+                        title: "You are signed out",
+                        description:
+                            "You have not confirmed the registration and agreement with the Terms of Use",
+                        autoDestroy: true,
+                    },
+                })
             })
         }
 
@@ -91,15 +133,20 @@ export default defineComponent({
             links,
             isActive,
             juster,
+            address,
             handleLogin,
+            handleAgree,
+            handleDisagree,
             handleLogout,
             pkh,
             showSettingsModal,
+            showConnectingModal,
             accountStore,
         }
     },
 
     components: {
+        ConnectingModal,
         TheSettingsModal,
         Tooltip,
         AppStatus,
@@ -113,9 +160,16 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
-        <TheSettingsModal
+        <!-- <TheSettingsModal
             :show="showSettingsModal"
             @onClose="showSettingsModal = false"
+        /> -->
+
+        <ConnectingModal
+            :show="showConnectingModal"
+            :address="address"
+            @onAgree="handleAgree"
+            @onClose="handleDisagree"
         />
 
         <div :class="$style.base">
@@ -167,6 +221,7 @@ export default defineComponent({
                         type="primary"
                         size="small"
                     >
+                        <Icon name="user" size="12" />
                         Sign in</Button
                     >
 
@@ -180,7 +235,10 @@ export default defineComponent({
                                     "
                                 />
                                 <div
-                                    v-if="accountStore.wonPositions.length"
+                                    v-if="
+                                        accountStore.wonPositions.length &&
+                                            accountStore.pkh
+                                    "
                                     :class="$style.indicator"
                                 />
                             </div>
@@ -188,11 +246,31 @@ export default defineComponent({
 
                         <template v-slot:dropdown>
                             <router-link to="/profile">
-                                <DropdownItem
-                                    ><Icon name="user" size="16" />My
-                                    profile</DropdownItem
-                                ></router-link
-                            >
+                                <div :class="$style.profile">
+                                    <Icon name="user" size="16" />
+
+                                    <div :class="$style.info">
+                                        <div :class="$style.address">
+                                            {{
+                                                `${accountStore.pkh.slice(
+                                                    0,
+                                                    5,
+                                                )}..${accountStore.pkh.slice(
+                                                    accountStore.pkh.length - 3,
+                                                    accountStore.pkh.length,
+                                                )}`
+                                            }}
+                                        </div>
+                                        <div :class="$style.balance">
+                                            {{
+                                                accountStore.balance.toFixed(0)
+                                            }}
+                                            XTZ
+                                        </div>
+                                    </div>
+                                </div>
+                            </router-link>
+
                             <router-link to="/withdrawals">
                                 <DropdownItem>
                                     <div :class="$style.dropdown_icon">
@@ -207,10 +285,10 @@ export default defineComponent({
                                     Withdrawals
                                 </DropdownItem>
                             </router-link>
-                            <DropdownItem disabled
+                            <!-- <DropdownItem disabled
                                 ><Icon name="settings" size="16" />
                                 Settings</DropdownItem
-                            >
+                            > -->
 
                             <DropdownDivider />
 
@@ -230,10 +308,10 @@ export default defineComponent({
                                 ><Icon name="help" size="16" />
                                 Onboarding</DropdownItem
                             >
-                            <DropdownItem disabled
+                            <!-- <DropdownItem disabled
                                 ><Icon name="bolt" size="16" />
                                 Changelog</DropdownItem
-                            >
+                            > -->
 
                             <DropdownDivider />
 
@@ -412,6 +490,46 @@ export default defineComponent({
     height: 6px;
     border-radius: 50%;
     background: var(--red);
+}
+
+.profile {
+    display: flex;
+    gap: 8px;
+
+    margin: 0 8px;
+    padding: 8px 16px 8px 8px;
+    background: transparent;
+    border-radius: 6px;
+
+    transition: background 0.2s ease;
+}
+
+.profile svg {
+    fill: var(--opacity-40);
+}
+
+.profile .info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.info .address {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.info .balance {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+.profile:hover {
+    background: var(--opacity-05);
 }
 
 @media (max-width: 600px) {

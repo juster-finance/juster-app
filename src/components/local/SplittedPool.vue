@@ -6,11 +6,12 @@ export default defineComponent({
     props: {
         event: Object,
         amount: Number,
+        winDelta: Number,
         side: String,
     },
 
     setup(props) {
-        const { event, amount, side } = toRefs(props)
+        const { event, amount, winDelta, side } = toRefs(props)
 
         const userAmount = computed(() => (amount.value ? amount.value : 0))
 
@@ -25,22 +26,25 @@ export default defineComponent({
                 )
             } else {
                 if (side.value == "Higher") {
-                    const below = event.value.poolBelow
+                    const below = event.value.poolBelow - winDelta.value
                     const above = event.value.poolAboveEq + userAmount.value
 
                     return Math.floor((above * 100) / (above + below))
                 }
                 if (side.value == "Lower") {
                     const below = event.value.poolBelow + userAmount.value
-                    const above = event.value.poolAboveEq
+                    const above = event.value.poolAboveEq - winDelta.value
 
                     return Math.floor((above * 100) / (above + below))
                 }
             }
         })
         const aboveAmount = computed(() => {
-            if (side.value == "Higher" || side.value == "Lower")
-                return event.value.poolAboveEq
+            if (side.value == "Higher")
+                return event.value.poolAboveEq + userAmount.value
+
+            if (side.value == "Lower")
+                return event.value.poolAboveEq - winDelta.value
 
             if (side.value == "Liquidity") {
                 const maxPool = Math.max(
@@ -80,8 +84,10 @@ export default defineComponent({
             }
         })
         const belowAmount = computed(() => {
-            if (side.value == "Higher" || side.value == "Lower")
-                return event.value.poolBelow
+            if (side.value == "Higher")
+                return event.value.poolBelow - winDelta.value
+            if (side.value == "Lower")
+                return event.value.poolBelow + userAmount.value
 
             if (side.value == "Liquidity") {
                 const maxPool = Math.max(
