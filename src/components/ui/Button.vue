@@ -109,7 +109,7 @@ export default defineComponent({
 
 .wrapper.small {
     height: 30px;
-    padding: 0 10px 0 8px;
+    padding: 0 10px 0 10px;
     font-size: 13px;
 }
 .wrapper.small.icon {
