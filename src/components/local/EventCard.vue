@@ -235,8 +235,6 @@ export default defineComponent({
             juster
                 .withdraw(event.value.id, accountStore.pkh)
                 .then(op => {
-                    console.log(`Hash: ${op.opHash}`)
-
                     notificationsStore.create({
                         notification: {
                             type: "success",
@@ -779,10 +777,6 @@ export default defineComponent({
 
 .wrapper:hover {
     border: 1px solid var(--border-highlight);
-}
-
-.wrapper:active {
-    transform: translateY(1px);
 }
 
 .dropdown {
