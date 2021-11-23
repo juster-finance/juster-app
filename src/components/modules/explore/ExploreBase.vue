@@ -91,11 +91,11 @@ export default defineComponent({
                 </div>
             </div>
 
-            <!-- Top events -->
+            <!-- Hot events -->
             <div :class="$style.block">
                 <div :class="$style.head">
                     <div :class="$style.left">
-                        <h1>Top events</h1>
+                        <h1>Hot events</h1>
                         <div :class="$style.description">
                             Events that are currently active and in demand
                         </div>
@@ -104,10 +104,10 @@ export default defineComponent({
                     <Button
                         @click="handleViewTopEvents"
                         size="small"
-                        type="secondary"
+                        type="tertiary"
                     >
                         <Icon name="collection" size="16" />
-                        View top events
+                        All Hot events
                     </Button>
                 </div>
 

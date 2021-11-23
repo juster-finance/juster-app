@@ -62,6 +62,7 @@ export default defineComponent({
     setup(props) {
         const { event } = toRefs(props)
 
+        /** Stores */
         const notificationsStore = useNotificationsStore()
         const accountStore = useAccountStore()
         const marketStore = useMarketStore()

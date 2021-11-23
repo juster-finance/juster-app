@@ -22,7 +22,12 @@ import {
     DropdownDivider,
 } from "@/components/ui/Dropdown"
 import Tooltip from "@/components/ui/Tooltip"
+
+/**
+ * Modals
+ */
 import TheSettingsModal from "@/components/local/modals/Settings/TheSettingsModal"
+import ConnectingModal from "@/components/local/modals/ConnectingModal"
 
 /**
  * Store
@@ -36,6 +41,7 @@ export default defineComponent({
         const accountStore = useAccountStore()
 
         const showSettingsModal = ref(false)
+        const showConnectingModal = ref(false)
 
         const route = useRoute()
         const router = useRouter()
@@ -60,10 +66,46 @@ export default defineComponent({
             return route.path.startsWith(url)
         }
 
+        const address = ref("")
         const handleLogin = async () => {
             await juster.sync()
             juster.getPkh().then(pkh => {
-                accountStore.setPkh(pkh)
+                if (!localStorage["connectingModal"]) {
+                    showConnectingModal.value = true
+                    address.value = pkh
+
+                    localStorage["connectingModal"] = true
+                } else {
+                    accountStore.pkh = pkh
+                }
+            })
+        }
+
+        const handleAgree = () => {
+            showConnectingModal.value = false
+
+            accountStore.pkh = address.value
+            address.value = ""
+        }
+        const handleDisagree = () => {
+            showConnectingModal.value = false
+
+            address.value = ""
+
+            juster._provider.client.clearActiveAccount().then(async () => {
+                await juster._provider.client.getActiveAccount()
+                accountStore.setPkh("")
+                router.push("/")
+
+                notificationsStore.create({
+                    notification: {
+                        type: "success",
+                        title: "You are signed out",
+                        description:
+                            "You have not confirmed the registration and agreement with the Terms of Use",
+                        autoDestroy: true,
+                    },
+                })
             })
         }
 
@@ -91,15 +133,20 @@ export default defineComponent({
             links,
             isActive,
             juster,
+            address,
             handleLogin,
+            handleAgree,
+            handleDisagree,
             handleLogout,
             pkh,
             showSettingsModal,
+            showConnectingModal,
             accountStore,
         }
     },
 
     components: {
+        ConnectingModal,
         TheSettingsModal,
         Tooltip,
         AppStatus,
@@ -113,9 +160,16 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
-        <TheSettingsModal
+        <!-- <TheSettingsModal
             :show="showSettingsModal"
             @onClose="showSettingsModal = false"
+        /> -->
+
+        <ConnectingModal
+            :show="showConnectingModal"
+            :address="address"
+            @onAgree="handleAgree"
+            @onClose="handleDisagree"
         />
 
         <div :class="$style.base">
@@ -167,6 +221,7 @@ export default defineComponent({
                         type="primary"
                         size="small"
                     >
+                        <Icon name="user" size="12" />
                         Sign in</Button
                     >
 
@@ -180,7 +235,10 @@ export default defineComponent({
                                     "
                                 />
                                 <div
-                                    v-if="accountStore.wonPositions.length"
+                                    v-if="
+                                        accountStore.wonPositions.length &&
+                                            accountStore.pkh
+                                    "
                                     :class="$style.indicator"
                                 />
                             </div>

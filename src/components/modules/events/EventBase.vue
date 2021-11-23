@@ -753,7 +753,7 @@ export default defineComponent({
                                         event.totalLiquidityProvided == 0
                                     "
                                     :class="$style.action"
-                                    ><Icon name="liquidity" size="16" />Provide
+                                    ><Icon name="liquidity" size="16" />Add
                                     liquidity</Button
                                 >
                                 <Button
