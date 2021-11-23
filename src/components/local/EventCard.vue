@@ -554,7 +554,7 @@ export default defineComponent({
                     position="bottom"
                     side="left"
                 >
-                    <Badge color="green" :class="$style.main_badge"
+                    <Badge color="yellow" :class="$style.main_badge"
                         ><Icon name="bolt" size="12" />Starting soon</Badge
                     >
 
