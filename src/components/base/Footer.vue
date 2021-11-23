@@ -38,7 +38,7 @@ export default defineComponent({
                             :class="$style.link"
                             >Discord</a
                         ><a
-                            href="https://t.me/baking_bad_chat"
+                            href="https://github.com/juster-finance"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
