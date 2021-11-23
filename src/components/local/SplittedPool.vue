@@ -41,7 +41,7 @@ export default defineComponent({
         })
         const aboveAmount = computed(() => {
             if (side.value == "Higher")
-                return event.value.poolAboveEq + winDelta.value
+                return event.value.poolAboveEq + userAmount.value
 
             if (side.value == "Lower")
                 return event.value.poolAboveEq - winDelta.value
@@ -87,7 +87,7 @@ export default defineComponent({
             if (side.value == "Higher")
                 return event.value.poolBelow - winDelta.value
             if (side.value == "Lower")
-                return event.value.poolBelow + winDelta.value
+                return event.value.poolBelow + userAmount.value
 
             if (side.value == "Liquidity") {
                 const maxPool = Math.max(
