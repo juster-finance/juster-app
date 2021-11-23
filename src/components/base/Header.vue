@@ -224,10 +224,10 @@ export default defineComponent({
                                     Withdrawals
                                 </DropdownItem>
                             </router-link>
-                            <DropdownItem disabled
+                            <!-- <DropdownItem disabled
                                 ><Icon name="settings" size="16" />
                                 Settings</DropdownItem
-                            >
+                            > -->
 
                             <DropdownDivider />
 
@@ -247,10 +247,10 @@ export default defineComponent({
                                 ><Icon name="help" size="16" />
                                 Onboarding</DropdownItem
                             >
-                            <DropdownItem disabled
+                            <!-- <DropdownItem disabled
                                 ><Icon name="bolt" size="16" />
                                 Changelog</DropdownItem
-                            >
+                            > -->
 
                             <DropdownDivider />
 
