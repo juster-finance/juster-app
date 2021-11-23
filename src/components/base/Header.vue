@@ -73,8 +73,6 @@ export default defineComponent({
                 if (!localStorage["connectingModal"]) {
                     showConnectingModal.value = true
                     address.value = pkh
-
-                    localStorage["connectingModal"] = true
                 } else {
                     accountStore.pkh = pkh
                 }
@@ -83,6 +81,8 @@ export default defineComponent({
 
         const handleAgree = () => {
             showConnectingModal.value = false
+
+            localStorage["connectingModal"] = true
 
             accountStore.pkh = address.value
             address.value = ""
