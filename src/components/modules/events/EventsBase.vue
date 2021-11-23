@@ -260,7 +260,7 @@ export default defineComponent({
 
         <h1>All events</h1>
         <div :class="$style.description">
-            Here you can see all possible events and filter
+            List of all new, active, and past events with customizable filtering
         </div>
 
         <div :class="$style.container">

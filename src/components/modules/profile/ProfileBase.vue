@@ -347,8 +347,7 @@ export default defineComponent({
 
         <div :class="$style.error_title">Your profile is not ready yet</div>
         <div :class="$style.error_description">
-            You must perform at least one action (<span>Liquidity</span> or
-            <span>Bet</span>) with the <span>Juster</span> for your profile to
+            Once you participate in any event, your profile will
             become available!
         </div>
 

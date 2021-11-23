@@ -70,9 +70,9 @@ export default defineComponent({
         </metainfo>
 
         <div :class="$style.block">
-            <h2>Won events</h2>
+            <h2>Outstanding balances</h2>
             <div :class="$style.description">
-                List of events available for withdrawal
+                List of events holding your unclaimed profits
             </div>
 
             <div v-if="positionsForWithdrawal.length" :class="$style.items">
@@ -85,15 +85,14 @@ export default defineComponent({
                 />
             </div>
             <div v-else :class="$style.empty">
-                <Icon name="help" size="16" /> There are no winning events
-                available for withdrawal
+                <Icon name="help" size="16" /> No funds available for withdrawal
             </div>
         </div>
 
         <div :class="$style.block">
-            <h2>Withdrawals history</h2>
+            <h2>Withdrawal history</h2>
             <div :class="$style.description">
-                Detailed table with history of withdrawals
+                Claimed profits
             </div>
 
             <div :class="$style.withdrawboard">
@@ -172,13 +171,13 @@ export default defineComponent({
 
             <div>
                 <div :class="$style.hint">
-                    You can withdraw the won funds manually. If you do not do
-                    this within X hours, they will be withdrawn automatically
-                    with a small commission.
+                    You can withdraw your funds manually, however if not done
+                    within 24 hours, Juster will do that for you and charge a
+                    small fee.
                 </div>
 
                 <Button type="tertiary" size="small"
-                    ><Icon name="book" size="14" />Read in Juster Docs</Button
+                    ><Icon name="book" size="14" />Read more in the docs</Button
                 >
             </div>
         </div>

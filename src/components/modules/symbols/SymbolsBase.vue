@@ -59,7 +59,7 @@ export default defineComponent({
 
         <h1 :class="$style.title">Available symbols</h1>
         <div :class="$style.description">
-            List of all current and archived events
+            List of all currency pairs available for betting
         </div>
 
         <transition name="fade">

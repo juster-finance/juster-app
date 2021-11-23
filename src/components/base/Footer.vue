@@ -42,14 +42,14 @@ export default defineComponent({
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
-                            >Telegram</a
+                            >GitHub</a
                         >
                         <a
-                            href="https://github.com/juster-finance"
+                            href="https://twitter.com/TezosBakingBad"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
-                            >GitHub</a
+                            >Twitter</a
                         >
                     </div>
                     <div :class="$style.column">

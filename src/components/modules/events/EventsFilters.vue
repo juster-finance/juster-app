@@ -290,10 +290,10 @@ export default defineComponent({
             </div>
         </div>
 
-        <div :class="$style.hint">
+        <!-- <div :class="$style.hint">
             Filters are saved for this device. You can customize this behavior
             in the settings.
-        </div>
+        </div> -->
 
         <div :class="$style.divider" />
 
@@ -301,9 +301,8 @@ export default defineComponent({
             <Button @click="$emit('onReset')" type="tertiary" size="small"
                 >Reset</Button
             >
-
             <Button type="tertiary" size="small" disabled
-                ><Icon name="collection" size="16" />Select Saved preset</Button
+                ><Icon name="collection" size="16" />Recent filters</Button
             >
         </div>
     </div>

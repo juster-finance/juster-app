@@ -60,13 +60,13 @@ export default defineComponent({
             </div>
 
             <div :class="$style.timer">
-                <span>Closing in</span>
+                <span>Time left</span>
 
                 <div v-if="status == 'In progress'" :class="$style.time">
                     <Icon name="time" size="12" /> {{ countdown }}
                 </div>
                 <div v-else-if="status == 'Finished'" :class="$style.time">
-                    Event closed
+                    Event is over
                 </div>
             </div>
         </div>

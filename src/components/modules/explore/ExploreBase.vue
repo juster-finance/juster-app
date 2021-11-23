@@ -79,7 +79,7 @@ export default defineComponent({
             <div v-if="marketStore.isSymbolsLoaded" :class="$style.block">
                 <h1>Top markets</h1>
                 <div :class="$style.description">
-                    Available currency pairs for bets
+                    Currency pairs available for betting
                 </div>
 
                 <div :class="$style.items">
@@ -97,7 +97,8 @@ export default defineComponent({
                     <div :class="$style.left">
                         <h1>Hot events</h1>
                         <div :class="$style.description">
-                            Events that are currently active and in demand
+                            Events that have not yet begun, but are attracting
+                            the interest of participants
                         </div>
                     </div>
 
