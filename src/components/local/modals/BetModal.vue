@@ -234,6 +234,7 @@ export default defineComponent({
             amount,
             slippage,
             sendingBet,
+            winDelta,
             ratio,
             ratioBeforeBet,
             ratioAfterBet,
@@ -337,6 +338,7 @@ export default defineComponent({
                 <SplittedPool
                     :event="event"
                     :amount="amount.value"
+                    :winDelta="winDelta"
                     :side="side"
                     :class="$style.pool"
                 />
