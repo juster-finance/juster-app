@@ -78,6 +78,10 @@ export default defineComponent({
 .wrapper {
 }
 
+.wrapper h1 {
+    font-family: "CalSans";
+}
+
 .breadcrumbs {
     margin-bottom: 24px;
 }

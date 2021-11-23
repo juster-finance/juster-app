@@ -134,6 +134,11 @@ export default defineComponent({
     margin-bottom: 0;
 }
 
+.block h1 {
+    font-family: "CalSans";
+    letter-spacing: 0.5px;
+}
+
 .head {
     display: flex;
     justify-content: space-between;
@@ -144,7 +149,7 @@ export default defineComponent({
     font-weight: 500;
     color: var(--text-tertiary);
 
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
 .items {

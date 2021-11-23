@@ -285,6 +285,10 @@ export default defineComponent({
 .wrapper {
 }
 
+.wrapper h1 {
+    font-family: "CalSans";
+}
+
 .breadcrumbs {
     margin-bottom: 24px;
 }
@@ -295,7 +299,7 @@ export default defineComponent({
     font-weight: 500;
     color: var(--text-tertiary);
 
-    margin-top: 12px;
+    margin-top: 8px;
     margin-bottom: 24px;
 }
 

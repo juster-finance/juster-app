@@ -70,7 +70,7 @@ export default defineComponent({
         </metainfo>
 
         <div :class="$style.block">
-            <h1>Won events</h1>
+            <h2>Won events</h2>
             <div :class="$style.description">
                 List of events available for withdrawal
             </div>
@@ -91,7 +91,7 @@ export default defineComponent({
         </div>
 
         <div :class="$style.block">
-            <h1>Withdrawals history</h1>
+            <h2>Withdrawals history</h2>
             <div :class="$style.description">
                 Detailed table with history of withdrawals
             </div>
@@ -190,13 +190,17 @@ export default defineComponent({
     margin-bottom: 40px;
 }
 
+.block h2 {
+    font-family: "CalSans";
+}
+
 .description {
     font-size: 14px;
     line-height: 1;
     font-weight: 500;
     color: var(--text-tertiary);
 
-    margin-top: 12px;
+    margin-top: 8px;
     margin-bottom: 24px;
 }
 

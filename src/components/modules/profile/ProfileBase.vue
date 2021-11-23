@@ -373,6 +373,8 @@ export default defineComponent({
 }
 
 .profile_title {
+    font-family: "CalSans";
+
     margin-bottom: 16px;
 }
 
@@ -577,6 +579,10 @@ export default defineComponent({
 .top {
     display: flex;
     justify-content: space-between;
+}
+
+.top h2 {
+    font-family: "CalSans";
 }
 
 .items {
