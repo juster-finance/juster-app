@@ -188,11 +188,28 @@ export default defineComponent({
 
                         <template v-slot:dropdown>
                             <router-link to="/profile">
-                                <DropdownItem
-                                    ><Icon name="user" size="16" />My
-                                    profile</DropdownItem
-                                ></router-link
-                            >
+                                <div :class="$style.profile">
+                                    <Icon name="user" size="16" />
+
+                                    <div :class="$style.info">
+                                        <div :class="$style.address">
+                                            {{
+                                                `${accountStore.pkh.slice(
+                                                    0,
+                                                    5,
+                                                )}..${accountStore.pkh.slice(
+                                                    accountStore.pkh.length - 3,
+                                                    accountStore.pkh.length,
+                                                )}`
+                                            }}
+                                        </div>
+                                        <div :class="$style.balance">
+                                            834 XTZ
+                                        </div>
+                                    </div>
+                                </div>
+                            </router-link>
+
                             <router-link to="/withdrawals">
                                 <DropdownItem>
                                     <div :class="$style.dropdown_icon">
@@ -412,6 +429,46 @@ export default defineComponent({
     height: 6px;
     border-radius: 50%;
     background: var(--red);
+}
+
+.profile {
+    display: flex;
+    gap: 8px;
+
+    margin: 0 8px;
+    padding: 8px 16px 8px 8px;
+    background: transparent;
+    border-radius: 6px;
+
+    transition: background 0.2s ease;
+}
+
+.profile svg {
+    fill: var(--opacity-40);
+}
+
+.profile .info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.info .address {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.info .balance {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+.profile:hover {
+    background: var(--opacity-05);
 }
 
 @media (max-width: 600px) {
