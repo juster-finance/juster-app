@@ -22,6 +22,7 @@ import { fetchEventsBySymbol } from "@/api/events"
  */
 import Symbol from "./Symbol"
 import EventCard from "@/components/local/EventCard"
+import EventCardLoading from "@/components/local/EventCardLoading"
 
 /**
  * Store
@@ -167,7 +168,7 @@ export default defineComponent({
         Symbol,
         Breadcrumbs,
         EventCard,
-        EventCard,
+        EventCardLoading,
         Pagination,
         Button,
     },
@@ -238,8 +239,8 @@ export default defineComponent({
             </div>
         </div>
 
-        <transition name="fade">
-            <div v-if="events" :class="$style.events">
+        <transition name="fastfade" mode="out-in">
+            <div v-if="events.length" :class="$style.events">
                 <EventCard
                     v-for="event in events.slice(
                         (currentPage - 1) * 8,
@@ -248,6 +249,12 @@ export default defineComponent({
                     :key="event.id"
                     :event="event"
                 />
+            </div>
+
+            <div v-else :class="$style.events">
+                <EventCardLoading />
+                <EventCardLoading />
+                <EventCardLoading />
             </div>
         </transition>
 

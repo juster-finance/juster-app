@@ -57,7 +57,7 @@ export default defineComponent({
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-        <h1>Available symbols</h1>
+        <h1 :class="$style.title">Available symbols</h1>
         <div :class="$style.description">
             List of all current and archived events
         </div>
@@ -78,7 +78,7 @@ export default defineComponent({
 .wrapper {
 }
 
-.wrapper h1 {
+.title {
     font-family: "CalSans";
 }
 

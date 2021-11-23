@@ -9,6 +9,7 @@ import { cloneDeep } from "lodash"
  */
 import SymbolCard from "@/components/local/SymbolCard"
 import EventCard from "@/components/local/EventCard"
+import EventCardLoading from "@/components/local/EventCardLoading"
 
 /**
  * UI
@@ -61,7 +62,7 @@ export default defineComponent({
         }
     },
 
-    components: { SymbolCard, EventCard, Button },
+    components: { SymbolCard, EventCard, EventCardLoading, Button },
 })
 </script>
 
@@ -110,13 +111,21 @@ export default defineComponent({
                     </Button>
                 </div>
 
-                <div v-if="marketStore.events.length" :class="$style.items">
-                    <EventCard
-                        v-for="event in marketStore.events"
-                        :key="event.id"
-                        :event="event"
-                    />
-                </div>
+                <transition name="fastfade" mode="out-in">
+                    <div v-if="marketStore.events.length" :class="$style.items">
+                        <EventCard
+                            v-for="event in marketStore.events"
+                            :key="event.id"
+                            :event="event"
+                        />
+                    </div>
+
+                    <div v-else :class="$style.items">
+                        <EventCardLoading />
+                        <EventCardLoading />
+                        <EventCardLoading />
+                    </div>
+                </transition>
             </div>
         </div>
     </transition>
@@ -127,7 +136,7 @@ export default defineComponent({
 }
 
 .block {
-    margin-bottom: 40px;
+    margin-bottom: 60px;
 }
 
 .block:last-child {

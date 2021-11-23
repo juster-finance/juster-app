@@ -812,6 +812,7 @@ export default defineComponent({
 .symbol_imgs img:first-child {
     position: absolute;
     z-index: 1;
+    outline: 3px solid var(--card-bg);
 }
 
 .symbol_imgs img:last-child {

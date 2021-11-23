@@ -146,13 +146,13 @@ html {
     opacity: 0;
 }
 
-.test-enter-active,
-.test-leave-active {
-    transition: opacity 0.5s ease;
+.fastfade-enter-active,
+.fastfade-leave-active {
+    transition: opacity 0.15s ease;
 }
 
-.test-enter-from,
-.test-leave-to {
+.fastfade-enter-from,
+.fastfade-leave-to {
     opacity: 0;
 }
 

@@ -26,6 +26,7 @@ import Banner from "@/components/ui/Banner"
  * Local
  */
 import EventCard from "@/components/local/EventCard"
+import EventCardLoading from "@/components/local/EventCardLoading"
 
 /**
  * Store
@@ -232,6 +233,7 @@ export default defineComponent({
         Banner,
         EventsFilters,
         EventCard,
+        EventCardLoading,
     },
 })
 </script>
@@ -269,13 +271,22 @@ export default defineComponent({
                     >We have temporarily disabled events with a target dynamics.
                     They will be available again soon.</Banner
                 >
-                <div :class="$style.events">
-                    <EventCard
-                        v-for="event in filteredEvents"
-                        :key="event.id"
-                        :event="event"
-                    />
-                </div>
+
+                <transition name="fastfade" mode="out-in">
+                    <div v-if="filteredEvents.length" :class="$style.events">
+                        <EventCard
+                            v-for="event in filteredEvents"
+                            :key="event.id"
+                            :event="event"
+                        />
+                    </div>
+
+                    <div v-else :class="$style.events">
+                        <EventCardLoading />
+                        <EventCardLoading />
+                        <EventCardLoading />
+                    </div>
+                </transition>
             </div>
         </div>
     </div>
