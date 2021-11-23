@@ -3,6 +3,7 @@ import { ApolloClients } from "@vue/apollo-composable"
 import { createMetaManager } from "vue-meta"
 import { apollo } from "@/apollo"
 import { createPinia } from "pinia"
+import VueGtag from "vue-gtag"
 
 import "@/services/tools"
 import App from "./App.vue"
@@ -24,6 +25,7 @@ const app = createApp({
 app.use(router)
 app.use(createPinia())
 app.use(createMetaManager())
+app.use(VueGtag, { config: { id: "G-58LD5WNLR4" } })
 
 /**
  * Global components
