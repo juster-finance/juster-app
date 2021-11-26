@@ -70,14 +70,14 @@ export default defineComponent({
                 )
             } else {
                 if (side.value == "Higher") {
-                    const below = event.value.poolBelow
+                    const below = event.value.poolBelow - winDelta.value
                     const above = event.value.poolAboveEq + userAmount.value
 
                     return Math.ceil((below * 100) / (above + below))
                 }
                 if (side.value == "Lower") {
                     const below = event.value.poolBelow + userAmount.value
-                    const above = event.value.poolAboveEq
+                    const above = event.value.poolAboveEq - winDelta.value
 
                     return Math.ceil((below * 100) / (above + below))
                 }
