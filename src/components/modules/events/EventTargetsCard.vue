@@ -18,7 +18,12 @@ export default defineComponent({
             if (event.value.status == "NEW") {
                 return "TBD"
             }
-            if (["FINISHED", "STARTED"].includes(event.value.status)) {
+
+            if (event.value.status == "STARTED") {
+                return change.value.diff > 0 ? `Up` : `Down`
+            }
+
+            if (event.value.status == "FINISHED") {
                 return event.value.winnerBets == "ABOVE_EQ" ? "Up" : "Down"
             }
         })

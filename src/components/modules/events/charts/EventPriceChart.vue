@@ -7,6 +7,7 @@ import {
     onMounted,
     onBeforeUnmount,
     useCssModule,
+    computed,
 } from "vue"
 import * as d3 from "d3"
 import { DateTime } from "luxon"
@@ -43,6 +44,18 @@ export default defineComponent({
             y: null,
         })
         const startData = ref([])
+
+        const priceDynamics = computed(() => {
+            const startRate = event.value.startRate * 100
+            const closedRate = event.value.closedRate * 100
+
+            const diff =
+                event.value.status == "FINISHED"
+                    ? closedRate - startRate
+                    : symbol.quotes[0].price - startRate
+
+            return diff
+        })
 
         const draw = () => {
             const margin = { top: 20, right: 100, bottom: 30, left: 0 },
@@ -253,9 +266,9 @@ export default defineComponent({
                 .attr("fill", "none")
                 .attr(
                     "stroke",
-                    event.value.winnerBets == "ABOVE_EQ"
-                        ? "#1aa168"
-                        : "#e05c43",
+                    (priceDynamics.value > 0 && "#1aa168") ||
+                        (priceDynamics.value < 0 && "#e05c43") ||
+                        (priceDynamics.value == 0 && "#464646"),
                 )
                 .attr("stroke-width", 1.5)
                 .attr(
@@ -422,12 +435,30 @@ export default defineComponent({
                             const newQuote = data.quotesWma[0]
 
                             if (
+                                DateTime.fromISO(
+                                    event.value.betsCloseTime,
+                                ).plus({ second: event.value.measurePeriod })
+                                    .ts ==
+                                    DateTime.fromISO(newQuote.timestamp).ts ||
+                                DateTime.fromISO(newQuote.timestamp).ts >
+                                    DateTime.fromISO(
+                                        event.value.betsCloseTime,
+                                    ).plus({
+                                        second: event.value.measurePeriod,
+                                    }).ts
+                            ) {
+                                subscription.value.unsubscribe()
+                                return
+                            }
+
+                            if (
                                 !symbol.quotes.some(
                                     quote =>
                                         quote.timestamp == newQuote.timestamp,
                                 )
                             ) {
                                 symbol.quotes.unshift(newQuote)
+
                                 draw()
                             }
                         },

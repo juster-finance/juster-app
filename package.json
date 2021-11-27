@@ -1,6 +1,6 @@
 {
     "name": "juster-web",
-    "version": "0.6.9",
+    "version": "0.6.11",
     "private": true,
     "scripts": {
         "serve": "vue-cli-service serve",
