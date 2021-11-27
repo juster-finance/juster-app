@@ -3,7 +3,7 @@ import { defineStore } from "pinia"
 /**
  * Services
  */
-import { tezos } from "@/services/tools"
+import { fetchBalance } from "@/services/tools"
 
 export const useAccountStore = defineStore({
     id: "account",
@@ -23,10 +23,8 @@ export const useAccountStore = defineStore({
             this.pkh = pkh
         },
 
-        updateBalance() {
-            tezos.tz
-                .getBalance(this.pkh)
-                .then(val => (this.balance = val.toNumber() / 1000000))
+        async updateBalance() {
+            this.balance = await fetchBalance(this.pkh)
         },
     },
     getters: {

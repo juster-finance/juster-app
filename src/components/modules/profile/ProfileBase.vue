@@ -17,7 +17,7 @@ import EventCard from "@/components/local/EventCard"
 /**
  * Services
  */
-import { juster, tezos } from "@/services/tools"
+import { juster, fetchBalance } from "@/services/tools"
 import { toClipboard } from "@/services/utils/global"
 
 /**
@@ -57,13 +57,12 @@ export default defineComponent({
         const positions = ref([])
 
         /** Balance */
+        const getUserBalance = async () => {
+            balance.value = await fetchBalance(address.value)
+        }
+
         if (!isMyProfile.value) {
-            tezos.tz
-                .getBalance(address.value)
-                .then(
-                    val =>
-                        (balance.value = (val.toNumber() / 1000000).toFixed(2)),
-                )
+            getUserBalance()
         } else {
             accountStore.updateBalance()
         }
@@ -147,7 +146,6 @@ export default defineComponent({
             balance,
             isMyProfile,
             address,
-            events,
             positions,
         }
     },
@@ -180,7 +178,7 @@ export default defineComponent({
                         />
 
                         <template v-slot:content
-                            >This avatar is supported by TzKT</template
+                            >This avatar is supported by TzKT.io</template
                         >
                     </Tooltip>
                 </div>
@@ -287,14 +285,6 @@ export default defineComponent({
                                 TzKT</Button
                             ></a
                         >
-                        <Button
-                            v-if="!isMyProfile"
-                            type="tertiary"
-                            size="small"
-                            disabled
-                            ><Icon name="flag" size="14" />Report this
-                            user</Button
-                        >
                     </div>
 
                     <div :class="$style.right">
@@ -347,8 +337,8 @@ export default defineComponent({
 
         <div :class="$style.error_title">Your profile is not ready yet</div>
         <div :class="$style.error_description">
-            Once you participate in any event, your profile will
-            become available!
+            Once you participate in any event, your profile will become
+            available!
         </div>
 
         <div :class="$style.error_buttons">
