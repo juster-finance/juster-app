@@ -193,7 +193,7 @@ export default defineComponent({
             </div>
 
             <div :class="$style.right">
-                <AppStatus :class="$style.app_status" />
+                <!-- <AppStatus :class="$style.app_status" /> -->
 
                 <Tooltip v-if="pkh" position="left">
                     <div :class="$style.testnet_warning">
@@ -286,10 +286,6 @@ export default defineComponent({
                                     Withdrawals
                                 </DropdownItem>
                             </router-link>
-                            <!-- <DropdownItem disabled
-                                ><Icon name="settings" size="16" />
-                                Settings</DropdownItem
-                            > -->
 
                             <DropdownDivider />
 
@@ -309,10 +305,6 @@ export default defineComponent({
                                 ><Icon name="help" size="16" />
                                 Onboarding</DropdownItem
                             >
-                            <!-- <DropdownItem disabled
-                                ><Icon name="bolt" size="16" />
-                                Changelog</DropdownItem
-                            > -->
 
                             <DropdownDivider />
 
