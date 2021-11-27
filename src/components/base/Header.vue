@@ -75,6 +75,7 @@ export default defineComponent({
                     address.value = pkh
                 } else {
                     accountStore.pkh = pkh
+                    accountStore.updateBalance()
                 }
             })
         }
@@ -86,6 +87,8 @@ export default defineComponent({
 
             accountStore.pkh = address.value
             address.value = ""
+
+            accountStore.updateBalance()
         }
         const handleDisagree = () => {
             showConnectingModal.value = false
