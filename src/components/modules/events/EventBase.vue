@@ -532,6 +532,14 @@ export default defineComponent({
                     >You have chosen the correct outcome of the event. You can
                     withdraw your reward ✨</Banner
                 >
+                <Banner
+                    v-if="event.status == 'CANCELED'"
+                    type="error"
+                    :class="$style.banner"
+                    >The event was canceled due to problems with the start of
+                    price measurement. All bets and liquidity are
+                    refunded</Banner
+                >
 
                 <div v-if="event" :class="$style.event">
                     <div :class="$style.header">
@@ -579,7 +587,22 @@ export default defineComponent({
                             <!-- Labels -->
                             <div :class="$style.labels">
                                 <Tooltip
-                                    v-if="countdownStatus == 'In progress'"
+                                    v-if="event.status == 'CANCELED'"
+                                    position="bottom"
+                                    side="left"
+                                >
+                                    <Label icon="stop" color="red"
+                                        >Canceled</Label
+                                    >
+
+                                    <template v-slot:content>
+                                        Event canceled due to problems with
+                                        starting or finishing price
+                                    </template>
+                                </Tooltip>
+
+                                <Tooltip
+                                    v-else-if="countdownStatus == 'In progress'"
                                     position="bottom"
                                     side="left"
                                 >
@@ -594,7 +617,8 @@ export default defineComponent({
                                     >
 
                                     <template v-slot:content>
-                                        Time left to make a bet or provide liquidity
+                                        Time left to make a bet or provide
+                                        liquidity
                                     </template>
                                 </Tooltip>
 
@@ -629,7 +653,8 @@ export default defineComponent({
                                     >
 
                                     <template v-slot:content>
-                                        Start price is fixed, waiting for event completion
+                                        Start price is fixed, waiting for event
+                                        completion
                                     </template>
                                 </Tooltip>
 
@@ -644,8 +669,7 @@ export default defineComponent({
                                     <Label icon="check">Finished</Label>
 
                                     <template v-slot:content>
-                                        Event is over, winners are
-                                        determined
+                                        Event is over, winners are determined
                                     </template>
                                 </Tooltip>
 
@@ -771,7 +795,10 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <EventChart v-if="event" :event="event" />
+                <EventChart
+                    v-if="event && event.status !== 'CANCELED'"
+                    :event="event"
+                />
 
                 <div :class="$style.block">
                     <div :class="$style.title">Bets</div>
@@ -816,7 +843,9 @@ export default defineComponent({
                         <span>TYPE</span>
                         <span>SIDE</span>
                         <span>AMOUNT</span>
-                        <span>REWARD</span>
+                        <span>{{
+                            event.status !== "CANCELED" ? "REWARD" : "REFUND"
+                        }}</span>
                     </div>
 
                     <div

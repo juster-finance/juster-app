@@ -82,7 +82,10 @@ export default defineComponent({
 
         <div :class="$style.param">{{ bet.amount }}&nbsp;<span>XTZ</span></div>
 
-        <div :class="$style.param">
+        <div v-if="event.status == 'CANCELED'" :class="$style.param">
+            {{ bet.amount }}&nbsp;<span>XTZ</span>
+        </div>
+        <div v-else :class="$style.param">
             {{ isWon ? bet.reward.toFixed(2) : 0 }}&nbsp;<span>XTZ</span>
         </div>
     </div>

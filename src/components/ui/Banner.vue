@@ -65,5 +65,6 @@ export default defineComponent({
 .wrapper.error {
     fill: var(--red);
     color: var(--red);
+    background: rgba(224, 92, 67, 0.15);
 }
 </style>

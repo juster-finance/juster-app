@@ -117,11 +117,21 @@ export default defineComponent({
                             ]"
                         >
                             <Spin v-if="event.status == 'STARTED'" size="14" />
-                            <Icon v-else name="flag" size="14" />
+                            <Icon
+                                v-else-if="event.status !== 'CANCELED'"
+                                name="flag"
+                                size="14"
+                            />
                             {{
-                                event.status == "FINISHED"
-                                    ? `$ ${(event.closedRate * 100).toFixed(2)}`
-                                    : "TBD"
+                                (event.status == "CANCELED" && "Not Defined") ||
+                                    (event.status == "FINISHED" &&
+                                        `$ ${(event.closedRate * 100).toFixed(
+                                            2,
+                                        )}`) ||
+                                    (["NEW", "STARTED"].includes(
+                                        event.status,
+                                    ) &&
+                                        "TBD")
                             }}
                         </div>
                     </div>
@@ -129,9 +139,7 @@ export default defineComponent({
                         <template v-if="event.status !== 'FINISHED'"
                             >Waiting for event completion</template
                         >
-                        <template v-else
-                            >Close price is settled</template
-                        >
+                        <template v-else>Close price is settled</template>
                     </template>
                 </Tooltip>
             </div>
@@ -156,7 +164,8 @@ export default defineComponent({
 
             <div :class="$style.param">
                 <span>Price dynamics</span>
-                <Spin size="16" v-if="!price.rate" />
+                <span v-if="event.status == 'CANCELED'">$ 0.00</span>
+                <Spin size="16" v-else-if="!price.rate" />
                 <span v-else-if="event.status == 'NEW'">TBD</span>
                 <span
                     v-else
@@ -167,7 +176,12 @@ export default defineComponent({
                     ({{ change.percent.toFixed(2) }}%)</span
                 >
             </div>
-            <div :class="$style.param">
+
+            <div v-if="event.status == 'CANCELED'" :class="$style.param">
+                <span>Winning Side</span>
+                <span>Draw</span>
+            </div>
+            <div v-else :class="$style.param">
                 <span>Winning Side</span>
                 <span v-if="price.rate">
                     <Icon
