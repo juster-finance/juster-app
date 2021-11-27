@@ -193,9 +193,7 @@ export default defineComponent({
                     <Icon name="copy" size="14" />
                 </div>
                 <div :class="$style.status">
-                    {{
-                        isMyProfile ? accountStore.balance.toFixed(2) : balance
-                    }}
+                    {{ isMyProfile ? accountStore.balance : balance }}
                     XTZ
                 </div>
 
