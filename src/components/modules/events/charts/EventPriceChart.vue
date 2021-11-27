@@ -259,16 +259,41 @@ export default defineComponent({
                 })
             }
 
-            /** Chart */
+            /** Draw chart Before start */
+            const dataBeforeStart = data.filter(
+                quote =>
+                    DateTime.fromJSDate(quote.date).ts <
+                    DateTime.fromISO(event.value.betsCloseTime).ts,
+            )
             chart
                 .append("path")
-                .datum(data)
+                .datum(dataBeforeStart)
+                .attr("fill", "none")
+                .attr("stroke", "#707070")
+                .attr("stroke-width", 1.5)
+                .attr(
+                    "d",
+                    d3
+                        .line()
+                        .x(d => scale.x(d.date))
+                        .y(d => scale.y(d.value)),
+                )
+
+            /** Draw chart After start */
+            const dataAfterStart = data.filter(
+                quote =>
+                    DateTime.fromJSDate(quote.date).ts >=
+                    DateTime.fromISO(event.value.betsCloseTime).ts,
+            )
+            chart
+                .append("path")
+                .datum(dataAfterStart)
                 .attr("fill", "none")
                 .attr(
                     "stroke",
                     (priceDynamics.value > 0 && "#1aa168") ||
                         (priceDynamics.value < 0 && "#e05c43") ||
-                        (priceDynamics.value == 0 && "#464646"),
+                        (priceDynamics.value == 0 && "#707070"),
                 )
                 .attr("stroke-width", 1.5)
                 .attr(
