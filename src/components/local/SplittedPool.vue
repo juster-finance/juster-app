@@ -112,12 +112,12 @@ export default defineComponent({
         <div :class="$style.half">
             <div :class="$style.head">
                 <div :class="$style.name">
-                    Higher <span>{{ abovePercent }}%</span>
+                    Rise <span>{{ abovePercent }}%</span>
                 </div>
 
                 <div :class="$style.size">
                     <Icon name="money" size="12" />
-                    {{ aboveAmount.toFixed(2) }}
+                    {{ aboveAmount.toFixed(0) }}
                     <span>XTZ</span>
                 </div>
             </div>
@@ -133,12 +133,12 @@ export default defineComponent({
         <div :class="$style.half">
             <div :class="$style.head">
                 <div :class="$style.name">
-                    Lower <span>{{ belowPercent }}%</span>
+                    Fall <span>{{ belowPercent }}%</span>
                 </div>
 
                 <div :class="$style.size">
                     <Icon name="money" size="12" />
-                    {{ belowAmount.toFixed(2) }}
+                    {{ belowAmount.toFixed(0) }}
                     <span>XTZ</span>
                 </div>
             </div>
