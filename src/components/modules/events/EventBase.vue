@@ -39,7 +39,9 @@ import EventTargetsCard from "./EventTargetsCard"
 
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
 import LiquidityModal from "@/components/local/modals/LiquidityModal"
+import ReportModal from "@/components/local/modals/ReportModal"
 import BetModal from "@/components/local/modals/BetModal"
+
 import BetCard from "./BetCard"
 import DepositCard from "./DepositCard"
 
@@ -94,6 +96,7 @@ export default defineComponent({
         const showBetModal = ref(false)
         const showLiquidityModal = ref(false)
         const showParticipantsModal = ref(false)
+        const showReportModal = ref(false)
 
         /**
          * Switch between Liquidity <-> Bet
@@ -135,13 +138,13 @@ export default defineComponent({
             if (!event.value) return
 
             return !!event.value.bets
-                .filter(bet => bet.userId == accountStore.pkh)
-                .filter(bet => bet.side == event.value.winnerBets).length
+                .filter((bet) => bet.userId == accountStore.pkh)
+                .filter((bet) => bet.side == event.value.winnerBets).length
         })
 
         const canWithdraw = computed(() => {
             return accountStore.wonPositions.some(
-                position => position.event.id == event.value.id,
+                (position) => position.event.id == event.value.id,
             )
         })
 
@@ -149,9 +152,11 @@ export default defineComponent({
         const eventStartTime = computed(() =>
             new Date(event.value?.betsCloseTime).getTime(),
         )
-        const { status: countdownStatus, time, stop } = useCountdown(
-            eventStartTime,
-        )
+        const {
+            status: countdownStatus,
+            time,
+            stop,
+        } = useCountdown(eventStartTime)
 
         // eslint-disable-next-line vue/return-in-computed-property
         const timeLeft = computed(() => {
@@ -167,9 +172,8 @@ export default defineComponent({
 
         const price = computed(() => {
             return {
-                rate:
-                    marketStore.symbols[event.value?.currencyPair.symbol]
-                        ?.quotes[0]?.price,
+                rate: marketStore.symbols[event.value?.currencyPair.symbol]
+                    ?.quotes[0]?.price,
                 integer: numberWithSymbol(
                     marketStore.symbols[
                         event.value?.currencyPair.symbol
@@ -198,7 +202,7 @@ export default defineComponent({
                 return event.value.deposits
             } else {
                 return event.value.deposits.filter(
-                    deposit => deposit.userId == accountStore.pkh,
+                    (deposit) => deposit.userId == accountStore.pkh,
                 )
             }
         })
@@ -209,14 +213,16 @@ export default defineComponent({
                 return event.value.bets
             } else {
                 return event.value.bets.filter(
-                    bet => bet.userId == accountStore.pkh,
+                    (bet) => bet.userId == accountStore.pkh,
                 )
             }
         })
         const pendingBet = ref(null)
         const userBets = computed(() =>
             event.value
-                ? event.value.bets.filter(bet => bet.userId == accountStore.pkh)
+                ? event.value.bets.filter(
+                      (bet) => bet.userId == accountStore.pkh,
+                  )
                 : [],
         )
 
@@ -277,28 +283,29 @@ export default defineComponent({
             }
         })
 
-        const handleJoin = event => {
+        const handleJoin = (event) => {
             event.stopPropagation()
             showBetModal.value = true
         }
 
-        const handleBet = bet => {
+        const handleBet = (bet) => {
             pendingBet.value = bet
             showBetModal.value = false
         }
 
-        const handleWithdraw = e => {
+        const handleWithdraw = (e) => {
             e.stopPropagation()
 
             juster
                 .withdraw(event.value.id, accountStore.pkh)
-                .then(op => {
+                .then((op) => {
                     console.log(`Hash: ${op.opHash}`)
 
                     /** rm won position from store */
-                    accountStore.wonPositions = accountStore.wonPositions.filter(
-                        position => position.event.id != event.value.id,
-                    )
+                    accountStore.wonPositions =
+                        accountStore.wonPositions.filter(
+                            (position) => position.event.id != event.value.id,
+                        )
 
                     notificationsStore.create({
                         notification: {
@@ -310,10 +317,10 @@ export default defineComponent({
                         },
                     })
                 })
-                .catch(err => console.log(err))
+                .catch((err) => console.log(err))
         }
 
-        const copy = target => {
+        const copy = (target) => {
             if (target == "id") {
                 notificationsStore.create({
                     notification: {
@@ -400,7 +407,7 @@ export default defineComponent({
                     ],
                 })
                 .subscribe({
-                    next: data => {
+                    next: (data) => {
                         const { event: newEvent } = data
 
                         /** Clear pending bet on update */
@@ -458,6 +465,7 @@ export default defineComponent({
             showBetModal,
             showLiquidityModal,
             showParticipantsModal,
+            showReportModal,
             handleSwitch,
             handleJoin,
             handleBet,
@@ -482,6 +490,7 @@ export default defineComponent({
         DropdownDivider,
         ParticipantsModal,
         LiquidityModal,
+        ReportModal,
         BetModal,
         BetCard,
         DepositCard,
@@ -522,6 +531,13 @@ export default defineComponent({
             :show="showParticipantsModal"
             :event="event"
             @onClose="showParticipantsModal = false"
+        />
+        <ReportModal
+            v-if="event"
+            :show="showReportModal"
+            :event="event"
+            :countdownStatus="countdownStatus"
+            @onClose="showReportModal = false"
         />
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
@@ -594,14 +610,15 @@ export default defineComponent({
                                     >
 
                                     <template v-slot:content>
-                                        Time left to make a bet or provide liquidity
+                                        Time left to make a bet or provide
+                                        liquidity
                                     </template>
                                 </Tooltip>
 
                                 <Tooltip
                                     v-else-if="
                                         countdownStatus == 'Finished' &&
-                                            event.status == 'NEW'
+                                        event.status == 'NEW'
                                     "
                                     position="bottom"
                                     side="left"
@@ -619,7 +636,7 @@ export default defineComponent({
                                 <Tooltip
                                     v-else-if="
                                         countdownStatus == 'Finished' &&
-                                            event.status == 'STARTED'
+                                        event.status == 'STARTED'
                                     "
                                     position="bottom"
                                     side="left"
@@ -629,14 +646,15 @@ export default defineComponent({
                                     >
 
                                     <template v-slot:content>
-                                        Start price is fixed, waiting for event completion
+                                        Start price is fixed, waiting for event
+                                        completion
                                     </template>
                                 </Tooltip>
 
                                 <Tooltip
                                     v-else-if="
                                         countdownStatus == 'Finished' &&
-                                            event.status == 'FINISHED'
+                                        event.status == 'FINISHED'
                                     "
                                     position="bottom"
                                     side="left"
@@ -644,8 +662,7 @@ export default defineComponent({
                                     <Label icon="check">Finished</Label>
 
                                     <template v-slot:content>
-                                        Event is over, winners are
-                                        determined
+                                        Event is over, winners are determined
                                     </template>
                                 </Tooltip>
 
@@ -720,8 +737,8 @@ export default defineComponent({
                             <Button
                                 v-if="
                                     event.status == 'FINISHED' &&
-                                        won &&
-                                        canWithdraw
+                                    won &&
+                                    canWithdraw
                                 "
                                 @click="handleWithdraw"
                                 type="success"
@@ -742,7 +759,7 @@ export default defineComponent({
                             <template
                                 v-else-if="
                                     event.status == 'NEW' &&
-                                        countdownStatus == 'In progress'
+                                    countdownStatus == 'In progress'
                                 "
                             >
                                 <Button
@@ -986,7 +1003,10 @@ export default defineComponent({
                 />
 
                 <div :class="$style.additional_buttons">
-                    <Button type="tertiary" size="small" disabled
+                    <Button
+                        @click="showReportModal = true"
+                        type="tertiary"
+                        size="small"
                         ><Icon name="flag" size="16" />Report this event</Button
                     >
                     <router-link to="/docs/how-to-bet">

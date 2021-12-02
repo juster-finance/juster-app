@@ -23,7 +23,7 @@ export default {
 
     font-size: 12px;
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1;
     white-space: nowrap;
 
     padding: 0 8px;

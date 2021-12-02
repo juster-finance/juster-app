@@ -10,7 +10,6 @@ import {
     computed,
 } from "vue"
 import { DateTime } from "luxon"
-import { useRouter } from "vue-router"
 import { gql } from "@/services/tools"
 
 /**
