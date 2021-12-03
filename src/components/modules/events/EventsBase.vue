@@ -10,6 +10,7 @@ import {
 } from "vue"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
+import { gql } from "@/services/tools"
 
 /**
  * API
@@ -219,6 +220,67 @@ export default defineComponent({
             isAllEventsLoaded.value = true
 
             marketStore.events = cloneDeep(allNewEvents)
+
+            // subscribe to new events
+            gql.subscription({
+                event: [
+                    {
+                        where: { status: { _eq: "NEW" } },
+                    },
+                    {
+                        status: true,
+                        betsCloseTime: true,
+                        currencyPair: {
+                            symbol: true,
+                            id: true,
+                        },
+                        poolAboveEq: true,
+                        poolBelow: true,
+                        totalBetsAmount: true,
+                        totalLiquidityProvided: true,
+                        totalLiquidityShares: true,
+                        totalValueLocked: true,
+                        liquidityPercent: true,
+                        measurePeriod: true,
+                        closedOracleTime: true,
+                        createdTime: true,
+                        startRate: true,
+                        closedRate: true,
+                        winnerBets: true,
+                        targetDynamics: true,
+                        bets: {
+                            id: true,
+                            side: true,
+                            reward: true,
+                            amount: true,
+                            createdTime: true,
+                            userId: true,
+                        },
+                        deposits: {
+                            amountAboveEq: true,
+                            amountBelow: true,
+                            eventId: true,
+                            id: true,
+                            userId: true,
+                            createdTime: true,
+                            shares: true,
+                        },
+                    },
+                ],
+            }).subscribe({
+                next: (data) => {
+                    const { event } = data
+
+                    /** skip initial data */
+                    if (event.length > 1) return
+
+                    console.log(event[0])
+                    console.log(marketStore.events)
+                    marketStore.events.push(event[0])
+                    console.log(marketStore.events)
+                },
+                error: console.error,
+            })
         })
         onBeforeUnmount(() => {
             marketStore.events = []
