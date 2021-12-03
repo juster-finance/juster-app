@@ -14,14 +14,14 @@ export default defineComponent({
         <Icon
             :name="
                 (type == 'warning' && 'help') ||
-                    (type == 'success' && 'checkcircle') ||
-                    (type == 'error' && 'close') ||
-                    (type == 'info' && 'help')
+                (type == 'success' && 'checkcircle') ||
+                (type == 'error' && 'close') ||
+                (type == 'info' && 'help')
             "
             size="14"
         />
 
-        <span><slot /></span>
+        <span><slot /> </span>
     </div>
 </template>
 

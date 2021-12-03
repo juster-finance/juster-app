@@ -86,6 +86,8 @@ export default defineComponent({
 
         const marketStore = useMarketStore()
 
+        const isAllEventsLoaded = ref(false)
+
         /** Filters */
         let filters = ref(cloneDeep(defaultFilters))
 
@@ -98,22 +100,22 @@ export default defineComponent({
             max: 0,
         })
 
-        const handleNewMin = value => {
+        const handleNewMin = (value) => {
             liquidityFilters.min = value
         }
 
-        const handleNewMax = value => {
+        const handleNewMax = (value) => {
             liquidityFilters.max = value
         }
 
-        const handleSelectPeriod = target => {
-            filters.value.periods.forEach(period => {
+        const handleSelectPeriod = (target) => {
+            filters.value.periods.forEach((period) => {
                 if (target.name == period.name) period.active = !period.active
             })
         }
 
-        const handleSelectStatus = target => {
-            filters.value.statuses.forEach(status => {
+        const handleSelectStatus = (target) => {
+            filters.value.statuses.forEach((status) => {
                 if (target.name == status.name) status.active = !status.active
             })
         }
@@ -127,7 +129,7 @@ export default defineComponent({
 
         /** Events */
         const availableEvents = computed(() => {
-            return marketStore.events.filter(event =>
+            return marketStore.events.filter((event) =>
                 ["NEW", "STARTED"].includes(event.status),
             )
         })
@@ -146,45 +148,47 @@ export default defineComponent({
                     filters.value.symbols.eth && "ETH-USD",
                 ].filter(Boolean)
 
-                events = events.filter(event =>
+                events = events.filter((event) =>
                     symbols.includes(event.currencyPair.symbol),
                 )
             }
 
             /** Filter by Liquidity */
             events = events.filter(
-                event => event.totalLiquidityProvided >= liquidityFilters.min,
+                (event) => event.totalLiquidityProvided >= liquidityFilters.min,
             )
             events = events.filter(
-                event => event.totalLiquidityProvided <= liquidityFilters.max,
+                (event) => event.totalLiquidityProvided <= liquidityFilters.max,
             )
 
             /** Filter by Status */
             if (filters.value.statuses.length) {
                 const statuses = filters.value.statuses
-                    .filter(status => status.active)
-                    .map(status => {
+                    .filter((status) => status.active)
+                    .map((status) => {
                         if (status.name == "New") return "NEW"
                         if (status.name == "Active") return "STARTED"
                         if (status.name == "Finished") return "FINISHED"
                     })
 
-                events = events.filter(event => statuses.includes(event.status))
+                events = events.filter((event) =>
+                    statuses.includes(event.status),
+                )
             }
 
             /** Filter by Period */
             if (filters.value.periods.length) {
                 const periods = filters.value.periods
-                    .filter(period => period.active)
+                    .filter((period) => period.active)
                     .map(
-                        period =>
+                        (period) =>
                             (period.name == "1h" && 3600) ||
                             (period.name == "6h" && 21600) ||
                             (period.name == "24h" && 86400),
                     )
 
                 if (periods.length) {
-                    events = events.filter(event =>
+                    events = events.filter((event) =>
                         periods.includes(event.measurePeriod),
                     )
                 }
@@ -197,8 +201,10 @@ export default defineComponent({
             () => marketStore.events,
             () => {
                 const allLiquidity = cloneDeep(marketStore.events)
-                    .filter(event => ["NEW", "STARTED"].includes(event.status))
-                    .map(event => event.totalLiquidityProvided)
+                    .filter((event) =>
+                        ["NEW", "STARTED"].includes(event.status),
+                    )
+                    .map((event) => event.totalLiquidityProvided)
 
                 liquidityRange.min = Math.min(...allLiquidity)
                 liquidityRange.max = Math.max(...allLiquidity)
@@ -209,6 +215,8 @@ export default defineComponent({
 
         onMounted(async () => {
             let allNewEvents = await fetchAllEvents()
+
+            isAllEventsLoaded.value = true
 
             marketStore.events = cloneDeep(allNewEvents)
         })
@@ -225,6 +233,7 @@ export default defineComponent({
         return {
             breadcrumbs,
             marketStore,
+            isAllEventsLoaded,
             filteredEvents,
             availableEvents,
             filters,
@@ -280,7 +289,14 @@ export default defineComponent({
             <div :class="$style.events_base">
                 <Banner
                     type="info"
-                    v-if="filteredEvents.length !== availableEvents.length"
+                    v-if="filteredEvents.length == 0 && isAllEventsLoaded"
+                    >All
+                    {{ availableEvents.length - filteredEvents.length }} events
+                    hidden due to filters. Reset filters to see some</Banner
+                >
+                <Banner
+                    type="info"
+                    v-else-if="filteredEvents.length !== availableEvents.length"
                     >{{ availableEvents.length - filteredEvents.length }} events
                     hidden due to filters</Banner
                 >
@@ -294,7 +310,7 @@ export default defineComponent({
                         />
                     </div>
 
-                    <div v-else :class="$style.events">
+                    <div v-else-if="!isAllEventsLoaded" :class="$style.events">
                         <EventCardLoading />
                         <EventCardLoading />
                         <EventCardLoading />
