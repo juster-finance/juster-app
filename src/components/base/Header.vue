@@ -289,6 +289,12 @@ export default defineComponent({
 
                             <DropdownDivider />
 
+                            <router-link to="/releases">
+                                <DropdownItem>
+                                    <Icon name="merge" size="16" />
+                                    Releases
+                                </DropdownItem>
+                            </router-link>
                             <a
                                 href="https://fishy-cheque-5ae.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
                                 target="_blank"

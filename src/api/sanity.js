@@ -34,3 +34,18 @@ export const fetchSections = async () => {
         return {}
     }
 }
+
+export const fetchReleases = async () => {
+    try {
+        const {
+            data: { result: releases },
+        } = await axios.get(
+            `https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'release']`,
+        )
+
+        return releases
+    } catch (error) {
+        console.error(error)
+        return {}
+    }
+}
