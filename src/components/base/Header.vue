@@ -35,6 +35,11 @@ import ConnectingModal from "@/components/local/modals/ConnectingModal"
 import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
 
+/**
+ * API
+ */
+import { fetchUserPositionsForWithdrawal } from "@/api/positions"
+
 export default defineComponent({
     setup() {
         const notificationsStore = useNotificationsStore()
@@ -61,7 +66,7 @@ export default defineComponent({
             },
         ])
 
-        const isActive = url => {
+        const isActive = (url) => {
             if (!route.name) return
             return route.path.startsWith(url)
         }
@@ -69,13 +74,23 @@ export default defineComponent({
         const address = ref("")
         const handleLogin = async () => {
             await juster.sync()
-            juster.getPkh().then(pkh => {
+            juster.getPkh().then(async (pkh) => {
                 if (!localStorage["connectingModal"]) {
                     showConnectingModal.value = true
                     address.value = pkh
                 } else {
                     accountStore.pkh = pkh
                     accountStore.updateBalance()
+
+                    // todo: sep. func
+                    /** check for won positions */
+                    const wonPositions = await fetchUserPositionsForWithdrawal({
+                        address: accountStore.pkh,
+                    })
+
+                    if (wonPositions.length) {
+                        accountStore.wonPositions = wonPositions
+                    }
                 }
             })
         }
@@ -233,14 +248,12 @@ export default defineComponent({
                             <div :class="$style.avatar">
                                 <img
                                     v-if="pkh"
-                                    :src="
-                                        `https://services.tzkt.io/v1/avatars/${pkh}`
-                                    "
+                                    :src="`https://services.tzkt.io/v1/avatars/${pkh}`"
                                 />
                                 <div
                                     v-if="
                                         accountStore.wonPositions.length &&
-                                            accountStore.pkh
+                                        accountStore.pkh
                                     "
                                     :class="$style.indicator"
                                 />
