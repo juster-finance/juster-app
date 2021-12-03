@@ -97,7 +97,7 @@ export default defineComponent({
             },
         )
 
-        const handleBlur = target => {
+        const handleBlur = (target) => {
             if (target == "min") {
                 if (inputs.min < liquidityRange.value.min) {
                     inputs.min = liquidityRange.value.min
@@ -119,7 +119,7 @@ export default defineComponent({
             }
         }
 
-        const handleKeydown = e => {
+        const handleKeydown = (e) => {
             if (e.key === "-") e.preventDefault()
         }
 
@@ -151,7 +151,8 @@ export default defineComponent({
                         XTZ-USD
                         <span>{{
                             events.filter(
-                                event => event.currencyPair.symbol == "XTZ-USD",
+                                (event) =>
+                                    event.currencyPair.symbol == "XTZ-USD",
                             ).length
                         }}</span>
                     </div></Checkbox
@@ -161,7 +162,8 @@ export default defineComponent({
                         BTC-USD
                         <span>{{
                             events.filter(
-                                event => event.currencyPair.symbol == "BTC-USD",
+                                (event) =>
+                                    event.currencyPair.symbol == "BTC-USD",
                             ).length
                         }}</span>
                     </div></Checkbox
@@ -171,7 +173,8 @@ export default defineComponent({
                         ETH-USD
                         <span>{{
                             events.filter(
-                                event => event.currencyPair.symbol == "ETH-USD",
+                                (event) =>
+                                    event.currencyPair.symbol == "ETH-USD",
                             ).length
                         }}</span>
                     </div></Checkbox
@@ -278,9 +281,7 @@ export default defineComponent({
             <div :class="$style.subtitle">Target dynamics</div>
 
             <div :class="$style.badges">
-                <div :class="$style.badge">
-                    0%
-                </div>
+                <div :class="$style.badge">0%</div>
                 <div :class="[$style.badge, $style.green]">
                     <Icon name="higher" size="14" />1%
                 </div>
@@ -290,20 +291,15 @@ export default defineComponent({
             </div>
         </div>
 
-        <!-- <div :class="$style.hint">
-            Filters are saved for this device. You can customize this behavior
-            in the settings.
-        </div> -->
-
         <div :class="$style.divider" />
 
         <div :class="$style.actions">
             <Button @click="$emit('onReset')" type="tertiary" size="small"
                 >Reset</Button
             >
-            <Button type="tertiary" size="small" disabled
+            <!-- <Button type="tertiary" size="small" disabled
                 ><Icon name="collection" size="16" />Recent filters</Button
-            >
+            > -->
         </div>
     </div>
 </template>
