@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onMounted, reactive, ref } from "vue"
+import { computed, defineComponent, onMounted, reactive, ref } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
 
@@ -36,6 +36,15 @@ export default defineComponent({
         const accountStore = useAccountStore()
 
         const withdrawals = ref([])
+
+        const currentPage = ref(1)
+        const paginatedWithdrawals = computed(() =>
+            withdrawals.value.slice(
+                (currentPage.value - 1) * 5,
+                currentPage.value * 5,
+            ),
+        )
+
         const positionsForWithdrawal = ref([])
 
         const statistics = reactive({
@@ -108,7 +117,9 @@ export default defineComponent({
 
         return {
             withdrawals,
+            paginatedWithdrawals,
             positionsForWithdrawal,
+            currentPage,
             statistics,
             numberWithSymbol,
         }
@@ -211,7 +222,7 @@ export default defineComponent({
                     </tr>
 
                     <tr
-                        v-for="withdraw in withdrawals.slice(0, 5)"
+                        v-for="withdraw in paginatedWithdrawals"
                         :key="withdraw.id"
                     >
                         <td>
@@ -264,10 +275,19 @@ export default defineComponent({
                 <div :class="$style.bottom">
                     <span>{{ withdrawals.length }} withdrawals</span>
 
-                    <span v-if="withdrawals.length"
-                        >Last 5 withdrawals. Pagination will be available
-                        soon</span
-                    >
+                    <div v-if="withdrawals.length" :class="$style.pagination">
+                        <div
+                            v-for="page in Math.round(withdrawals.length / 5)"
+                            :key="page"
+                            @click="currentPage = page"
+                            :class="[
+                                $style.page,
+                                currentPage == page && $style.current,
+                            ]"
+                        >
+                            {{ page }}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -401,6 +421,7 @@ export default defineComponent({
 .bottom {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 
     font-size: 12px;
     line-height: 1;
@@ -491,5 +512,36 @@ export default defineComponent({
     line-height: 1.6;
     color: var(--text-tertiary);
     fill: var(--text-tertiary);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    font-size: 12px;
+
+    width: 24px;
+    height: 20px;
+    border-radius: 5px;
+    background: var(--opacity-05);
+
+    transition: all 0.2s ease;
+}
+
+.page.current {
+    color: var(--text-primary);
+    background: var(--opacity-10);
+}
+
+.page:hover {
+    background: var(--opacity-10);
 }
 </style>
