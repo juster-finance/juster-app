@@ -178,8 +178,8 @@ export default defineComponent({
 
         const participantsAvatars = computed(() => {
             let avatars = [
-                ...event.value.bets.map(bet => bet.userId),
-                ...event.value.deposits.map(deposit => deposit.userId),
+                ...event.value.bets.map((bet) => bet.userId),
+                ...event.value.deposits.map((deposit) => deposit.userId),
             ]
 
             /** remove duplicates */
@@ -192,10 +192,10 @@ export default defineComponent({
             let tvl = 0
 
             tvl += event.value.deposits
-                .filter(deposit => deposit.userId == accountStore.pkh)
+                .filter((deposit) => deposit.userId == accountStore.pkh)
                 .reduce((a, { amountBelow }) => a + amountBelow, 0)
             tvl += event.value.bets
-                .filter(bet => bet.userId == accountStore.pkh)
+                .filter((bet) => bet.userId == accountStore.pkh)
                 .reduce((a, { amount }) => a + amount, 0)
 
             return tvl
@@ -203,27 +203,27 @@ export default defineComponent({
 
         const isUserWon = computed(() => {
             return accountStore.wonPositions.some(
-                position => position.event.id == event.value.id,
+                (position) => position.event.id == event.value.id,
             )
         })
         const wonPosition = computed(() => {
             return accountStore.wonPositions.find(
-                position => position.event.id == event.value.id,
+                (position) => position.event.id == event.value.id,
             )
         })
 
         /** Join to the event & Liquidity */
-        const handleJoin = event => {
+        const handleJoin = (event) => {
             /** disable Bet / Liquidity right after betsCloseTime */
-            if (startStatus == "Finished") return
+            if (startStatus.value == "Finished") return
 
             event.stopImmediatePropagation()
 
             showBetModal.value = true
         }
-        const handleLiquidity = event => {
+        const handleLiquidity = (event) => {
             /** disable Bet / Liquidity right after betsCloseTime */
-            if (startStatus == "Finished") return
+            if (startStatus.value == "Finished") return
 
             event.stopImmediatePropagation()
 
@@ -231,10 +231,10 @@ export default defineComponent({
         }
 
         /** Withdraw */
-        const handleWithdraw = e => {
+        const handleWithdraw = (e) => {
             juster
                 .withdraw(event.value.id, accountStore.pkh)
-                .then(op => {
+                .then((op) => {
                     notificationsStore.create({
                         notification: {
                             type: "success",
@@ -245,10 +245,10 @@ export default defineComponent({
                         },
                     })
                 })
-                .catch(err => console.log(err))
+                .catch((err) => console.log(err))
         }
 
-        const copy = target => {
+        const copy = (target) => {
             if (target == "id") {
                 notificationsStore.create({
                     notification: {
@@ -280,7 +280,7 @@ export default defineComponent({
             top: 0,
             left: 0,
         })
-        const contextMenuHandler = e => {
+        const contextMenuHandler = (e) => {
             e.preventDefault()
 
             contextMenuStyles.top = `${e.clientY}px`
@@ -341,7 +341,7 @@ export default defineComponent({
                     ],
                 })
                 .subscribe({
-                    next: data => {
+                    next: (data) => {
                         const { event: newEvent } = data
 
                         marketStore.updEvent(newEvent[0])
@@ -480,9 +480,7 @@ export default defineComponent({
                                 3,
                             )"
                             :key="participantAvatar"
-                            :src="
-                                `https://services.tzkt.io/v1/avatars/${participantAvatar}`
-                            "
+                            :src="`https://services.tzkt.io/v1/avatars/${participantAvatar}`"
                             :class="$style.image"
                         />
                     </div>
@@ -506,7 +504,7 @@ export default defineComponent({
 
                 {{
                     supportedSymbols[symbol] &&
-                        supportedSymbols[symbol].description
+                    supportedSymbols[symbol].description
                 }}
                 <span>price event</span>
             </div>
@@ -606,9 +604,7 @@ export default defineComponent({
                 <Tooltip position="bottom" side="right">
                     <Badge v-if="userTVL" color="gray" :class="$style.badge">
                         <img
-                            :src="
-                                `https://services.tzkt.io/v1/avatars/${accountStore.pkh}`
-                            "
+                            :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
                             :class="$style.user_avatar"
                         />
 
@@ -645,9 +641,7 @@ export default defineComponent({
                     :class="[$style.hint, $style.gray]"
                 >
                     <Icon name="time" size="14" />
-                    <div>
-                        Starting soon
-                    </div>
+                    <div>Starting soon</div>
                 </div>
 
                 <div
@@ -697,11 +691,10 @@ export default defineComponent({
                     <Icon
                         :name="
                             (liquidityLevel == 'Low' && 'liquidity_low') ||
-                                (liquidityLevel == 'Medium' &&
-                                    'liquidity_medium') ||
-                                (liquidityLevel == 'High' &&
-                                    'liquidity_high') ||
-                                (liquidityLevel == 'Ultra' && 'liquidity_ultra')
+                            (liquidityLevel == 'Medium' &&
+                                'liquidity_medium') ||
+                            (liquidityLevel == 'High' && 'liquidity_high') ||
+                            (liquidityLevel == 'Ultra' && 'liquidity_ultra')
                         "
                         size="14"
                     />

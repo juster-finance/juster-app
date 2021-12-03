@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onBeforeMount, onMounted, ref, watch } from "vue"
+import { defineComponent, onBeforeMount, ref } from "vue"
 
 /**
  * Base
@@ -44,7 +44,7 @@ export default defineComponent({
         const accountStore = useAccountStore()
 
         onBeforeMount(() => {
-            juster._provider.client.getActiveAccount().then(async account => {
+            juster._provider.client.getActiveAccount().then(async (account) => {
                 if (!account) return
 
                 accountStore.setPkh(account.address)

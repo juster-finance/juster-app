@@ -71,7 +71,7 @@ export default defineComponent({
             context.emit("onClose")
         }
 
-        const onKeydown = event => {
+        const onKeydown = (event) => {
             if (event.key == "Escape" && show.value) handleClose()
         }
 

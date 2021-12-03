@@ -60,9 +60,11 @@ export default defineComponent({
         const eventStartTime = computed(() =>
             new Date(event.value?.betsCloseTime).getTime(),
         )
-        const { countdownText, status: countdownStatus, stop } = useCountdown(
-            eventStartTime,
-        )
+        const {
+            countdownText,
+            status: countdownStatus,
+            stop,
+        } = useCountdown(eventStartTime)
 
         /** User inputs */
         const side = ref(null) /** pre-selected side */
@@ -141,7 +143,7 @@ export default defineComponent({
             }
         })
 
-        const selectTab = tab => {
+        const selectTab = (tab) => {
             side.value = tab
         }
 
@@ -198,7 +200,7 @@ export default defineComponent({
                     BigNumber(amount.value),
                     BigNumber(minReward.value),
                 )
-                .then(op => {
+                .then((op) => {
                     sendingBet.value = false
 
                     /** slow notification to get attention */
@@ -223,7 +225,7 @@ export default defineComponent({
                         reward: minReward.value,
                     })
                 })
-                .catch(err => {
+                .catch((err) => {
                     sendingBet.value = false
                 })
         }
@@ -231,7 +233,7 @@ export default defineComponent({
         /** Login */
         const handleLogin = async () => {
             await juster.sync()
-            juster.getPkh().then(pkh => {
+            juster.getPkh().then((pkh) => {
                 accountStore.setPkh(pkh)
             })
 
@@ -342,7 +344,7 @@ export default defineComponent({
                     <span
                         @click="amount.value = Math.floor(accountStore.balance)"
                         @dblclick="amount.value = accountStore.balance / 2"
-                        >{{ accountStore.balance.toFixed(2) }}
+                        >{{ accountStore.balance }}
                     </span>
 
                     XTZ
@@ -377,8 +379,8 @@ export default defineComponent({
                 :loading="sendingBet"
                 :disabled="
                     !amount.value ||
-                        countdownStatus !== 'In progress' ||
-                        amount.value > accountStore.balance
+                    countdownStatus !== 'In progress' ||
+                    amount.value > accountStore.balance
                 "
             >
                 <Spin v-if="sendingBet" size="16" />

@@ -50,9 +50,11 @@ export default defineComponent({
         const eventStartTime = computed(() =>
             new Date(event.value?.betsCloseTime).getTime(),
         )
-        const { countdownText, status: countdownStatus, stop } = useCountdown(
-            eventStartTime,
-        )
+        const {
+            countdownText,
+            status: countdownStatus,
+            stop,
+        } = useCountdown(eventStartTime)
 
         /** User inputs */
         const amount = reactive({ value: 0, error: "" })
@@ -122,7 +124,7 @@ export default defineComponent({
                     new BigNumber(slippage.value / 100),
                     new BigNumber(amount.value),
                 )
-                .then(op => {
+                .then((op) => {
                     sendingBet.value = false
 
                     /** slow notification to get attention */
@@ -140,13 +142,13 @@ export default defineComponent({
 
                     context.emit("onClose")
                 })
-                .catch(err => console.log(err))
+                .catch((err) => console.log(err))
         }
 
         /** Login */
         const handleLogin = async () => {
             await juster.sync()
-            juster.getPkh().then(pkh => {
+            juster.getPkh().then((pkh) => {
                 accountStore.setPkh(pkh)
             })
 
@@ -220,7 +222,7 @@ export default defineComponent({
                 <span
                     @click="amount.value = Math.floor(accountStore.balance)"
                     @dblclick="amount.value = accountStore.balance / 2"
-                    >{{ accountStore.balance.toFixed(2) }}
+                    >{{ accountStore.balance }}
                 </span>
 
                 XTZ
@@ -261,8 +263,8 @@ export default defineComponent({
                 :loading="sendingBet"
                 :disabled="
                     !amount.value ||
-                        countdownStatus !== 'In progress' ||
-                        accountStore.balance < amount.value
+                    countdownStatus !== 'In progress' ||
+                    accountStore.balance < amount.value
                 "
             >
                 <Spin v-if="sendingBet" size="16" />
