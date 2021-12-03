@@ -225,9 +225,14 @@ export default defineComponent({
             gql.subscription({
                 event: [
                     {
-                        where: { status: { _eq: "NEW" } },
+                        where: {
+                            status: { _eq: "NEW" },
+                        },
+                        order_by: { id: "desc" },
+                        limit: 1,
                     },
                     {
+                        id: true,
                         status: true,
                         betsCloseTime: true,
                         currencyPair: {
@@ -269,15 +274,17 @@ export default defineComponent({
                 ],
             }).subscribe({
                 next: (data) => {
-                    const { event } = data
+                    const { event: newEvent } = data
 
-                    /** skip initial data */
-                    if (event.length > 1) return
+                    if (
+                        marketStore.events.some(
+                            (event) => newEvent[0].id == event.id,
+                        )
+                    ) {
+                        return
+                    }
 
-                    console.log(event[0])
-                    console.log(marketStore.events)
-                    marketStore.events.push(event[0])
-                    console.log(marketStore.events)
+                    marketStore.events.push(newEvent[0])
                 },
                 error: console.error,
             })

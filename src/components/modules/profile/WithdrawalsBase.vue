@@ -1,6 +1,7 @@
 <script>
-import { defineComponent, onMounted, ref } from "vue"
+import { defineComponent, onMounted, reactive, ref } from "vue"
 import { useMeta } from "vue-meta"
+import { DateTime } from "luxon"
 
 /**
  * UI
@@ -37,16 +38,67 @@ export default defineComponent({
         const withdrawals = ref([])
         const positionsForWithdrawal = ref([])
 
+        const statistics = reactive({
+            week: {
+                value: 0,
+                avg: 0,
+            },
+            month: {
+                value: 0,
+                avg: 0,
+            },
+            all: {
+                value: 0,
+                avg: 0,
+            },
+        })
+
         onMounted(async () => {
             withdrawals.value = await fetchUserWithdrawals({
                 address: accountStore.pkh,
             })
 
-            positionsForWithdrawal.value = await fetchUserPositionsForWithdrawal(
-                {
+            positionsForWithdrawal.value =
+                await fetchUserPositionsForWithdrawal({
                     address: accountStore.pkh,
-                },
+                })
+
+            /**
+             * Statistics:
+             * @Week
+             * @Month
+             * @AllTime
+             */
+            const withdrawalsLastWeek = withdrawals.value.filter(
+                (withdraw) =>
+                    DateTime.fromISO(withdraw.event.closedOracleTime).ts >
+                    DateTime.now().minus({ days: 7 }).ts,
             )
+            const withdrawalsLastMonth = withdrawals.value.filter(
+                (withdraw) =>
+                    DateTime.fromISO(withdraw.event.closedOracleTime).ts >
+                    DateTime.now().minus({ days: 30 }).ts,
+            )
+
+            statistics.week.value = withdrawalsLastWeek.reduce(
+                (acc, curr) => acc + curr.amount,
+                0,
+            )
+            statistics.week.avg =
+                statistics.week.value / withdrawalsLastWeek.length
+
+            statistics.month.value = withdrawalsLastMonth.reduce(
+                (acc, curr) => acc + curr.amount,
+                0,
+            )
+            statistics.month.avg =
+                statistics.month.value / withdrawalsLastMonth.length
+
+            statistics.all.value = withdrawals.value.reduce(
+                (acc, curr) => acc + curr.amount,
+                0,
+            )
+            statistics.all.avg = statistics.all.value / withdrawals.value.length
         })
 
         /** Meta */
@@ -54,7 +106,12 @@ export default defineComponent({
             title: "Withdrawals",
         })
 
-        return { withdrawals, positionsForWithdrawal, numberWithSymbol }
+        return {
+            withdrawals,
+            positionsForWithdrawal,
+            statistics,
+            numberWithSymbol,
+        }
     },
 
     components: { Button, EventCard },
@@ -68,6 +125,57 @@ export default defineComponent({
                 >{{ content }} • Juster</template
             >
         </metainfo>
+
+        <div :class="$style.block">
+            <h2>Withdraw stats</h2>
+            <div :class="$style.description">
+                Your withdraw statistics for this month & all time
+            </div>
+
+            <div :class="$style.stats">
+                <div :class="$style.stat">
+                    <div :class="$style.stat_name">Last week</div>
+                    <div :class="$style.stat_value">
+                        {{ statistics.week.value.toFixed(0) }} XTZ
+                    </div>
+                    <div :class="$style.stat_avg">
+                        Avg
+                        <span>{{ statistics.week.avg.toFixed(0) }} XTZ</span>
+                        per event
+                    </div>
+                </div>
+                <div :class="$style.stat">
+                    <div :class="$style.stat_name">Last month</div>
+                    <div :class="$style.stat_value">
+                        {{ statistics.month.value.toFixed(0) }} XTZ
+                    </div>
+                    <div :class="$style.stat_avg">
+                        Avg
+                        <span>{{ statistics.month.avg.toFixed(0) }} XTZ</span>
+                        per event
+                    </div>
+                </div>
+                <div :class="$style.stat">
+                    <div :class="$style.stat_name">All time</div>
+                    <div :class="$style.stat_value">
+                        {{ statistics.all.value.toFixed(0) }} XTZ
+                    </div>
+                    <div :class="$style.stat_avg">
+                        Avg
+                        <span>{{ statistics.all.avg.toFixed(0) }} XTZ</span> per
+                        event
+                    </div>
+                </div>
+            </div>
+
+            <div :class="$style.hint">
+                <Icon name="help" size="14" /><span
+                    >Last week & Last month</span
+                >
+                - here we mean a week from the current day minus 7 days / 30
+                days
+            </div>
+        </div>
 
         <div :class="$style.block">
             <h2>Outstanding balances</h2>
@@ -91,9 +199,7 @@ export default defineComponent({
 
         <div :class="$style.block">
             <h2>Withdrawal history</h2>
-            <div :class="$style.description">
-                Claimed profits
-            </div>
+            <div :class="$style.description">Claimed profits</div>
 
             <div :class="$style.withdrawboard">
                 <table v-if="withdrawals.length">
@@ -164,29 +270,24 @@ export default defineComponent({
                     >
                 </div>
             </div>
-        </div>
 
-        <div :class="$style.hint_block">
-            <Icon name="help" size="20" />
-
-            <div>
-                <div :class="$style.hint">
-                    You can withdraw your funds manually, however if not done
-                    within 24 hours, Juster will do that for you and charge a
-                    small fee.
-                </div>
-
-                <Button type="tertiary" size="small"
-                    ><Icon name="book" size="14" />Read more in the docs</Button
-                >
+            <div :class="$style.hint">
+                <Icon name="help" size="14" />
+                You can withdraw your funds manually, however if not done within
+                24 hours, Juster will do that for you and charge a small fee.
             </div>
         </div>
     </div>
 </template>
 
 <style module>
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
 .block {
-    margin-bottom: 40px;
 }
 
 .block h2 {
@@ -201,6 +302,50 @@ export default defineComponent({
 
     margin-top: 8px;
     margin-bottom: 24px;
+}
+
+.stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.stat {
+    flex: 1;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+}
+
+.stat_name {
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--text-tertiary);
+}
+
+.stat_value {
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--text-primary);
+
+    margin-top: 16px;
+    margin-bottom: 10px;
+}
+
+.stat_avg {
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+}
+
+.stat_avg span {
+    color: var(--text-secondary);
 }
 
 .withdrawboard {
@@ -311,12 +456,22 @@ export default defineComponent({
 }
 
 .hint {
-    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 12px;
+    font-weight: 500;
     line-height: 1.6;
     color: var(--text-tertiary);
-    max-width: 500px;
+    fill: var(--text-tertiary);
 
-    margin-bottom: 12px;
+    margin-top: 12px;
+}
+
+.hint span {
+    font-weight: 600;
+    color: var(--text-secondary);
 }
 
 .items {
