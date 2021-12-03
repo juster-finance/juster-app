@@ -152,6 +152,8 @@ export default defineComponent({
                 events = events.filter((event) =>
                     symbols.includes(event.currencyPair.symbol),
                 )
+            } else {
+                return []
             }
 
             /** Filter by Liquidity */
