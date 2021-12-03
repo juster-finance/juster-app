@@ -133,6 +133,8 @@ export default defineComponent({
                 accountStore.setPkh("")
                 router.push("/")
 
+                accountStore.wonPositions = []
+
                 notificationsStore.create({
                     notification: {
                         type: "success",

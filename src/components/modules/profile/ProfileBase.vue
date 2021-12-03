@@ -77,7 +77,7 @@ export default defineComponent({
             positions.value = await fetchAllUserPositions({
                 address: address.value,
             })
-            events.value = positions.value.map(position => position.event)
+            events.value = positions.value.map((position) => position.event)
         }
 
         onMounted(() => {
@@ -101,6 +101,8 @@ export default defineComponent({
                 await juster._provider.client.getActiveAccount()
                 accountStore.setPkh("")
                 router.push("/")
+
+                accountStore.wonPositions = []
 
                 notificationsStore.create({
                     notification: {
@@ -171,9 +173,7 @@ export default defineComponent({
                 <div :class="$style.avatar">
                     <Tooltip>
                         <img
-                            :src="
-                                `https://services.tzkt.io/v1/avatars/${address}`
-                            "
+                            :src="`https://services.tzkt.io/v1/avatars/${address}`"
                             :class="$style.image"
                         />
 
@@ -317,9 +317,7 @@ export default defineComponent({
                 />
             </div>
             <div v-else :class="$style.empty">
-                <div :class="$style.empty_title">
-                    You dont have submissions
-                </div>
+                <div :class="$style.empty_title">You dont have submissions</div>
                 <div :class="$style.hint">
                     Make bets on events to be displayed in your profile
                 </div>
