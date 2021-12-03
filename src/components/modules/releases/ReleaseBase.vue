@@ -40,7 +40,7 @@ export default defineComponent({
 
         const release = computed(() =>
             releasesStore.all.find(
-                release => release.slug.current == route.params.slug,
+                (release) => release.slug.current == route.params.slug,
             ),
         )
 
@@ -206,6 +206,8 @@ export default defineComponent({
 }
 
 .body ul {
+    padding-inline-start: 26px;
+
     margin-bottom: 24px;
 }
 
@@ -220,6 +222,9 @@ export default defineComponent({
 
 .body li strong {
     color: var(--text-primary);
+}
+
+.body li::marker {
 }
 
 .body hr {

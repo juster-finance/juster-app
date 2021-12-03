@@ -8,12 +8,24 @@ import Markdown from "markdown-it"
  */
 import Button from "@/components/ui/Button"
 
+/**
+ * Services
+ */
+import { toClipboard } from "@/services/utils/global"
+
+/**
+ * Store
+ */
+import { useNotificationsStore } from "@/store/notifications"
+
 export default defineComponent({
     name: "ReleaseCard",
     props: { release: Object },
 
     setup(props) {
         const { release } = toRefs(props)
+
+        const notificationsStore = useNotificationsStore()
 
         const md = ref(null)
         md.value = new Markdown({ html: true })
@@ -26,7 +38,26 @@ export default defineComponent({
                 )[0],
         )
 
-        return { content, DateTime }
+        const copyURL = () => {
+            toClipboard(
+                `https://app.juster.fi/releases/${release.value.slug.current}`,
+            )
+
+            notificationsStore.create({
+                notification: {
+                    type: "success",
+                    title: "Release URL copied to clipboard",
+                    description: "Use Ctrl+V to paste",
+                    autoDestroy: true,
+                },
+            })
+        }
+
+        const openGithub = () => {
+            window.open("https://google.com", "_blank").focus()
+        }
+
+        return { content, DateTime, copyURL, openGithub }
     },
 
     components: { Button },
@@ -34,7 +65,10 @@ export default defineComponent({
 </script>
 
 <template>
-    <div :class="$style.wrapper">
+    <router-link
+        :to="`/releases/${release.slug.current}`"
+        :class="$style.wrapper"
+    >
         <div :class="$style.when">
             {{ DateTime.fromISO(release._createdAt).toRelative() }}
         </div>
@@ -56,26 +90,29 @@ export default defineComponent({
                 <div :class="$style.buttons">
                     <router-link :to="`/releases/${release.slug.current}`">
                         <Button type="secondary" size="small">
-                            <Icon name="document" size="16" /> Read all changes
+                            <Icon name="document" size="16" />View all changes
                         </Button>
                     </router-link>
 
-                    <a
-                        href="https://github.com/juster-finance/juster-app"
-                        target="_blank"
+                    <Button
+                        @click.prevent="openGithub"
+                        type="secondary"
+                        size="small"
                     >
-                        <Button type="secondary" size="small">
-                            <Icon name="github" size="16" /> View on Github
-                        </Button>
-                    </a>
+                        <Icon name="github" size="16" /> View on Github
+                    </Button>
 
-                    <Button type="tertiary" size="small">
+                    <Button
+                        @click.prevent="copyURL"
+                        type="tertiary"
+                        size="small"
+                    >
                         <Icon name="back" size="16" /> Share
                     </Button>
                 </div>
             </div>
         </div>
-    </div>
+    </router-link>
 </template>
 
 <style module>
