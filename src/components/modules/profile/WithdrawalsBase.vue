@@ -253,7 +253,9 @@ export default defineComponent({
 
             <div v-if="positionsForWithdrawal.length" :class="$style.items">
                 <EventCard
-                    v-for="position in positionsForWithdrawal"
+                    v-for="position in positionsForWithdrawal.filter(
+                        (position) => position.value,
+                    )"
                     :key="position.event.id"
                     :event="position.event"
                     won
