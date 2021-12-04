@@ -212,19 +212,27 @@ export default defineComponent({
         })
 
         /** Join to the event & Liquidity */
-        const handleJoin = (event) => {
+        const handleJoin = (e) => {
             /** disable Bet / Liquidity right after betsCloseTime */
-            if (startStatus.value == "Finished") return
+            if (
+                startStatus.value == "Finished" ||
+                event.value.totalLiquidityProvided == 0
+            )
+                return
 
-            event.stopImmediatePropagation()
+            e.stopImmediatePropagation()
 
             showBetModal.value = true
         }
-        const handleLiquidity = (event) => {
+        const handleLiquidity = (e) => {
             /** disable Bet / Liquidity right after betsCloseTime */
-            if (startStatus.value == "Finished") return
+            if (
+                startStatus.value == "Finished" ||
+                event.value.totalLiquidityProvided == 0
+            )
+                return
 
-            event.stopImmediatePropagation()
+            e.stopImmediatePropagation()
 
             showLiquidityModal.value = true
         }
@@ -725,7 +733,8 @@ export default defineComponent({
                 v-if="!isUserWon"
                 :class="[
                     $style.buttons,
-                    startStatus == 'Finished' && $style.disabled,
+                    startStatus == 'Finished' ||
+                        (event.totalLiquidityProvided == 0 && $style.disabled),
                 ]"
             >
                 <div

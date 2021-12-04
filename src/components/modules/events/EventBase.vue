@@ -530,7 +530,7 @@ export default defineComponent({
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-        <div :class="$style.container">
+        <div v-if="event" :class="$style.container">
             <div :class="$style.base">
                 <Banner v-if="won" type="success" :class="$style.banner"
                     >You have chosen the correct outcome of the event. You can
