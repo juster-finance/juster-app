@@ -535,7 +535,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="green" :class="$style.main_badge"
-                        ><Icon name="bolt" size="12" />New</Badge
+                        ><Icon name="event_new" size="12" />New</Badge
                     >
 
                     <template v-slot:content>
@@ -551,7 +551,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="yellow" :class="$style.main_badge"
-                        ><Icon name="bolt" size="12" />Starting soon</Badge
+                        ><Icon name="event_new" size="12" />Starting soon</Badge
                     >
 
                     <template v-slot:content>
@@ -564,7 +564,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="yellow" :class="$style.main_badge"
-                        ><Icon name="time" size="12" />Active</Badge
+                        ><Icon name="event_active" size="12" />Active</Badge
                     >
                     <template v-slot:content>
                         Betting is closed. The end of the event is pending
@@ -576,7 +576,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="gray" :class="$style.main_badge"
-                        ><Icon name="checkcircle" size="12" />Finished</Badge
+                        ><Icon name="event_finished" size="12" />Finished</Badge
                     >
                     <template v-slot:content>
                         The event is closed, winning side determined
