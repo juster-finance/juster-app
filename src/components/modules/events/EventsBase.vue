@@ -47,15 +47,15 @@ const defaultFilters = {
     periods: [
         {
             name: "1h",
-            active: false,
+            active: true,
         },
         {
             name: "6h",
-            active: false,
+            active: true,
         },
         {
             name: "24h",
-            active: false,
+            active: true,
         },
     ],
 
@@ -197,6 +197,8 @@ export default defineComponent({
                     events = events.filter((event) =>
                         periods.includes(event.measurePeriod),
                     )
+                } else {
+                    events = []
                 }
             }
 
