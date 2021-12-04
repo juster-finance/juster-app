@@ -47,9 +47,11 @@ export default defineComponent({
         const eventStartTime = computed(() =>
             new Date(event.value?.betsCloseTime).getTime(),
         )
-        const { countdownText, status: countdownStatus, stop } = useCountdown(
-            eventStartTime,
-        )
+        const {
+            countdownText,
+            status: countdownStatus,
+            stop,
+        } = useCountdown(eventStartTime)
 
         watch(show, () => {
             if (!show.value) {
@@ -93,8 +95,15 @@ export default defineComponent({
             :class="$style.preview"
         />
 
-        <div :class="$style.subtitle">Users who participate</div>
+        <div :class="$style.subtitle">Creator</div>
+        <div :class="$style.users">
+            <UserCard
+                :user="{ userId: event.creatorId, creator: true }"
+                :class="$style.user"
+            />
+        </div>
 
+        <div :class="$style.subtitle">Users who participate</div>
         <div v-if="users.length" :class="$style.users">
             <UserCard
                 v-for="user in users"
@@ -103,6 +112,7 @@ export default defineComponent({
                 :class="$style.user"
             />
         </div>
+
         <div v-else :class="$style.empty">
             <Icon name="help" size="16" /> Wait for the initial liquidity to be
             provided
@@ -144,6 +154,8 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     gap: 8px;
+
+    margin-bottom: 16px;
 }
 
 .empty {
@@ -166,6 +178,5 @@ export default defineComponent({
     max-width: 330px;
 
     margin: 0 auto;
-    margin-top: 16px;
 }
 </style>
