@@ -7,6 +7,7 @@ import {
     watch,
     computed,
     onBeforeUnmount,
+    onUnmounted,
 } from "vue"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
@@ -86,6 +87,8 @@ export default defineComponent({
         ])
 
         const marketStore = useMarketStore()
+
+        const subscription = ref(null)
 
         const isAllEventsLoaded = ref(false)
 
@@ -214,6 +217,7 @@ export default defineComponent({
                 liquidityFilters.min = Math.min(...allLiquidity)
                 liquidityFilters.max = Math.max(...allLiquidity)
             },
+            { deep: true },
         )
 
         onMounted(async () => {
@@ -224,75 +228,88 @@ export default defineComponent({
             marketStore.events = cloneDeep(allNewEvents)
 
             // subscribe to new events
-            gql.subscription({
-                event: [
-                    {
-                        where: {
-                            status: { _eq: "NEW" },
+            subscription.value = await gql
+                .subscription({
+                    event: [
+                        {
+                            where: {
+                                status: { _eq: "NEW" },
+                            },
                         },
-                        order_by: { id: "desc" },
-                        limit: 1,
-                    },
-                    {
-                        id: true,
-                        status: true,
-                        betsCloseTime: true,
-                        currencyPair: {
-                            symbol: true,
+                        {
                             id: true,
-                        },
-                        poolAboveEq: true,
-                        poolBelow: true,
-                        totalBetsAmount: true,
-                        totalLiquidityProvided: true,
-                        totalLiquidityShares: true,
-                        totalValueLocked: true,
-                        liquidityPercent: true,
-                        measurePeriod: true,
-                        closedOracleTime: true,
-                        createdTime: true,
-                        startRate: true,
-                        closedRate: true,
-                        winnerBets: true,
-                        targetDynamics: true,
-                        bets: {
-                            id: true,
-                            side: true,
-                            reward: true,
-                            amount: true,
+                            status: true,
+                            betsCloseTime: true,
+                            currencyPair: {
+                                symbol: true,
+                                id: true,
+                            },
+                            poolAboveEq: true,
+                            poolBelow: true,
+                            totalBetsAmount: true,
+                            totalLiquidityProvided: true,
+                            totalLiquidityShares: true,
+                            totalValueLocked: true,
+                            liquidityPercent: true,
+                            measurePeriod: true,
+                            closedOracleTime: true,
                             createdTime: true,
-                            userId: true,
+                            startRate: true,
+                            closedRate: true,
+                            winnerBets: true,
+                            targetDynamics: true,
+                            bets: {
+                                id: true,
+                                side: true,
+                                reward: true,
+                                amount: true,
+                                createdTime: true,
+                                userId: true,
+                            },
+                            deposits: {
+                                amountAboveEq: true,
+                                amountBelow: true,
+                                eventId: true,
+                                id: true,
+                                userId: true,
+                                createdTime: true,
+                                shares: true,
+                            },
                         },
-                        deposits: {
-                            amountAboveEq: true,
-                            amountBelow: true,
-                            eventId: true,
-                            id: true,
-                            userId: true,
-                            createdTime: true,
-                            shares: true,
-                        },
+                    ],
+                })
+                .subscribe({
+                    next: (data) => {
+                        const { event: newEvents } = data
+
+                        newEvents.forEach((newEvent) => {
+                            if (
+                                marketStore.events.some(
+                                    (event) => newEvent.id == event.id,
+                                )
+                            ) {
+                                return
+                            }
+
+                            marketStore.events.push(newEvent)
+                        })
                     },
-                ],
-            }).subscribe({
-                next: (data) => {
-                    const { event: newEvent } = data
-
-                    if (
-                        marketStore.events.some(
-                            (event) => newEvent[0].id == event.id,
-                        )
-                    ) {
-                        return
-                    }
-
-                    marketStore.events.push(newEvent[0])
-                },
-                error: console.error,
-            })
+                    error: console.error,
+                })
         })
+
         onBeforeUnmount(() => {
             marketStore.events = []
+        })
+
+        onUnmounted(() => {
+            if (
+                subscription.value &&
+                subscription.value.unsubscribe &&
+                !subscription.value?.closed
+            ) {
+                subscription.value.unsubscribe()
+            }
         })
 
         /** Meta */

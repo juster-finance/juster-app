@@ -2,6 +2,7 @@
 import { computed, defineComponent, onMounted, reactive, ref } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
+import { cloneDeep } from "lodash"
 
 /**
  * UI
@@ -62,10 +63,60 @@ export default defineComponent({
             },
         })
 
+        const sort = reactive({
+            date: "desc",
+            amount: "default",
+        })
+        const sortBy = (target) => {
+            switch (target) {
+                case "date":
+                    if (sort.date == "desc") {
+                        sort.date = "asc"
+                        withdrawals.value.sort(
+                            (a, b) =>
+                                new Date(a.event.closedOracleTime).getTime() -
+                                new Date(b.event.closedOracleTime).getTime(),
+                        )
+                    } else if (sort.date == "asc") {
+                        sort.date = "desc"
+                        withdrawals.value.sort(
+                            (a, b) =>
+                                new Date(b.event.closedOracleTime).getTime() -
+                                new Date(a.event.closedOracleTime).getTime(),
+                        )
+                    }
+
+                    break
+
+                case "amount":
+                    if (sort.amount == "default") {
+                        sort.date = "default"
+
+                        sort.amount = "desc"
+                        withdrawals.value.sort((a, b) => b.amount - a.amount)
+                    } else if (sort.amount == "desc") {
+                        sort.amount = "asc"
+                        withdrawals.value.sort((a, b) => a.amount - b.amount)
+                    } else if (sort.amount == "asc") {
+                        sort.date = "desc"
+
+                        sort.amount = "default"
+                        withdrawals.value.sort(
+                            (a, b) =>
+                                new Date(b.event.closedOracleTime).getTime() -
+                                new Date(a.event.closedOracleTime).getTime(),
+                        )
+                    }
+
+                    break
+            }
+        }
+
         onMounted(async () => {
-            withdrawals.value = await fetchUserWithdrawals({
+            const allUserWithdrawals = await fetchUserWithdrawals({
                 address: accountStore.pkh,
             })
+            withdrawals.value = cloneDeep(allUserWithdrawals)
 
             positionsForWithdrawal.value =
                 await fetchUserPositionsForWithdrawal({
@@ -93,21 +144,25 @@ export default defineComponent({
                 (acc, curr) => acc + curr.amount,
                 0,
             )
-            statistics.week.avg =
-                statistics.week.value / withdrawalsLastWeek.length
+            statistics.week.avg = withdrawalsLastWeek.length
+                ? statistics.week.value / withdrawalsLastWeek.length
+                : 0
 
             statistics.month.value = withdrawalsLastMonth.reduce(
                 (acc, curr) => acc + curr.amount,
                 0,
             )
-            statistics.month.avg =
-                statistics.month.value / withdrawalsLastMonth.length
+            statistics.month.avg = withdrawalsLastMonth.length
+                ? statistics.month.value / withdrawalsLastMonth.length
+                : 0
 
             statistics.all.value = withdrawals.value.reduce(
                 (acc, curr) => acc + curr.amount,
                 0,
             )
-            statistics.all.avg = statistics.all.value / withdrawals.value.length
+            statistics.all.avg = withdrawals.value.length
+                ? statistics.all.value / withdrawals.value.length
+                : 0
         })
 
         /** Meta */
@@ -119,6 +174,8 @@ export default defineComponent({
             withdrawals,
             paginatedWithdrawals,
             positionsForWithdrawal,
+            sort,
+            sortBy,
             currentPage,
             statistics,
             numberWithSymbol,
@@ -215,8 +272,30 @@ export default defineComponent({
             <div :class="$style.withdrawboard">
                 <table v-if="withdrawals.length">
                     <tr>
-                        <th>withdraw</th>
-                        <th>amount</th>
+                        <th @click="sortBy('date')">
+                            withdraw
+                            <Icon
+                                v-if="sort.date !== 'default'"
+                                name="arrow_down"
+                                size="10"
+                                :class="[
+                                    $style.sort_icon,
+                                    sort.date == 'asc' && $style.reverse,
+                                ]"
+                            />
+                        </th>
+                        <th @click="sortBy('amount')">
+                            amount
+                            <Icon
+                                v-if="sort.amount !== 'default'"
+                                name="arrow_down"
+                                size="10"
+                                :class="[
+                                    $style.sort_icon,
+                                    sort.amount == 'asc' && $style.reverse,
+                                ]"
+                            />
+                        </th>
                         <th>event</th>
                         <th>type</th>
                     </tr>
@@ -396,7 +475,7 @@ export default defineComponent({
 
     display: flex;
     flex: 1;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .withdrawboard td {
@@ -416,6 +495,18 @@ export default defineComponent({
 
 .withdrawboard td span {
     color: var(--text-tertiary);
+}
+
+.sort_icon {
+    fill: var(--blue);
+
+    margin-left: 6px;
+
+    transition: transform 0.2s ease;
+}
+
+.sort_icon.reverse {
+    transform: rotate(180deg);
 }
 
 .bottom {
