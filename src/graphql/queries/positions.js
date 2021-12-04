@@ -10,6 +10,7 @@ export const getAllUserPositions = gql`
                 id
                 status
                 betsCloseTime
+                creatorId
                 currencyPair {
                     symbol
                 }
@@ -66,6 +67,7 @@ export const getUserPositionsForWithdrawal = gql`
                 id
                 status
                 betsCloseTime
+                creatorId
                 currencyPair {
                     symbol
                 }

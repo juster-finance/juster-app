@@ -240,6 +240,7 @@ export default defineComponent({
                             id: true,
                             status: true,
                             betsCloseTime: true,
+                            creatorId: true,
                             currencyPair: {
                                 symbol: true,
                                 id: true,

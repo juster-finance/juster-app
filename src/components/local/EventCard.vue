@@ -321,6 +321,7 @@ export default defineComponent({
                             totalValueLocked: true,
                             totalLiquidityProvided: true,
                             createdTime: true,
+                            creatorId: true,
                             betsCloseTime: true,
                             liquidityPercent: true,
                             status: true,
@@ -479,23 +480,45 @@ export default defineComponent({
                     <img :src="getCurrencyIcon('USD')" />
                 </div>
 
-                <Tooltip position="bottom" side="right">
-                    <div :class="$style.participants">
-                        <img
-                            v-for="participantAvatar in participantsAvatars.slice(
-                                0,
-                                3,
-                            )"
-                            :key="participantAvatar"
-                            :src="`https://services.tzkt.io/v1/avatars/${participantAvatar}`"
-                            :class="$style.image"
-                        />
-                    </div>
+                <div :class="$style.users">
+                    <Tooltip position="bottom" side="right">
+                        <div :class="$style.participants">
+                            <img
+                                v-for="participantAvatar in participantsAvatars.slice(
+                                    0,
+                                    3,
+                                )"
+                                :key="participantAvatar"
+                                :src="`https://services.tzkt.io/v1/avatars/${participantAvatar}`"
+                                :class="$style.user_avatar"
+                            />
+                        </div>
 
-                    <template v-slot:content>
-                        Participants ({{ participantsAvatars.length }})
-                    </template>
-                </Tooltip>
+                        <template v-slot:content>
+                            Participants ({{ participantsAvatars.length }})
+                        </template>
+                    </Tooltip>
+
+                    <Tooltip position="bottom" side="right">
+                        <div :class="$style.creator">
+                            <img
+                                :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
+                                :class="$style.user_avatar"
+                            />
+                            <Icon name="verified" size="14" />
+                        </div>
+
+                        <template v-slot:content>
+                            Creator:
+                            {{
+                                `${event.creatorId.slice(
+                                    0,
+                                    4,
+                                )}....${event.creatorId.slice(32, 36)}`
+                            }}
+                        </template>
+                    </Tooltip>
+                </div>
             </div>
 
             <div :class="$style.title">
@@ -612,7 +635,7 @@ export default defineComponent({
                     <Badge v-if="userTVL" color="gray" :class="$style.badge">
                         <img
                             :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-                            :class="$style.user_avatar"
+                            :class="$style.my_avatar"
                         />
 
                         {{ abbreviateNumber(userTVL) }} XTZ
@@ -817,11 +840,30 @@ export default defineComponent({
     right: 0;
 }
 
+.users {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .participants {
     display: flex;
 }
 
-.participants img {
+.creator {
+    display: flex;
+    position: relative;
+}
+
+.creator svg {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+
+    fill: var(--yellow);
+}
+
+.user_avatar {
     width: 30px;
     height: 30px;
 
@@ -968,7 +1010,7 @@ export default defineComponent({
     fill: var(--text-secondary);
 }
 
-.user_avatar {
+.my_avatar {
     width: 16px;
     height: 16px;
 }
