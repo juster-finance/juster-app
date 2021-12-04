@@ -309,7 +309,9 @@ export default defineComponent({
 
             <div v-if="positions.length" :class="$style.items">
                 <EventCard
-                    v-for="position in positions"
+                    v-for="position in positions.filter(
+                        (position) => position.value,
+                    )"
                     :key="position.event.id"
                     :event="position.event"
                     :won="position.value !== 0 && !position.withdrawn"
