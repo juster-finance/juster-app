@@ -40,7 +40,7 @@ export default defineComponent({
             context.emit("switch")
         }
 
-        return { name, day, period, countdown, status, handleSwitch }
+        return { event, name, day, period, countdown, status, handleSwitch }
     },
 })
 </script>
@@ -65,8 +65,21 @@ export default defineComponent({
                 <div v-if="status == 'In progress'" :class="$style.time">
                     <Icon name="time" size="12" /> {{ countdown }}
                 </div>
-                <div v-else-if="status == 'Finished'" :class="$style.time">
-                    Event is over
+                <div
+                    v-else-if="
+                        status == 'Finished' && event.status == 'STARTED'
+                    "
+                    :class="$style.time"
+                >
+                    Event is active
+                </div>
+                <div
+                    v-else-if="
+                        status == 'Finished' && event.status == 'FINISHED'
+                    "
+                    :class="$style.time"
+                >
+                    Event is finished
                 </div>
             </div>
         </div>
