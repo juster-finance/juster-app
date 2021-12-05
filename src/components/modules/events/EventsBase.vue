@@ -63,13 +63,13 @@ const defaultFilters = {
     statuses: [
         {
             name: "New",
-            icon: "bolt",
+            icon: "event_new",
             color: "green",
             active: true,
         },
         {
             name: "Active",
-            icon: "time",
+            icon: "event_active",
             color: "yellow",
             active: false,
         },
