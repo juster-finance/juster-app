@@ -10,6 +10,7 @@ import {
 } from "vue"
 import BigNumber from "bignumber.js"
 import { estimateFeeMultiplier } from "@juster-finance/sdk"
+import { DateTime } from "luxon"
 
 /**
  * Services
@@ -221,7 +222,14 @@ export default defineComponent({
                     }, 700)
 
                     /** analytics */
-                    amplitude.logEvent("onBet")
+                    amplitude.logEvent("onBet", {
+                        eventId: event.value.id,
+                        amount: amount.value,
+                        fm: fee.value.toNumber(),
+                        tts:
+                            DateTime.fromISO(event.value.betsCloseTime).ts -
+                            DateTime.now().ts,
+                    })
 
                     context.emit("onBet", {
                         side: betType == "aboveEq" ? "ABOVE_EQ" : "BELOW",

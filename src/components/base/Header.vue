@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, reactive, computed } from "vue"
+import { defineComponent, ref, reactive, computed, inject } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
 /**
@@ -42,6 +42,9 @@ import { fetchUserPositionsForWithdrawal } from "@/api/positions"
 
 export default defineComponent({
     setup() {
+        const amplitude = inject("amplitude")
+        const identify = new amplitude.Identify()
+
         const notificationsStore = useNotificationsStore()
         const accountStore = useAccountStore()
 
@@ -72,14 +75,23 @@ export default defineComponent({
         }
 
         const address = ref("")
+        const network = ref("")
         const handleLogin = async () => {
             await juster.sync()
-            juster.getPkh().then(async (pkh) => {
+            juster._provider.client.getActiveAccount().then(async (account) => {
                 if (!localStorage["connectingModal"]) {
                     showConnectingModal.value = true
-                    address.value = pkh
+
+                    address.value = account.address
+                    network.value = account.network.type
                 } else {
-                    accountStore.pkh = pkh
+                    /** analytics */
+                    identify.set("address", account.address)
+                    identify.set("network", account.network.type)
+                    amplitude.identify(identify)
+                    amplitude.logEvent("login", { address: account.address })
+
+                    accountStore.pkh = account.address
                     accountStore.updateBalance()
 
                     // todo: sep. func
@@ -99,6 +111,12 @@ export default defineComponent({
             showConnectingModal.value = false
 
             localStorage["connectingModal"] = true
+
+            /** analytics */
+            identify.set("address", address.value)
+            identify.set("network", network.value)
+            amplitude.identify(identify)
+            amplitude.logEvent("registration", { address: address.value })
 
             accountStore.pkh = address.value
             address.value = ""
@@ -127,9 +145,24 @@ export default defineComponent({
             })
         }
 
+        const handleOpenProfile = () => {
+            router.push("/profile")
+
+            amplitude.logEvent("openProfile")
+        }
+
+        const handleOpenWithdrawals = () => {
+            router.push("/withdrawals")
+
+            amplitude.logEvent("openWithdrawals")
+        }
+
         const handleLogout = () => {
             juster._provider.client.clearActiveAccount().then(async () => {
                 await juster._provider.client.getActiveAccount()
+
+                amplitude.logEvent("logout", { address: accountStore.pkh })
+
                 accountStore.setPkh("")
                 router.push("/")
 
@@ -162,6 +195,8 @@ export default defineComponent({
             showSettingsModal,
             showConnectingModal,
             accountStore,
+            handleOpenProfile,
+            handleOpenWithdrawals,
         }
     },
 
@@ -180,11 +215,6 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
-        <!-- <TheSettingsModal
-            :show="showSettingsModal"
-            @onClose="showSettingsModal = false"
-        /> -->
-
         <ConnectingModal
             :show="showConnectingModal"
             :address="address"
@@ -263,44 +293,41 @@ export default defineComponent({
                         </template>
 
                         <template v-slot:dropdown>
-                            <router-link to="/profile">
-                                <div :class="$style.profile">
-                                    <Icon name="user" size="16" />
+                            <div
+                                @click="handleOpenProfile"
+                                :class="$style.profile"
+                            >
+                                <Icon name="user" size="16" />
 
-                                    <div :class="$style.info">
-                                        <div :class="$style.address">
-                                            {{
-                                                `${accountStore.pkh.slice(
-                                                    0,
-                                                    5,
-                                                )}..${accountStore.pkh.slice(
-                                                    accountStore.pkh.length - 3,
-                                                    accountStore.pkh.length,
-                                                )}`
-                                            }}
-                                        </div>
-                                        <div :class="$style.balance">
-                                            {{ accountStore.balance }}
-                                            XTZ
-                                        </div>
+                                <div :class="$style.info">
+                                    <div :class="$style.address">
+                                        {{
+                                            `${accountStore.pkh.slice(
+                                                0,
+                                                5,
+                                            )}..${accountStore.pkh.slice(
+                                                accountStore.pkh.length - 3,
+                                                accountStore.pkh.length,
+                                            )}`
+                                        }}
+                                    </div>
+                                    <div :class="$style.balance">
+                                        {{ accountStore.balance }}
+                                        XTZ
                                     </div>
                                 </div>
-                            </router-link>
+                            </div>
 
-                            <router-link to="/withdrawals">
-                                <DropdownItem>
-                                    <div :class="$style.dropdown_icon">
-                                        <Icon name="money" size="16" />
-                                        <div
-                                            v-if="
-                                                accountStore.wonPositions.length
-                                            "
-                                            :class="$style.dropdown_indicator"
-                                        />
-                                    </div>
-                                    Withdrawals
-                                </DropdownItem>
-                            </router-link>
+                            <DropdownItem @click="handleOpenWithdrawals">
+                                <div :class="$style.dropdown_icon">
+                                    <Icon name="money" size="16" />
+                                    <div
+                                        v-if="accountStore.wonPositions.length"
+                                        :class="$style.dropdown_indicator"
+                                    />
+                                </div>
+                                Withdrawals
+                            </DropdownItem>
 
                             <DropdownDivider />
 

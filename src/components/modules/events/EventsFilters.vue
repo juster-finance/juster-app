@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, reactive, ref, toRefs, watch } from "vue"
+import { defineComponent, reactive, ref, toRefs, watch, inject } from "vue"
 
 /**
  * UI
@@ -17,6 +17,8 @@ export default defineComponent({
     },
 
     setup(props, context) {
+        const amplitude = inject("amplitude")
+
         const { liquidityRange, liquidityFilters } = toRefs(props)
 
         const values = reactive({
@@ -36,6 +38,12 @@ export default defineComponent({
 
         const minInputEl = ref(null)
         const maxInputEl = ref(null)
+
+        const handleReset = () => {
+            amplitude.logEvent("onResetFilters")
+
+            context.emit("onReset")
+        }
 
         /** watch for reset */
         watch(liquidityFilters.value, () => {
@@ -131,6 +139,7 @@ export default defineComponent({
             inputs,
             minInputEl,
             maxInputEl,
+            handleReset,
         }
     },
 
@@ -294,12 +303,9 @@ export default defineComponent({
         <div :class="$style.divider" />
 
         <div :class="$style.actions">
-            <Button @click="$emit('onReset')" type="tertiary" size="small"
-                >Reset</Button
+            <Button @click="handleReset" type="tertiary" size="small"
+                >Reset filters</Button
             >
-            <!-- <Button type="tertiary" size="small" disabled
-                ><Icon name="collection" size="16" />Recent filters</Button
-            > -->
         </div>
     </div>
 </template>

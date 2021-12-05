@@ -8,6 +8,7 @@ import {
     computed,
     onBeforeUnmount,
     onUnmounted,
+    inject,
 } from "vue"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
@@ -85,6 +86,8 @@ export default defineComponent({
                 path: "/events",
             },
         ])
+
+        const amplitude = inject("amplitude")
 
         const marketStore = useMarketStore()
 
@@ -223,6 +226,8 @@ export default defineComponent({
         )
 
         onMounted(async () => {
+            amplitude.logEvent("onPage", { name: "AllEvents" })
+
             let allNewEvents = await fetchAllEvents()
 
             isAllEventsLoaded.value = true

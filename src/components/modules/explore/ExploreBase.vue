@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, onMounted, computed, onBeforeUnmount } from "vue"
+import { defineComponent, onMounted, onBeforeUnmount, inject } from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
@@ -30,6 +30,8 @@ export default defineComponent({
     name: "ExploreBase",
 
     setup() {
+        const amplitude = inject("amplitude")
+
         const router = useRouter()
 
         const marketStore = useMarketStore()
@@ -39,6 +41,8 @@ export default defineComponent({
         }
 
         onMounted(async () => {
+            amplitude.logEvent("onPage", { name: "Explore" })
+
             const topEvents = await fetchTopEvents({ limit: 3 })
 
             marketStore.events = cloneDeep(topEvents).sort(

@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onBeforeMount, ref } from "vue"
+import { defineComponent, onBeforeMount, ref, inject } from "vue"
 
 /**
  * Base
@@ -9,7 +9,6 @@ import Footer from "@/components/base/Footer"
 
 /** Local */
 import TheWelcomeScreen from "@/components/local/onboarding/TheWelcomeScreen"
-import LandingPage from "@/views/LandingPage"
 
 /**
  * UI
@@ -40,6 +39,9 @@ import { fetchUserPositionsForWithdrawal } from "@/api/positions"
 
 export default defineComponent({
     setup() {
+        const amplitude = inject("amplitude")
+        const identify = new amplitude.Identify()
+
         const notificationsStore = useNotificationsStore()
 
         /**
@@ -74,6 +76,10 @@ export default defineComponent({
         onBeforeMount(() => {
             juster._provider.client.getActiveAccount().then(async (account) => {
                 if (!account) return
+
+                identify.set("address", account.address)
+                identify.set("network", account.network.type)
+                amplitude.identify(identify)
 
                 accountStore.setPkh(account.address)
                 accountStore.updateBalance()

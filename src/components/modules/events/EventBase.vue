@@ -7,6 +7,7 @@ import {
     computed,
     onMounted,
     onUnmounted,
+    inject,
 } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
@@ -72,6 +73,8 @@ export default defineComponent({
     name: "EventBase",
 
     setup() {
+        const amplitude = inject("amplitude")
+
         const router = useRouter()
 
         const breadcrumbs = reactive([
@@ -283,6 +286,8 @@ export default defineComponent({
         const handleJoin = (event) => {
             event.stopPropagation()
             showBetModal.value = true
+
+            amplitude.logEvent("showBetModal", { where: "event_base" })
         }
 
         const handleBet = (bet) => {
@@ -290,8 +295,16 @@ export default defineComponent({
             showBetModal.value = false
         }
 
+        const handleLiquidity = () => {
+            showLiquidityModal.value = true
+
+            amplitude.logEvent("showLiquidityModal", { where: "event_base" })
+        }
+
         const handleWithdraw = (e) => {
             e.stopPropagation()
+
+            amplitude.logEvent("clickWithdraw", { where: "event_base" })
 
             juster
                 .withdraw(event.value.id, accountStore.pkh)
@@ -315,6 +328,12 @@ export default defineComponent({
                     })
                 })
                 .catch((err) => console.log(err))
+        }
+
+        const handleParticipants = () => {
+            showParticipantsModal.value = true
+
+            amplitude.logEvent("showParticipantsModal", { where: "event_base" })
         }
 
         const copy = (target) => {
@@ -465,6 +484,8 @@ export default defineComponent({
             showParticipantsModal,
             handleSwitch,
             handleJoin,
+            handleLiquidity,
+            handleParticipants,
             handleBet,
             handleWithdraw,
             copy,
@@ -723,8 +744,7 @@ export default defineComponent({
                                 </template>
 
                                 <template v-slot:dropdown>
-                                    <DropdownItem
-                                        @click="showParticipantsModal = true"
+                                    <DropdownItem @click="handleParticipants"
                                         ><Icon name="users" size="16" />View
                                         participants
                                     </DropdownItem>
@@ -775,7 +795,7 @@ export default defineComponent({
                                 "
                             >
                                 <Button
-                                    @click="showLiquidityModal = true"
+                                    @click="handleLiquidity"
                                     type="secondary"
                                     size="small"
                                     :disabled="

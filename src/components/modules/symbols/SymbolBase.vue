@@ -5,6 +5,8 @@ import {
     computed,
     watch,
     reactive,
+    inject,
+    onMounted,
     onBeforeUnmount,
 } from "vue"
 import { useRoute } from "vue-router"
@@ -48,6 +50,8 @@ export default defineComponent({
             },
         ])
 
+        const amplitude = inject("amplitude")
+
         const currentPage = ref(1)
 
         /** Symbol */
@@ -56,15 +60,15 @@ export default defineComponent({
 
         const symbol = computed(() => {
             return Object.keys(marketStore.symbols)
-                .map(item => marketStore.symbols[item])
-                .find(item => item.symbol == route.params.name)
+                .map((item) => marketStore.symbols[item])
+                .find((item) => item.symbol == route.params.name)
         })
         const price = computed(
             () => marketStore.symbols[symbol.value?.symbol]?.quotes[0]?.price,
         )
 
         const selectedTab = ref("Available")
-        const selectTab = tab => {
+        const selectTab = (tab) => {
             currentPage.value = 1
             selectedTab.value = tab
         }
@@ -146,6 +150,10 @@ export default defineComponent({
             },
             { deep: true },
         )
+
+        onMounted(() => {
+            amplitude.logEvent("onPage", { name: "Symbol" })
+        })
 
         onBeforeUnmount(() => {
             marketStore.events = []

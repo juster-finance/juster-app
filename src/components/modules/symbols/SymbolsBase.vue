@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, reactive } from "vue"
+import { defineComponent, reactive, inject, onMounted } from "vue"
 import { useMeta } from "vue-meta"
 
 /**
@@ -28,7 +28,13 @@ export default defineComponent({
             },
         ])
 
+        const amplitude = inject("amplitude")
+
         const marketStore = useMarketStore()
+
+        onMounted(() => {
+            amplitude.logEvent("onPage", { name: "Symbols" })
+        })
 
         /** Meta */
         useMeta({

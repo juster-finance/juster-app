@@ -1,6 +1,15 @@
 <script>
-import { defineComponent, ref, reactive, computed, toRefs, watch } from "vue"
+import {
+    defineComponent,
+    ref,
+    reactive,
+    computed,
+    toRefs,
+    watch,
+    inject,
+} from "vue"
 import BigNumber from "bignumber.js"
+import { DateTime } from "luxon"
 
 /**
  * Services
@@ -42,6 +51,8 @@ export default defineComponent({
 
     setup(props, context) {
         const { event, show } = toRefs(props)
+
+        const amplitude = inject("amplitude")
 
         const accountStore = useAccountStore()
         const notificationsStore = useNotificationsStore()
@@ -143,6 +154,15 @@ export default defineComponent({
                             },
                         })
                     }, 700)
+
+                    /** analytics */
+                    amplitude.logEvent("onLiquidity", {
+                        eventId: event.value.id,
+                        amount: amount.value,
+                        tts:
+                            DateTime.fromISO(event.value.betsCloseTime).ts -
+                            DateTime.now().ts,
+                    })
 
                     context.emit("onClose")
                 })

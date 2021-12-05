@@ -8,6 +8,7 @@ import {
     ref,
     reactive,
     computed,
+    inject,
 } from "vue"
 import { DateTime } from "luxon"
 import { gql } from "@/services/tools"
@@ -60,6 +61,8 @@ export default defineComponent({
 
     setup(props) {
         const { event } = toRefs(props)
+
+        const amplitude = inject("amplitude")
 
         /** Stores */
         const notificationsStore = useNotificationsStore()
@@ -212,7 +215,7 @@ export default defineComponent({
         })
 
         /** Join to the event & Liquidity */
-        const handleJoin = (e) => {
+        const handleBet = (e) => {
             /** disable Bet / Liquidity right after betsCloseTime */
             if (
                 startStatus.value == "Finished" ||
@@ -221,6 +224,8 @@ export default defineComponent({
                 return
 
             e.stopImmediatePropagation()
+
+            amplitude.logEvent("showBetModal", { where: "event_card" })
 
             showBetModal.value = true
         }
@@ -234,11 +239,15 @@ export default defineComponent({
 
             e.stopImmediatePropagation()
 
+            amplitude.logEvent("showLiquidityModal", { where: "event_card" })
+
             showLiquidityModal.value = true
         }
 
         /** Withdraw */
         const handleWithdraw = (e) => {
+            amplitude.logEvent("clickWithdraw", { where: "event_card" })
+
             juster
                 .withdraw(event.value.id, accountStore.pkh)
                 .then((op) => {
@@ -251,8 +260,18 @@ export default defineComponent({
                             autoDestroy: true,
                         },
                     })
+
+                    amplitude.logEvent("onWithdraw", {
+                        eventId: event.value.id,
+                    })
                 })
                 .catch((err) => console.log(err))
+        }
+
+        const handleParticipants = () => {
+            showParticipantsModal.value = true
+
+            amplitude.logEvent("showParticipantsModal", { where: "event_card" })
         }
 
         const copy = (target) => {
@@ -289,6 +308,8 @@ export default defineComponent({
         })
         const contextMenuHandler = (e) => {
             e.preventDefault()
+
+            amplitude.logEvent("showContextMenu")
 
             contextMenuStyles.top = `${e.clientY}px`
             contextMenuStyles.left = `${e.clientX}px`
@@ -393,8 +414,9 @@ export default defineComponent({
             isUserWon,
             wonPosition,
             percentage,
-            handleJoin,
+            handleBet,
             handleLiquidity,
+            handleParticipants,
             handleWithdraw,
             copy,
             handleSwitch,
@@ -456,7 +478,7 @@ export default defineComponent({
 
                     <DropdownDivider />
 
-                    <DropdownItem @click.prevent="showParticipantsModal = true"
+                    <DropdownItem @click.prevent="handleParticipants"
                         ><Icon name="users" size="16" />View participants
                     </DropdownItem>
                     <DropdownItem disabled
@@ -761,7 +783,7 @@ export default defineComponent({
                 ]"
             >
                 <div
-                    @click.prevent="handleJoin"
+                    @click.prevent="handleBet"
                     :class="[$style.button, $style.green]"
                 >
                     <Icon name="plus" size="16" /> Bet
