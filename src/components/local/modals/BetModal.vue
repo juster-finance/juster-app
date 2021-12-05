@@ -164,22 +164,26 @@ export default defineComponent({
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
-        const buttonText = computed(() => {
+        const buttonState = computed(() => {
             if (!side.value) {
-                return "Select your submission"
+                return { text: "Select your submission", disabled: true }
             }
 
             if (countdownStatus.value !== "In progress")
-                return "Acceptance of bets is closed"
-            if (sendingBet.value) return "Awaiting confirmation.."
+                return { text: "Acceptance of bets is closed", disabled: true }
+            if (sendingBet.value)
+                return { text: "Awaiting confirmation..", disabled: true }
 
-            if (amount.value > accountStore.balance) return "Insufficient funds"
+            if (amount.value > accountStore.balance)
+                return { text: "Insufficient funds", disabled: true }
 
             switch (side.value) {
                 case "Higher":
                 case "Lower":
-                    if (!amount.value) return "Type the bet amount"
-                    if (amount.value) return "Place a bet"
+                    if (!amount.value)
+                        return { text: "Select the bet amount", disabled: true }
+                    if (amount.value)
+                        return { text: "Place a bet", disabled: false }
             }
         })
 
@@ -257,7 +261,7 @@ export default defineComponent({
             rewardText,
             handleBet,
             handleLogin,
-            buttonText,
+            buttonState,
         }
     },
 
@@ -374,14 +378,10 @@ export default defineComponent({
             <Button
                 @click="handleBet"
                 size="large"
-                type="primary"
+                :type="buttonState.disabled ? 'secondary' : 'primary'"
                 block
                 :loading="sendingBet"
-                :disabled="
-                    !amount.value ||
-                    countdownStatus !== 'In progress' ||
-                    amount.value > accountStore.balance
-                "
+                :disabled="buttonState.disabled"
             >
                 <Spin v-if="sendingBet" size="16" />
                 <Icon
@@ -392,7 +392,7 @@ export default defineComponent({
                             : 'lock'
                     "
                     size="16"
-                />{{ buttonText }}</Button
+                />{{ buttonState.text }}</Button
             >
         </template>
 

@@ -100,15 +100,19 @@ export default defineComponent({
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
-        const buttonText = computed(() => {
+        const buttonState = computed(() => {
             if (countdownStatus.value !== "In progress")
-                return "Acceptance of bets is closed"
-            if (sendingBet.value) return "Awaiting confirmation.."
+                return { text: "Acceptance of bets is closed", disabled: true }
+            if (sendingBet.value)
+                return { text: "Awaiting confirmation..", disabled: true }
 
-            if (amount.value > accountStore.balance) return "Insufficient funds"
+            if (amount.value > accountStore.balance)
+                return { text: "Insufficient funds", disabled: true }
 
-            if (!amount.value) return "Type the liquidity amount"
-            if (amount.value) return "Provide liquidity"
+            if (!amount.value)
+                return { text: "Select the liquidity amount", disabled: true }
+            if (amount.value)
+                return { text: "Provide liquidity", disabled: false }
         })
 
         const handleProvideLiquidity = () => {
@@ -166,7 +170,7 @@ export default defineComponent({
             shares,
             handleProvideLiquidity,
             handleLogin,
-            buttonText,
+            buttonState,
         }
     },
 
@@ -258,14 +262,10 @@ export default defineComponent({
             <Button
                 @click="handleProvideLiquidity"
                 size="large"
-                type="primary"
+                :type="buttonState.disabled ? 'secondary' : 'primary'"
                 block
                 :loading="sendingBet"
-                :disabled="
-                    !amount.value ||
-                    countdownStatus !== 'In progress' ||
-                    accountStore.balance < amount.value
-                "
+                :disabled="buttonState.disabled"
             >
                 <Spin v-if="sendingBet" size="16" />
                 <Icon
@@ -276,7 +276,7 @@ export default defineComponent({
                             : 'lock'
                     "
                     size="16"
-                />{{ buttonText }}</Button
+                />{{ buttonState }}</Button
             >
         </template>
 
