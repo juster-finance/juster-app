@@ -215,7 +215,7 @@ export default defineComponent({
                             selectedTab == 'Available' && $style.active,
                         ]"
                     >
-                        <Icon name="bolt" size="12" />Available for bets
+                        <Icon name="event_new" size="12" />New
                     </div>
                     <div :class="$style.dot" />
                     <div
@@ -225,7 +225,7 @@ export default defineComponent({
                             selectedTab == 'Closed' && $style.active,
                         ]"
                     >
-                        <Icon name="time" size="12" />In process
+                        <Icon name="event_active" size="12" />Active
                     </div>
                     <div :class="$style.dot" />
                     <div
