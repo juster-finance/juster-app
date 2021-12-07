@@ -217,6 +217,35 @@ export default defineComponent({
                 )
             }
         })
+
+        const selectedPageForDeposits = ref(1)
+        const paginatedDeposits = computed(() =>
+            cloneDeep(filteredDeposits.value)
+                .sort(
+                    (a, b) =>
+                        new Date(b.createdTime).getTime() -
+                        new Date(a.createdTime).getTime(),
+                )
+                .slice(
+                    (selectedPageForDeposits.value - 1) * 3,
+                    selectedPageForDeposits.value * 3,
+                ),
+        )
+
+        const selectedPageForBets = ref(1)
+        const paginatedBets = computed(() =>
+            cloneDeep(filteredBets.value)
+                .sort(
+                    (a, b) =>
+                        new Date(b.createdTime).getTime() -
+                        new Date(a.createdTime).getTime(),
+                )
+                .slice(
+                    (selectedPageForBets.value - 1) * 3,
+                    selectedPageForBets.value * 3,
+                ),
+        )
+
         const pendingBet = ref(null)
         const userBets = computed(() =>
             event.value
@@ -468,6 +497,10 @@ export default defineComponent({
             filters,
             filteredDeposits,
             filteredBets,
+            selectedPageForDeposits,
+            selectedPageForBets,
+            paginatedDeposits,
+            paginatedBets,
             pendingBet,
             userBets,
             timeLeft,
@@ -879,11 +912,7 @@ export default defineComponent({
                     >
                         <BetCard v-if="pendingBet" :bet="pendingBet" pending />
                         <BetCard
-                            v-for="bet in cloneDeep(filteredBets).sort(
-                                (a, b) =>
-                                    new Date(b.createdTime) -
-                                    new Date(a.createdTime),
-                            )"
+                            v-for="bet in paginatedBets"
                             :event="event"
                             :key="bet.id"
                             :bet="bet"
@@ -896,41 +925,28 @@ export default defineComponent({
                             : `If you have placed a bet, but it is not in this list yet — please wait for the transaction confirmation`
                     }}</Banner>
 
-                    <div v-if="userBets.length" :class="$style.params">
-                        <div :class="$style.param">
-                            My bets:
-                            <span>{{ userBets.length }}</span>
+                    <div
+                        v-if="filteredBets.length > 3"
+                        :class="$style.block_bottom"
+                    >
+                        <div :class="$style.pagination">
+                            <Button
+                                @click="selectedPageForBets = index"
+                                :type="
+                                    selectedPageForBets == index
+                                        ? 'secondary'
+                                        : 'tertiary'
+                                "
+                                size="small"
+                                v-for="index in Math.round(
+                                    filteredBets.length / 3,
+                                )"
+                                :key="index"
+                                >{{ index }}</Button
+                            >
                         </div>
 
-                        <div :class="$style.dot" />
-
-                        <div :class="$style.param">
-                            Summary:
-                            <span>{{
-                                userBets
-                                    .reduce(
-                                        (acc, { amount }) => acc + amount,
-                                        0,
-                                    )
-                                    .toFixed(2)
-                            }}</span>
-                            XTZ
-                        </div>
-
-                        <div :class="$style.dot" />
-
-                        <div :class="[$style.param, $style.green]">
-                            Potential reward:
-                            <span>{{
-                                userBets
-                                    .reduce(
-                                        (acc, { reward }) => acc + reward,
-                                        0,
-                                    )
-                                    .toFixed(2)
-                            }}</span>
-                            XTZ
-                        </div>
+                        <span>{{ filteredBets.length }} bets</span>
                     </div>
                 </div>
 
@@ -982,54 +998,46 @@ export default defineComponent({
                     </div>
                     <div v-if="filteredDeposits.length" :class="$style.bets">
                         <DepositCard
-                            v-for="deposit in cloneDeep(filteredDeposits).sort(
-                                (a, b) =>
-                                    new Date(b.createdTime) -
-                                    new Date(a.createdTime),
-                            )"
+                            v-for="deposit in paginatedDeposits"
                             :key="deposit.id"
                             :deposit="deposit"
                         />
                     </div>
+
                     <Banner v-else type="info">{{
                         filters.liquidity == "all"
                             ? `This event has not yet received initial liquidity, please wait for a few minutes`
                             : `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
                     }}</Banner>
 
-                    <div v-if="userBets.length" :class="$style.params">
-                        <div :class="$style.param">
-                            Liquidity deposits:
-                            <span>{{ filteredDeposits.length }}</span>
+                    <div
+                        v-if="filteredDeposits.length > 3"
+                        :class="$style.block_bottom"
+                    >
+                        <div :class="$style.pagination">
+                            <Button
+                                @click="selectedPageForDeposits = index"
+                                :type="
+                                    selectedPageForDeposits == index
+                                        ? 'secondary'
+                                        : 'tertiary'
+                                "
+                                size="small"
+                                v-for="index in Math.round(
+                                    filteredDeposits.length / 3,
+                                )"
+                                :key="index"
+                                >{{ index }}</Button
+                            >
                         </div>
 
-                        <div :class="$style.dot" />
-
-                        <div :class="$style.param">
-                            Summary:
-                            <span>{{
-                                filteredDeposits
-                                    .reduce(
-                                        (acc, { amountBelow }) =>
-                                            acc + amountBelow,
-                                        0,
-                                    )
-                                    .toFixed(2)
-                            }}</span>
-                            XTZ
-                        </div>
+                        <span>{{ filteredDeposits.length }} deposits</span>
                     </div>
                 </div>
             </div>
 
             <div v-if="event" :class="$style.side">
                 <EventTargetsCard :event="event" :price="price" />
-
-                <!-- <EventSymbolCard
-                    v-if="event && price.integer"
-                    :event="event"
-                    :price="price"
-                /> -->
 
                 <EventPoolCard :event="event" />
 
@@ -1256,29 +1264,6 @@ export default defineComponent({
     gap: 4px;
 }
 
-.params {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-
-    margin-top: 20px;
-}
-
-.param {
-    font-size: 13px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-tertiary);
-}
-
-.param span {
-    color: var(--text-primary);
-}
-
-.param.green span {
-    color: var(--green);
-}
-
 .additional_buttons {
     display: flex;
     justify-content: space-between;
@@ -1332,5 +1317,26 @@ export default defineComponent({
 .filter.active {
     fill: var(--blue);
     color: var(--text-primary);
+}
+
+.block_bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 16px;
+}
+
+.block_bottom span {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-tertiary);
 }
 </style>
