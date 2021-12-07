@@ -13,7 +13,7 @@ const gql = createClient({
     subscription: { url: dipdup.uri.subscription },
 })
 
-const tezos = new TezosToolkit("https://granadanet.smartpy.io")
+const tezos = new TezosToolkit("https://rpc.tzkt.io/granadanet/")
 
 /**
  * Utils

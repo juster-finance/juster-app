@@ -57,6 +57,8 @@ export default defineComponent({
 
                 return newAboveEq
             }
+
+            return 0
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
@@ -100,6 +102,8 @@ export default defineComponent({
 
                 return newBelow
             }
+
+            return 0
         })
 
         return { abovePercent, aboveAmount, belowPercent, belowAmount }

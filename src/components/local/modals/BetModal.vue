@@ -7,6 +7,9 @@ import {
     toRefs,
     watch,
     inject,
+    nextTick,
+    onMounted,
+    onBeforeUnmount,
 } from "vue"
 import BigNumber from "bignumber.js"
 import { estimateFeeMultiplier } from "@juster-finance/sdk"
@@ -56,6 +59,8 @@ export default defineComponent({
 
         const accountStore = useAccountStore()
         const notificationsStore = useNotificationsStore()
+
+        const amountInput = ref(null)
 
         /** Countdown setup */
         const eventStartTime = computed(() =>
@@ -148,20 +153,41 @@ export default defineComponent({
             side.value = tab
         }
 
-        /** clear on close */
+        const onKeydown = (e) => {
+            if (e.code == "Enter") {
+                e.preventDefault()
+                handleBet()
+            }
+        }
+
         watch(show, () => {
             if (!show.value) {
                 side.value = null
                 amount.value = 0
 
                 stop()
+
+                document.removeEventListener("keydown", onKeydown)
+
+                showConfirmationHint.value = false
             } else {
+                document.addEventListener("keydown", onKeydown)
+
                 accountStore.updateBalance()
             }
         })
 
         watch(amount, () => {
             if (!amount.value) amount.value = ""
+        })
+
+        /** focus input on side selection  */
+        watch(side, () => {
+            if (!side.value) return
+            /** nextTick due to v-show */
+            nextTick(() => {
+                amountInput.value.$el.querySelector("input").focus()
+            })
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
@@ -188,15 +214,20 @@ export default defineComponent({
             }
         })
 
+        const showConfirmationHint = ref(false)
+
         const handleBet = () => {
-            if (!amount.value) return
-            if (countdownStatus.value !== "In progress") return
+            if (buttonState.value.disabled) return
 
             let betType
             if (side.value == "Higher") betType = "aboveEq"
             if (side.value == "Lower") betType = "below"
 
             sendingBet.value = true
+
+            setTimeout(() => {
+                showConfirmationHint.value = true
+            }, 5000)
 
             juster
                 .bet(
@@ -207,6 +238,7 @@ export default defineComponent({
                 )
                 .then((op) => {
                     sendingBet.value = false
+                    showConfirmationHint.value = false
 
                     /** slow notification to get attention */
                     setTimeout(() => {
@@ -239,6 +271,7 @@ export default defineComponent({
                 })
                 .catch((err) => {
                     sendingBet.value = false
+                    showConfirmationHint.value = false
                 })
         }
 
@@ -256,6 +289,7 @@ export default defineComponent({
             accountStore,
             countdownText,
             countdownStatus,
+            amountInput,
             selectTab,
             side,
             amount,
@@ -268,6 +302,7 @@ export default defineComponent({
             fee,
             rewardText,
             handleBet,
+            showConfirmationHint,
             handleLogin,
             buttonState,
         }
@@ -338,8 +373,9 @@ export default defineComponent({
                 </div>
             </div>
 
-            <template v-if="side">
+            <div v-show="side">
                 <Input
+                    ref="amountInput"
                     type="number"
                     :limit="10000"
                     label="Amount"
@@ -381,7 +417,7 @@ export default defineComponent({
                         <span>XTZ</span></Stat
                     >
                 </div>
-            </template>
+            </div>
 
             <Button
                 @click="handleBet"
@@ -402,6 +438,15 @@ export default defineComponent({
                     size="16"
                 />{{ buttonState.text }}</Button
             >
+
+            <div v-if="showConfirmationHint" :class="$style.hint">
+                Confirmation not appearing?
+                <a
+                    href="https://fishy-cheque-5ae.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
+                    target="_blank"
+                    >Read about possible solutions</a
+                >
+            </div>
         </template>
 
         <template v-else>
@@ -576,5 +621,19 @@ export default defineComponent({
     display: flex;
     align-items: center;
     gap: 4px;
+}
+
+.hint {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    text-align: center;
+
+    margin-top: 12px;
+}
+
+.hint a {
+    color: var(--text-blue);
 }
 </style>

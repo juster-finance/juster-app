@@ -778,8 +778,8 @@ export default defineComponent({
                 v-if="!isUserWon"
                 :class="[
                     $style.buttons,
-                    startStatus == 'Finished' ||
-                        (event.totalLiquidityProvided == 0 && $style.disabled),
+                    startStatus == 'Finished' && $style.disabled,
+                    event.totalLiquidityProvided == 0 && $style.disabled,
                 ]"
             >
                 <div
@@ -907,7 +907,7 @@ export default defineComponent({
     font-weight: 600;
     color: var(--text-primary);
 
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .title img {

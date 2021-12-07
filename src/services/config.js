@@ -14,3 +14,14 @@ export const supportedSymbols = {
 export const sanity = {
     id: "7iinpn2j",
 }
+
+export const rpcNodes = [
+    {
+        name: "SmartPy Granadanet",
+        url: "https://granadanet.smartpy.io",
+    },
+    {
+        name: "TzKT Granadanet",
+        url: "https://rpc.tzkt.io/granadanet",
+    },
+]

@@ -1,6 +1,7 @@
 <script>
 import { defineComponent, ref, reactive, computed, inject } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import { NetworkType } from "@airgap/beacon-sdk"
 
 /**
  * Services
@@ -26,8 +27,8 @@ import Tooltip from "@/components/ui/Tooltip"
 /**
  * Modals
  */
-import TheSettingsModal from "@/components/local/modals/Settings/TheSettingsModal"
 import ConnectingModal from "@/components/local/modals/ConnectingModal"
+import CustomLoginModal from "@/components/local/modals/CustomLoginModal"
 
 /**
  * Store
@@ -74,10 +75,7 @@ export default defineComponent({
             return route.path.startsWith(url)
         }
 
-        const address = ref("")
-        const network = ref("")
-        const handleLogin = async () => {
-            await juster.sync()
+        const login = () => {
             juster._provider.client.getActiveAccount().then(async (account) => {
                 if (!localStorage["connectingModal"]) {
                     showConnectingModal.value = true
@@ -105,6 +103,34 @@ export default defineComponent({
                     }
                 }
             })
+        }
+
+        /**
+         * Default Login
+         */
+        const address = ref("")
+        const network = ref("")
+        const handleLogin = async () => {
+            await juster.sync()
+            login()
+        }
+
+        /**
+         * Custom RPC Login
+         */
+        const showCustomLoginModal = ref(false)
+        const handleCustomLogin = () => {
+            showCustomLoginModal.value = true
+        }
+        const handleSelectCustomNode = async (node) => {
+            await juster._provider.requestPermissions({
+                network: {
+                    type: NetworkType.CUSTOM,
+                    name: node.value.name,
+                    rpcUrl: node.value.url,
+                },
+            })
+            login()
         }
 
         const handleAgree = () => {
@@ -188,12 +214,15 @@ export default defineComponent({
             juster,
             address,
             handleLogin,
+            handleCustomLogin,
             handleAgree,
             handleDisagree,
             handleLogout,
             pkh,
             showSettingsModal,
             showConnectingModal,
+            showCustomLoginModal,
+            handleSelectCustomNode,
             accountStore,
             handleOpenProfile,
             handleOpenWithdrawals,
@@ -202,7 +231,7 @@ export default defineComponent({
 
     components: {
         ConnectingModal,
-        TheSettingsModal,
+        CustomLoginModal,
         Tooltip,
         AppStatus,
         Button,
@@ -215,6 +244,11 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
+        <CustomLoginModal
+            :show="showCustomLoginModal"
+            @onSelectCustomNode="handleSelectCustomNode"
+            @onClose="showCustomLoginModal = false"
+        />
         <ConnectingModal
             :show="showConnectingModal"
             :address="address"
@@ -265,7 +299,7 @@ export default defineComponent({
                 />
 
                 <div :class="$style.buttons">
-                    <Button
+                    <!-- <Button
                         v-if="!pkh"
                         @click="handleLogin"
                         type="primary"
@@ -273,7 +307,20 @@ export default defineComponent({
                     >
                         <Icon name="user" size="12" />
                         Sign in</Button
-                    >
+                    > -->
+
+                    <!-- todo: sep component -->
+                    <div v-if="!pkh" :class="$style.signin_button">
+                        <div @click="handleLogin" :class="$style.signin">
+                            Sign in
+                        </div>
+                        <div
+                            @click="handleCustomLogin"
+                            :class="$style.custom_signin"
+                        >
+                            <Icon name="settings" size="14" />
+                        </div>
+                    </div>
 
                     <Dropdown>
                         <template v-slot:trigger>
@@ -482,6 +529,56 @@ export default defineComponent({
 .buttons {
     display: flex;
     gap: 8px;
+}
+
+.signin_button {
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+
+    display: flex;
+    align-items: center;
+
+    transition: transform 0.2s ease;
+}
+
+.signin_button:active {
+    transform: translateY(1px);
+}
+
+.signin {
+    font-size: 13px;
+    line-height: 28px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--btn-secondary-bg);
+
+    padding: 0 10px 0 12px;
+    border-radius: 8px 0 0 8px;
+    border-right: 1px solid var(--border);
+
+    transition: background 0.2s ease;
+}
+
+.signin:hover {
+    background: var(--btn-secondary-bg-hover);
+}
+
+.custom_signin {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    border-radius: 0 8px 8px 0;
+    padding: 0 10px;
+
+    fill: var(--text-secondary);
+    background: var(--btn-secondary-bg);
+
+    transition: background 0.2s ease;
+}
+
+.custom_signin:hover {
+    background: var(--btn-secondary-bg-hover);
 }
 
 .avatar {
