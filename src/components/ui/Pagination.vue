@@ -25,7 +25,7 @@ export default defineComponent({
 
         const pages = computed(() => Math.round(total.value / limit.value))
 
-        const selectPage = page => {
+        const selectPage = (page) => {
             context.emit("update:modelValue", page)
         }
 
@@ -66,7 +66,7 @@ export default defineComponent({
         />
 
         <Button
-            v-for="page in pages"
+            v-for="page in 3"
             :key="page"
             @click="selectPage(page)"
             type="tertiary"
@@ -90,7 +90,6 @@ export default defineComponent({
 .wrapper {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
 }
 
