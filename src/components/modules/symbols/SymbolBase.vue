@@ -243,7 +243,6 @@ export default defineComponent({
             <div :class="$style.right">
                 <Button icon="filter" type="tertiary" size="small" />
                 <Button icon="calendar" type="tertiary" size="small" />
-                <Button icon="search" type="tertiary" size="small" />
             </div>
         </div>
 
@@ -371,6 +370,6 @@ export default defineComponent({
 }
 
 .pagination {
-    margin-top: 40px;
+    margin-top: 32px;
 }
 </style>

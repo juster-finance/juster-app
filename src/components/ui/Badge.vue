@@ -48,4 +48,9 @@ export default {
     color: var(--text-secondary);
     fill: var(--text-secondary);
 }
+
+.wrapper.orange {
+    color: var(--orange);
+    fill: var(--orange);
+}
 </style>

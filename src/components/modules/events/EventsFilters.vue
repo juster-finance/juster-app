@@ -437,6 +437,10 @@ export default defineComponent({
     fill: var(--red);
 }
 
+.badge.orange svg {
+    fill: var(--orange);
+}
+
 .badge.gray svg {
     fill: var(--text-secondary);
 }

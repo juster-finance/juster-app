@@ -358,7 +358,7 @@ export default defineComponent({
 
                     <div v-if="withdrawals.length" :class="$style.pagination">
                         <div
-                            v-for="page in Math.round(withdrawals.length / 5)"
+                            v-for="page in Math.ceil(withdrawals.length / 5)"
                             :key="page"
                             @click="currentPage = page"
                             :class="[

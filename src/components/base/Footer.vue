@@ -79,7 +79,7 @@ export default defineComponent({
     display: flex;
     justify-content: center;
 
-    background: rgba(0, 0, 0, 0.25);
+    border-top: 1px solid var(--border);
 }
 
 .base {

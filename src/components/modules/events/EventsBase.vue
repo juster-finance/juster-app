@@ -24,6 +24,7 @@ import { fetchAllEvents } from "@/api/events"
  */
 import Breadcrumbs from "@/components/ui/Breadcrumbs"
 import Banner from "@/components/ui/Banner"
+import Pagination from "@/components/ui/Pagination"
 
 /**
  * Local
@@ -73,6 +74,18 @@ const defaultFilters = {
             color: "yellow",
             active: false,
         },
+        {
+            name: "Finished",
+            icon: "checkcircle",
+            color: "gray",
+            active: false,
+        },
+        {
+            name: "Canceled",
+            icon: "stop",
+            color: "orange",
+            active: false,
+        },
     ],
 }
 
@@ -95,8 +108,18 @@ export default defineComponent({
 
         const isAllEventsLoaded = ref(false)
 
-        /** Filters */
+        const currentPage = ref(1)
+
         let filters = ref(cloneDeep(defaultFilters))
+
+        /** reset "currentPage" when changing filters */
+        watch(
+            filters.value,
+            () => {
+                currentPage.value = 1
+            },
+            { deep: true },
+        )
 
         const liquidityRange = reactive({
             min: 0,
@@ -137,7 +160,7 @@ export default defineComponent({
         /** Events */
         const availableEvents = computed(() => {
             return marketStore.events.filter((event) =>
-                ["NEW", "STARTED"].includes(event.status),
+                ["NEW", "STARTED", "FINISHED"].includes(event.status),
             )
         })
         const filteredEvents = computed(() => {
@@ -178,6 +201,7 @@ export default defineComponent({
                         if (status.name == "New") return "NEW"
                         if (status.name == "Active") return "STARTED"
                         if (status.name == "Finished") return "FINISHED"
+                        if (status.name == "Canceled") return "CANCELED"
                     })
 
                 events = events.filter((event) =>
@@ -332,6 +356,7 @@ export default defineComponent({
             isAllEventsLoaded,
             filteredEvents,
             availableEvents,
+            currentPage,
             filters,
             liquidityRange,
             liquidityFilters,
@@ -346,6 +371,7 @@ export default defineComponent({
     components: {
         Breadcrumbs,
         Banner,
+        Pagination,
         EventsFilters,
         EventCard,
         EventCardLoading,
@@ -400,7 +426,10 @@ export default defineComponent({
                 <transition name="fastfade" mode="out-in">
                     <div v-if="filteredEvents.length" :class="$style.events">
                         <EventCard
-                            v-for="event in filteredEvents"
+                            v-for="event in filteredEvents.slice(
+                                (currentPage - 1) * 6,
+                                currentPage * 6,
+                            )"
                             :key="event.id"
                             :event="event"
                         />
@@ -412,6 +441,14 @@ export default defineComponent({
                         <EventCardLoading />
                     </div>
                 </transition>
+
+                <Pagination
+                    v-if="filteredEvents.length > 6"
+                    v-model="currentPage"
+                    :total="filteredEvents.length"
+                    :limit="6"
+                    :class="$style.pagination"
+                />
             </div>
         </div>
     </div>
@@ -460,6 +497,10 @@ export default defineComponent({
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-gap: 16px;
+}
+
+.pagination {
+    margin-top: 16px;
 }
 
 @media (max-width: 420px) {

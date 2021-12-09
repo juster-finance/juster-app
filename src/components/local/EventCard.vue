@@ -635,6 +635,18 @@ export default defineComponent({
                         The event is closed, winning side determined
                     </template>
                 </Tooltip>
+                <Tooltip
+                    v-else-if="event.status == 'CANCELED'"
+                    position="bottom"
+                    side="left"
+                >
+                    <Badge color="orange" :class="$style.main_badge"
+                        ><Icon name="stop" size="12" />Canceled</Badge
+                    >
+                    <template v-slot:content>
+                        This event has been canceled, funds returned
+                    </template>
+                </Tooltip>
 
                 <Badge
                     v-if="participantsAvatars.length >= 3"
@@ -728,6 +740,14 @@ export default defineComponent({
                                 .toRelative()
                         }}</span>
                     </div>
+                </div>
+
+                <div
+                    v-if="event.status == 'CANCELED'"
+                    :class="[$style.hint, $style.red]"
+                >
+                    <Icon name="flag" size="14" />
+                    <div><span>Start price</span> is not determined</div>
                 </div>
 
                 <div
