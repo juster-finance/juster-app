@@ -8,8 +8,6 @@ import {
     watch,
     inject,
     nextTick,
-    onMounted,
-    onBeforeUnmount,
 } from "vue"
 import BigNumber from "bignumber.js"
 import { estimateFeeMultiplier } from "@juster-finance/sdk"
@@ -442,7 +440,7 @@ export default defineComponent({
             <div v-if="showConfirmationHint" :class="$style.hint">
                 Confirmation not appearing?
                 <a
-                    href="https://fishy-cheque-5ae.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
+                    href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
                     target="_blank"
                     >Read about possible solutions</a
                 >

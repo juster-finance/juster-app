@@ -32,13 +32,10 @@ import { useAccountStore } from "@/store/account"
  */
 import { useMarket } from "@/composable/market"
 
-/**
- * API
- */
-import { fetchUserPositionsForWithdrawal } from "@/api/positions"
-
 export default defineComponent({
     setup() {
+        const { setupMarket, setupUser } = useMarket()
+
         const amplitude = inject("amplitude")
         const identify = new amplitude.Identify()
 
@@ -69,7 +66,7 @@ export default defineComponent({
         }, 60000)
 
         /**
-         * Setup account
+         * Setup account & user
          */
         const accountStore = useAccountStore()
 
@@ -84,21 +81,13 @@ export default defineComponent({
                 accountStore.setPkh(account.address)
                 accountStore.updateBalance()
 
-                /** check for won positions */
-                const wonPositions = await fetchUserPositionsForWithdrawal({
-                    address: accountStore.pkh,
-                })
-
-                if (wonPositions.length) {
-                    accountStore.wonPositions = wonPositions
-                }
+                setupUser()
             })
         })
 
         /**
-         * Setup Market (Symbols & Quotes)
+         * Setup Market (Symbols & Quotes & Subscriptinos)
          */
-        const { setupMarket } = useMarket()
         setupMarket()
 
         /** Onboarding */

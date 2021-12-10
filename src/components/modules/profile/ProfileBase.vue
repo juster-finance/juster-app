@@ -102,7 +102,7 @@ export default defineComponent({
                 accountStore.setPkh("")
                 router.push("/")
 
-                accountStore.wonPositions = []
+                accountStore.positionsForWithdrawal = []
 
                 notificationsStore.create({
                     notification: {

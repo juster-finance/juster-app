@@ -3,7 +3,7 @@ import { defineComponent, toRefs } from "vue"
 
 export default defineComponent({
     name: "Checkbox",
-    props: { modelValue: Boolean },
+    props: { modelValue: Boolean, forceChecked: Boolean },
 
     setup(props, context) {
         const { modelValue } = toRefs(props)
@@ -19,10 +19,16 @@ export default defineComponent({
 
 <template>
     <div @click="toggle" :class="$style.wrapper">
-        <div :class="[$style.box, modelValue && $style.active]">
+        <div
+            :class="[
+                $style.box,
+                (modelValue && $style.active) ||
+                    (forceChecked && $style.active),
+            ]"
+        >
             <transition name="popup">
                 <Icon
-                    v-if="modelValue"
+                    v-if="modelValue || forceChecked"
                     name="check"
                     size="12"
                     :class="$style.check_icon"

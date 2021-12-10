@@ -143,7 +143,7 @@ export default defineComponent({
         })
 
         const canWithdraw = computed(() => {
-            return accountStore.wonPositions.some(
+            return accountStore.positionsForWithdrawal.some(
                 (position) => position.event.id == event.value.id,
             )
         })
@@ -341,8 +341,8 @@ export default defineComponent({
                     console.log(`Hash: ${op.opHash}`)
 
                     /** rm won position from store */
-                    accountStore.wonPositions =
-                        accountStore.wonPositions.filter(
+                    accountStore.positionsForWithdrawal =
+                        accountStore.positionsForWithdrawal.filter(
                             (position) => position.event.id != event.value.id,
                         )
 

@@ -123,7 +123,8 @@ export default defineComponent({
 /** TYPES */
 .wrapper.success {
     background: var(--btn-success-bg);
-    fill: var(--text-primary);
+    fill: var(--text-black);
+    color: var(--text-black);
 }
 .wrapper.success:hover {
     background: var(--btn-success-bg-hover);

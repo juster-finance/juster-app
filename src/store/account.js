@@ -13,7 +13,8 @@ export const useAccountStore = defineStore({
             pkh: "",
             balance: 0,
 
-            wonPositions: [],
+            isPositionsLoading: false,
+            positionsForWithdrawal: [],
 
             showOnboarding: false,
         }
@@ -25,6 +26,16 @@ export const useAccountStore = defineStore({
 
         async updateBalance() {
             this.balance = await fetchBalance(this.pkh)
+        },
+
+        /** positions */
+        removePosition(id) {
+            const positionIndex = this.positionsForWithdrawal.findIndex(
+                pos => pos.id == id,
+            )
+            if (positionIndex == -1) return
+
+            this.positionsForWithdrawal.splice(positionIndex, 1)
         },
     },
     getters: {

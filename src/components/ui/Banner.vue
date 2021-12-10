@@ -1,17 +1,27 @@
 <script>
 import { defineComponent } from "vue"
 
+/**
+ * UI
+ */
+import Spin from "@/components/ui/Spin"
+
 export default defineComponent({
     name: "Banner",
     props: {
         type: String,
+        loading: Boolean,
     },
+
+    components: { Spin },
 })
 </script>
 
 <template>
     <div :class="[$style.wrapper, $style[type]]">
+        <Spin v-if="loading" size="14" />
         <Icon
+            v-else
             :name="
                 (type == 'warning' && 'help') ||
                 (type == 'success' && 'checkcircle') ||

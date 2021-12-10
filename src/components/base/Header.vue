@@ -37,12 +37,14 @@ import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
 
 /**
- * API
+ * Composable
  */
-import { fetchUserPositionsForWithdrawal } from "@/api/positions"
+import { useMarket } from "@/composable/market"
 
 export default defineComponent({
     setup() {
+        const { setupUser } = useMarket()
+
         const amplitude = inject("amplitude")
         const identify = new amplitude.Identify()
 
@@ -92,15 +94,7 @@ export default defineComponent({
                     accountStore.pkh = account.address
                     accountStore.updateBalance()
 
-                    // todo: sep. func
-                    /** check for won positions */
-                    const wonPositions = await fetchUserPositionsForWithdrawal({
-                        address: accountStore.pkh,
-                    })
-
-                    if (wonPositions.length) {
-                        accountStore.wonPositions = wonPositions
-                    }
+                    setupUser()
                 }
             })
         }
@@ -148,6 +142,8 @@ export default defineComponent({
             address.value = ""
 
             accountStore.updateBalance()
+
+            setupUser()
         }
         const handleDisagree = () => {
             showConnectingModal.value = false
@@ -192,7 +188,7 @@ export default defineComponent({
                 accountStore.setPkh("")
                 router.push("/")
 
-                accountStore.wonPositions = []
+                accountStore.positionsForWithdrawal = []
 
                 notificationsStore.create({
                     notification: {
@@ -299,16 +295,6 @@ export default defineComponent({
                 />
 
                 <div :class="$style.buttons">
-                    <!-- <Button
-                        v-if="!pkh"
-                        @click="handleLogin"
-                        type="primary"
-                        size="small"
-                    >
-                        <Icon name="user" size="12" />
-                        Sign in</Button
-                    > -->
-
                     <!-- todo: sep component -->
                     <div v-if="!pkh" :class="$style.signin_button">
                         <div @click="handleLogin" :class="$style.signin">
@@ -331,8 +317,8 @@ export default defineComponent({
                                 />
                                 <div
                                     v-if="
-                                        accountStore.wonPositions.length &&
-                                        accountStore.pkh
+                                        accountStore.positionsForWithdrawal
+                                            .length && accountStore.pkh
                                     "
                                     :class="$style.indicator"
                                 />
@@ -369,7 +355,10 @@ export default defineComponent({
                                 <div :class="$style.dropdown_icon">
                                     <Icon name="money" size="16" />
                                     <div
-                                        v-if="accountStore.wonPositions.length"
+                                        v-if="
+                                            accountStore.positionsForWithdrawal
+                                                .length
+                                        "
                                         :class="$style.dropdown_indicator"
                                     />
                                 </div>
@@ -385,7 +374,7 @@ export default defineComponent({
                                 </DropdownItem>
                             </router-link>
                             <a
-                                href="https://fishy-cheque-5ae.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
+                                href="https://juster.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
                                 target="_blank"
                             >
                                 <DropdownItem

@@ -1,7 +1,5 @@
-// import { Juster } from "@juster-finance/sdk"
 import { Juster } from "@juster-finance/sdk"
 import { createClient } from "@juster-finance/gql-client"
-import { TezosToolkit } from "@taquito/taquito"
 
 /** Config */
 import { dipdup } from "@/services/config"
@@ -13,14 +11,12 @@ const gql = createClient({
     subscription: { url: dipdup.uri.subscription },
 })
 
-const tezos = new TezosToolkit("https://rpc.tzkt.io/granadanet/")
-
 /**
  * Utils
  */
 export const fetchBalance = async address => {
-    const balance = await tezos.tz.getBalance(address)
+    const balance = await juster._tezos.tz.getBalance(address)
     return (balance.toNumber() / 1000000).toFixed(2)
 }
 
-export { juster, gql, tezos }
+export { juster, gql }

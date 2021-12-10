@@ -1,24 +1,37 @@
 <script>
-import { computed, defineComponent, onMounted, reactive, ref } from "vue"
+import {
+    computed,
+    defineComponent,
+    onMounted,
+    onUnmounted,
+    reactive,
+    ref,
+} from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
 import { cloneDeep } from "lodash"
+
+import { test } from "@/services/sdk"
+// test()
 
 /**
  * UI
  */
 import Button from "@/components/ui/Button"
+import Banner from "@/components/ui/Banner"
+import Pagination from "@/components/ui/Pagination"
 
 /**
  * Local
  */
 import EventCard from "@/components/local/EventCard"
+import WithdrawAllModal from "@/components/local/modals/WithdrawAllModal"
 
 /**
  * API
  */
 import { fetchUserWithdrawals } from "@/api/users"
-import { fetchUserPositionsForWithdrawal } from "@/api/positions"
+import { fetchUserPositionsForWithdraw } from "@/api/positions"
 
 /**
  * Services
@@ -36,17 +49,33 @@ export default defineComponent({
     setup() {
         const accountStore = useAccountStore()
 
-        const withdrawals = ref([])
+        const showWithdrawAllModal = ref(false)
 
-        const currentPage = ref(1)
-        const paginatedWithdrawals = computed(() =>
-            withdrawals.value.slice(
-                (currentPage.value - 1) * 5,
-                currentPage.value * 5,
+        const withdrawalsHistory = ref([])
+
+        const subToNewPositions = ref({})
+
+        const currentPageHistory = ref(1)
+        const paginatedWithdrawalsHistory = computed(() =>
+            withdrawalsHistory.value.slice(
+                (currentPageHistory.value - 1) * 5,
+                currentPageHistory.value * 5,
             ),
         )
 
-        const positionsForWithdrawal = ref([])
+        const currentPageForPositions = ref(1)
+
+        const positionsForWithdraw = computed(() =>
+            accountStore.positionsForWithdrawal.filter(
+                (position) => position.value,
+            ),
+        )
+        const paginatedPositionsForWithdraw = computed(() =>
+            positionsForWithdraw.value.slice(
+                (currentPageForPositions.value - 1) * 6,
+                currentPageForPositions.value * 6,
+            ),
+        )
 
         const statistics = reactive({
             week: {
@@ -72,14 +101,14 @@ export default defineComponent({
                 case "date":
                     if (sort.date == "desc") {
                         sort.date = "asc"
-                        withdrawals.value.sort(
+                        withdrawalsHistory.value.sort(
                             (a, b) =>
                                 new Date(a.event.closedOracleTime).getTime() -
                                 new Date(b.event.closedOracleTime).getTime(),
                         )
                     } else if (sort.date == "asc") {
                         sort.date = "desc"
-                        withdrawals.value.sort(
+                        withdrawalsHistory.value.sort(
                             (a, b) =>
                                 new Date(b.event.closedOracleTime).getTime() -
                                 new Date(a.event.closedOracleTime).getTime(),
@@ -93,15 +122,19 @@ export default defineComponent({
                         sort.date = "default"
 
                         sort.amount = "desc"
-                        withdrawals.value.sort((a, b) => b.amount - a.amount)
+                        withdrawalsHistory.value.sort(
+                            (a, b) => b.amount - a.amount,
+                        )
                     } else if (sort.amount == "desc") {
                         sort.amount = "asc"
-                        withdrawals.value.sort((a, b) => a.amount - b.amount)
+                        withdrawalsHistory.value.sort(
+                            (a, b) => a.amount - b.amount,
+                        )
                     } else if (sort.amount == "asc") {
                         sort.date = "desc"
 
                         sort.amount = "default"
-                        withdrawals.value.sort(
+                        withdrawalsHistory.value.sort(
                             (a, b) =>
                                 new Date(b.event.closedOracleTime).getTime() -
                                 new Date(a.event.closedOracleTime).getTime(),
@@ -113,15 +146,11 @@ export default defineComponent({
         }
 
         onMounted(async () => {
+            /** History */
             const allUserWithdrawals = await fetchUserWithdrawals({
                 address: accountStore.pkh,
             })
-            withdrawals.value = cloneDeep(allUserWithdrawals)
-
-            positionsForWithdrawal.value =
-                await fetchUserPositionsForWithdrawal({
-                    address: accountStore.pkh,
-                })
+            withdrawalsHistory.value = cloneDeep(allUserWithdrawals)
 
             /**
              * Statistics:
@@ -129,12 +158,12 @@ export default defineComponent({
              * @Month
              * @AllTime
              */
-            const withdrawalsLastWeek = withdrawals.value.filter(
+            const withdrawalsLastWeek = withdrawalsHistory.value.filter(
                 (withdraw) =>
                     DateTime.fromISO(withdraw.event.closedOracleTime).ts >
                     DateTime.now().minus({ days: 7 }).ts,
             )
-            const withdrawalsLastMonth = withdrawals.value.filter(
+            const withdrawalsLastMonth = withdrawalsHistory.value.filter(
                 (withdraw) =>
                     DateTime.fromISO(withdraw.event.closedOracleTime).ts >
                     DateTime.now().minus({ days: 30 }).ts,
@@ -156,13 +185,22 @@ export default defineComponent({
                 ? statistics.month.value / withdrawalsLastMonth.length
                 : 0
 
-            statistics.all.value = withdrawals.value.reduce(
+            statistics.all.value = withdrawalsHistory.value.reduce(
                 (acc, curr) => acc + curr.amount,
                 0,
             )
-            statistics.all.avg = withdrawals.value.length
-                ? statistics.all.value / withdrawals.value.length
+            statistics.all.avg = withdrawalsHistory.value.length
+                ? statistics.all.value / withdrawalsHistory.value.length
                 : 0
+        })
+
+        onUnmounted(() => {
+            if (
+                subToNewPositions.value.unsubscribe &&
+                !subToNewPositions.value?.closed
+            ) {
+                subToNewPositions.value.unsubscribe()
+            }
         })
 
         /** Meta */
@@ -171,23 +209,33 @@ export default defineComponent({
         })
 
         return {
-            withdrawals,
-            paginatedWithdrawals,
-            positionsForWithdrawal,
+            accountStore,
+            showWithdrawAllModal,
+            withdrawalsHistory,
+            positionsForWithdraw,
+            allPositionsForWithdraw: accountStore.positionsForWithdrawal,
+            currentPageForPositions,
+            currentPageHistory,
+            paginatedWithdrawalsHistory,
+            paginatedPositionsForWithdraw,
             sort,
             sortBy,
-            currentPage,
             statistics,
             numberWithSymbol,
         }
     },
 
-    components: { Button, EventCard },
+    components: { WithdrawAllModal, Button, Banner, Pagination, EventCard },
 })
 </script>
 
 <template>
     <div :class="$style.wrapper">
+        <WithdrawAllModal
+            :show="showWithdrawAllModal"
+            @onClose="showWithdrawAllModal = false"
+        />
+
         <metainfo>
             <template v-slot:title="{ content }"
                 >{{ content }} • Juster</template
@@ -246,16 +294,28 @@ export default defineComponent({
         </div>
 
         <div :class="$style.block">
-            <h2>Outstanding balances</h2>
-            <div :class="$style.description">
-                List of events holding your unclaimed profits
+            <div :class="$style.header">
+                <div :class="$style.left">
+                    <h2>Outstanding balances</h2>
+                    <div :class="$style.description">
+                        List of events holding your unclaimed profits
+                    </div>
+                </div>
+
+                <Button
+                    @click="showWithdrawAllModal = true"
+                    :type="
+                        positionsForWithdraw.length ? 'success' : 'secondary'
+                    "
+                    size="small"
+                    :disabled="!positionsForWithdraw.length"
+                    >Withdraw all</Button
+                >
             </div>
 
-            <div v-if="positionsForWithdrawal.length" :class="$style.items">
+            <div v-if="positionsForWithdraw.length" :class="$style.items">
                 <EventCard
-                    v-for="position in positionsForWithdrawal.filter(
-                        (position) => position.value,
-                    )"
+                    v-for="position in paginatedPositionsForWithdraw"
                     :key="position.event.id"
                     :event="position.event"
                     won
@@ -263,8 +323,27 @@ export default defineComponent({
                 />
             </div>
             <div v-else :class="$style.empty">
-                <Icon name="help" size="16" /> No funds available for withdrawal
+                <Banner
+                    :loading="accountStore.isPositionsLoading"
+                    type="info"
+                    >{{
+                        accountStore.isPositionsLoading
+                            ? "Fetching your positions"
+                            : "No positions for withdraw"
+                    }}</Banner
+                >
             </div>
+
+            <Pagination
+                v-if="
+                    !accountStore.isPositionsLoading &&
+                    positionsForWithdraw.length > 6
+                "
+                v-model="currentPageForPositions"
+                :total="positionsForWithdraw.length"
+                :limit="6"
+                :class="$style.pagination"
+            />
         </div>
 
         <div :class="$style.block">
@@ -272,7 +351,7 @@ export default defineComponent({
             <div :class="$style.description">Claimed profits</div>
 
             <div :class="$style.withdrawboard">
-                <table v-if="withdrawals.length">
+                <table v-if="withdrawalsHistory.length">
                     <tr>
                         <th @click="sortBy('date')">
                             withdraw
@@ -303,7 +382,7 @@ export default defineComponent({
                     </tr>
 
                     <tr
-                        v-for="withdraw in paginatedWithdrawals"
+                        v-for="withdraw in paginatedWithdrawalsHistory"
                         :key="withdraw.id"
                     >
                         <td>
@@ -354,16 +433,21 @@ export default defineComponent({
                 </table>
 
                 <div :class="$style.bottom">
-                    <span>{{ withdrawals.length }} withdrawals</span>
+                    <span>{{ withdrawalsHistory.length }} withdrawals</span>
 
-                    <div v-if="withdrawals.length" :class="$style.pagination">
+                    <div
+                        v-if="withdrawalsHistory.length"
+                        :class="$style.tb_pagination"
+                    >
                         <div
-                            v-for="page in Math.ceil(withdrawals.length / 5)"
+                            v-for="page in Math.ceil(
+                                withdrawalsHistory.length / 5,
+                            )"
                             :key="page"
-                            @click="currentPage = page"
+                            @click="currentPageHistory = page"
                             :class="[
                                 $style.page,
-                                currentPage == page && $style.current,
+                                currentPageHistory == page && $style.current,
                             ]"
                         >
                             {{ page }}
@@ -403,6 +487,11 @@ export default defineComponent({
 
     margin-top: 8px;
     margin-bottom: 24px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
 }
 
 .stats {
@@ -592,8 +681,6 @@ export default defineComponent({
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     grid-gap: 16px;
-
-    margin-top: 24px;
 }
 
 .empty {
@@ -608,6 +695,10 @@ export default defineComponent({
 }
 
 .pagination {
+    margin-top: 24px;
+}
+
+.tb_pagination {
     display: flex;
     align-items: center;
     gap: 6px;

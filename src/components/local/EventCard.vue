@@ -204,12 +204,12 @@ export default defineComponent({
         })
 
         const isUserWon = computed(() => {
-            return accountStore.wonPositions.some(
+            return accountStore.positionsForWithdrawal.some(
                 (position) => position.event.id == event.value.id,
             )
         })
         const wonPosition = computed(() => {
-            return accountStore.wonPositions.find(
+            return accountStore.positionsForWithdrawal.find(
                 (position) => position.event.id == event.value.id,
             )
         })
