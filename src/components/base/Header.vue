@@ -1,6 +1,7 @@
 <script>
-import { defineComponent, ref, reactive, computed } from "vue"
+import { defineComponent, ref, reactive, computed, inject } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import { NetworkType } from "@airgap/beacon-sdk"
 
 /**
  * Services
@@ -26,8 +27,8 @@ import Tooltip from "@/components/ui/Tooltip"
 /**
  * Modals
  */
-import TheSettingsModal from "@/components/local/modals/Settings/TheSettingsModal"
 import ConnectingModal from "@/components/local/modals/ConnectingModal"
+import CustomLoginModal from "@/components/local/modals/CustomLoginModal"
 
 /**
  * Store
@@ -35,8 +36,18 @@ import ConnectingModal from "@/components/local/modals/ConnectingModal"
 import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
 
+/**
+ * Composable
+ */
+import { useMarket } from "@/composable/market"
+
 export default defineComponent({
     setup() {
+        const { setupUser } = useMarket()
+
+        const amplitude = inject("amplitude")
+        const identify = new amplitude.Identify()
+
         const notificationsStore = useNotificationsStore()
         const accountStore = useAccountStore()
 
@@ -61,22 +72,59 @@ export default defineComponent({
             },
         ])
 
-        const isActive = url => {
+        const isActive = (url) => {
             if (!route.name) return
             return route.path.startsWith(url)
         }
 
-        const address = ref("")
-        const handleLogin = async () => {
-            await juster.sync()
-            juster.getPkh().then(pkh => {
+        const login = () => {
+            juster._provider.client.getActiveAccount().then(async (account) => {
                 if (!localStorage["connectingModal"]) {
                     showConnectingModal.value = true
-                    address.value = pkh
+
+                    address.value = account.address
+                    network.value = account.network.type
                 } else {
-                    accountStore.pkh = pkh
+                    /** analytics */
+                    identify.set("address", account.address)
+                    identify.set("network", account.network.type)
+                    amplitude.identify(identify)
+                    amplitude.logEvent("login", { address: account.address })
+
+                    accountStore.pkh = account.address
+                    accountStore.updateBalance()
+
+                    setupUser()
                 }
             })
+        }
+
+        /**
+         * Default Login
+         */
+        const address = ref("")
+        const network = ref("")
+        const handleLogin = async () => {
+            await juster.sync()
+            login()
+        }
+
+        /**
+         * Custom RPC Login
+         */
+        const showCustomLoginModal = ref(false)
+        const handleCustomLogin = () => {
+            showCustomLoginModal.value = true
+        }
+        const handleSelectCustomNode = async (node) => {
+            await juster._provider.requestPermissions({
+                network: {
+                    type: NetworkType.CUSTOM,
+                    name: node.value.name,
+                    rpcUrl: node.value.url,
+                },
+            })
+            login()
         }
 
         const handleAgree = () => {
@@ -84,8 +132,18 @@ export default defineComponent({
 
             localStorage["connectingModal"] = true
 
+            /** analytics */
+            identify.set("address", address.value)
+            identify.set("network", network.value)
+            amplitude.identify(identify)
+            amplitude.logEvent("registration", { address: address.value })
+
             accountStore.pkh = address.value
             address.value = ""
+
+            accountStore.updateBalance()
+
+            setupUser()
         }
         const handleDisagree = () => {
             showConnectingModal.value = false
@@ -109,11 +167,28 @@ export default defineComponent({
             })
         }
 
+        const handleOpenProfile = () => {
+            router.push("/profile")
+
+            amplitude.logEvent("openProfile")
+        }
+
+        const handleOpenWithdrawals = () => {
+            router.push("/withdrawals")
+
+            amplitude.logEvent("openWithdrawals")
+        }
+
         const handleLogout = () => {
             juster._provider.client.clearActiveAccount().then(async () => {
                 await juster._provider.client.getActiveAccount()
+
+                amplitude.logEvent("logout", { address: accountStore.pkh })
+
                 accountStore.setPkh("")
                 router.push("/")
+
+                accountStore.positionsForWithdrawal = []
 
                 notificationsStore.create({
                     notification: {
@@ -135,19 +210,24 @@ export default defineComponent({
             juster,
             address,
             handleLogin,
+            handleCustomLogin,
             handleAgree,
             handleDisagree,
             handleLogout,
             pkh,
             showSettingsModal,
             showConnectingModal,
+            showCustomLoginModal,
+            handleSelectCustomNode,
             accountStore,
+            handleOpenProfile,
+            handleOpenWithdrawals,
         }
     },
 
     components: {
         ConnectingModal,
-        TheSettingsModal,
+        CustomLoginModal,
         Tooltip,
         AppStatus,
         Button,
@@ -160,11 +240,11 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
-        <!-- <TheSettingsModal
-            :show="showSettingsModal"
-            @onClose="showSettingsModal = false"
-        /> -->
-
+        <CustomLoginModal
+            :show="showCustomLoginModal"
+            @onSelectCustomNode="handleSelectCustomNode"
+            @onClose="showCustomLoginModal = false"
+        />
         <ConnectingModal
             :show="showConnectingModal"
             :address="address"
@@ -190,7 +270,7 @@ export default defineComponent({
             </div>
 
             <div :class="$style.right">
-                <AppStatus :class="$style.app_status" />
+                <!-- <AppStatus :class="$style.app_status" /> -->
 
                 <Tooltip v-if="pkh" position="left">
                     <div :class="$style.testnet_warning">
@@ -215,29 +295,30 @@ export default defineComponent({
                 />
 
                 <div :class="$style.buttons">
-                    <Button
-                        v-if="!pkh"
-                        @click="handleLogin"
-                        type="primary"
-                        size="small"
-                    >
-                        <Icon name="user" size="12" />
-                        Sign in</Button
-                    >
+                    <!-- todo: sep component -->
+                    <div v-if="!pkh" :class="$style.signin_button">
+                        <div @click="handleLogin" :class="$style.signin">
+                            Sign in
+                        </div>
+                        <div
+                            @click="handleCustomLogin"
+                            :class="$style.custom_signin"
+                        >
+                            <Icon name="settings" size="14" />
+                        </div>
+                    </div>
 
                     <Dropdown>
                         <template v-slot:trigger>
                             <div :class="$style.avatar">
                                 <img
                                     v-if="pkh"
-                                    :src="
-                                        `https://services.tzkt.io/v1/avatars/${pkh}`
-                                    "
+                                    :src="`https://services.tzkt.io/v1/avatars/${pkh}`"
                                 />
                                 <div
                                     v-if="
-                                        accountStore.wonPositions.length &&
-                                            accountStore.pkh
+                                        accountStore.positionsForWithdrawal
+                                            .length && accountStore.pkh
                                     "
                                     :class="$style.indicator"
                                 />
@@ -245,55 +326,55 @@ export default defineComponent({
                         </template>
 
                         <template v-slot:dropdown>
-                            <router-link to="/profile">
-                                <div :class="$style.profile">
-                                    <Icon name="user" size="16" />
+                            <div
+                                @click="handleOpenProfile"
+                                :class="$style.profile"
+                            >
+                                <Icon name="user" size="16" />
 
-                                    <div :class="$style.info">
-                                        <div :class="$style.address">
-                                            {{
-                                                `${accountStore.pkh.slice(
-                                                    0,
-                                                    5,
-                                                )}..${accountStore.pkh.slice(
-                                                    accountStore.pkh.length - 3,
-                                                    accountStore.pkh.length,
-                                                )}`
-                                            }}
-                                        </div>
-                                        <div :class="$style.balance">
-                                            {{
-                                                accountStore.balance.toFixed(0)
-                                            }}
-                                            XTZ
-                                        </div>
+                                <div :class="$style.info">
+                                    <div :class="$style.address">
+                                        {{
+                                            `${accountStore.pkh.slice(
+                                                0,
+                                                5,
+                                            )}..${accountStore.pkh.slice(
+                                                accountStore.pkh.length - 3,
+                                                accountStore.pkh.length,
+                                            )}`
+                                        }}
+                                    </div>
+                                    <div :class="$style.balance">
+                                        {{ accountStore.balance }}
+                                        XTZ
                                     </div>
                                 </div>
-                            </router-link>
+                            </div>
 
-                            <router-link to="/withdrawals">
-                                <DropdownItem>
-                                    <div :class="$style.dropdown_icon">
-                                        <Icon name="money" size="16" />
-                                        <div
-                                            v-if="
-                                                accountStore.wonPositions.length
-                                            "
-                                            :class="$style.dropdown_indicator"
-                                        />
-                                    </div>
-                                    Withdrawals
-                                </DropdownItem>
-                            </router-link>
-                            <!-- <DropdownItem disabled
-                                ><Icon name="settings" size="16" />
-                                Settings</DropdownItem
-                            > -->
+                            <DropdownItem @click="handleOpenWithdrawals">
+                                <div :class="$style.dropdown_icon">
+                                    <Icon name="money" size="16" />
+                                    <div
+                                        v-if="
+                                            accountStore.positionsForWithdrawal
+                                                .length
+                                        "
+                                        :class="$style.dropdown_indicator"
+                                    />
+                                </div>
+                                Withdrawals
+                            </DropdownItem>
 
                             <DropdownDivider />
 
+                            <router-link to="/releases">
+                                <DropdownItem>
+                                    <Icon name="merge" size="16" />
+                                    Releases
+                                </DropdownItem>
+                            </router-link>
                             <a
-                                href="https://fishy-cheque-5ae.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
+                                href="https://juster.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
                                 target="_blank"
                             >
                                 <DropdownItem
@@ -308,10 +389,6 @@ export default defineComponent({
                                 ><Icon name="help" size="16" />
                                 Onboarding</DropdownItem
                             >
-                            <!-- <DropdownItem disabled
-                                ><Icon name="bolt" size="16" />
-                                Changelog</DropdownItem
-                            > -->
 
                             <DropdownDivider />
 
@@ -441,6 +518,56 @@ export default defineComponent({
 .buttons {
     display: flex;
     gap: 8px;
+}
+
+.signin_button {
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+
+    display: flex;
+    align-items: center;
+
+    transition: transform 0.2s ease;
+}
+
+.signin_button:active {
+    transform: translateY(1px);
+}
+
+.signin {
+    font-size: 13px;
+    line-height: 28px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--btn-secondary-bg);
+
+    padding: 0 10px 0 12px;
+    border-radius: 8px 0 0 8px;
+    border-right: 1px solid var(--border);
+
+    transition: background 0.2s ease;
+}
+
+.signin:hover {
+    background: var(--btn-secondary-bg-hover);
+}
+
+.custom_signin {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    border-radius: 0 8px 8px 0;
+    padding: 0 10px;
+
+    fill: var(--text-secondary);
+    background: var(--btn-secondary-bg);
+
+    transition: background 0.2s ease;
+}
+
+.custom_signin:hover {
+    background: var(--btn-secondary-bg-hover);
 }
 
 .avatar {

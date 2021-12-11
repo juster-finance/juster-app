@@ -63,19 +63,6 @@ app.use(VueGtag, { config: { id: "G-58LD5WNLR4" } })
 app.provide("amplitude", amplitude.getInstance())
 app.provide("firebaseApp", firebaseApp)
 
-/** Logging Init */
-Sentry.init({
-    app,
-    dsn: "https://a7417549147b41f2bad0065b5b5ebb3f@o189424.ingest.sentry.io/6077496",
-    integrations: [
-        new Integrations.BrowserTracing({
-            routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-            tracingOrigins: ["app.juster.fi", /^\//],
-        }),
-    ],
-    tracesSampleRate: 1.0,
-})
-
 /**
  * Global components
  */

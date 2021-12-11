@@ -137,6 +137,20 @@ const routes = [
             },
         ],
     },
+
+    /** Releases */
+    {
+        path: "/releases",
+        name: "Releases",
+        component: () =>
+            import(/* webpackChunkName: "releases" */ "@/views/ReleasesPage"),
+    },
+    {
+        path: "/releases/:slug",
+        name: "Release",
+        component: () =>
+            import(/* webpackChunkName: "release" */ "@/views/ReleasePage"),
+    },
 ]
 
 const router = createRouter({

@@ -1,8 +1,13 @@
 <script>
 import { defineComponent } from "vue"
+import { version } from "@/version"
 
 export default defineComponent({
     name: "Footer",
+
+    setup() {
+        return { version }
+    },
 })
 </script>
 
@@ -67,7 +72,7 @@ export default defineComponent({
                 </div>
             </div>
 
-            <div :class="$style.right">© 2021 Juster. All rights reserved</div>
+            <div :class="$style.right">Juster v{{ version }}, Testnet</div>
         </div>
     </div>
 </template>
@@ -79,7 +84,7 @@ export default defineComponent({
     display: flex;
     justify-content: center;
 
-    background: rgba(0, 0, 0, 0.25);
+    border-top: 1px solid var(--border);
 }
 
 .base {

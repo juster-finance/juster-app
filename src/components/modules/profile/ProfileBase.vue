@@ -17,7 +17,7 @@ import EventCard from "@/components/local/EventCard"
 /**
  * Services
  */
-import { juster, tezos } from "@/services/tools"
+import { juster, fetchBalance } from "@/services/tools"
 import { toClipboard } from "@/services/utils/global"
 
 /**
@@ -57,13 +57,12 @@ export default defineComponent({
         const positions = ref([])
 
         /** Balance */
+        const getUserBalance = async () => {
+            balance.value = await fetchBalance(address.value)
+        }
+
         if (!isMyProfile.value) {
-            tezos.tz
-                .getBalance(address.value)
-                .then(
-                    val =>
-                        (balance.value = (val.toNumber() / 1000000).toFixed(2)),
-                )
+            getUserBalance()
         } else {
             accountStore.updateBalance()
         }
@@ -78,7 +77,7 @@ export default defineComponent({
             positions.value = await fetchAllUserPositions({
                 address: address.value,
             })
-            events.value = positions.value.map(position => position.event)
+            events.value = positions.value.map((position) => position.event)
         }
 
         onMounted(() => {
@@ -102,6 +101,8 @@ export default defineComponent({
                 await juster._provider.client.getActiveAccount()
                 accountStore.setPkh("")
                 router.push("/")
+
+                accountStore.positionsForWithdrawal = []
 
                 notificationsStore.create({
                     notification: {
@@ -147,7 +148,6 @@ export default defineComponent({
             balance,
             isMyProfile,
             address,
-            events,
             positions,
         }
     },
@@ -173,14 +173,12 @@ export default defineComponent({
                 <div :class="$style.avatar">
                     <Tooltip>
                         <img
-                            :src="
-                                `https://services.tzkt.io/v1/avatars/${address}`
-                            "
+                            :src="`https://services.tzkt.io/v1/avatars/${address}`"
                             :class="$style.image"
                         />
 
                         <template v-slot:content
-                            >This avatar is supported by TzKT</template
+                            >This avatar is supported by TzKT.io</template
                         >
                     </Tooltip>
                 </div>
@@ -195,9 +193,7 @@ export default defineComponent({
                     <Icon name="copy" size="14" />
                 </div>
                 <div :class="$style.status">
-                    {{
-                        isMyProfile ? accountStore.balance.toFixed(2) : balance
-                    }}
+                    {{ isMyProfile ? accountStore.balance : balance }}
                     XTZ
                 </div>
 
@@ -287,14 +283,6 @@ export default defineComponent({
                                 TzKT</Button
                             ></a
                         >
-                        <Button
-                            v-if="!isMyProfile"
-                            type="tertiary"
-                            size="small"
-                            disabled
-                            ><Icon name="flag" size="14" />Report this
-                            user</Button
-                        >
                     </div>
 
                     <div :class="$style.right">
@@ -321,7 +309,9 @@ export default defineComponent({
 
             <div v-if="positions.length" :class="$style.items">
                 <EventCard
-                    v-for="position in positions"
+                    v-for="position in positions.filter(
+                        (position) => position.value,
+                    )"
                     :key="position.event.id"
                     :event="position.event"
                     :won="position.value !== 0 && !position.withdrawn"
@@ -329,9 +319,7 @@ export default defineComponent({
                 />
             </div>
             <div v-else :class="$style.empty">
-                <div :class="$style.empty_title">
-                    You dont have submissions
-                </div>
+                <div :class="$style.empty_title">You dont have submissions</div>
                 <div :class="$style.hint">
                     Make bets on events to be displayed in your profile
                 </div>
@@ -347,8 +335,8 @@ export default defineComponent({
 
         <div :class="$style.error_title">Your profile is not ready yet</div>
         <div :class="$style.error_description">
-            Once you participate in any event, your profile will
-            become available!
+            Once you participate in any event, your profile will become
+            available!
         </div>
 
         <div :class="$style.error_buttons">

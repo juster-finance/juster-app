@@ -1,4 +1,5 @@
 import { apollo } from "@/apollo"
+import { cloneDeep } from "lodash"
 
 /**
  * GQL: Queries
@@ -24,14 +25,14 @@ export const fetchAllUserPositions = async ({ address }) => {
     }
 }
 
-export const fetchUserPositionsForWithdrawal = async ({ address }) => {
+export const fetchUserPositionsForWithdraw = async ({ address }) => {
     try {
         const { data } = await apollo.query({
             query: getUserPositionsForWithdrawal,
             variables: { address },
         })
 
-        return data.position
+        return cloneDeep(data.position)
     } catch (error) {
         console.error(
             `Error during fetching user positions \n\n ${error.name}: ${error.message}`,

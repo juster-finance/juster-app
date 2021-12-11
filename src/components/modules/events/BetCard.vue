@@ -25,7 +25,7 @@ export default defineComponent({
             bet.value.side == "ABOVE_EQ" ? "Up" : "Down",
         )
 
-        const isWon = computed(() => bet.value.side == event.value.winnerBets)
+        const isWon = computed(() => bet.value.side == event.value?.winnerBets)
 
         return { isWon, side, DateTime, pkh: accountStore.pkh }
     },
@@ -50,11 +50,9 @@ export default defineComponent({
                     :class="$style.user_avatar"
                 >
                     <img
-                        :src="
-                            `https://services.tzkt.io/v1/avatars/${
-                                pending ? pkh : bet.userId
-                            }`
-                        "
+                        :src="`https://services.tzkt.io/v1/avatars/${
+                            pending ? pkh : bet.userId
+                        }`"
                     />
                 </router-link>
             </div>
@@ -63,16 +61,12 @@ export default defineComponent({
                 <div v-if="!pending" :class="$style.title">
                     {{ pkh == bet.userId ? "My" : "" }} Bet
                 </div>
-                <div v-else :class="$style.title">
-                    Pending Bet
-                </div>
+                <div v-else :class="$style.title">Pending Bet</div>
 
                 <div v-if="!pending" :class="$style.time">
                     {{ DateTime.fromISO(bet.createdTime).toRelative() }}
                 </div>
-                <div v-else :class="$style.time">
-                    Just now
-                </div>
+                <div v-else :class="$style.time">Just now</div>
             </div>
         </div>
 
@@ -82,7 +76,10 @@ export default defineComponent({
 
         <div :class="$style.param">{{ bet.amount }}&nbsp;<span>XTZ</span></div>
 
-        <div :class="$style.param">
+        <div v-if="event && event.status == 'CANCELED'" :class="$style.param">
+            {{ bet.amount }}&nbsp;<span>XTZ</span>
+        </div>
+        <div v-else :class="$style.param">
             {{ isWon ? bet.reward.toFixed(2) : 0 }}&nbsp;<span>XTZ</span>
         </div>
     </div>

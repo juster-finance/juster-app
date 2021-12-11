@@ -5,6 +5,8 @@ import {
     computed,
     watch,
     reactive,
+    inject,
+    onMounted,
     onBeforeUnmount,
 } from "vue"
 import { useRoute } from "vue-router"
@@ -48,6 +50,8 @@ export default defineComponent({
             },
         ])
 
+        const amplitude = inject("amplitude")
+
         const currentPage = ref(1)
 
         /** Symbol */
@@ -56,15 +60,15 @@ export default defineComponent({
 
         const symbol = computed(() => {
             return Object.keys(marketStore.symbols)
-                .map(item => marketStore.symbols[item])
-                .find(item => item.symbol == route.params.name)
+                .map((item) => marketStore.symbols[item])
+                .find((item) => item.symbol == route.params.name)
         })
         const price = computed(
             () => marketStore.symbols[symbol.value?.symbol]?.quotes[0]?.price,
         )
 
         const selectedTab = ref("Available")
-        const selectTab = tab => {
+        const selectTab = (tab) => {
             currentPage.value = 1
             selectedTab.value = tab
         }
@@ -147,6 +151,10 @@ export default defineComponent({
             { deep: true },
         )
 
+        onMounted(() => {
+            amplitude.logEvent("onPage", { name: "Symbol" })
+        })
+
         onBeforeUnmount(() => {
             marketStore.events = []
         })
@@ -207,7 +215,7 @@ export default defineComponent({
                             selectedTab == 'Available' && $style.active,
                         ]"
                     >
-                        <Icon name="bolt" size="12" />Available for bets
+                        <Icon name="event_new" size="12" />New
                     </div>
                     <div :class="$style.dot" />
                     <div
@@ -217,7 +225,7 @@ export default defineComponent({
                             selectedTab == 'Closed' && $style.active,
                         ]"
                     >
-                        <Icon name="time" size="12" />In process
+                        <Icon name="event_active" size="12" />Active
                     </div>
                     <div :class="$style.dot" />
                     <div
@@ -235,7 +243,6 @@ export default defineComponent({
             <div :class="$style.right">
                 <Button icon="filter" type="tertiary" size="small" />
                 <Button icon="calendar" type="tertiary" size="small" />
-                <Button icon="search" type="tertiary" size="small" />
             </div>
         </div>
 
@@ -363,6 +370,6 @@ export default defineComponent({
 }
 
 .pagination {
-    margin-top: 40px;
+    margin-top: 32px;
 }
 </style>

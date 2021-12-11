@@ -57,6 +57,8 @@ export default defineComponent({
 
                 return newAboveEq
             }
+
+            return 0
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
@@ -70,14 +72,14 @@ export default defineComponent({
                 )
             } else {
                 if (side.value == "Higher") {
-                    const below = event.value.poolBelow
+                    const below = event.value.poolBelow - winDelta.value
                     const above = event.value.poolAboveEq + userAmount.value
 
                     return Math.ceil((below * 100) / (above + below))
                 }
                 if (side.value == "Lower") {
                     const below = event.value.poolBelow + userAmount.value
-                    const above = event.value.poolAboveEq
+                    const above = event.value.poolAboveEq - winDelta.value
 
                     return Math.ceil((below * 100) / (above + below))
                 }
@@ -100,6 +102,8 @@ export default defineComponent({
 
                 return newBelow
             }
+
+            return 0
         })
 
         return { abovePercent, aboveAmount, belowPercent, belowAmount }
@@ -112,12 +116,12 @@ export default defineComponent({
         <div :class="$style.half">
             <div :class="$style.head">
                 <div :class="$style.name">
-                    Higher <span>{{ abovePercent }}%</span>
+                    Rise <span>{{ abovePercent }}%</span>
                 </div>
 
                 <div :class="$style.size">
                     <Icon name="money" size="12" />
-                    {{ aboveAmount.toFixed(2) }}
+                    {{ aboveAmount.toFixed(0) }}
                     <span>XTZ</span>
                 </div>
             </div>
@@ -133,12 +137,12 @@ export default defineComponent({
         <div :class="$style.half">
             <div :class="$style.head">
                 <div :class="$style.name">
-                    Lower <span>{{ belowPercent }}%</span>
+                    Fall <span>{{ belowPercent }}%</span>
                 </div>
 
                 <div :class="$style.size">
                     <Icon name="money" size="12" />
-                    {{ belowAmount.toFixed(2) }}
+                    {{ belowAmount.toFixed(0) }}
                     <span>XTZ</span>
                 </div>
             </div>

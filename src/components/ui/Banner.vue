@@ -1,27 +1,37 @@
 <script>
 import { defineComponent } from "vue"
 
+/**
+ * UI
+ */
+import Spin from "@/components/ui/Spin"
+
 export default defineComponent({
     name: "Banner",
     props: {
         type: String,
+        loading: Boolean,
     },
+
+    components: { Spin },
 })
 </script>
 
 <template>
     <div :class="[$style.wrapper, $style[type]]">
+        <Spin v-if="loading" size="14" />
         <Icon
+            v-else
             :name="
                 (type == 'warning' && 'help') ||
-                    (type == 'success' && 'checkcircle') ||
-                    (type == 'error' && 'close') ||
-                    (type == 'info' && 'help')
+                (type == 'success' && 'checkcircle') ||
+                (type == 'error' && 'close') ||
+                (type == 'info' && 'help')
             "
             size="14"
         />
 
-        <span><slot /></span>
+        <span><slot /> </span>
     </div>
 </template>
 
@@ -65,5 +75,6 @@ export default defineComponent({
 .wrapper.error {
     fill: var(--red);
     color: var(--red);
+    background: rgba(224, 92, 67, 0.15);
 }
 </style>

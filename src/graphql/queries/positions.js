@@ -10,6 +10,7 @@ export const getAllUserPositions = gql`
                 id
                 status
                 betsCloseTime
+                creatorId
                 currencyPair {
                     symbol
                 }
@@ -66,8 +67,24 @@ export const getUserPositionsForWithdrawal = gql`
                 id
                 status
                 betsCloseTime
+                creatorId
+                poolAboveEq
+                poolBelow
+                totalBetsAmount
+                totalLiquidityProvided
+                totalLiquidityShares
+                totalValueLocked
+                liquidityPercent
+                measurePeriod
+                closedOracleTime
+                createdTime
+                startRate
+                closedRate
+                winnerBets
+                targetDynamics
                 currencyPair {
                     symbol
+                    id
                 }
                 bets {
                     id
@@ -86,18 +103,6 @@ export const getUserPositionsForWithdrawal = gql`
                     createdTime
                     shares
                 }
-                winnerBets
-                poolAboveEq
-                poolBelow
-                totalBetsAmount
-                totalLiquidityProvided
-                totalLiquidityShares
-                totalValueLocked
-                liquidityPercent
-                measurePeriod
-                closedOracleTime
-                createdTime
-                targetDynamics
             }
         }
     }
