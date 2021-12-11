@@ -96,7 +96,7 @@ export default defineComponent({
 
                 <div :class="$style.badge">
                     <Icon name="calendar" size="14" />
-                    25 Aug 2021
+                    {{ new Date(release._updatedAt).toDateString() }}
                 </div>
             </div>
 
@@ -130,7 +130,7 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
 
-    width: 600px;
+    width: 700px;
 }
 
 .title {
