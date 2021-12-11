@@ -54,7 +54,9 @@ export default defineComponent({
         }
 
         const openGithub = () => {
-            window.open("https://google.com", "_blank").focus()
+            window
+                .open("https://github.com/juster-finance/juster-app", "_blank")
+                .focus()
         }
 
         return { content, DateTime, copyURL, openGithub }
@@ -70,7 +72,7 @@ export default defineComponent({
         :class="$style.wrapper"
     >
         <div :class="$style.when">
-            {{ DateTime.fromISO(release._createdAt).toRelative() }}
+            {{ DateTime.fromISO(release._updatedAt).toRelative() }}
         </div>
 
         <div>
