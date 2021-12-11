@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, reactive, ref, toRefs, watch } from "vue"
+import { defineComponent, reactive, ref, toRefs, watch, inject } from "vue"
 
 /**
  * UI
@@ -17,6 +17,8 @@ export default defineComponent({
     },
 
     setup(props, context) {
+        const amplitude = inject("amplitude")
+
         const { liquidityRange, liquidityFilters } = toRefs(props)
 
         const values = reactive({
@@ -36,6 +38,12 @@ export default defineComponent({
 
         const minInputEl = ref(null)
         const maxInputEl = ref(null)
+
+        const handleReset = () => {
+            amplitude.logEvent("onResetFilters")
+
+            context.emit("onReset")
+        }
 
         /** watch for reset */
         watch(liquidityFilters.value, () => {
@@ -97,7 +105,7 @@ export default defineComponent({
             },
         )
 
-        const handleBlur = target => {
+        const handleBlur = (target) => {
             if (target == "min") {
                 if (inputs.min < liquidityRange.value.min) {
                     inputs.min = liquidityRange.value.min
@@ -119,7 +127,7 @@ export default defineComponent({
             }
         }
 
-        const handleKeydown = e => {
+        const handleKeydown = (e) => {
             if (e.key === "-") e.preventDefault()
         }
 
@@ -131,6 +139,7 @@ export default defineComponent({
             inputs,
             minInputEl,
             maxInputEl,
+            handleReset,
         }
     },
 
@@ -151,7 +160,8 @@ export default defineComponent({
                         XTZ-USD
                         <span>{{
                             events.filter(
-                                event => event.currencyPair.symbol == "XTZ-USD",
+                                (event) =>
+                                    event.currencyPair.symbol == "XTZ-USD",
                             ).length
                         }}</span>
                     </div></Checkbox
@@ -161,7 +171,8 @@ export default defineComponent({
                         BTC-USD
                         <span>{{
                             events.filter(
-                                event => event.currencyPair.symbol == "BTC-USD",
+                                (event) =>
+                                    event.currencyPair.symbol == "BTC-USD",
                             ).length
                         }}</span>
                     </div></Checkbox
@@ -171,7 +182,8 @@ export default defineComponent({
                         ETH-USD
                         <span>{{
                             events.filter(
-                                event => event.currencyPair.symbol == "ETH-USD",
+                                (event) =>
+                                    event.currencyPair.symbol == "ETH-USD",
                             ).length
                         }}</span>
                     </div></Checkbox
@@ -278,9 +290,7 @@ export default defineComponent({
             <div :class="$style.subtitle">Target dynamics</div>
 
             <div :class="$style.badges">
-                <div :class="$style.badge">
-                    0%
-                </div>
+                <div :class="$style.badge">0%</div>
                 <div :class="[$style.badge, $style.green]">
                     <Icon name="higher" size="14" />1%
                 </div>
@@ -290,19 +300,11 @@ export default defineComponent({
             </div>
         </div>
 
-        <!-- <div :class="$style.hint">
-            Filters are saved for this device. You can customize this behavior
-            in the settings.
-        </div> -->
-
         <div :class="$style.divider" />
 
         <div :class="$style.actions">
-            <Button @click="$emit('onReset')" type="tertiary" size="small"
-                >Reset</Button
-            >
-            <Button type="tertiary" size="small" disabled
-                ><Icon name="collection" size="16" />Recent filters</Button
+            <Button @click="handleReset" type="tertiary" size="small"
+                >Reset filters</Button
             >
         </div>
     </div>
@@ -433,6 +435,10 @@ export default defineComponent({
 
 .badge.red svg {
     fill: var(--red);
+}
+
+.badge.orange svg {
+    fill: var(--orange);
 }
 
 .badge.gray svg {

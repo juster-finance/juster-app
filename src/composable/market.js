@@ -1,4 +1,4 @@
-import { ref, reactive } from "vue"
+import { reactive } from "vue"
 import { DateTime } from "luxon"
 import { gql } from "@/services/tools"
 
@@ -12,16 +12,105 @@ import { supportedSymbols } from "@/services/config"
  */
 import { fetchSymbols } from "@/api/symbols"
 import { fetchQuotesBySymbol, fetchQuoteByTimestamp } from "@/api/quotes"
+import { fetchUserPositionsForWithdraw } from "@/api/positions"
 
 /**
  * Store
  */
 import { useMarketStore } from "@/store/market"
+import { useAccountStore } from "@/store/account"
+
+/**
+ * gql
+ */
+import { position } from "@/graphql/models"
 
 export const useMarket = () => {
     const marketStore = useMarketStore()
+    const accountStore = useAccountStore()
 
     const symbols = reactive([])
+
+    const setupUser = async () => {
+        /** All positions for withdraw */
+        const userPositions = await fetchUserPositionsForWithdraw({
+            address: accountStore.pkh,
+        })
+        if (userPositions.length) {
+            accountStore.positionsForWithdrawal = userPositions
+            accountStore.isPositionsLoading = false
+        }
+
+        /**
+         * Subscriptions
+         */
+
+        /** New Positions */
+        gql.subscription({
+            position: [
+                {
+                    where: {
+                        userId: {
+                            _eq: accountStore.pkh,
+                        },
+                        withdrawn: { _eq: false },
+                        event: { status: { _eq: "FINISHED" } },
+                    },
+                },
+                {
+                    ...position,
+                },
+            ],
+        }).subscribe({
+            next: data => {
+                const newPositions = data.position
+
+                newPositions.forEach(newPosition => {
+                    if (
+                        accountStore.positionsForWithdrawal.some(
+                            position => position.id == newPosition.id,
+                        )
+                    )
+                        return
+
+                    accountStore.positionsForWithdrawal.push(newPosition)
+                })
+            },
+            error: console.error,
+        })
+
+        /** Newly withdrawn positions */
+        gql.subscription({
+            position: [
+                {
+                    where: {
+                        userId: { _eq: accountStore.pkh },
+                        withdrawn: { _eq: true },
+                        event: { status: { _eq: "FINISHED" } },
+                    },
+                },
+                {
+                    ...position,
+                },
+            ],
+        }).subscribe({
+            next: data => {
+                const { position: withdrawnPositions } = data
+
+                const positionsIdsForWithdrawal = accountStore.positionsForWithdrawal.map(
+                    pos => pos.id,
+                )
+                withdrawnPositions.forEach(withdrawnPosition => {
+                    if (
+                        positionsIdsForWithdrawal.includes(withdrawnPosition.id)
+                    ) {
+                        accountStore.removePosition(withdrawnPosition.id)
+                    }
+                })
+            },
+            error: console.error,
+        })
+    }
 
     const setupMarket = async () => {
         const allSymbols = await fetchSymbols()
@@ -59,7 +148,11 @@ export const useMarket = () => {
                 price: historyQuote[0] ? historyQuote[0].price : 0,
             })
 
-            /** subscription */
+            /**
+             * Subscriptions
+             */
+
+            /** Quotes */
             gql.subscription({
                 quotesWma: [
                     {
@@ -88,5 +181,5 @@ export const useMarket = () => {
         })
     }
 
-    return { setupMarket, symbols }
+    return { setupMarket, setupUser, symbols }
 }

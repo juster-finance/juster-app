@@ -6,6 +6,7 @@ export const getEventById = gql`
             id
             status
             betsCloseTime
+            creatorId
             poolAboveEq
             poolBelow
             totalBetsAmount
@@ -51,6 +52,7 @@ export const getAllEvents = gql`
             id
             status
             betsCloseTime
+            creatorId
             currencyPair {
                 symbol
                 id
@@ -99,6 +101,7 @@ export const getEventsBySymbol = gql`
             id
             status
             betsCloseTime
+            creatorId
             currencyPair {
                 symbol
                 id
@@ -148,6 +151,7 @@ export const getTopEvents = gql`
             id
             status
             betsCloseTime
+            creatorId
             currencyPair {
                 symbol
                 id

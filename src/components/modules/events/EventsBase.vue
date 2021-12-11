@@ -7,9 +7,12 @@ import {
     watch,
     computed,
     onBeforeUnmount,
+    onUnmounted,
+    inject,
 } from "vue"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
+import { gql } from "@/services/tools"
 
 /**
  * API
@@ -21,6 +24,7 @@ import { fetchAllEvents } from "@/api/events"
  */
 import Breadcrumbs from "@/components/ui/Breadcrumbs"
 import Banner from "@/components/ui/Banner"
+import Pagination from "@/components/ui/Pagination"
 
 /**
  * Local
@@ -45,29 +49,41 @@ const defaultFilters = {
     periods: [
         {
             name: "1h",
-            active: false,
+            active: true,
         },
         {
             name: "6h",
-            active: false,
+            active: true,
         },
         {
             name: "24h",
-            active: false,
+            active: true,
         },
     ],
 
     statuses: [
         {
             name: "New",
-            icon: "bolt",
+            icon: "event_new",
             color: "green",
             active: true,
         },
         {
             name: "Active",
-            icon: "time",
+            icon: "event_active",
             color: "yellow",
+            active: false,
+        },
+        {
+            name: "Finished",
+            icon: "checkcircle",
+            color: "gray",
+            active: false,
+        },
+        {
+            name: "Canceled",
+            icon: "stop",
+            color: "orange",
             active: false,
         },
     ],
@@ -84,10 +100,26 @@ export default defineComponent({
             },
         ])
 
+        const amplitude = inject("amplitude")
+
         const marketStore = useMarketStore()
 
-        /** Filters */
+        const subscription = ref(null)
+
+        const isAllEventsLoaded = ref(false)
+
+        const currentPage = ref(1)
+
         let filters = ref(cloneDeep(defaultFilters))
+
+        /** reset "currentPage" when changing filters */
+        watch(
+            filters.value,
+            () => {
+                currentPage.value = 1
+            },
+            { deep: true },
+        )
 
         const liquidityRange = reactive({
             min: 0,
@@ -98,22 +130,22 @@ export default defineComponent({
             max: 0,
         })
 
-        const handleNewMin = value => {
+        const handleNewMin = (value) => {
             liquidityFilters.min = value
         }
 
-        const handleNewMax = value => {
+        const handleNewMax = (value) => {
             liquidityFilters.max = value
         }
 
-        const handleSelectPeriod = target => {
-            filters.value.periods.forEach(period => {
+        const handleSelectPeriod = (target) => {
+            filters.value.periods.forEach((period) => {
                 if (target.name == period.name) period.active = !period.active
             })
         }
 
-        const handleSelectStatus = target => {
-            filters.value.statuses.forEach(status => {
+        const handleSelectStatus = (target) => {
+            filters.value.statuses.forEach((status) => {
                 if (target.name == status.name) status.active = !status.active
             })
         }
@@ -127,8 +159,8 @@ export default defineComponent({
 
         /** Events */
         const availableEvents = computed(() => {
-            return marketStore.events.filter(event =>
-                ["NEW", "STARTED"].includes(event.status),
+            return marketStore.events.filter((event) =>
+                ["NEW", "STARTED", "FINISHED"].includes(event.status),
             )
         })
         const filteredEvents = computed(() => {
@@ -146,47 +178,54 @@ export default defineComponent({
                     filters.value.symbols.eth && "ETH-USD",
                 ].filter(Boolean)
 
-                events = events.filter(event =>
+                events = events.filter((event) =>
                     symbols.includes(event.currencyPair.symbol),
                 )
+            } else {
+                return []
             }
 
             /** Filter by Liquidity */
             events = events.filter(
-                event => event.totalLiquidityProvided >= liquidityFilters.min,
+                (event) => event.totalLiquidityProvided >= liquidityFilters.min,
             )
             events = events.filter(
-                event => event.totalLiquidityProvided <= liquidityFilters.max,
+                (event) => event.totalLiquidityProvided <= liquidityFilters.max,
             )
 
             /** Filter by Status */
             if (filters.value.statuses.length) {
                 const statuses = filters.value.statuses
-                    .filter(status => status.active)
-                    .map(status => {
+                    .filter((status) => status.active)
+                    .map((status) => {
                         if (status.name == "New") return "NEW"
                         if (status.name == "Active") return "STARTED"
                         if (status.name == "Finished") return "FINISHED"
+                        if (status.name == "Canceled") return "CANCELED"
                     })
 
-                events = events.filter(event => statuses.includes(event.status))
+                events = events.filter((event) =>
+                    statuses.includes(event.status),
+                )
             }
 
             /** Filter by Period */
             if (filters.value.periods.length) {
                 const periods = filters.value.periods
-                    .filter(period => period.active)
+                    .filter((period) => period.active)
                     .map(
-                        period =>
+                        (period) =>
                             (period.name == "1h" && 3600) ||
                             (period.name == "6h" && 21600) ||
                             (period.name == "24h" && 86400),
                     )
 
                 if (periods.length) {
-                    events = events.filter(event =>
+                    events = events.filter((event) =>
                         periods.includes(event.measurePeriod),
                     )
+                } else {
+                    events = []
                 }
             }
 
@@ -197,23 +236,112 @@ export default defineComponent({
             () => marketStore.events,
             () => {
                 const allLiquidity = cloneDeep(marketStore.events)
-                    .filter(event => ["NEW", "STARTED"].includes(event.status))
-                    .map(event => event.totalLiquidityProvided)
+                    .filter((event) =>
+                        ["NEW", "STARTED"].includes(event.status),
+                    )
+                    .map((event) => event.totalLiquidityProvided)
 
                 liquidityRange.min = Math.min(...allLiquidity)
                 liquidityRange.max = Math.max(...allLiquidity)
                 liquidityFilters.min = Math.min(...allLiquidity)
                 liquidityFilters.max = Math.max(...allLiquidity)
             },
+            { deep: true },
         )
 
         onMounted(async () => {
+            amplitude.logEvent("onPage", { name: "AllEvents" })
+
             let allNewEvents = await fetchAllEvents()
 
+            isAllEventsLoaded.value = true
+
             marketStore.events = cloneDeep(allNewEvents)
+
+            // subscribe to new events
+            subscription.value = await gql
+                .subscription({
+                    event: [
+                        {
+                            where: {
+                                status: { _eq: "NEW" },
+                            },
+                        },
+                        {
+                            id: true,
+                            status: true,
+                            betsCloseTime: true,
+                            creatorId: true,
+                            currencyPair: {
+                                symbol: true,
+                                id: true,
+                            },
+                            poolAboveEq: true,
+                            poolBelow: true,
+                            totalBetsAmount: true,
+                            totalLiquidityProvided: true,
+                            totalLiquidityShares: true,
+                            totalValueLocked: true,
+                            liquidityPercent: true,
+                            measurePeriod: true,
+                            closedOracleTime: true,
+                            createdTime: true,
+                            startRate: true,
+                            closedRate: true,
+                            winnerBets: true,
+                            targetDynamics: true,
+                            bets: {
+                                id: true,
+                                side: true,
+                                reward: true,
+                                amount: true,
+                                createdTime: true,
+                                userId: true,
+                            },
+                            deposits: {
+                                amountAboveEq: true,
+                                amountBelow: true,
+                                eventId: true,
+                                id: true,
+                                userId: true,
+                                createdTime: true,
+                                shares: true,
+                            },
+                        },
+                    ],
+                })
+                .subscribe({
+                    next: (data) => {
+                        const { event: newEvents } = data
+
+                        newEvents.forEach((newEvent) => {
+                            if (
+                                marketStore.events.some(
+                                    (event) => newEvent.id == event.id,
+                                )
+                            ) {
+                                return
+                            }
+
+                            marketStore.events.push(newEvent)
+                        })
+                    },
+                    error: console.error,
+                })
         })
+
         onBeforeUnmount(() => {
             marketStore.events = []
+        })
+
+        onUnmounted(() => {
+            if (
+                subscription.value &&
+                subscription.value.unsubscribe &&
+                !subscription.value?.closed
+            ) {
+                subscription.value.unsubscribe()
+            }
         })
 
         /** Meta */
@@ -225,8 +353,10 @@ export default defineComponent({
         return {
             breadcrumbs,
             marketStore,
+            isAllEventsLoaded,
             filteredEvents,
             availableEvents,
+            currentPage,
             filters,
             liquidityRange,
             liquidityFilters,
@@ -241,6 +371,7 @@ export default defineComponent({
     components: {
         Breadcrumbs,
         Banner,
+        Pagination,
         EventsFilters,
         EventCard,
         EventCardLoading,
@@ -280,7 +411,14 @@ export default defineComponent({
             <div :class="$style.events_base">
                 <Banner
                     type="info"
-                    v-if="filteredEvents.length !== availableEvents.length"
+                    v-if="filteredEvents.length == 0 && isAllEventsLoaded"
+                    >All
+                    {{ availableEvents.length - filteredEvents.length }} events
+                    hidden due to filters. Reset filters to see some</Banner
+                >
+                <Banner
+                    type="info"
+                    v-else-if="filteredEvents.length !== availableEvents.length"
                     >{{ availableEvents.length - filteredEvents.length }} events
                     hidden due to filters</Banner
                 >
@@ -288,18 +426,29 @@ export default defineComponent({
                 <transition name="fastfade" mode="out-in">
                     <div v-if="filteredEvents.length" :class="$style.events">
                         <EventCard
-                            v-for="event in filteredEvents"
+                            v-for="event in filteredEvents.slice(
+                                (currentPage - 1) * 6,
+                                currentPage * 6,
+                            )"
                             :key="event.id"
                             :event="event"
                         />
                     </div>
 
-                    <div v-else :class="$style.events">
+                    <div v-else-if="!isAllEventsLoaded" :class="$style.events">
                         <EventCardLoading />
                         <EventCardLoading />
                         <EventCardLoading />
                     </div>
                 </transition>
+
+                <Pagination
+                    v-if="filteredEvents.length > 6"
+                    v-model="currentPage"
+                    :total="filteredEvents.length"
+                    :limit="6"
+                    :class="$style.pagination"
+                />
             </div>
         </div>
     </div>
@@ -348,6 +497,10 @@ export default defineComponent({
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-gap: 16px;
+}
+
+.pagination {
+    margin-top: 16px;
 }
 
 @media (max-width: 420px) {

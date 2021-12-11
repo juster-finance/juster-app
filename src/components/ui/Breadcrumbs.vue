@@ -11,19 +11,19 @@ export default defineComponent({
     setup() {
         const router = useRouter()
 
-        const selectCrumb = crumb => {
+        const selectCrumb = (crumb) => {
             router.push(crumb.path)
         }
 
-        const go = target => {
+        const go = (target) => {
             if (!canGo(target)) return
             router.go(target == "back" ? -1 : 1)
         }
-        const canGo = target => {
+        const canGo = (target) => {
             return !!window.history.state[target]
         }
 
-        const handleNavigationShortcut = event => {
+        const handleNavigationShortcut = (event) => {
             if (event.ctrlKey && event.key === "ArrowLeft") {
                 event.preventDefault()
                 go("back")

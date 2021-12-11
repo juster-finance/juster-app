@@ -8,9 +8,9 @@ import {
     ref,
     reactive,
     computed,
+    inject,
 } from "vue"
 import { DateTime } from "luxon"
-import { useRouter } from "vue-router"
 import { gql } from "@/services/tools"
 
 /**
@@ -61,6 +61,8 @@ export default defineComponent({
 
     setup(props) {
         const { event } = toRefs(props)
+
+        const amplitude = inject("amplitude")
 
         /** Stores */
         const notificationsStore = useNotificationsStore()
@@ -178,8 +180,8 @@ export default defineComponent({
 
         const participantsAvatars = computed(() => {
             let avatars = [
-                ...event.value.bets.map(bet => bet.userId),
-                ...event.value.deposits.map(deposit => deposit.userId),
+                ...event.value.bets.map((bet) => bet.userId),
+                ...event.value.deposits.map((deposit) => deposit.userId),
             ]
 
             /** remove duplicates */
@@ -192,49 +194,63 @@ export default defineComponent({
             let tvl = 0
 
             tvl += event.value.deposits
-                .filter(deposit => deposit.userId == accountStore.pkh)
+                .filter((deposit) => deposit.userId == accountStore.pkh)
                 .reduce((a, { amountBelow }) => a + amountBelow, 0)
             tvl += event.value.bets
-                .filter(bet => bet.userId == accountStore.pkh)
+                .filter((bet) => bet.userId == accountStore.pkh)
                 .reduce((a, { amount }) => a + amount, 0)
 
             return tvl
         })
 
         const isUserWon = computed(() => {
-            return accountStore.wonPositions.some(
-                position => position.event.id == event.value.id,
+            return accountStore.positionsForWithdrawal.some(
+                (position) => position.event.id == event.value.id,
             )
         })
         const wonPosition = computed(() => {
-            return accountStore.wonPositions.find(
-                position => position.event.id == event.value.id,
+            return accountStore.positionsForWithdrawal.find(
+                (position) => position.event.id == event.value.id,
             )
         })
 
         /** Join to the event & Liquidity */
-        const handleJoin = event => {
+        const handleBet = (e) => {
             /** disable Bet / Liquidity right after betsCloseTime */
-            if (startStatus == "Finished") return
+            if (
+                startStatus.value == "Finished" ||
+                event.value.totalLiquidityProvided == 0
+            )
+                return
 
-            event.stopImmediatePropagation()
+            e.stopImmediatePropagation()
+
+            amplitude.logEvent("showBetModal", { where: "event_card" })
 
             showBetModal.value = true
         }
-        const handleLiquidity = event => {
+        const handleLiquidity = (e) => {
             /** disable Bet / Liquidity right after betsCloseTime */
-            if (startStatus == "Finished") return
+            if (
+                startStatus.value == "Finished" ||
+                event.value.totalLiquidityProvided == 0
+            )
+                return
 
-            event.stopImmediatePropagation()
+            e.stopImmediatePropagation()
+
+            amplitude.logEvent("showLiquidityModal", { where: "event_card" })
 
             showLiquidityModal.value = true
         }
 
         /** Withdraw */
-        const handleWithdraw = e => {
+        const handleWithdraw = (e) => {
+            amplitude.logEvent("clickWithdraw", { where: "event_card" })
+
             juster
                 .withdraw(event.value.id, accountStore.pkh)
-                .then(op => {
+                .then((op) => {
                     notificationsStore.create({
                         notification: {
                             type: "success",
@@ -244,11 +260,21 @@ export default defineComponent({
                             autoDestroy: true,
                         },
                     })
+
+                    amplitude.logEvent("onWithdraw", {
+                        eventId: event.value.id,
+                    })
                 })
-                .catch(err => console.log(err))
+                .catch((err) => console.log(err))
         }
 
-        const copy = target => {
+        const handleParticipants = () => {
+            showParticipantsModal.value = true
+
+            amplitude.logEvent("showParticipantsModal", { where: "event_card" })
+        }
+
+        const copy = (target) => {
             if (target == "id") {
                 notificationsStore.create({
                     notification: {
@@ -280,8 +306,10 @@ export default defineComponent({
             top: 0,
             left: 0,
         })
-        const contextMenuHandler = e => {
+        const contextMenuHandler = (e) => {
             e.preventDefault()
+
+            amplitude.logEvent("showContextMenu")
 
             contextMenuStyles.top = `${e.clientY}px`
             contextMenuStyles.left = `${e.clientX}px`
@@ -314,6 +342,7 @@ export default defineComponent({
                             totalValueLocked: true,
                             totalLiquidityProvided: true,
                             createdTime: true,
+                            creatorId: true,
                             betsCloseTime: true,
                             liquidityPercent: true,
                             status: true,
@@ -341,7 +370,7 @@ export default defineComponent({
                     ],
                 })
                 .subscribe({
-                    next: data => {
+                    next: (data) => {
                         const { event: newEvent } = data
 
                         marketStore.updEvent(newEvent[0])
@@ -385,8 +414,9 @@ export default defineComponent({
             isUserWon,
             wonPosition,
             percentage,
-            handleJoin,
+            handleBet,
             handleLiquidity,
+            handleParticipants,
             handleWithdraw,
             copy,
             handleSwitch,
@@ -448,7 +478,7 @@ export default defineComponent({
 
                     <DropdownDivider />
 
-                    <DropdownItem @click.prevent="showParticipantsModal = true"
+                    <DropdownItem @click.prevent="handleParticipants"
                         ><Icon name="users" size="16" />View participants
                     </DropdownItem>
                     <DropdownItem disabled
@@ -472,25 +502,45 @@ export default defineComponent({
                     <img :src="getCurrencyIcon('USD')" />
                 </div>
 
-                <Tooltip position="bottom" side="right">
-                    <div :class="$style.participants">
-                        <img
-                            v-for="participantAvatar in participantsAvatars.slice(
-                                0,
-                                3,
-                            )"
-                            :key="participantAvatar"
-                            :src="
-                                `https://services.tzkt.io/v1/avatars/${participantAvatar}`
-                            "
-                            :class="$style.image"
-                        />
-                    </div>
+                <div :class="$style.users">
+                    <Tooltip position="bottom" side="right">
+                        <div :class="$style.participants">
+                            <img
+                                v-for="participantAvatar in participantsAvatars.slice(
+                                    0,
+                                    3,
+                                )"
+                                :key="participantAvatar"
+                                :src="`https://services.tzkt.io/v1/avatars/${participantAvatar}`"
+                                :class="$style.user_avatar"
+                            />
+                        </div>
 
-                    <template v-slot:content>
-                        Participants ({{ participantsAvatars.length }})
-                    </template>
-                </Tooltip>
+                        <template v-slot:content>
+                            Participants ({{ participantsAvatars.length }})
+                        </template>
+                    </Tooltip>
+
+                    <Tooltip position="bottom" side="right">
+                        <div :class="$style.creator">
+                            <img
+                                :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
+                                :class="$style.user_avatar"
+                            />
+                            <Icon name="verified" size="14" />
+                        </div>
+
+                        <template v-slot:content>
+                            Creator:
+                            {{
+                                `${event.creatorId.slice(
+                                    0,
+                                    4,
+                                )}....${event.creatorId.slice(32, 36)}`
+                            }}
+                        </template>
+                    </Tooltip>
+                </div>
             </div>
 
             <div :class="$style.title">
@@ -506,7 +556,7 @@ export default defineComponent({
 
                 {{
                     supportedSymbols[symbol] &&
-                        supportedSymbols[symbol].description
+                    supportedSymbols[symbol].description
                 }}
                 <span>price event</span>
             </div>
@@ -538,7 +588,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="green" :class="$style.main_badge"
-                        ><Icon name="bolt" size="12" />New</Badge
+                        ><Icon name="event_new" size="12" />New</Badge
                     >
 
                     <template v-slot:content>
@@ -554,7 +604,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="yellow" :class="$style.main_badge"
-                        ><Icon name="bolt" size="12" />Starting soon</Badge
+                        ><Icon name="event_new" size="12" />Starting soon</Badge
                     >
 
                     <template v-slot:content>
@@ -567,7 +617,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="yellow" :class="$style.main_badge"
-                        ><Icon name="time" size="12" />Active</Badge
+                        ><Icon name="event_active" size="12" />Active</Badge
                     >
                     <template v-slot:content>
                         Betting is closed. The end of the event is pending
@@ -579,10 +629,22 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="gray" :class="$style.main_badge"
-                        ><Icon name="checkcircle" size="12" />Finished</Badge
+                        ><Icon name="event_finished" size="12" />Finished</Badge
                     >
                     <template v-slot:content>
                         The event is closed, winning side determined
+                    </template>
+                </Tooltip>
+                <Tooltip
+                    v-else-if="event.status == 'CANCELED'"
+                    position="bottom"
+                    side="left"
+                >
+                    <Badge color="orange" :class="$style.main_badge"
+                        ><Icon name="stop" size="12" />Canceled</Badge
+                    >
+                    <template v-slot:content>
+                        This event has been canceled, funds returned
                     </template>
                 </Tooltip>
 
@@ -606,10 +668,8 @@ export default defineComponent({
                 <Tooltip position="bottom" side="right">
                     <Badge v-if="userTVL" color="gray" :class="$style.badge">
                         <img
-                            :src="
-                                `https://services.tzkt.io/v1/avatars/${accountStore.pkh}`
-                            "
-                            :class="$style.user_avatar"
+                            :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
+                            :class="$style.my_avatar"
                         />
 
                         {{ abbreviateNumber(userTVL) }} XTZ
@@ -645,9 +705,7 @@ export default defineComponent({
                     :class="[$style.hint, $style.gray]"
                 >
                     <Icon name="time" size="14" />
-                    <div>
-                        Starting soon
-                    </div>
+                    <div>Starting soon</div>
                 </div>
 
                 <div
@@ -685,6 +743,14 @@ export default defineComponent({
                 </div>
 
                 <div
+                    v-if="event.status == 'CANCELED'"
+                    :class="[$style.hint, $style.red]"
+                >
+                    <Icon name="flag" size="14" />
+                    <div><span>Start price</span> is not determined</div>
+                </div>
+
+                <div
                     v-if="event.status !== 'FINISHED'"
                     :class="[
                         $style.hint,
@@ -697,11 +763,10 @@ export default defineComponent({
                     <Icon
                         :name="
                             (liquidityLevel == 'Low' && 'liquidity_low') ||
-                                (liquidityLevel == 'Medium' &&
-                                    'liquidity_medium') ||
-                                (liquidityLevel == 'High' &&
-                                    'liquidity_high') ||
-                                (liquidityLevel == 'Ultra' && 'liquidity_ultra')
+                            (liquidityLevel == 'Medium' &&
+                                'liquidity_medium') ||
+                            (liquidityLevel == 'High' && 'liquidity_high') ||
+                            (liquidityLevel == 'Ultra' && 'liquidity_ultra')
                         "
                         size="14"
                     />
@@ -734,10 +799,11 @@ export default defineComponent({
                 :class="[
                     $style.buttons,
                     startStatus == 'Finished' && $style.disabled,
+                    event.totalLiquidityProvided == 0 && $style.disabled,
                 ]"
             >
                 <div
-                    @click.prevent="handleJoin"
+                    @click.prevent="handleBet"
                     :class="[$style.button, $style.green]"
                 >
                     <Icon name="plus" size="16" /> Bet
@@ -816,11 +882,30 @@ export default defineComponent({
     right: 0;
 }
 
+.users {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .participants {
     display: flex;
 }
 
-.participants img {
+.creator {
+    display: flex;
+    position: relative;
+}
+
+.creator svg {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+
+    fill: var(--yellow);
+}
+
+.user_avatar {
     width: 30px;
     height: 30px;
 
@@ -842,7 +927,7 @@ export default defineComponent({
     font-weight: 600;
     color: var(--text-primary);
 
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .title img {
@@ -967,7 +1052,7 @@ export default defineComponent({
     fill: var(--text-secondary);
 }
 
-.user_avatar {
+.my_avatar {
     width: 16px;
     height: 16px;
 }

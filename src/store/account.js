@@ -3,7 +3,7 @@ import { defineStore } from "pinia"
 /**
  * Services
  */
-import { tezos } from "@/services/tools"
+import { fetchBalance } from "@/services/tools"
 
 export const useAccountStore = defineStore({
     id: "account",
@@ -13,7 +13,8 @@ export const useAccountStore = defineStore({
             pkh: "",
             balance: 0,
 
-            wonPositions: [],
+            isPositionsLoading: false,
+            positionsForWithdrawal: [],
 
             showOnboarding: false,
         }
@@ -23,10 +24,18 @@ export const useAccountStore = defineStore({
             this.pkh = pkh
         },
 
-        updateBalance() {
-            tezos.tz
-                .getBalance(this.pkh)
-                .then(val => (this.balance = val.toNumber() / 1000000))
+        async updateBalance() {
+            this.balance = await fetchBalance(this.pkh)
+        },
+
+        /** positions */
+        removePosition(id) {
+            const positionIndex = this.positionsForWithdrawal.findIndex(
+                pos => pos.id == id,
+            )
+            if (positionIndex == -1) return
+
+            this.positionsForWithdrawal.splice(positionIndex, 1)
         },
     },
     getters: {

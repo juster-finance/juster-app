@@ -1,6 +1,16 @@
 <script>
-import { defineComponent, ref, reactive, computed, toRefs, watch } from "vue"
+import {
+    defineComponent,
+    ref,
+    reactive,
+    computed,
+    toRefs,
+    watch,
+    inject,
+    nextTick,
+} from "vue"
 import BigNumber from "bignumber.js"
+import { DateTime } from "luxon"
 
 /**
  * Services
@@ -43,22 +53,28 @@ export default defineComponent({
     setup(props, context) {
         const { event, show } = toRefs(props)
 
+        const amplitude = inject("amplitude")
+
         const accountStore = useAccountStore()
         const notificationsStore = useNotificationsStore()
+
+        const amountInput = ref(null)
 
         /** Countdown setup */
         const eventStartTime = computed(() =>
             new Date(event.value?.betsCloseTime).getTime(),
         )
-        const { countdownText, status: countdownStatus, stop } = useCountdown(
-            eventStartTime,
-        )
+        const {
+            countdownText,
+            status: countdownStatus,
+            stop,
+        } = useCountdown(eventStartTime)
 
         /** User inputs */
         const amount = reactive({ value: 0, error: "" })
         const slippage = ref(2.5)
 
-        const sendingBet = ref(false)
+        const sendingLiquidity = ref(false)
 
         const liquidityRatio = computed(() => {
             const abRatio = event.value.poolBelow / event.value.poolAboveEq
@@ -82,14 +98,32 @@ export default defineComponent({
             )
         })
 
-        /** clear on close */
+        const onKeydown = (e) => {
+            if (e.code == "Enter") {
+                e.preventDefault()
+                handleProvideLiquidity()
+            }
+        }
+
         watch(show, () => {
             if (!show.value) {
                 amount.value = 0
-                sendingBet.value = false
+                sendingLiquidity.value = false
+
                 stop()
+
+                document.removeEventListener("keydown", onKeydown)
+
+                showConfirmationHint.value = false
             } else {
                 accountStore.updateBalance()
+
+                document.addEventListener("keydown", onKeydown)
+
+                /** auto-focus input */
+                nextTick(() => {
+                    amountInput.value.$el.querySelector("input").focus()
+                })
             }
         })
 
@@ -98,22 +132,33 @@ export default defineComponent({
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
-        const buttonText = computed(() => {
+        const buttonState = computed(() => {
             if (countdownStatus.value !== "In progress")
-                return "Acceptance of bets is closed"
-            if (sendingBet.value) return "Awaiting confirmation.."
+                return { text: "Acceptance of bets is closed", disabled: true }
+            if (sendingLiquidity.value)
+                return { text: "Awaiting confirmation..", disabled: true }
 
-            if (amount.value > accountStore.balance) return "Insufficient funds"
+            if (amount.value > accountStore.balance)
+                return { text: "Insufficient funds", disabled: true }
 
-            if (!amount.value) return "Type the liquidity amount"
-            if (amount.value) return "Provide liquidity"
+            if (!amount.value)
+                return { text: "Select the liquidity amount", disabled: true }
+            if (amount.value)
+                return { text: "Provide liquidity", disabled: false }
         })
+
+        const showConfirmationHint = ref(false)
 
         const handleProvideLiquidity = () => {
             if (!amount.value) return
             if (countdownStatus.value !== "In progress") return
 
-            sendingBet.value = true
+            sendingLiquidity.value = true
+
+            setTimeout(() => {
+                showConfirmationHint.value = true
+            }, 5000)
+
             juster
                 .provideLiquidity(
                     event.value.id,
@@ -122,8 +167,9 @@ export default defineComponent({
                     new BigNumber(slippage.value / 100),
                     new BigNumber(amount.value),
                 )
-                .then(op => {
-                    sendingBet.value = false
+                .then((op) => {
+                    sendingLiquidity.value = false
+                    showConfirmationHint.value = false
 
                     /** slow notification to get attention */
                     setTimeout(() => {
@@ -138,15 +184,27 @@ export default defineComponent({
                         })
                     }, 700)
 
+                    /** analytics */
+                    amplitude.logEvent("onLiquidity", {
+                        eventId: event.value.id,
+                        amount: amount.value,
+                        tts:
+                            DateTime.fromISO(event.value.betsCloseTime).ts -
+                            DateTime.now().ts,
+                    })
+
                     context.emit("onClose")
                 })
-                .catch(err => console.log(err))
+                .catch((err) => {
+                    sendingLiquidity.value = false
+                    showConfirmationHint.value = false
+                })
         }
 
         /** Login */
         const handleLogin = async () => {
             await juster.sync()
-            juster.getPkh().then(pkh => {
+            juster.getPkh().then((pkh) => {
                 accountStore.setPkh(pkh)
             })
 
@@ -157,14 +215,16 @@ export default defineComponent({
             accountStore,
             countdownText,
             countdownStatus,
+            amountInput,
             amount,
             slippage,
-            sendingBet,
+            sendingLiquidity,
             liquidityRatio,
             shares,
+            showConfirmationHint,
             handleProvideLiquidity,
             handleLogin,
-            buttonText,
+            buttonState,
         }
     },
 
@@ -204,6 +264,7 @@ export default defineComponent({
             />
 
             <Input
+                ref="amountInput"
                 type="number"
                 :limit="10000"
                 label="Amount"
@@ -220,7 +281,7 @@ export default defineComponent({
                 <span
                     @click="amount.value = Math.floor(accountStore.balance)"
                     @dblclick="amount.value = accountStore.balance / 2"
-                    >{{ accountStore.balance.toFixed(2) }}
+                    >{{ accountStore.balance }}
                 </span>
 
                 XTZ
@@ -256,16 +317,12 @@ export default defineComponent({
             <Button
                 @click="handleProvideLiquidity"
                 size="large"
-                type="primary"
+                :type="buttonState.disabled ? 'secondary' : 'primary'"
                 block
-                :loading="sendingBet"
-                :disabled="
-                    !amount.value ||
-                        countdownStatus !== 'In progress' ||
-                        accountStore.balance < amount.value
-                "
+                :loading="sendingLiquidity"
+                :disabled="buttonState.disabled"
             >
-                <Spin v-if="sendingBet" size="16" />
+                <Spin v-if="sendingLiquidity" size="16" />
                 <Icon
                     v-else
                     :name="
@@ -274,8 +331,17 @@ export default defineComponent({
                             : 'lock'
                     "
                     size="16"
-                />{{ buttonText }}</Button
+                />{{ buttonState.text }}</Button
             >
+
+            <div v-if="showConfirmationHint" :class="$style.hint">
+                Confirmation not appearing?
+                <a
+                    href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
+                    target="_blank"
+                    >Read about possible solutions</a
+                >
+            </div>
         </template>
 
         <template v-else>
@@ -354,5 +420,19 @@ export default defineComponent({
 
 .ratio_icon {
     fill: var(--opacity-40);
+}
+
+.hint {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    text-align: center;
+
+    margin-top: 12px;
+}
+
+.hint a {
+    color: var(--text-blue);
 }
 </style>

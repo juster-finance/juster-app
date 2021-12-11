@@ -7,6 +7,7 @@ import {
     computed,
     onMounted,
     onUnmounted,
+    inject,
 } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
@@ -72,6 +73,8 @@ export default defineComponent({
     name: "EventBase",
 
     setup() {
+        const amplitude = inject("amplitude")
+
         const router = useRouter()
 
         const breadcrumbs = reactive([
@@ -135,13 +138,13 @@ export default defineComponent({
             if (!event.value) return
 
             return !!event.value.bets
-                .filter(bet => bet.userId == accountStore.pkh)
-                .filter(bet => bet.side == event.value.winnerBets).length
+                .filter((bet) => bet.userId == accountStore.pkh)
+                .filter((bet) => bet.side == event.value.winnerBets).length
         })
 
         const canWithdraw = computed(() => {
-            return accountStore.wonPositions.some(
-                position => position.event.id == event.value.id,
+            return accountStore.positionsForWithdrawal.some(
+                (position) => position.event.id == event.value.id,
             )
         })
 
@@ -149,9 +152,11 @@ export default defineComponent({
         const eventStartTime = computed(() =>
             new Date(event.value?.betsCloseTime).getTime(),
         )
-        const { status: countdownStatus, time, stop } = useCountdown(
-            eventStartTime,
-        )
+        const {
+            status: countdownStatus,
+            time,
+            stop,
+        } = useCountdown(eventStartTime)
 
         // eslint-disable-next-line vue/return-in-computed-property
         const timeLeft = computed(() => {
@@ -167,9 +172,8 @@ export default defineComponent({
 
         const price = computed(() => {
             return {
-                rate:
-                    marketStore.symbols[event.value?.currencyPair.symbol]
-                        ?.quotes[0]?.price,
+                rate: marketStore.symbols[event.value?.currencyPair.symbol]
+                    ?.quotes[0]?.price,
                 integer: numberWithSymbol(
                     marketStore.symbols[
                         event.value?.currencyPair.symbol
@@ -198,7 +202,7 @@ export default defineComponent({
                 return event.value.deposits
             } else {
                 return event.value.deposits.filter(
-                    deposit => deposit.userId == accountStore.pkh,
+                    (deposit) => deposit.userId == accountStore.pkh,
                 )
             }
         })
@@ -209,14 +213,45 @@ export default defineComponent({
                 return event.value.bets
             } else {
                 return event.value.bets.filter(
-                    bet => bet.userId == accountStore.pkh,
+                    (bet) => bet.userId == accountStore.pkh,
                 )
             }
         })
+
+        const selectedPageForDeposits = ref(1)
+        const paginatedDeposits = computed(() =>
+            cloneDeep(filteredDeposits.value)
+                .sort(
+                    (a, b) =>
+                        new Date(b.createdTime).getTime() -
+                        new Date(a.createdTime).getTime(),
+                )
+                .slice(
+                    (selectedPageForDeposits.value - 1) * 3,
+                    selectedPageForDeposits.value * 3,
+                ),
+        )
+
+        const selectedPageForBets = ref(1)
+        const paginatedBets = computed(() =>
+            cloneDeep(filteredBets.value)
+                .sort(
+                    (a, b) =>
+                        new Date(b.createdTime).getTime() -
+                        new Date(a.createdTime).getTime(),
+                )
+                .slice(
+                    (selectedPageForBets.value - 1) * 3,
+                    selectedPageForBets.value * 3,
+                ),
+        )
+
         const pendingBet = ref(null)
         const userBets = computed(() =>
             event.value
-                ? event.value.bets.filter(bet => bet.userId == accountStore.pkh)
+                ? event.value.bets.filter(
+                      (bet) => bet.userId == accountStore.pkh,
+                  )
                 : [],
         )
 
@@ -277,28 +312,39 @@ export default defineComponent({
             }
         })
 
-        const handleJoin = event => {
+        const handleJoin = (event) => {
             event.stopPropagation()
             showBetModal.value = true
+
+            amplitude.logEvent("showBetModal", { where: "event_base" })
         }
 
-        const handleBet = bet => {
+        const handleBet = (bet) => {
             pendingBet.value = bet
             showBetModal.value = false
         }
 
-        const handleWithdraw = e => {
+        const handleLiquidity = () => {
+            showLiquidityModal.value = true
+
+            amplitude.logEvent("showLiquidityModal", { where: "event_base" })
+        }
+
+        const handleWithdraw = (e) => {
             e.stopPropagation()
+
+            amplitude.logEvent("clickWithdraw", { where: "event_base" })
 
             juster
                 .withdraw(event.value.id, accountStore.pkh)
-                .then(op => {
+                .then((op) => {
                     console.log(`Hash: ${op.opHash}`)
 
                     /** rm won position from store */
-                    accountStore.wonPositions = accountStore.wonPositions.filter(
-                        position => position.event.id != event.value.id,
-                    )
+                    accountStore.positionsForWithdrawal =
+                        accountStore.positionsForWithdrawal.filter(
+                            (position) => position.event.id != event.value.id,
+                        )
 
                     notificationsStore.create({
                         notification: {
@@ -310,10 +356,16 @@ export default defineComponent({
                         },
                     })
                 })
-                .catch(err => console.log(err))
+                .catch((err) => console.log(err))
         }
 
-        const copy = target => {
+        const handleParticipants = () => {
+            showParticipantsModal.value = true
+
+            amplitude.logEvent("showParticipantsModal", { where: "event_base" })
+        }
+
+        const copy = (target) => {
             if (target == "id") {
                 notificationsStore.create({
                     notification: {
@@ -361,6 +413,7 @@ export default defineComponent({
                             id: true,
                             status: true,
                             betsCloseTime: true,
+                            creatorId: true,
                             poolAboveEq: true,
                             poolBelow: true,
                             totalBetsAmount: true,
@@ -400,7 +453,7 @@ export default defineComponent({
                     ],
                 })
                 .subscribe({
-                    next: data => {
+                    next: (data) => {
                         const { event: newEvent } = data
 
                         /** Clear pending bet on update */
@@ -444,6 +497,10 @@ export default defineComponent({
             filters,
             filteredDeposits,
             filteredBets,
+            selectedPageForDeposits,
+            selectedPageForBets,
+            paginatedDeposits,
+            paginatedBets,
             pendingBet,
             userBets,
             timeLeft,
@@ -460,6 +517,8 @@ export default defineComponent({
             showParticipantsModal,
             handleSwitch,
             handleJoin,
+            handleLiquidity,
+            handleParticipants,
             handleBet,
             handleWithdraw,
             copy,
@@ -526,11 +585,19 @@ export default defineComponent({
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-        <div :class="$style.container">
+        <div v-if="event" :class="$style.container">
             <div :class="$style.base">
                 <Banner v-if="won" type="success" :class="$style.banner"
                     >You have chosen the correct outcome of the event. You can
                     withdraw your reward ✨</Banner
+                >
+                <Banner
+                    v-if="event.status == 'CANCELED'"
+                    type="error"
+                    :class="$style.banner"
+                    >The event was canceled due to problems with the start of
+                    price measurement. All bets and liquidity are
+                    refunded</Banner
                 >
 
                 <div v-if="event" :class="$style.event">
@@ -579,7 +646,22 @@ export default defineComponent({
                             <!-- Labels -->
                             <div :class="$style.labels">
                                 <Tooltip
-                                    v-if="countdownStatus == 'In progress'"
+                                    v-if="event.status == 'CANCELED'"
+                                    position="bottom"
+                                    side="left"
+                                >
+                                    <Label icon="stop" color="red"
+                                        >Canceled</Label
+                                    >
+
+                                    <template v-slot:content>
+                                        Event canceled due to problems with
+                                        starting or finishing price
+                                    </template>
+                                </Tooltip>
+
+                                <Tooltip
+                                    v-else-if="countdownStatus == 'In progress'"
                                     position="bottom"
                                     side="left"
                                 >
@@ -594,14 +676,15 @@ export default defineComponent({
                                     >
 
                                     <template v-slot:content>
-                                        Time left to make a bet or provide liquidity
+                                        Time left to make a bet or provide
+                                        liquidity
                                     </template>
                                 </Tooltip>
 
                                 <Tooltip
                                     v-else-if="
                                         countdownStatus == 'Finished' &&
-                                            event.status == 'NEW'
+                                        event.status == 'NEW'
                                     "
                                     position="bottom"
                                     side="left"
@@ -619,7 +702,7 @@ export default defineComponent({
                                 <Tooltip
                                     v-else-if="
                                         countdownStatus == 'Finished' &&
-                                            event.status == 'STARTED'
+                                        event.status == 'STARTED'
                                     "
                                     position="bottom"
                                     side="left"
@@ -629,14 +712,15 @@ export default defineComponent({
                                     >
 
                                     <template v-slot:content>
-                                        Start price is fixed, waiting for event completion
+                                        Start price is fixed, waiting for event
+                                        completion
                                     </template>
                                 </Tooltip>
 
                                 <Tooltip
                                     v-else-if="
                                         countdownStatus == 'Finished' &&
-                                            event.status == 'FINISHED'
+                                        event.status == 'FINISHED'
                                     "
                                     position="bottom"
                                     side="left"
@@ -644,8 +728,7 @@ export default defineComponent({
                                     <Label icon="check">Finished</Label>
 
                                     <template v-slot:content>
-                                        Event is over, winners are
-                                        determined
+                                        Event is over, winners are determined
                                     </template>
                                 </Tooltip>
 
@@ -694,8 +777,7 @@ export default defineComponent({
                                 </template>
 
                                 <template v-slot:dropdown>
-                                    <DropdownItem
-                                        @click="showParticipantsModal = true"
+                                    <DropdownItem @click="handleParticipants"
                                         ><Icon name="users" size="16" />View
                                         participants
                                     </DropdownItem>
@@ -720,8 +802,8 @@ export default defineComponent({
                             <Button
                                 v-if="
                                     event.status == 'FINISHED' &&
-                                        won &&
-                                        canWithdraw
+                                    won &&
+                                    canWithdraw
                                 "
                                 @click="handleWithdraw"
                                 type="success"
@@ -742,11 +824,11 @@ export default defineComponent({
                             <template
                                 v-else-if="
                                     event.status == 'NEW' &&
-                                        countdownStatus == 'In progress'
+                                    countdownStatus == 'In progress'
                                 "
                             >
                                 <Button
-                                    @click="showLiquidityModal = true"
+                                    @click="handleLiquidity"
                                     type="secondary"
                                     size="small"
                                     :disabled="
@@ -771,7 +853,10 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <EventChart v-if="event" :event="event" />
+                <EventChart
+                    v-if="event && event.status !== 'CANCELED'"
+                    :event="event"
+                />
 
                 <div :class="$style.block">
                     <div :class="$style.title">Bets</div>
@@ -816,7 +901,9 @@ export default defineComponent({
                         <span>TYPE</span>
                         <span>SIDE</span>
                         <span>AMOUNT</span>
-                        <span>REWARD</span>
+                        <span>{{
+                            event.status !== "CANCELED" ? "REWARD" : "REFUND"
+                        }}</span>
                     </div>
 
                     <div
@@ -825,11 +912,7 @@ export default defineComponent({
                     >
                         <BetCard v-if="pendingBet" :bet="pendingBet" pending />
                         <BetCard
-                            v-for="bet in cloneDeep(filteredBets).sort(
-                                (a, b) =>
-                                    new Date(b.createdTime) -
-                                    new Date(a.createdTime),
-                            )"
+                            v-for="bet in paginatedBets"
                             :event="event"
                             :key="bet.id"
                             :bet="bet"
@@ -842,41 +925,28 @@ export default defineComponent({
                             : `If you have placed a bet, but it is not in this list yet — please wait for the transaction confirmation`
                     }}</Banner>
 
-                    <div v-if="userBets.length" :class="$style.params">
-                        <div :class="$style.param">
-                            My bets:
-                            <span>{{ userBets.length }}</span>
+                    <div
+                        v-if="filteredBets.length > 3"
+                        :class="$style.block_bottom"
+                    >
+                        <div :class="$style.pagination">
+                            <Button
+                                @click="selectedPageForBets = index"
+                                :type="
+                                    selectedPageForBets == index
+                                        ? 'secondary'
+                                        : 'tertiary'
+                                "
+                                size="small"
+                                v-for="index in Math.round(
+                                    filteredBets.length / 3,
+                                )"
+                                :key="index"
+                                >{{ index }}</Button
+                            >
                         </div>
 
-                        <div :class="$style.dot" />
-
-                        <div :class="$style.param">
-                            Summary:
-                            <span>{{
-                                userBets
-                                    .reduce(
-                                        (acc, { amount }) => acc + amount,
-                                        0,
-                                    )
-                                    .toFixed(2)
-                            }}</span>
-                            XTZ
-                        </div>
-
-                        <div :class="$style.dot" />
-
-                        <div :class="[$style.param, $style.green]">
-                            Potential reward:
-                            <span>{{
-                                userBets
-                                    .reduce(
-                                        (acc, { reward }) => acc + reward,
-                                        0,
-                                    )
-                                    .toFixed(2)
-                            }}</span>
-                            XTZ
-                        </div>
+                        <span>{{ filteredBets.length }} bets</span>
                     </div>
                 </div>
 
@@ -928,54 +998,46 @@ export default defineComponent({
                     </div>
                     <div v-if="filteredDeposits.length" :class="$style.bets">
                         <DepositCard
-                            v-for="deposit in cloneDeep(filteredDeposits).sort(
-                                (a, b) =>
-                                    new Date(b.createdTime) -
-                                    new Date(a.createdTime),
-                            )"
+                            v-for="deposit in paginatedDeposits"
                             :key="deposit.id"
                             :deposit="deposit"
                         />
                     </div>
+
                     <Banner v-else type="info">{{
                         filters.liquidity == "all"
                             ? `This event has not yet received initial liquidity, please wait for a few minutes`
                             : `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
                     }}</Banner>
 
-                    <div v-if="userBets.length" :class="$style.params">
-                        <div :class="$style.param">
-                            Liquidity deposits:
-                            <span>{{ filteredDeposits.length }}</span>
+                    <div
+                        v-if="filteredDeposits.length > 3"
+                        :class="$style.block_bottom"
+                    >
+                        <div :class="$style.pagination">
+                            <Button
+                                @click="selectedPageForDeposits = index"
+                                :type="
+                                    selectedPageForDeposits == index
+                                        ? 'secondary'
+                                        : 'tertiary'
+                                "
+                                size="small"
+                                v-for="index in Math.round(
+                                    filteredDeposits.length / 3,
+                                )"
+                                :key="index"
+                                >{{ index }}</Button
+                            >
                         </div>
 
-                        <div :class="$style.dot" />
-
-                        <div :class="$style.param">
-                            Summary:
-                            <span>{{
-                                filteredDeposits
-                                    .reduce(
-                                        (acc, { amountBelow }) =>
-                                            acc + amountBelow,
-                                        0,
-                                    )
-                                    .toFixed(2)
-                            }}</span>
-                            XTZ
-                        </div>
+                        <span>{{ filteredDeposits.length }} deposits</span>
                     </div>
                 </div>
             </div>
 
             <div v-if="event" :class="$style.side">
                 <EventTargetsCard :event="event" :price="price" />
-
-                <!-- <EventSymbolCard
-                    v-if="event && price.integer"
-                    :event="event"
-                    :price="price"
-                /> -->
 
                 <EventPoolCard :event="event" />
 
@@ -1202,29 +1264,6 @@ export default defineComponent({
     gap: 4px;
 }
 
-.params {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-
-    margin-top: 20px;
-}
-
-.param {
-    font-size: 13px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-tertiary);
-}
-
-.param span {
-    color: var(--text-primary);
-}
-
-.param.green span {
-    color: var(--green);
-}
-
 .additional_buttons {
     display: flex;
     justify-content: space-between;
@@ -1278,5 +1317,26 @@ export default defineComponent({
 .filter.active {
     fill: var(--blue);
     color: var(--text-primary);
+}
+
+.block_bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 16px;
+}
+
+.block_bottom span {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-tertiary);
 }
 </style>

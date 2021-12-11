@@ -34,7 +34,7 @@ export default defineComponent({
         const accountStore = useAccountStore()
         const notificationsStore = useNotificationsStore()
 
-        const handleCopy = target => {
+        const handleCopy = (target) => {
             if (target == "address") {
                 notificationsStore.create({
                     notification: {
@@ -75,6 +75,7 @@ export default defineComponent({
                 <img
                     :src="`https://services.tzkt.io/v1/avatars/${user.userId}`"
                 />
+                <Icon v-if="user.creator" name="verified" size="14" />
             </div>
 
             <div :class="$style.base">
@@ -92,7 +93,14 @@ export default defineComponent({
                     <Icon name="copy" size="14" />
                 </div>
 
-                <div :class="$style.params">
+                <div
+                    v-if="
+                        user.shares &&
+                        user.liquidityProvidedAboveEq &&
+                        user.liquidityProvidedBelow
+                    "
+                    :class="$style.params"
+                >
                     <div :class="$style.param">
                         Shares: <span>{{ user.shares }}</span>
                     </div>
@@ -169,6 +177,7 @@ export default defineComponent({
 }
 
 .avatar {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -176,7 +185,15 @@ export default defineComponent({
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: var(--opacity-10);
+    background: #121212;
+}
+
+.avatar svg {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+
+    fill: var(--yellow);
 }
 
 .avatar img {
@@ -199,7 +216,7 @@ export default defineComponent({
 
     font-size: 13px;
     line-height: 1.1;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
     fill: var(--text-tertiary);
 }

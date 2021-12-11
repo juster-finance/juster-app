@@ -29,7 +29,7 @@ export default defineComponent({
                 path: "/events",
             },
             {
-                name: "Top events",
+                name: "Hot events",
                 path: "/events/top",
             },
         ])
@@ -75,17 +75,14 @@ export default defineComponent({
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-        <h1 :class="$style.title">Top events</h1>
+        <h1 :class="$style.title">Hot events</h1>
         <div :class="$style.description">
-            Events that have not yet begun, but are attracting the interest of participants
+            Events that have not yet begun, but are attracting the interest of
+            participants
         </div>
 
         <div :class="$style.container">
             <div :class="$style.events_base">
-                <!-- <Banner type="warning"
-                    >We have temporarily disabled events with target dynamics.
-                    They will be available soon.</Banner
-                > -->
                 <div :class="$style.events">
                     <EventCard
                         v-for="event in topEvents"

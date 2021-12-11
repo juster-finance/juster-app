@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onBeforeMount, onMounted, ref, watch } from "vue"
+import { defineComponent, onBeforeMount, ref, inject } from "vue"
 
 /**
  * Base
@@ -9,7 +9,6 @@ import Footer from "@/components/base/Footer"
 
 /** Local */
 import TheWelcomeScreen from "@/components/local/onboarding/TheWelcomeScreen"
-import LandingPage from "@/views/LandingPage"
 
 /**
  * UI
@@ -24,6 +23,8 @@ import { juster } from "@/services/tools"
 /**
  * Store
  */
+import { useAppStore } from "@/store/app"
+import { useNotificationsStore } from "@/store/notifications"
 import { useAccountStore } from "@/store/account"
 
 /**
@@ -31,40 +32,62 @@ import { useAccountStore } from "@/store/account"
  */
 import { useMarket } from "@/composable/market"
 
-/**
- * API
- */
-import { fetchUserPositionsForWithdrawal } from "@/api/positions"
-
 export default defineComponent({
     setup() {
+        const { setupMarket, setupUser } = useMarket()
+
+        const amplitude = inject("amplitude")
+        const identify = new amplitude.Identify()
+
+        const notificationsStore = useNotificationsStore()
+
         /**
-         * Setup account
+         * App Version
+         */
+        const appStore = useAppStore()
+        const { version } = require("@/version")
+        appStore.version = version
+
+        setInterval(() => {
+            const { version } = require("@/version")
+
+            if (version !== appStore.version) {
+                notificationsStore.create({
+                    notification: {
+                        type: "info",
+                        title: "New version is ready",
+                        description: "Refresh the page to get new features",
+                        autoDestroy: false,
+                    },
+                })
+
+                appStore.version = version
+            }
+        }, 60000)
+
+        /**
+         * Setup account & user
          */
         const accountStore = useAccountStore()
 
         onBeforeMount(() => {
-            juster._provider.client.getActiveAccount().then(async account => {
+            juster._provider.client.getActiveAccount().then(async (account) => {
                 if (!account) return
+
+                identify.set("address", account.address)
+                identify.set("network", account.network.type)
+                amplitude.identify(identify)
 
                 accountStore.setPkh(account.address)
                 accountStore.updateBalance()
 
-                /** check for won positions */
-                const wonPositions = await fetchUserPositionsForWithdrawal({
-                    address: accountStore.pkh,
-                })
-
-                if (wonPositions.length) {
-                    accountStore.wonPositions = wonPositions
-                }
+                setupUser()
             })
         })
 
         /**
-         * Setup Market (Symbols & Quotes)
+         * Setup Market (Symbols & Quotes & Subscriptinos)
          */
-        const { setupMarket } = useMarket()
         setupMarket()
 
         /** Onboarding */
