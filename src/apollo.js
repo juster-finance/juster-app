@@ -6,7 +6,7 @@ import {
 } from "@apollo/client/core"
 
 const link = from([
-    new HttpLink({ uri: "https://api.granadanet.juster.fi/v1/graphql" }),
+    new HttpLink({ uri: "https://api.hangzhounet.juster.fi/v1/graphql" }),
 ])
 
 export const apollo = new ApolloClient({

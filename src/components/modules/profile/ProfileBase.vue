@@ -275,7 +275,7 @@ export default defineComponent({
                 <div :class="$style.additional">
                     <div :class="$style.left">
                         <a
-                            :href="`https://granadanet.tzkt.io/${address}`"
+                            :href="`https://hangzhou2net.tzkt.io/${address}`"
                             target="_blank"
                         >
                             <Button type="tertiary" size="small"

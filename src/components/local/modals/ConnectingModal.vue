@@ -98,9 +98,7 @@ export default defineComponent({
                 </div>
             </div>
 
-            <div :class="$style.title">
-                Connecting to Juster
-            </div>
+            <div :class="$style.title">Connecting to Juster</div>
 
             <div
                 @mouseenter="isAddressHovered = true"
@@ -118,7 +116,7 @@ export default defineComponent({
                     address
                 </div>
                 <div :class="[$style.label, $style.orange]">
-                    <Icon name="warning" size="16" /> Notice, Granada Testnet
+                    <Icon name="warning" size="16" /> Notice, Hangzhou Testnet
                     used
                 </div>
             </div>

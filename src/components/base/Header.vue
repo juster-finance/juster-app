@@ -279,11 +279,11 @@ export default defineComponent({
                             size="16"
                             :class="$style.warning_icon"
                         />
-                        Granada Testnet
+                        Hangzhou Testnet
                     </div>
 
                     <template v-slot:content>
-                        Granada Testnet in use.
+                        Hangzhounet Testnet in use.
                         <span>You can change the network in the settings</span>
                     </template>
                 </Tooltip>

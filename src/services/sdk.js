@@ -4,7 +4,7 @@ import { OpKind } from "@taquito/taquito"
 export const withdrawAll = async ({ eventIds, address }) => {
     try {
         const contract = await juster._tezos.contract.at(
-            "KT1JPehwEkAhg1z5RVA8wAccYbDgF2E2itDv",
+            "KT197iHRJaAGw3oGpQj21YYV1vK9Fa5ShoMn",
         )
 
         if (!eventIds.length || !address) return
