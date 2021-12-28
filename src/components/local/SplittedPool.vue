@@ -5,7 +5,7 @@ export default defineComponent({
     name: "SplittedPool",
     props: {
         event: Object,
-        amount: Number,
+        amount: [Number, String],
         winDelta: Number,
         side: String,
     },
@@ -25,13 +25,13 @@ export default defineComponent({
                         (event.value.poolAboveEq + event.value.poolBelow),
                 )
             } else {
-                if (side.value == "Higher") {
+                if (side.value == "Rise") {
                     const below = event.value.poolBelow - winDelta.value
                     const above = event.value.poolAboveEq + userAmount.value
 
                     return Math.floor((above * 100) / (above + below))
                 }
-                if (side.value == "Lower") {
+                if (side.value == "Fall") {
                     const below = event.value.poolBelow + userAmount.value
                     const above = event.value.poolAboveEq - winDelta.value
 
@@ -40,10 +40,10 @@ export default defineComponent({
             }
         })
         const aboveAmount = computed(() => {
-            if (side.value == "Higher")
+            if (side.value == "Rise")
                 return event.value.poolAboveEq + userAmount.value
 
-            if (side.value == "Lower")
+            if (side.value == "Fall")
                 return event.value.poolAboveEq - winDelta.value
 
             if (side.value == "Liquidity") {
@@ -71,13 +71,13 @@ export default defineComponent({
                         (event.value.poolAboveEq + event.value.poolBelow),
                 )
             } else {
-                if (side.value == "Higher") {
+                if (side.value == "Rise") {
                     const below = event.value.poolBelow - winDelta.value
                     const above = event.value.poolAboveEq + userAmount.value
 
                     return Math.ceil((below * 100) / (above + below))
                 }
-                if (side.value == "Lower") {
+                if (side.value == "Fall") {
                     const below = event.value.poolBelow + userAmount.value
                     const above = event.value.poolAboveEq - winDelta.value
 
@@ -86,9 +86,9 @@ export default defineComponent({
             }
         })
         const belowAmount = computed(() => {
-            if (side.value == "Higher")
+            if (side.value == "Rise")
                 return event.value.poolBelow - winDelta.value
-            if (side.value == "Lower")
+            if (side.value == "Fall")
                 return event.value.poolBelow + userAmount.value
 
             if (side.value == "Liquidity") {
@@ -113,7 +113,7 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
-        <div :class="$style.half">
+        <!-- <div :class="$style.half">
             <div :class="$style.head">
                 <div :class="$style.name">
                     Rise <span>{{ abovePercent }}%</span>
@@ -153,13 +153,53 @@ export default defineComponent({
                     :class="[$style.fill, $style.fall]"
                 />
             </div>
+        </div> -->
+
+        <div :class="$style.head">
+            <div :class="$style.left">
+                <div :class="$style.name">
+                    Rise <span>{{ abovePercent }}%</span>
+                </div>
+
+                <div :class="$style.dot" />
+
+                <div :class="$style.size">
+                    <Icon name="money" size="12" />
+                    {{ aboveAmount.toFixed(0) }}
+                    <span>XTZ</span>
+                </div>
+            </div>
+
+            <div :class="$style.right">
+                <div :class="$style.size">
+                    <Icon name="money" size="12" />
+                    {{ belowAmount.toFixed(0) }}
+                    <span>XTZ</span>
+                </div>
+
+                <div :class="$style.dot" />
+
+                <div :class="$style.name">
+                    Fall <span>{{ belowPercent }}%</span>
+                </div>
+            </div>
+        </div>
+
+        <div :class="$style.pool">
+            <div
+                :style="{ width: `${abovePercent - 1}%` }"
+                :class="[$style.fill, $style.rise]"
+            />
+            <div
+                :style="{ width: `${belowPercent - 1}%`, right: 0 }"
+                :class="[$style.fill, $style.fall]"
+            />
         </div>
     </div>
 </template>
 
 <style module>
 .wrapper {
-    height: 104px;
     border-radius: 8px;
     border: 1px solid var(--border);
     padding: 16px;
@@ -171,6 +211,20 @@ export default defineComponent({
     justify-content: space-between;
 
     margin-bottom: 10px;
+}
+
+.left,
+.right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--border);
 }
 
 .name {
@@ -209,7 +263,7 @@ export default defineComponent({
     border-radius: 50px;
     background: var(--opacity-10);
 
-    margin-bottom: 14px;
+    margin-bottom: 4px;
 }
 
 .fill {

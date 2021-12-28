@@ -116,10 +116,7 @@ export default defineComponent({
     <Notifications />
 
     <transition name="popup">
-        <TheWelcomeScreen
-            v-if="showWelcomeScreen"
-            @skip="showWelcomeScreen = false"
-        />
+        <TheWelcomeScreen v-if="showWelcomeScreen" @skip="showWelcomeScreen = false" />
     </transition>
 
     <div v-if="!showWelcomeScreen" class="app_wrapper">
