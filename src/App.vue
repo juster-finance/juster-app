@@ -250,7 +250,7 @@ html {
 
     /** Other */
     --border: rgba(255, 255, 255, 0.1);
-    --border-highlight: rgba(255, 255, 255, 0.2);
+    --border-highlight: rgba(255, 255, 255, 0.15);
     --dot: rgba(255, 255, 255, 0.06);
 }
 

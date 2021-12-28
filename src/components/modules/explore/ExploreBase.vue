@@ -8,8 +8,7 @@ import { cloneDeep } from "lodash"
  * Local
  */
 import SymbolCard from "@/components/local/SymbolCard"
-import EventCard from "@/components/local/EventCard"
-import EventCardLoading from "@/components/local/EventCardLoading"
+import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
 /**
  * UI

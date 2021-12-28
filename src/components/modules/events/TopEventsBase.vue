@@ -17,7 +17,7 @@ import Banner from "@/components/ui/Banner"
 /**
  * Local
  */
-import EventCard from "@/components/local/EventCard"
+import { EventCard } from "@/components/local/EventCard"
 
 export default defineComponent({
     name: "TopEventsBase",

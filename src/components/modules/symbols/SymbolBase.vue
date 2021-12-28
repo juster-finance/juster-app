@@ -23,8 +23,7 @@ import { fetchEventsBySymbol } from "@/api/events"
  * Local
  */
 import Symbol from "./Symbol"
-import EventCard from "@/components/local/EventCard"
-import EventCardLoading from "@/components/local/EventCardLoading"
+import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
 /**
  * Store

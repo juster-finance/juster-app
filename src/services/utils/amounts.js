@@ -37,3 +37,11 @@ export const abbreviateNumber = (num, digits = 1) => {
         ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol
         : "0"
 }
+
+export const f = num => {
+    if (num % 1 === 0) {
+        return num.toFixed(0)
+    } else {
+        return num.toFixed(2)
+    }
+}

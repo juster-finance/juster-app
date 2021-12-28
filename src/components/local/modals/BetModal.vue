@@ -48,11 +48,11 @@ import { useCountdown } from "@/composable/date"
 
 export default defineComponent({
     name: "BetModal",
-    props: { show: Boolean, event: Object },
+    props: { show: Boolean, event: Object, preselectedSide: String },
     emits: ["onClose"],
 
     setup(props, context) {
-        const { event, show } = toRefs(props)
+        const { event, show, preselectedSide } = toRefs(props)
         const amplitude = inject("amplitude")
 
         const accountStore = useAccountStore()
@@ -71,7 +71,7 @@ export default defineComponent({
         } = useCountdown(eventStartTime)
 
         /** User inputs */
-        const side = ref(null) /** pre-selected side */
+        const side = ref(preselectedSide.value)
         const amount = reactive({ value: 0, error: "" })
         const slippage = ref(2.5)
 
@@ -82,29 +82,34 @@ export default defineComponent({
          */
         const ratio = computed(() => {
             return {
-                higher:
+                rise:
                     event.value.poolBelow /
                     (event.value.poolAboveEq + amount.value),
-                lower:
+                fall:
                     event.value.poolAboveEq /
                     (event.value.poolBelow + amount.value),
             }
         })
         const ratioBeforeBet = computed(
-            () =>
-                (side.value == "Higher" &&
-                    event.value.poolBelow / event.value.poolAboveEq) ||
-                (side.value == "Lower" &&
-                    event.value.poolAboveEq / event.value.poolBelow),
+            () => {
+                return {
+                    rise:
+                        event.value.poolBelow /
+                        (event.value.poolAboveEq),
+                    fall:
+                        event.value.poolAboveEq /
+                        (event.value.poolBelow),
+                }
+            }
         )
         const ratioAfterBet = computed(
             () =>
-                (side.value == "Higher" &&
+                (side.value == "Rise" &&
                     (event.value.poolBelow - winDelta.value) /
-                        (event.value.poolAboveEq + amount.value)) ||
-                (side.value == "Lower" &&
+                    (event.value.poolAboveEq + amount.value)) ||
+                (side.value == "Fall" &&
                     (event.value.poolAboveEq - winDelta.value) /
-                        (event.value.poolBelow + amount.value)),
+                    (event.value.poolBelow + amount.value)),
         )
 
         const fee = computed(() =>
@@ -121,7 +126,7 @@ export default defineComponent({
         /** Reward */
         const winDelta = computed(() => {
             const selectedRatio =
-                side.value == "Higher" ? ratio.value.higher : ratio.value.lower
+                side.value == "Rise" ? ratio.value.rise : ratio.value.fall
 
             return amount.value * selectedRatio * (1 - fee.value)
         })
@@ -161,6 +166,7 @@ export default defineComponent({
         watch(show, () => {
             if (!show.value) {
                 side.value = null
+
                 amount.value = 0
 
                 stop()
@@ -169,6 +175,8 @@ export default defineComponent({
 
                 showConfirmationHint.value = false
             } else {
+                side.value = preselectedSide.value
+
                 document.addEventListener("keydown", onKeydown)
 
                 accountStore.updateBalance()
@@ -203,8 +211,8 @@ export default defineComponent({
                 return { text: "Insufficient funds", disabled: true }
 
             switch (side.value) {
-                case "Higher":
-                case "Lower":
+                case "Rise":
+                case "Fall":
                     if (!amount.value)
                         return { text: "Select the bet amount", disabled: true }
                     if (amount.value)
@@ -218,8 +226,8 @@ export default defineComponent({
             if (buttonState.value.disabled) return
 
             let betType
-            if (side.value == "Higher") betType = "aboveEq"
-            if (side.value == "Lower") betType = "below"
+            if (side.value == "Rise") betType = "aboveEq"
+            if (side.value == "Fall") betType = "below"
 
             sendingBet.value = true
 
@@ -345,24 +353,24 @@ export default defineComponent({
 
             <div :class="$style.tabs">
                 <div
-                    @click="selectTab('Higher')"
-                    :class="[$style.tab, side == 'Higher' && $style.higher]"
+                    @click="selectTab('Rise')"
+                    :class="[$style.tab, side == 'Rise' && $style.higher]"
                 >
                     <div :class="$style.tab_left">
                         <Icon name="higher" size="16" />Rise
                     </div>
                     <div :class="$style.tab_ratio">
                         <Icon name="close" size="10" />
-                        {{ (1 + ratio.higher).toFixed(2) }}
+                        {{ (1 + ratioBeforeBet.rise).toFixed(2) }}
                     </div>
                 </div>
                 <div
-                    @click="selectTab('Lower')"
-                    :class="[$style.tab, side == 'Lower' && $style.lower]"
+                    @click="selectTab('Fall')"
+                    :class="[$style.tab, side == 'Fall' && $style.lower]"
                 >
                     <div :class="$style.tab_ratio">
                         <Icon name="close" size="10" />
-                        {{ (1 + ratio.lower).toFixed(2) }}
+                        {{ (1 + ratioBeforeBet.fall).toFixed(2) }}
                     </div>
 
                     <div :class="$style.tab_left">
@@ -390,9 +398,7 @@ export default defineComponent({
                     <span
                         @click="amount.value = Math.floor(accountStore.balance)"
                         @dblclick="amount.value = accountStore.balance / 2"
-                        >{{ accountStore.balance }}
-                    </span>
-
+                    >{{ accountStore.balance }}</span>
                     XTZ
                 </div>
 
@@ -404,16 +410,13 @@ export default defineComponent({
                     :class="$style.pool"
                 />
 
-                <SlippageSelector
-                    v-model="slippage"
-                    :class="$style.slippage_block"
-                />
+                <SlippageSelector v-model="slippage" :class="$style.slippage_block" />
 
                 <div :class="$style.stats">
                     <Stat name="Reward">
                         {{ rewardText }}
-                        <span>XTZ</span></Stat
-                    >
+                        <span>XTZ</span>
+                    </Stat>
                 </div>
             </div>
 
@@ -434,16 +437,16 @@ export default defineComponent({
                             : 'lock'
                     "
                     size="16"
-                />{{ buttonState.text }}</Button
-            >
+                />
+                {{ buttonState.text }}
+            </Button>
 
             <div v-if="showConfirmationHint" :class="$style.hint">
                 Confirmation not appearing?
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
                     target="_blank"
-                    >Read about possible solutions</a
-                >
+                >Read about possible solutions</a>
             </div>
         </template>
 
@@ -454,9 +457,9 @@ export default defineComponent({
                 account and connect Temple wallet
             </div>
 
-            <Button @click="handleLogin" size="large" type="primary" block
-                ><Icon name="login" size="16" />Sign in to continue</Button
-            >
+            <Button @click="handleLogin" size="large" type="primary" block>
+                <Icon name="login" size="16" />Sign in to continue
+            </Button>
         </template>
     </Modal>
 </template>

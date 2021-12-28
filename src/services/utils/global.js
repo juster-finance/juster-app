@@ -22,3 +22,7 @@ export const getCurrencyIcon = name => {
             return require(`@/assets/symbols/usd.png`)
     }
 }
+
+export const capitalizeFirstLetter = str => {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+}

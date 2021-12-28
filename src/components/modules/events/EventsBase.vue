@@ -29,8 +29,7 @@ import Pagination from "@/components/ui/Pagination"
 /**
  * Local
  */
-import EventCard from "@/components/local/EventCard"
-import EventCardLoading from "@/components/local/EventCardLoading"
+import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
 /**
  * Store

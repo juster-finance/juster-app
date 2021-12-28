@@ -24,14 +24,13 @@ import Pagination from "@/components/ui/Pagination"
 /**
  * Local
  */
-import EventCard from "@/components/local/EventCard"
+import { EventCard } from "@/components/local/EventCard"
 import WithdrawAllModal from "@/components/local/modals/WithdrawAllModal"
 
 /**
  * API
  */
 import { fetchUserWithdrawals } from "@/api/users"
-import { fetchUserPositionsForWithdraw } from "@/api/positions"
 
 /**
  * Services

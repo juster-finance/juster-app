@@ -12,7 +12,7 @@ import Tooltip from "@/components/ui/Tooltip"
 /**
  * Local
  */
-import EventCard from "@/components/local/EventCard"
+import { EventCard } from "@/components/local/EventCard"
 
 /**
  * Services
