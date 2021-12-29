@@ -175,20 +175,15 @@ export default defineComponent({
                 document.addEventListener("keydown", onKeydown)
 
                 accountStore.updateBalance()
+
+                nextTick(() => {
+                    amountInput.value.$el.querySelector("input").focus()
+                })
             }
         })
 
         watch(amount, () => {
             if (!amount.value) amount.value = ""
-        })
-
-        /** focus input on side selection  */
-        watch(side, () => {
-            if (!side.value) return
-            /** nextTick due to v-show */
-            nextTick(() => {
-                amountInput.value.$el.querySelector("input").focus()
-            })
         })
 
         // eslint-disable-next-line vue/return-in-computed-property
