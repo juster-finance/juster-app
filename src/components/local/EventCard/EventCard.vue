@@ -37,7 +37,11 @@ import EventCardActions from "./EventCardActions"
 /**
  * Services
  */
-import { toClipboard, getCurrencyIcon, capitalizeFirstLetter } from "@/services/utils/global"
+import {
+    toClipboard,
+    getCurrencyIcon,
+    capitalizeFirstLetter,
+} from "@/services/utils/global"
 import { juster } from "@/services/tools"
 import { abbreviateNumber } from "@/services/utils/amounts"
 import { supportedSymbols } from "@/services/config"
@@ -76,7 +80,7 @@ export default defineComponent({
 
         /** Bet modal */
         const showBetModal = ref(false)
-        const preselectedSide = ref('Rise')
+        const preselectedSide = ref("Rise")
 
         /** Liquidity modal */
         const showLiquidityModal = ref(false)
@@ -467,8 +471,7 @@ export default defineComponent({
                 <template v-slot:dropdown>
                     <router-link :to="`/events/${event.id}`">
                         <DropdownItem>
-                            <Icon name="open" size="16" />Open Event
-                            page
+                            <Icon name="open" size="16" />Open Event page
                         </DropdownItem>
                     </router-link>
 
@@ -512,7 +515,11 @@ export default defineComponent({
                             />
                         </div>
 
-                        <template v-slot:content>Participants ({{ participantsAvatars.length }})</template>
+                        <template v-slot:content
+                            >Participants ({{
+                                participantsAvatars.length
+                            }})</template
+                        >
                     </Tooltip>
 
                     <Tooltip position="bottom" side="right">
@@ -549,7 +556,7 @@ export default defineComponent({
                 <Icon v-else name="sides" size="16" />
                 {{
                     supportedSymbols[symbol] &&
-                        supportedSymbols[symbol].description
+                    supportedSymbols[symbol].description
                 }}
                 <span>price event</span>
             </div>
@@ -557,8 +564,9 @@ export default defineComponent({
             <div :class="$style.timing">
                 <div :class="$style.days">
                     {{
-                        `${timing.start.day} ${timing.showDay ? `- ${timing.end.day}` : ``
-                            } ${timing.start.month}`
+                        `${timing.start.day} ${
+                            timing.showDay ? `- ${timing.end.day}` : ``
+                        } ${timing.start.month}`
                     }}
                 </div>
 
@@ -598,28 +606,53 @@ export default defineComponent({
                         <Icon name="event_new" size="12" />Starting soon
                     </Badge>
 
-                    <template v-slot:content>Betting is closed. The event is starting</template>
+                    <template v-slot:content
+                        >Betting is closed. The event is starting</template
+                    >
                 </Tooltip>
-                <Tooltip v-else-if="event.status == 'STARTED'" position="bottom" side="left">
+                <Tooltip
+                    v-else-if="event.status == 'STARTED'"
+                    position="bottom"
+                    side="left"
+                >
                     <Badge color="yellow" :class="$style.main_badge">
                         <Icon name="event_active" size="12" />Active
                     </Badge>
-                    <template v-slot:content>Betting is closed. The end of the event is pending</template>
+                    <template v-slot:content
+                        >Betting is closed. The end of the event is
+                        pending</template
+                    >
                 </Tooltip>
-                <Tooltip v-else-if="event.status == 'FINISHED'" position="bottom" side="left">
+                <Tooltip
+                    v-else-if="event.status == 'FINISHED'"
+                    position="bottom"
+                    side="left"
+                >
                     <Badge color="gray" :class="$style.main_badge">
                         <Icon name="event_finished" size="12" />Finished
                     </Badge>
-                    <template v-slot:content>The event is closed, winning side determined</template>
+                    <template v-slot:content
+                        >The event is closed, winning side determined</template
+                    >
                 </Tooltip>
-                <Tooltip v-else-if="event.status == 'CANCELED'" position="bottom" side="left">
+                <Tooltip
+                    v-else-if="event.status == 'CANCELED'"
+                    position="bottom"
+                    side="left"
+                >
                     <Badge color="orange" :class="$style.main_badge">
                         <Icon name="stop" size="12" />Canceled
                     </Badge>
-                    <template v-slot:content>This event has been canceled, funds returned</template>
+                    <template v-slot:content
+                        >This event has been canceled, funds returned</template
+                    >
                 </Tooltip>
 
-                <Badge v-if="participantsAvatars.length >= 3" color="red" :class="$style.badge">
+                <Badge
+                    v-if="participantsAvatars.length >= 3"
+                    color="red"
+                    :class="$style.badge"
+                >
                     <Icon name="hot" size="12" />
                 </Badge>
 
@@ -628,7 +661,9 @@ export default defineComponent({
                         <Icon name="infinite" size="12" />
                     </Badge>
 
-                    <template v-slot:content>Recurring, created automatically</template>
+                    <template v-slot:content
+                        >Recurring, created automatically</template
+                    >
                 </Tooltip>
 
                 <Tooltip position="bottom" side="right">
@@ -645,14 +680,15 @@ export default defineComponent({
             </div>
 
             <div :class="$style.hints">
-                <div v-if="startStatus == 'In progress'" :class="[$style.hint, $style.gray]">
+                <div
+                    v-if="startStatus == 'In progress'"
+                    :class="[$style.hint, $style.gray]"
+                >
                     <Icon name="time" size="14" />
                     <div>
                         Starting in
                         <span>
-                            {{
-                                timeToStart.num == 0 ? "<1" : timeToStart.num
-                            }}
+                            {{ timeToStart.num == 0 ? "<1" : timeToStart.num }}
                             {{ timeToStart.suffix }}
                         </span>
                     </div>
@@ -686,7 +722,10 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <div v-else-if="event.status == 'FINISHED'" :class="[$style.hint, $style.gray]">
+                <div
+                    v-else-if="event.status == 'FINISHED'"
+                    :class="[$style.hint, $style.gray]"
+                >
                     <Icon name="time" size="14" />
                     <div>
                         Ended
@@ -700,11 +739,12 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <div v-if="event.status == 'CANCELED'" :class="[$style.hint, $style.red]">
+                <div
+                    v-if="event.status == 'CANCELED'"
+                    :class="[$style.hint, $style.red]"
+                >
                     <Icon name="flag" size="14" />
-                    <div>
-                        <span>Start price</span> is not determined
-                    </div>
+                    <div><span>Start price</span> is not determined</div>
                 </div>
 
                 <div
@@ -734,17 +774,19 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <div v-if="event.winnerBets == 'BELOW'" :class="[$style.hint, $style.red]">
+                <div
+                    v-if="event.winnerBets == 'BELOW'"
+                    :class="[$style.hint, $style.red]"
+                >
                     <Icon name="lower" size="14" />
-                    <div>
-                        <span>Fall</span> won
-                    </div>
+                    <div><span>Fall</span> won</div>
                 </div>
-                <div v-if="event.winnerBets == 'ABOVE_EQ'" :class="[$style.hint, $style.green]">
+                <div
+                    v-if="event.winnerBets == 'ABOVE_EQ'"
+                    :class="[$style.hint, $style.green]"
+                >
                     <Icon name="higher" size="14" />
-                    <div>
-                        <span>Rise</span> won
-                    </div>
+                    <div><span>Rise</span> won</div>
                 </div>
             </div>
 
@@ -754,7 +796,10 @@ export default defineComponent({
                 :isUserWon="isUserWon"
                 :wonPosition="wonPosition"
                 :event="event"
-                :disabled="event.totalLiquidityProvided == 0 || startStatus == 'Finished'"
+                :disabled="
+                    event.totalLiquidityProvided == 0 ||
+                    startStatus == 'Finished'
+                "
             />
         </div>
     </router-link>
@@ -766,8 +811,8 @@ export default defineComponent({
     border-radius: 10px;
     border: 1px solid var(--border);
 
-    max-width: 447px;
     padding: 20px;
+    max-width: 617px;
 
     transition: all 0.2s ease;
 }
