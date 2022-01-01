@@ -9,11 +9,6 @@ import { NetworkType } from "@airgap/beacon-sdk"
 import { juster } from "@/services/tools"
 
 /**
- * Local
- */
-import AppStatus from "@/components/local/AppStatus"
-
-/**
  * UI
  */
 import Button from "@/components/ui/Button"
@@ -229,7 +224,6 @@ export default defineComponent({
         ConnectingModal,
         CustomLoginModal,
         Tooltip,
-        AppStatus,
         Button,
         Dropdown,
         DropdownItem,
@@ -270,8 +264,6 @@ export default defineComponent({
             </div>
 
             <div :class="$style.right">
-                <!-- <AppStatus :class="$style.app_status" /> -->
-
                 <Tooltip v-if="pkh" position="left">
                     <div :class="$style.testnet_warning">
                         <Icon
