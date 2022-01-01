@@ -42,5 +42,11 @@ export const useAccountStore = defineStore({
         isLoggined() {
             return !!this.pkh
         },
+
+        wonPositions() {
+            return this.positionsForWithdrawal.filter(
+                position => position.value,
+            )
+        },
     },
 })

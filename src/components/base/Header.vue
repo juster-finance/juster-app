@@ -317,8 +317,8 @@ export default defineComponent({
                                 />
                                 <div
                                     v-if="
-                                        accountStore.positionsForWithdrawal
-                                            .length && accountStore.pkh
+                                        accountStore.wonPositions.length &&
+                                        accountStore.pkh
                                     "
                                     :class="$style.indicator"
                                 />
@@ -355,10 +355,7 @@ export default defineComponent({
                                 <div :class="$style.dropdown_icon">
                                     <Icon name="money" size="16" />
                                     <div
-                                        v-if="
-                                            accountStore.positionsForWithdrawal
-                                                .length
-                                        "
+                                        v-if="accountStore.wonPositions.length"
                                         :class="$style.dropdown_indicator"
                                     />
                                 </div>
