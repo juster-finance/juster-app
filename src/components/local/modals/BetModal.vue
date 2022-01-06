@@ -189,7 +189,7 @@ export default defineComponent({
         // eslint-disable-next-line vue/return-in-computed-property
         const buttonState = computed(() => {
             if (accountStore.pendingTransaction.awaiting) {
-                return { text: 'Previous transaction in progress', disabled: true }
+                return { text: 'Previous transaction in process', disabled: true }
             }
 
             if (!side.value) {
