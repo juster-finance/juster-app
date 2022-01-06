@@ -133,6 +133,10 @@ export default defineComponent({
 
         // eslint-disable-next-line vue/return-in-computed-property
         const buttonState = computed(() => {
+            if (accountStore.pendingTransaction.awaiting) {
+                return { text: 'Previous transaction in progress', disabled: true }
+            }
+
             if (countdownStatus.value !== "In progress")
                 return { text: "Acceptance of bets is closed", disabled: true }
             if (sendingLiquidity.value)
@@ -150,8 +154,7 @@ export default defineComponent({
         const showConfirmationHint = ref(false)
 
         const handleProvideLiquidity = () => {
-            if (!amount.value) return
-            if (countdownStatus.value !== "In progress") return
+            if (buttonState.value.disabled) return
 
             sendingLiquidity.value = true
 
