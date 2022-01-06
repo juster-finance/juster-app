@@ -101,10 +101,10 @@ export default defineComponent({
             () =>
                 (side.value == "Rise" &&
                     (event.value.poolBelow - winDelta.value) /
-                        (event.value.poolAboveEq + amount.value)) ||
+                    (event.value.poolAboveEq + amount.value)) ||
                 (side.value == "Fall" &&
                     (event.value.poolAboveEq - winDelta.value) /
-                        (event.value.poolBelow + amount.value)),
+                    (event.value.poolBelow + amount.value)),
         )
 
         const fee = computed(() =>
@@ -233,6 +233,21 @@ export default defineComponent({
                     BigNumber(minReward.value),
                 )
                 .then((op) => {
+                    /** Pending transaction label */
+                    accountStore.pendingTransaction.awaiting = true
+
+                    op.confirmation()
+                        .then((result) => {
+                            accountStore.pendingTransaction.awaiting = false
+
+                            if (!result.completed) {
+                                // todo: handle it?
+                            }
+                        })
+                        .catch((err) => {
+                            accountStore.pendingTransaction.awaiting = false
+                        })
+
                     sendingBet.value = false
                     showConfirmationHint.value = false
 
@@ -362,18 +377,13 @@ export default defineComponent({
                                 @dblclick="
                                     amount.value = accountStore.balance / 2
                                 "
-                                >{{ accountStore.balance }}</span
-                            >
+                            >{{ accountStore.balance }}</span>
                             XTZ
                         </div>
                     </div>
                 </div>
 
-                <Icon
-                    name="arrowright"
-                    size="16"
-                    :class="$style.direction_icon"
-                />
+                <Icon name="arrowright" size="16" :class="$style.direction_icon" />
 
                 <div :class="$style.to">
                     <div :class="$style.crc">
@@ -382,11 +392,11 @@ export default defineComponent({
 
                     <div :class="$style.meta">
                         <div :class="$style.name">
-                            <Icon name="event_new" size="14" /> Tezos / Dollar
+                            <Icon name="event_new" size="14" />Tezos / Dollar
                         </div>
                         <div :class="$style.subname">
-                            <span>{{ countdownText }}</span
-                            >, #{{ event.id }}
+                            <span>{{ countdownText }}</span>
+                            , #{{ event.id }}
                         </div>
                     </div>
                 </div>
@@ -417,7 +427,8 @@ export default defineComponent({
                     </div>
 
                     <div :class="$style.tab_left">
-                        Fall<Icon name="lower" size="16" />
+                        Fall
+                        <Icon name="lower" size="16" />
                     </div>
                 </div>
             </div>
@@ -434,7 +445,8 @@ export default defineComponent({
             >
                 <template v-slot:rightText>
                     <div :class="$style.potential_reward">
-                        Reward: <span>{{ rewardText }}</span> XTZ
+                        Reward:
+                        <span>{{ rewardText }}</span> XTZ
                     </div>
                 </template>
             </Input>
@@ -447,15 +459,12 @@ export default defineComponent({
                 :class="$style.pool"
             />
 
-            <SlippageSelector
-                v-model="slippage"
-                :class="$style.slippage_block"
-            />
+            <SlippageSelector v-model="slippage" :class="$style.slippage_block" />
 
-            <Banner type="warning" size="small" :class="$style.banner"
-                >Note that the transaction takes place on the Hangzhou
-                Testnet</Banner
-            >
+            <Banner type="warning" size="small" :class="$style.banner">
+                Note that the transaction takes place on the Hangzhou
+                Testnet
+            </Banner>
 
             <Button
                 @click="handleBet"
@@ -483,8 +492,7 @@ export default defineComponent({
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
                     target="_blank"
-                    >Read about possible solutions</a
-                >
+                >Read about possible solutions</a>
             </div>
         </template>
 

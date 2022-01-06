@@ -21,18 +21,12 @@ export default defineComponent({
                     <div :class="$style.column">
                         <div :class="$style.name">Juster</div>
 
-                        <router-link to="/explore" :class="$style.link"
-                            >Explore</router-link
-                        >
-                        <router-link to="/events" :class="$style.link"
-                            >Events</router-link
-                        >
-                        <router-link to="/symbols" :class="$style.link"
-                            >Symbols</router-link
-                        >
+                        <router-link to="/explore" :class="$style.link">Explore</router-link>
+                        <router-link to="/events" :class="$style.link">Events</router-link>
+                        <router-link to="/symbols" :class="$style.link">Symbols</router-link>
                         <!-- <router-link to="/rating" :class="$style.link"
                             >Rating</router-link
-                        > -->
+                        >-->
                     </div>
                     <div :class="$style.column">
                         <div :class="$style.name">Follow us</div>
@@ -41,33 +35,25 @@ export default defineComponent({
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
-                            >Discord</a
-                        ><a
+                        >Discord</a>
+                        <a
                             href="https://t.me/baking_bad_chat"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
-                            >GitHub</a
-                        >
+                        >GitHub</a>
                         <a
                             href="https://twitter.com/TezosBakingBad"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
-                            >Twitter</a
-                        >
+                        >Twitter</a>
                     </div>
                     <div :class="$style.column">
                         <div :class="$style.name">Learn</div>
-                        <router-link to="/docs" :class="$style.link"
-                            >Documentation</router-link
-                        >
-                        <router-link to="/terms" :class="$style.link"
-                            >Terms of Use</router-link
-                        >
-                        <router-link to="/policy" :class="$style.link"
-                            >Privacy Policy</router-link
-                        >
+                        <router-link to="/docs" :class="$style.link">Documentation</router-link>
+                        <router-link to="/terms" :class="$style.link">Terms of Use</router-link>
+                        <router-link to="/policy" :class="$style.link">Privacy Policy</router-link>
                     </div>
                 </div>
             </div>
@@ -123,8 +109,6 @@ export default defineComponent({
 }
 
 .name {
-    font-family: "CalSans";
-
     font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);

@@ -1,5 +1,5 @@
-<script>
-import { defineComponent, ref, reactive, computed, inject } from "vue"
+<script setup>
+import { ref, reactive, computed, inject } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { NetworkType } from "@airgap/beacon-sdk"
 
@@ -11,13 +11,17 @@ import { juster } from "@/services/tools"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
 import {
     Dropdown,
     DropdownItem,
     DropdownDivider,
 } from "@/components/ui/Dropdown"
 import Tooltip from "@/components/ui/Tooltip"
+
+/**
+ * Local
+ */
+import ThePendingTransaction from "./ThePendingTransaction"
 
 /**
  * Modals
@@ -36,200 +40,166 @@ import { useNotificationsStore } from "@/store/notifications"
  */
 import { useMarket } from "@/composable/market"
 
-export default defineComponent({
-    setup() {
-        const { setupUser } = useMarket()
+const { setupUser } = useMarket()
 
-        const amplitude = inject("amplitude")
-        const identify = new amplitude.Identify()
+const amplitude = inject("amplitude")
+const identify = new amplitude.Identify()
 
-        const notificationsStore = useNotificationsStore()
-        const accountStore = useAccountStore()
+const notificationsStore = useNotificationsStore()
+const accountStore = useAccountStore()
 
-        const showSettingsModal = ref(false)
-        const showConnectingModal = ref(false)
+const showSettingsModal = ref(false)
+const showConnectingModal = ref(false)
 
-        const route = useRoute()
-        const router = useRouter()
+const route = useRoute()
+const router = useRouter()
 
-        const links = reactive([
-            {
-                name: "Explore",
-                url: "/explore",
-            },
-            {
-                name: "Events",
-                url: "/events",
-            },
-            {
-                name: "Symbols",
-                url: "/symbols",
-            },
-        ])
+const links = reactive([
+    {
+        name: "Explore",
+        url: "/explore",
+    },
+    {
+        name: "Events",
+        url: "/events",
+    },
+    {
+        name: "Symbols",
+        url: "/symbols",
+    },
+])
 
-        const isActive = (url) => {
-            if (!route.name) return
-            return route.path.startsWith(url)
-        }
+const isActive = (url) => {
+    if (!route.name) return
+    return route.path.startsWith(url)
+}
 
-        const login = () => {
-            juster._provider.client.getActiveAccount().then(async (account) => {
-                if (!localStorage["connectingModal"]) {
-                    showConnectingModal.value = true
+const login = () => {
+    juster._provider.client.getActiveAccount().then(async (account) => {
+        if (!localStorage["connectingModal"]) {
+            showConnectingModal.value = true
 
-                    address.value = account.address
-                    network.value = account.network.type
-                } else {
-                    /** analytics */
-                    identify.set("address", account.address)
-                    identify.set("network", account.network.type)
-                    amplitude.identify(identify)
-                    amplitude.logEvent("login", { address: account.address })
-
-                    accountStore.pkh = account.address
-                    accountStore.updateBalance()
-
-                    setupUser()
-                }
-            })
-        }
-
-        /**
-         * Default Login
-         */
-        const address = ref("")
-        const network = ref("")
-        const handleLogin = async () => {
-            await juster.sync()
-            login()
-        }
-
-        /**
-         * Custom RPC Login
-         */
-        const showCustomLoginModal = ref(false)
-        const handleCustomLogin = () => {
-            showCustomLoginModal.value = true
-        }
-        const handleSelectCustomNode = async (node) => {
-            await juster._provider.requestPermissions({
-                network: {
-                    type: NetworkType.CUSTOM,
-                    name: node.value.name,
-                    rpcUrl: node.value.url,
-                },
-            })
-            login()
-        }
-
-        const handleAgree = () => {
-            showConnectingModal.value = false
-
-            localStorage["connectingModal"] = true
-
+            address.value = account.address
+            network.value = account.network.type
+        } else {
             /** analytics */
-            identify.set("address", address.value)
-            identify.set("network", network.value)
+            identify.set("address", account.address)
+            identify.set("network", account.network.type)
             amplitude.identify(identify)
-            amplitude.logEvent("registration", { address: address.value })
+            amplitude.logEvent("login", { address: account.address })
 
-            accountStore.pkh = address.value
-            address.value = ""
-
+            accountStore.pkh = account.address
             accountStore.updateBalance()
 
             setupUser()
         }
-        const handleDisagree = () => {
-            showConnectingModal.value = false
+    })
+}
 
-            address.value = ""
+/**
+ * Default Login
+ */
+const address = ref("")
+const network = ref("")
+const handleLogin = async () => {
+    await juster.sync()
+    login()
+}
 
-            juster._provider.client.clearActiveAccount().then(async () => {
-                await juster._provider.client.getActiveAccount()
-                accountStore.setPkh("")
-                router.push("/")
+/**
+ * Custom RPC Login
+ */
+const showCustomLoginModal = ref(false)
+const handleCustomLogin = () => {
+    showCustomLoginModal.value = true
+}
+const handleSelectCustomNode = async (node) => {
+    await juster._provider.requestPermissions({
+        network: {
+            type: NetworkType.CUSTOM,
+            name: node.value.name,
+            rpcUrl: node.value.url,
+        },
+    })
+    login()
+}
 
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "You are signed out",
-                        description:
-                            "You have not confirmed the registration and agreement with the Terms of Use",
-                        autoDestroy: true,
-                    },
-                })
-            })
-        }
+const handleAgree = () => {
+    showConnectingModal.value = false
 
-        const handleOpenProfile = () => {
-            router.push("/profile")
+    localStorage["connectingModal"] = true
 
-            amplitude.logEvent("openProfile")
-        }
+    /** analytics */
+    identify.set("address", address.value)
+    identify.set("network", network.value)
+    amplitude.identify(identify)
+    amplitude.logEvent("registration", { address: address.value })
 
-        const handleOpenWithdrawals = () => {
-            router.push("/withdrawals")
+    accountStore.pkh = address.value
+    address.value = ""
 
-            amplitude.logEvent("openWithdrawals")
-        }
+    accountStore.updateBalance()
 
-        const handleLogout = () => {
-            juster._provider.client.clearActiveAccount().then(async () => {
-                await juster._provider.client.getActiveAccount()
+    setupUser()
+}
+const handleDisagree = () => {
+    showConnectingModal.value = false
 
-                amplitude.logEvent("logout", { address: accountStore.pkh })
+    address.value = ""
 
-                accountStore.setPkh("")
-                router.push("/")
+    juster._provider.client.clearActiveAccount().then(async () => {
+        await juster._provider.client.getActiveAccount()
+        accountStore.setPkh("")
+        router.push("/")
 
-                accountStore.positionsForWithdrawal = []
+        notificationsStore.create({
+            notification: {
+                type: "success",
+                title: "You are signed out",
+                description:
+                    "You have not confirmed the registration and agreement with the Terms of Use",
+                autoDestroy: true,
+            },
+        })
+    })
+}
 
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "You are signed out",
-                        description:
-                            "To work with the application, you definitely need an account :)",
-                        autoDestroy: true,
-                    },
-                })
-            })
-        }
+const handleOpenProfile = () => {
+    router.push("/profile")
 
-        const pkh = computed(() => accountStore.pkh)
+    amplitude.logEvent("openProfile")
+}
 
-        return {
-            links,
-            isActive,
-            juster,
-            address,
-            handleLogin,
-            handleCustomLogin,
-            handleAgree,
-            handleDisagree,
-            handleLogout,
-            pkh,
-            showSettingsModal,
-            showConnectingModal,
-            showCustomLoginModal,
-            handleSelectCustomNode,
-            accountStore,
-            handleOpenProfile,
-            handleOpenWithdrawals,
-        }
-    },
+const handleOpenWithdrawals = () => {
+    router.push("/withdrawals")
 
-    components: {
-        ConnectingModal,
-        CustomLoginModal,
-        Tooltip,
-        Button,
-        Dropdown,
-        DropdownItem,
-        DropdownDivider,
-    },
-})
+    amplitude.logEvent("openWithdrawals")
+}
+
+const handleLogout = () => {
+    juster._provider.client.clearActiveAccount().then(async () => {
+        await juster._provider.client.getActiveAccount()
+
+        amplitude.logEvent("logout", { address: accountStore.pkh })
+
+        accountStore.setPkh("")
+        router.push("/")
+
+        accountStore.positionsForWithdrawal = []
+
+        notificationsStore.create({
+            notification: {
+                type: "success",
+                title: "You are signed out",
+                description:
+                    "To work with the application, you definitely need an account :)",
+                autoDestroy: true,
+            },
+        })
+    })
+}
+
+const pkh = computed(() => accountStore.pkh)
 </script>
 
 <template>
@@ -248,9 +218,9 @@ export default defineComponent({
 
         <div :class="$style.base">
             <div :class="$style.left">
-                <router-link to="/explore" :class="$style.logo"
-                    ><img src="@/assets/logo.png"
-                /></router-link>
+                <router-link to="/explore" :class="$style.logo">
+                    <img src="@/assets/logo.png" />
+                </router-link>
 
                 <div :class="$style.links">
                     <router-link
@@ -258,20 +228,14 @@ export default defineComponent({
                         :key="link.name"
                         :to="link.url"
                         :class="isActive(link.url) && $style.active"
-                        >{{ link.name }}</router-link
-                    >
+                    >{{ link.name }}</router-link>
                 </div>
             </div>
 
             <div :class="$style.right">
                 <Tooltip v-if="pkh" position="left">
                     <div :class="$style.testnet_warning">
-                        <Icon
-                            name="Warning"
-                            size="16"
-                            :class="$style.warning_icon"
-                        />
-                        Hangzhou Testnet
+                        <Icon name="Warning" size="16" :class="$style.warning_icon" />Hangzhou Testnet
                     </div>
 
                     <template v-slot:content>
@@ -280,22 +244,13 @@ export default defineComponent({
                     </template>
                 </Tooltip>
 
-                <Icon
-                    name="Notifications"
-                    size="16"
-                    :class="$style.notifications_icon"
-                />
+                <Icon name="Notifications" size="16" :class="$style.notifications_icon" />
 
                 <div :class="$style.buttons">
                     <!-- todo: sep component -->
                     <div v-if="!pkh" :class="$style.signin_button">
-                        <div @click="handleLogin" :class="$style.signin">
-                            Sign in
-                        </div>
-                        <div
-                            @click="handleCustomLogin"
-                            :class="$style.custom_signin"
-                        >
+                        <div @click="handleLogin" :class="$style.signin">Sign in</div>
+                        <div @click="handleCustomLogin" :class="$style.custom_signin">
                             <Icon name="settings" size="14" />
                         </div>
                     </div>
@@ -303,10 +258,7 @@ export default defineComponent({
                     <Dropdown>
                         <template v-slot:trigger>
                             <div :class="$style.avatar">
-                                <img
-                                    v-if="pkh"
-                                    :src="`https://services.tzkt.io/v1/avatars/${pkh}`"
-                                />
+                                <img v-if="pkh" :src="`https://services.tzkt.io/v1/avatars/${pkh}`" />
                                 <div
                                     v-if="
                                         accountStore.wonPositions.length &&
@@ -318,10 +270,7 @@ export default defineComponent({
                         </template>
 
                         <template v-slot:dropdown>
-                            <div
-                                @click="handleOpenProfile"
-                                :class="$style.profile"
-                            >
+                            <div @click="handleOpenProfile" :class="$style.profile">
                                 <Icon name="user" size="16" />
 
                                 <div :class="$style.info">
@@ -350,47 +299,41 @@ export default defineComponent({
                                         v-if="accountStore.wonPositions.length"
                                         :class="$style.dropdown_indicator"
                                     />
-                                </div>
-                                Withdrawals
+                                </div>Withdrawals
                             </DropdownItem>
 
                             <DropdownDivider />
 
                             <router-link to="/releases">
                                 <DropdownItem>
-                                    <Icon name="merge" size="16" />
-                                    Releases
+                                    <Icon name="merge" size="16" />Releases
                                 </DropdownItem>
                             </router-link>
                             <a
                                 href="https://juster.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
                                 target="_blank"
                             >
-                                <DropdownItem
-                                    ><Icon
-                                        name="book"
-                                        size="16"
-                                    />Documentation</DropdownItem
-                                ></a
-                            >
-                            <DropdownItem
-                                @click="accountStore.showOnboarding = true"
-                                ><Icon name="help" size="16" />
-                                Onboarding</DropdownItem
-                            >
+                                <DropdownItem>
+                                    <Icon name="book" size="16" />Documentation
+                                </DropdownItem>
+                            </a>
+                            <DropdownItem @click="accountStore.showOnboarding = true">
+                                <Icon name="help" size="16" />Onboarding
+                            </DropdownItem>
 
                             <DropdownDivider />
 
-                            <DropdownItem @click="handleLogout"
-                                ><Icon name="logout" size="16" />
-                                Logout</DropdownItem
-                            >
+                            <DropdownItem @click="handleLogout">
+                                <Icon name="logout" size="16" />Logout
+                            </DropdownItem>
                         </template>
                     </Dropdown>
                 </div>
             </div>
         </div>
     </div>
+
+    <ThePendingTransaction v-if="accountStore.pendingTransaction.awaiting" />
 </template>
 
 <style module>

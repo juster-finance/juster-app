@@ -140,10 +140,11 @@ html {
     background: var(--app-background);
 }
 
+/* 
 @font-face {
     font-family: "CalSans";
     src: local("CalSans"), url(./assets/fonts/CalSans.ttf) format("truetype");
-}
+} */
 
 .popup-enter-active,
 .popup-leave-active {

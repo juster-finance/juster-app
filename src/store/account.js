@@ -13,6 +13,11 @@ export const useAccountStore = defineStore({
             pkh: "",
             balance: 0,
 
+            pendingTransaction: {
+                awaiting: false,
+                when: null,
+            },
+
             isPositionsLoading: false,
             positionsForWithdrawal: [],
 

@@ -56,25 +56,17 @@ export default defineComponent({
 <template>
     <div :class="$style.wrapper">
         <metainfo>
-            <template v-slot:title="{ content }"
-                >{{ content }} • Juster</template
-            >
+            <template v-slot:title="{ content }">{{ content }} • Juster</template>
         </metainfo>
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
         <h1 :class="$style.title">Available symbols</h1>
-        <div :class="$style.description">
-            List of all currency pairs available for betting
-        </div>
+        <div :class="$style.description">List of all currency pairs available for betting</div>
 
         <transition name="fade">
             <div v-if="marketStore.isSymbolsLoaded" :class="$style.symbols">
-                <Symbol
-                    v-for="symbol in marketStore.symbols"
-                    :key="symbol.id"
-                    :symbol="symbol"
-                />
+                <Symbol v-for="symbol in marketStore.symbols" :key="symbol.id" :symbol="symbol" />
             </div>
         </transition>
     </div>
@@ -82,10 +74,6 @@ export default defineComponent({
 
 <style module>
 .wrapper {
-}
-
-.title {
-    font-family: "CalSans";
 }
 
 .breadcrumbs {

@@ -168,6 +168,21 @@ export default defineComponent({
                     new BigNumber(amount.value),
                 )
                 .then((op) => {
+                    /** Pending transaction label */
+                    accountStore.pendingTransaction.awaiting = true
+
+                    op.confirmation()
+                        .then((result) => {
+                            accountStore.pendingTransaction.awaiting = false
+
+                            if (!result.completed) {
+                                // todo: handle it?
+                            }
+                        })
+                        .catch((err) => {
+                            accountStore.pendingTransaction.awaiting = false
+                        })
+
                     sendingLiquidity.value = false
                     showConfirmationHint.value = false
 
@@ -281,9 +296,7 @@ export default defineComponent({
                 <span
                     @click="amount.value = Math.floor(accountStore.balance)"
                     @dblclick="amount.value = accountStore.balance / 2"
-                    >{{ accountStore.balance }}
-                </span>
-
+                >{{ accountStore.balance }}</span>
                 XTZ
             </div>
 
@@ -294,24 +307,16 @@ export default defineComponent({
                 :class="$style.pool"
             />
 
-            <SlippageSelector
-                v-model="slippage"
-                :class="$style.slippage_block"
-            />
+            <SlippageSelector v-model="slippage" :class="$style.slippage_block" />
 
             <div :class="$style.stats">
-                <Stat name="Reward for providing">
-                    {{ event.liquidityPercent * 100 }}%
-                </Stat>
+                <Stat name="Reward for providing">{{ event.liquidityPercent * 100 }}%</Stat>
 
-                <Stat v-if="liquidityRatio" name="Ratio"
-                    ><Icon
-                        name="close"
-                        size="14"
-                        :class="$style.ratio_icon"
-                    />{{ (1 + liquidityRatio.min).toFixed(2) }} -
-                    {{ (1 + liquidityRatio.max).toFixed(2) }}</Stat
-                >
+                <Stat v-if="liquidityRatio" name="Ratio">
+                    <Icon name="close" size="14" :class="$style.ratio_icon" />
+                    {{ (1 + liquidityRatio.min).toFixed(2) }} -
+                    {{ (1 + liquidityRatio.max).toFixed(2) }}
+                </Stat>
             </div>
 
             <Button
@@ -331,16 +336,16 @@ export default defineComponent({
                             : 'lock'
                     "
                     size="16"
-                />{{ buttonState.text }}</Button
-            >
+                />
+                {{ buttonState.text }}
+            </Button>
 
             <div v-if="showConfirmationHint" :class="$style.hint">
                 Confirmation not appearing?
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
                     target="_blank"
-                    >Read about possible solutions</a
-                >
+                >Read about possible solutions</a>
             </div>
         </template>
 
@@ -351,9 +356,9 @@ export default defineComponent({
                 account and connect Temple wallet
             </div>
 
-            <Button @click="handleLogin" size="large" type="primary" block
-                ><Icon name="login" size="16" />Sign in to continue</Button
-            >
+            <Button @click="handleLogin" size="large" type="primary" block>
+                <Icon name="login" size="16" />Sign in to continue
+            </Button>
         </template>
     </Modal>
 </template>

@@ -73,17 +73,13 @@ export default defineComponent({
     <transition name="fade">
         <div :class="$style.wrapper">
             <metainfo>
-                <template v-slot:title="{ content }"
-                    >{{ content }} • Juster</template
-                >
+                <template v-slot:title="{ content }">{{ content }} • Juster</template>
             </metainfo>
 
             <!-- Top markets -->
             <div v-if="marketStore.isSymbolsLoaded" :class="$style.block">
                 <h1>Top markets</h1>
-                <div :class="$style.description">
-                    Currency pairs available for betting
-                </div>
+                <div :class="$style.description">Currency pairs available for betting</div>
 
                 <div :class="$style.items">
                     <SymbolCard
@@ -105,13 +101,8 @@ export default defineComponent({
                         </div>
                     </div>
 
-                    <Button
-                        @click="handleViewTopEvents"
-                        size="small"
-                        type="tertiary"
-                    >
-                        <Icon name="collection" size="16" />
-                        All Hot events
+                    <Button @click="handleViewTopEvents" size="small" type="tertiary">
+                        <Icon name="collection" size="16" />All Hot events
                     </Button>
                 </div>
 
@@ -148,7 +139,6 @@ export default defineComponent({
 }
 
 .block h1 {
-    font-family: "CalSans";
     letter-spacing: 0.5px;
 }
 

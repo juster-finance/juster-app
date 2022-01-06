@@ -381,17 +381,15 @@ export default defineComponent({
 <template>
     <div :class="$style.wrapper">
         <metainfo>
-            <template v-slot:title="{ content }"
-                >{{ content }} • Juster</template
-            >
+            <template v-slot:title="{ content }">{{ content }} • Juster</template>
         </metainfo>
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
         <h1>All events</h1>
-        <div :class="$style.description">
-            List of all new, active, and past events with customizable filtering
-        </div>
+        <div
+            :class="$style.description"
+        >List of all new, active, and past events with customizable filtering</div>
 
         <div :class="$style.container">
             <EventsFilters
@@ -408,19 +406,15 @@ export default defineComponent({
             />
 
             <div :class="$style.events_base">
-                <Banner
-                    type="info"
-                    v-if="filteredEvents.length == 0 && isAllEventsLoaded"
-                    >All
+                <Banner type="info" v-if="filteredEvents.length == 0 && isAllEventsLoaded">
+                    All
                     {{ availableEvents.length - filteredEvents.length }} events
-                    hidden due to filters. Reset filters to see some</Banner
-                >
-                <Banner
-                    type="info"
-                    v-else-if="filteredEvents.length !== availableEvents.length"
-                    >{{ availableEvents.length - filteredEvents.length }} events
-                    hidden due to filters</Banner
-                >
+                    hidden due to filters. Reset filters to see some
+                </Banner>
+                <Banner type="info" v-else-if="filteredEvents.length !== availableEvents.length">
+                    {{ availableEvents.length - filteredEvents.length }} events
+                    hidden due to filters
+                </Banner>
 
                 <transition name="fastfade" mode="out-in">
                     <div v-if="filteredEvents.length" :class="$style.events">
@@ -455,10 +449,6 @@ export default defineComponent({
 
 <style module>
 .wrapper {
-}
-
-.wrapper h1 {
-    font-family: "CalSans";
 }
 
 .breadcrumbs {

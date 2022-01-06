@@ -33,7 +33,7 @@ export default {
                 <div :class="$style.dot" />
 
                 <div :class="$style.roadmap_link">View our Roadmap</div>
-            </a> -->
+            </a>-->
 
             <h1>Decentralized Betting Protocol</h1>
             <div :class="$style.description">
@@ -43,16 +43,16 @@ export default {
             </div>
 
             <div :class="$style.buttons">
-                <router-link to="/explore"
-                    ><Button type="primary" size="medium"
-                        ><Icon name="spark" size="16" />Launch Juster app</Button
-                    ></router-link
-                >
+                <router-link to="/explore">
+                    <Button type="primary" size="medium">
+                        <Icon name="spark" size="16" />Launch Juster app
+                    </Button>
+                </router-link>
                 <router-link to="/docs">
-                    <Button type="secondary" size="medium"
-                        ><Icon name="book" size="16" />Read the docs</Button
-                    ></router-link
-                >
+                    <Button type="secondary" size="medium">
+                        <Icon name="book" size="16" />Read the docs
+                    </Button>
+                </router-link>
             </div>
 
             <div :class="$style.promo">
@@ -63,7 +63,7 @@ export default {
                         src="https://www.youtube.com/embed/rOYu2Qpbpdw?controls=0&modestbranding=1&rel=0"
                         title="Juster promo"
                         frameborder="0"
-                        allow=""
+                        allow
                         allowfullscreen
                     ></iframe>
                 </div>
@@ -74,11 +74,12 @@ export default {
                 width="1100"
                 height="734"
                 :class="$style.app_img"
-            /> -->
+            />-->
 
             <div :class="$style.hint">
-                <Icon name="help" size="14" />
-                Juster is built on <span>Tezos</span> blockchain and uses <span>Harbinger</span> oracle price feed
+                <Icon name="help" size="14" />Juster is built on
+                <span>Tezos</span> blockchain and uses
+                <span>Harbinger</span> oracle price feed
             </div>
         </div>
 
@@ -352,7 +353,7 @@ export default {
                     ></router-link
                 >
             </div>
-        </div> -->
+        </div>-->
     </Page>
 </template>
 
@@ -368,7 +369,6 @@ export default {
     line-height: 1.4;
     font-weight: 600;
     text-align: center;
-    font-family: "Sora", sans-serif;
 
     max-width: 800px;
 
@@ -497,7 +497,6 @@ export default {
 }
 
 .block h2 {
-    font-family: "Sora", sans-serif;
     font-size: 32px;
 
     margin-bottom: 20px;
@@ -588,7 +587,6 @@ export default {
 }
 
 .step_name {
-    font-family: "Sora", sans-serif;
     font-size: 16px;
     line-height: 1;
     font-weight: 600;
