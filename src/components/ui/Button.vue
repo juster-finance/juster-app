@@ -34,9 +34,12 @@ export default defineComponent({
         const hasSlot = computed(() => !!context.slots.default)
 
         const getStyles = () => {
-            const hasCorrectSize = ["large", "medium", "small"].includes(
-                size.value,
-            )
+            const hasCorrectSize = [
+                "large",
+                "medium",
+                "small",
+                "mini",
+            ].includes(size.value)
 
             return [
                 style.wrapper,
@@ -113,6 +116,16 @@ export default defineComponent({
     font-size: 13px;
 }
 .wrapper.small.icon {
+    padding: 0 10px;
+}
+
+.wrapper.mini {
+    height: 26px;
+    padding: 0 10px 0 10px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+.wrapper.mini.icon {
     padding: 0 10px;
 }
 

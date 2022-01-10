@@ -13,6 +13,11 @@ export const useAccountStore = defineStore({
             pkh: "",
             balance: 0,
 
+            pendingTransaction: {
+                awaiting: false,
+                when: null,
+            },
+
             isPositionsLoading: false,
             positionsForWithdrawal: [],
 
@@ -41,6 +46,12 @@ export const useAccountStore = defineStore({
     getters: {
         isLoggined() {
             return !!this.pkh
+        },
+
+        wonPositions() {
+            return this.positionsForWithdrawal.filter(
+                position => position.value,
+            )
         },
     },
 })

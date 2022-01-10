@@ -1,11 +1,30 @@
 <script>
-import { defineComponent, reactive, ref, toRefs, watch, inject } from "vue"
+import {
+    defineComponent,
+    reactive,
+    ref,
+    toRefs,
+    watch,
+    inject,
+    computed,
+} from "vue"
+
+/**
+ * Modals
+ */
+import FindParticipantModal from "@/components/local/modals/FindParticipantModal"
 
 /**
  * UI
  */
 import Button from "@/components/ui/Button"
 import Checkbox from "@/components/ui/Checkbox"
+import Toggle from "@/components/ui/Toggle"
+
+/**
+ * Store
+ */
+import { useAccountStore } from "@/store/account"
 
 export default defineComponent({
     name: "EventsFilters",
@@ -19,7 +38,14 @@ export default defineComponent({
     setup(props, context) {
         const amplitude = inject("amplitude")
 
-        const { liquidityRange, liquidityFilters } = toRefs(props)
+        const selectedTab = ref("Basic")
+
+        const { filters, liquidityRange, liquidityFilters } = toRefs(props)
+
+        const accountStore = useAccountStore()
+
+        /** modals */
+        const showFindParticipantModal = ref(false)
 
         const values = reactive({
             min: 0,
@@ -43,6 +69,35 @@ export default defineComponent({
             amplitude.logEvent("onResetFilters")
 
             context.emit("onReset")
+        }
+
+        const advancedFiltersCount = computed(() => {
+            let count = 0
+
+            Object.keys(filters.value.misc).forEach((filterKey) => {
+                if (filters.value.misc[filterKey].active) count += 1
+            })
+
+            if (filters.value.advanced.period) {
+                count += 1
+            }
+
+            if (filters.value.advanced.participants.length) {
+                count += 1
+            }
+
+            return count
+        })
+
+        /** advanced filters (participants) */
+        const manageParticipant = (address, action) => {
+            context.emit("onManageParticipant", { address, action })
+        }
+
+        const handleFindParticipant = (address) => {
+            manageParticipant(address, "add")
+
+            showFindParticipantModal.value = false
         }
 
         /** watch for reset */
@@ -132,6 +187,9 @@ export default defineComponent({
         }
 
         return {
+            showFindParticipantModal,
+            advancedFiltersCount,
+            selectedTab,
             handleKeydown,
             handleBlur,
             values,
@@ -140,165 +198,263 @@ export default defineComponent({
             minInputEl,
             maxInputEl,
             handleReset,
+            accountStore,
+            manageParticipant,
+            handleFindParticipant,
         }
     },
 
-    components: { Button, Checkbox },
+    components: { Button, Checkbox, Toggle, FindParticipantModal },
 })
 </script>
 
 <template>
     <div :class="$style.wrapper">
+        <FindParticipantModal
+            :show="showFindParticipantModal"
+            @onAdd="handleFindParticipant"
+            @onClose="showFindParticipantModal = false"
+        />
+
         <div :class="$style.title">Filters</div>
 
-        <div :class="$style.block">
-            <div :class="$style.subtitle">Symbol</div>
-
-            <div :class="$style.symbols">
-                <Checkbox v-model="filters.symbols.xtz"
-                    ><div :class="$style.symbol_checkbox">
-                        XTZ-USD
-                        <span>{{
-                            events.filter(
-                                (event) =>
-                                    event.currencyPair.symbol == "XTZ-USD",
-                            ).length
-                        }}</span>
-                    </div></Checkbox
-                >
-                <Checkbox v-model="filters.symbols.btc"
-                    ><div :class="$style.symbol_checkbox">
-                        BTC-USD
-                        <span>{{
-                            events.filter(
-                                (event) =>
-                                    event.currencyPair.symbol == "BTC-USD",
-                            ).length
-                        }}</span>
-                    </div></Checkbox
-                >
-                <Checkbox v-model="filters.symbols.eth"
-                    ><div :class="$style.symbol_checkbox">
-                        ETH-USD
-                        <span>{{
-                            events.filter(
-                                (event) =>
-                                    event.currencyPair.symbol == "ETH-USD",
-                            ).length
-                        }}</span>
-                    </div></Checkbox
-                >
+        <div :class="$style.switcher">
+            <div
+                @click="selectedTab = 'Basic'"
+                :class="[$style.tab, selectedTab == 'Basic' && $style.active]"
+            >
+                Basic
+            </div>
+            <div
+                @click="selectedTab = 'Advanced'"
+                :class="[
+                    $style.tab,
+                    selectedTab == 'Advanced' && $style.active,
+                ]"
+            >
+                Advanced
+                <div v-if="advancedFiltersCount" />
             </div>
         </div>
 
-        <div :class="$style.block">
-            <div :class="$style.subtitle">Liquidity</div>
+        <template v-if="selectedTab == 'Basic'">
+            <div :class="$style.block">
+                <div :class="$style.subtitle">Symbol</div>
 
-            <div :class="$style.range_picker">
-                <div :class="$style.range">
+                <div :class="$style.badges">
                     <div
-                        :class="$style.filled_range"
-                        :style="{
-                            left: `${position.left}%`,
-                            right: `${position.right}%`,
-                        }"
+                        v-for="(symbol, index) in filters.symbols"
+                        :key="index"
+                        @click="$emit('onSelect', 'symbols', symbol)"
+                        :class="[
+                            $style.badge,
+                            $style.symbol,
+                            symbol.active && $style.active,
+                        ]"
+                    >
+                        <img
+                            :src="
+                                require(`@/assets/symbols/${
+                                    (symbol.name == 'XTZ-USD' && 'tz') ||
+                                    (symbol.name == 'ETH-USD' && 'eth') ||
+                                    (symbol.name == 'BTC-USD' && 'btc')
+                                }.png`)
+                            "
+                        />
+                        {{ symbol.name.replace("-USD", "") }}
+                    </div>
+                </div>
+            </div>
+
+            <div :class="$style.block">
+                <div :class="$style.subtitle">Liquidity</div>
+
+                <div :class="$style.range_picker">
+                    <div :class="$style.range">
+                        <div
+                            :class="$style.filled_range"
+                            :style="{
+                                left: `${position.left}%`,
+                                right: `${position.right}%`,
+                            }"
+                        />
+                    </div>
+
+                    <div :class="$style.range_inputs">
+                        <div
+                            @click="minInputEl.focus()"
+                            :class="$style.range_input"
+                        >
+                            <Icon name="download" size="12" />
+                            <input
+                                ref="minInputEl"
+                                v-model="inputs.min"
+                                type="number"
+                                step="200"
+                                @keydown="handleKeydown"
+                                @blur="handleBlur('min')"
+                                placeholder="0"
+                            />
+                            <span>XTZ</span>
+                        </div>
+
+                        <div
+                            @click="maxInputEl.focus()"
+                            :class="$style.range_input"
+                        >
+                            <span>XTZ</span>
+                            <input
+                                ref="maxInputEl"
+                                v-model="inputs.max"
+                                type="number"
+                                step="200"
+                                @keydown="handleKeydown"
+                                @blur="handleBlur('max')"
+                                placeholder="0"
+                                :class="$style.right"
+                            />
+                            <Icon
+                                name="download"
+                                size="12"
+                                :class="$style.reverse"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div :class="$style.block">
+                <div :class="$style.subtitle">Status</div>
+
+                <div :class="$style.badges">
+                    <div
+                        v-for="(status, index) in filters.statuses"
+                        :key="index"
+                        @click="$emit('onSelect', 'statuses', status)"
+                        :class="[
+                            $style.badge,
+                            $style[status.color],
+                            status.active && $style.active,
+                        ]"
+                    >
+                        <Icon :name="status.icon" size="14" />
+                        {{ status.name }}
+                    </div>
+                </div>
+            </div>
+
+            <div :class="$style.block">
+                <div :class="$style.subtitle">Period</div>
+
+                <div :class="$style.badges">
+                    <div
+                        v-for="(period, index) in filters.periods"
+                        :key="index"
+                        @click="$emit('onSelect', 'periods', period)"
+                        :class="[
+                            $style.badge,
+                            $style.yellow,
+                            period.active && $style.active,
+                        ]"
+                    >
+                        <Icon name="time" size="14" />
+                        {{ period.name }}
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template v-else>
+            <div :class="$style.block">
+                <div :class="$style.subtitle">Participants</div>
+
+                <div :class="$style.badges">
+                    <div
+                        @click="showFindParticipantModal = true"
+                        :class="[$style.badge, $style.active]"
+                    >
+                        <Icon name="plus" size="14" /> Add user
+                    </div>
+                    <div
+                        @click="manageParticipant(accountStore.pkh, 'add')"
+                        :class="[$style.badge, $style.active]"
+                    >
+                        <img
+                            :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
+                            :class="$style.avatar"
+                        />
+                        Find Me
+                    </div>
+                </div>
+
+                <div :class="$style.badges">
+                    <div
+                        v-for="participant in filters.advanced.participants"
+                        :key="participant"
+                        @click="manageParticipant(participant, 'remove')"
+                        :class="[$style.badge, $style.active]"
+                    >
+                        <img
+                            :src="`https://services.tzkt.io/v1/avatars/${participant}`"
+                            :class="$style.avatar"
+                        />
+                        {{ participant.slice(0, 5) }}..{{
+                            participant.slice(
+                                participant.length - 4,
+                                participant.length,
+                            )
+                        }}
+                    </div>
+                </div>
+            </div>
+
+            <div :class="$style.block">
+                <div :class="$style.subtitle">Period</div>
+
+                <div :class="$style.period">
+                    <input
+                        v-model="filters.advanced.period"
+                        type="date"
+                        id="filter_day"
+                        name="filter_day"
                     />
                 </div>
+            </div>
 
-                <div :class="$style.range_inputs">
-                    <div
-                        @click="minInputEl.focus()"
-                        :class="$style.range_input"
-                    >
-                        <Icon name="download" size="12" />
-                        <input
-                            ref="minInputEl"
-                            v-model="inputs.min"
-                            type="number"
-                            step="200"
-                            @keydown="handleKeydown"
-                            @blur="handleBlur('min')"
-                            placeholder="0"
+            <div :class="$style.block">
+                <div :class="$style.subtitle">Misc</div>
+
+                <div :class="$style.misc">
+                    <div :class="$style.toggle_filter">
+                        <div :class="$style.left">Starting Today</div>
+                        <Toggle
+                            v-model="filters.misc.startingToday.active"
+                            :disabled="filters.misc.startingToday.disabled"
                         />
-                        <span>XTZ</span>
                     </div>
-
-                    <div
-                        @click="maxInputEl.focus()"
-                        :class="$style.range_input"
-                    >
-                        <span>XTZ</span>
-                        <input
-                            ref="maxInputEl"
-                            v-model="inputs.max"
-                            type="number"
-                            step="200"
-                            @keydown="handleKeydown"
-                            @blur="handleBlur('max')"
-                            placeholder="0"
-                            :class="$style.right"
+                    <div :class="$style.toggle_filter">
+                        <div :class="$style.left">More than 2 Participant</div>
+                        <Toggle
+                            v-model="filters.misc.moreThan.active"
+                            :disabled="filters.misc.moreThan.disabled"
                         />
-                        <Icon
-                            name="download"
-                            size="12"
-                            :class="$style.reverse"
+                    </div>
+                    <div :class="$style.toggle_filter">
+                        <div :class="$style.left">With Target Dynamics</div>
+                        <Toggle
+                            v-model="filters.misc.targetDynamics.active"
+                            :disabled="filters.misc.targetDynamics.disabled"
+                        />
+                    </div>
+                    <div :class="$style.toggle_filter">
+                        <div :class="$style.left">Custom events</div>
+                        <Toggle
+                            v-model="filters.misc.customEvents.active"
+                            :disabled="filters.misc.customEvents.disabled"
                         />
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div :class="$style.block">
-            <div :class="$style.subtitle">Status</div>
-
-            <div :class="$style.badges">
-                <div
-                    v-for="(status, index) in filters.statuses"
-                    :key="index"
-                    @click="$emit('onSelectStatus', status)"
-                    :class="[
-                        $style.badge,
-                        $style[status.color],
-                        status.active && $style.active,
-                    ]"
-                >
-                    <Icon :name="status.icon" size="14" />{{ status.name }}
-                </div>
-            </div>
-        </div>
-
-        <div :class="$style.block">
-            <div :class="$style.subtitle">Period</div>
-
-            <div :class="$style.badges">
-                <div
-                    v-for="(period, index) in filters.periods"
-                    :key="index"
-                    @click="$emit('onSelectPeriod', period)"
-                    :class="[
-                        $style.badge,
-                        $style.yellow,
-                        period.active && $style.active,
-                    ]"
-                >
-                    <Icon name="time" size="14" />{{ period.name }}
-                </div>
-            </div>
-        </div>
-
-        <div :class="$style.block">
-            <div :class="$style.subtitle">Target dynamics</div>
-
-            <div :class="$style.badges">
-                <div :class="$style.badge">0%</div>
-                <div :class="[$style.badge, $style.green]">
-                    <Icon name="higher" size="14" />1%
-                </div>
-                <div :class="[$style.badge, $style.red]">
-                    <Icon name="lower" size="14" />1%
-                </div>
-            </div>
-        </div>
+        </template>
 
         <div :class="$style.divider" />
 
@@ -320,6 +476,55 @@ export default defineComponent({
     border: 1px solid var(--border);
     padding: 20px 0;
     height: fit-content;
+}
+
+.switcher {
+    display: flex;
+
+    margin: 0 20px 24px 20px;
+
+    border-radius: 6px;
+    outline: 1px solid var(--border);
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    width: 130px;
+    height: 28px;
+    cursor: pointer;
+
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--text-primary);
+
+    opacity: 0.7;
+
+    transition: all 0.2s ease;
+}
+
+.tab div {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--blue);
+}
+
+.tab:nth-child(1) {
+    border-radius: 6px 0 0 6px;
+}
+
+.tab:nth-child(2) {
+    border-radius: 0 6px 6px 0;
+}
+
+.tab.active {
+    background: var(--opacity-05);
+    opacity: 1;
 }
 
 .title {
@@ -413,6 +618,7 @@ export default defineComponent({
     line-height: 1;
     font-weight: 600;
     color: var(--text-primary);
+    fill: var(--text-tertiary);
 
     transition: all 0.2s ease;
 }
@@ -443,6 +649,12 @@ export default defineComponent({
 
 .badge.gray svg {
     fill: var(--text-secondary);
+}
+
+.symbol img {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
 }
 
 .range_picker {
@@ -530,5 +742,50 @@ export default defineComponent({
 .range_input input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+.misc {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.toggle_filter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.left {
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.period {
+    display: flex;
+}
+
+.period input {
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--text-primary);
+
+    padding: 0 10px;
+}
+
+.period input::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+.avatar {
+    width: 14px;
+    height: 14px;
 }
 </style>

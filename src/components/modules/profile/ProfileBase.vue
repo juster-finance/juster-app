@@ -12,13 +12,14 @@ import Tooltip from "@/components/ui/Tooltip"
 /**
  * Local
  */
-import EventCard from "@/components/local/EventCard"
+import { EventCard } from "@/components/local/EventCard"
 
 /**
  * Services
  */
 import { juster, fetchBalance } from "@/services/tools"
 import { toClipboard } from "@/services/utils/global"
+import { abbreviateNumber } from "@/services/utils/amounts"
 
 /**
  * API
@@ -149,6 +150,7 @@ export default defineComponent({
             isMyProfile,
             address,
             positions,
+            abbreviateNumber,
         }
     },
 
@@ -222,14 +224,14 @@ export default defineComponent({
                     <div :class="$style.stat">
                         <div :class="$style.key">Liquidity provided</div>
                         <div :class="$style.value">
-                            {{ user.totalLiquidityProvided }}
+                            {{ abbreviateNumber(user.totalLiquidityProvided) }}
                             <span>XTZ</span>
                         </div>
                     </div>
                     <div :class="$style.stat">
                         <div :class="$style.key">Net return</div>
                         <div :class="$style.value">
-                            {{ user.totalProviderReward.toFixed(2) }}
+                            {{ abbreviateNumber(user.totalProviderReward) }}
                             <span>XTZ</span>
                         </div>
                     </div>
@@ -248,13 +250,14 @@ export default defineComponent({
                     <div :class="$style.stat">
                         <div :class="$style.key">Bets value</div>
                         <div :class="$style.value">
-                            {{ user.totalBetsAmount }} <span>XTZ</span>
+                            {{ user.totalBetsAmount }}
+                            <span>XTZ</span>
                         </div>
                     </div>
                     <div v-if="user.totalWithdrawn" :class="$style.stat">
                         <div :class="$style.key">Withdrawn</div>
                         <div :class="$style.value">
-                            {{ user.totalWithdrawn.toFixed(2) }}
+                            {{ abbreviateNumber(user.totalWithdrawn) }}
                             <span>XTZ</span>
                         </div>
                     </div>
@@ -275,14 +278,13 @@ export default defineComponent({
                 <div :class="$style.additional">
                     <div :class="$style.left">
                         <a
-                            :href="`https://granadanet.tzkt.io/${address}`"
+                            :href="`https://hangzhou2net.tzkt.io/${address}`"
                             target="_blank"
                         >
-                            <Button type="tertiary" size="small"
-                                ><Icon name="open" size="14" /> View on
-                                TzKT</Button
-                            ></a
-                        >
+                            <Button type="tertiary" size="small">
+                                <Icon name="open" size="14" />View on TzKT
+                            </Button>
+                        </a>
                     </div>
 
                     <div :class="$style.right">
@@ -341,9 +343,9 @@ export default defineComponent({
 
         <div :class="$style.error_buttons">
             <router-link to="/explore">
-                <Button type="secondary" size="small"
-                    ><Icon name="spark" size="14" /> Explore Juster</Button
-                >
+                <Button type="secondary" size="small">
+                    <Icon name="spark" size="14" />Explore Juster
+                </Button>
             </router-link>
 
             <div :class="$style.error_description">or</div>
@@ -360,8 +362,6 @@ export default defineComponent({
 }
 
 .profile_title {
-    font-family: "CalSans";
-
     margin-bottom: 16px;
 }
 
@@ -566,10 +566,6 @@ export default defineComponent({
 .top {
     display: flex;
     justify-content: space-between;
-}
-
-.top h2 {
-    font-family: "CalSans";
 }
 
 .items {

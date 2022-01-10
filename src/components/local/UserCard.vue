@@ -137,7 +137,7 @@ export default defineComponent({
                 </router-link>
 
                 <a
-                    :href="`https://granadanet.tzkt.io/${user.userId}`"
+                    :href="`https://hangzhou2net.tzkt.io/${user.userId}`"
                     target="_blank"
                 >
                     <DropdownItem

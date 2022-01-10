@@ -1,5 +1,5 @@
-<script>
-import { defineComponent, ref, reactive, computed, inject } from "vue"
+<script setup>
+import { ref, reactive, computed, inject } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { NetworkType } from "@airgap/beacon-sdk"
 
@@ -9,20 +9,19 @@ import { NetworkType } from "@airgap/beacon-sdk"
 import { juster } from "@/services/tools"
 
 /**
- * Local
- */
-import AppStatus from "@/components/local/AppStatus"
-
-/**
  * UI
  */
-import Button from "@/components/ui/Button"
 import {
     Dropdown,
     DropdownItem,
     DropdownDivider,
 } from "@/components/ui/Dropdown"
-import Tooltip from "@/components/ui/Tooltip"
+
+/**
+ * Local
+ */
+import ThePendingTransaction from "./ThePendingTransaction"
+import RewardAlert from "@/components/local/RewardAlert"
 
 /**
  * Modals
@@ -41,201 +40,156 @@ import { useNotificationsStore } from "@/store/notifications"
  */
 import { useMarket } from "@/composable/market"
 
-export default defineComponent({
-    setup() {
-        const { setupUser } = useMarket()
+const { setupUser } = useMarket()
 
-        const amplitude = inject("amplitude")
-        const identify = new amplitude.Identify()
+const amplitude = inject("amplitude")
+const identify = new amplitude.Identify()
 
-        const notificationsStore = useNotificationsStore()
-        const accountStore = useAccountStore()
+const notificationsStore = useNotificationsStore()
+const accountStore = useAccountStore()
 
-        const showSettingsModal = ref(false)
-        const showConnectingModal = ref(false)
+const showSettingsModal = ref(false)
+const showConnectingModal = ref(false)
 
-        const route = useRoute()
-        const router = useRouter()
+const route = useRoute()
+const router = useRouter()
 
-        const links = reactive([
-            {
-                name: "Explore",
-                url: "/explore",
-            },
-            {
-                name: "Events",
-                url: "/events",
-            },
-            {
-                name: "Symbols",
-                url: "/symbols",
-            },
-        ])
+const links = reactive([
+    {
+        name: "Explore",
+        url: "/explore",
+    },
+    {
+        name: "Events",
+        url: "/events",
+    },
+    {
+        name: "Symbols",
+        url: "/symbols",
+    },
+])
 
-        const isActive = (url) => {
-            if (!route.name) return
-            return route.path.startsWith(url)
-        }
+const isActive = (url) => {
+    if (!route.name) return
+    return route.path.startsWith(url)
+}
 
-        const login = () => {
-            juster._provider.client.getActiveAccount().then(async (account) => {
-                if (!localStorage["connectingModal"]) {
-                    showConnectingModal.value = true
+const login = () => {
+    juster._provider.client.getActiveAccount().then(async (account) => {
+        if (!localStorage["connectingModal"]) {
+            showConnectingModal.value = true
 
-                    address.value = account.address
-                    network.value = account.network.type
-                } else {
-                    /** analytics */
-                    identify.set("address", account.address)
-                    identify.set("network", account.network.type)
-                    amplitude.identify(identify)
-                    amplitude.logEvent("login", { address: account.address })
-
-                    accountStore.pkh = account.address
-                    accountStore.updateBalance()
-
-                    setupUser()
-                }
-            })
-        }
-
-        /**
-         * Default Login
-         */
-        const address = ref("")
-        const network = ref("")
-        const handleLogin = async () => {
-            await juster.sync()
-            login()
-        }
-
-        /**
-         * Custom RPC Login
-         */
-        const showCustomLoginModal = ref(false)
-        const handleCustomLogin = () => {
-            showCustomLoginModal.value = true
-        }
-        const handleSelectCustomNode = async (node) => {
-            await juster._provider.requestPermissions({
-                network: {
-                    type: NetworkType.CUSTOM,
-                    name: node.value.name,
-                    rpcUrl: node.value.url,
-                },
-            })
-            login()
-        }
-
-        const handleAgree = () => {
-            showConnectingModal.value = false
-
-            localStorage["connectingModal"] = true
-
+            address.value = account.address
+            network.value = account.network.type
+        } else {
             /** analytics */
-            identify.set("address", address.value)
-            identify.set("network", network.value)
+            identify.set("address", account.address)
+            identify.set("network", account.network.type)
             amplitude.identify(identify)
-            amplitude.logEvent("registration", { address: address.value })
+            amplitude.logEvent("login", { address: account.address })
 
-            accountStore.pkh = address.value
-            address.value = ""
-
+            accountStore.pkh = account.address
             accountStore.updateBalance()
 
             setupUser()
         }
-        const handleDisagree = () => {
-            showConnectingModal.value = false
+    })
+}
 
-            address.value = ""
+/**
+ * Default Login
+ */
+const address = ref("")
+const network = ref("")
+const handleLogin = async () => {
+    await juster.sync()
+    login()
+}
 
-            juster._provider.client.clearActiveAccount().then(async () => {
-                await juster._provider.client.getActiveAccount()
-                accountStore.setPkh("")
-                router.push("/")
+/**
+ * Custom RPC Login
+ */
+const showCustomLoginModal = ref(false)
+const handleCustomLogin = () => {
+    showCustomLoginModal.value = true
+}
+const handleSelectCustomNode = async (node) => {
+    await juster._provider.requestPermissions({
+        network: {
+            type: NetworkType.CUSTOM,
+            name: node.value.name,
+            rpcUrl: node.value.url,
+        },
+    })
+    login()
+}
 
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "You are signed out",
-                        description:
-                            "You have not confirmed the registration and agreement with the Terms of Use",
-                        autoDestroy: true,
-                    },
-                })
-            })
-        }
+const handleAgree = () => {
+    showConnectingModal.value = false
 
-        const handleOpenProfile = () => {
-            router.push("/profile")
+    localStorage["connectingModal"] = true
 
-            amplitude.logEvent("openProfile")
-        }
+    /** analytics */
+    identify.set("address", address.value)
+    identify.set("network", network.value)
+    amplitude.identify(identify)
+    amplitude.logEvent("registration", { address: address.value })
 
-        const handleOpenWithdrawals = () => {
-            router.push("/withdrawals")
+    accountStore.pkh = address.value
+    address.value = ""
 
-            amplitude.logEvent("openWithdrawals")
-        }
+    accountStore.updateBalance()
 
-        const handleLogout = () => {
-            juster._provider.client.clearActiveAccount().then(async () => {
-                await juster._provider.client.getActiveAccount()
+    setupUser()
+}
+const handleDisagree = () => {
+    showConnectingModal.value = false
 
-                amplitude.logEvent("logout", { address: accountStore.pkh })
+    address.value = ""
 
-                accountStore.setPkh("")
-                router.push("/")
+    juster._provider.client.clearActiveAccount().then(async () => {
+        await juster._provider.client.getActiveAccount()
+        accountStore.setPkh("")
+        router.push("/")
+    })
+}
 
-                accountStore.positionsForWithdrawal = []
+const handleOpenProfile = () => {
+    router.push("/profile")
 
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "You are signed out",
-                        description:
-                            "To work with the application, you definitely need an account :)",
-                        autoDestroy: true,
-                    },
-                })
-            })
-        }
+    amplitude.logEvent("openProfile")
+}
 
-        const pkh = computed(() => accountStore.pkh)
+const handleOpenWithdrawals = () => {
+    router.push("/withdrawals")
 
-        return {
-            links,
-            isActive,
-            juster,
-            address,
-            handleLogin,
-            handleCustomLogin,
-            handleAgree,
-            handleDisagree,
-            handleLogout,
-            pkh,
-            showSettingsModal,
-            showConnectingModal,
-            showCustomLoginModal,
-            handleSelectCustomNode,
-            accountStore,
-            handleOpenProfile,
-            handleOpenWithdrawals,
-        }
-    },
+    amplitude.logEvent("openWithdrawals")
+}
 
-    components: {
-        ConnectingModal,
-        CustomLoginModal,
-        Tooltip,
-        AppStatus,
-        Button,
-        Dropdown,
-        DropdownItem,
-        DropdownDivider,
-    },
-})
+const handleLogout = () => {
+    juster._provider.client.clearActiveAccount().then(async () => {
+        await juster._provider.client.getActiveAccount()
+
+        amplitude.logEvent("logout", { address: accountStore.pkh })
+
+        accountStore.setPkh("")
+        router.push("/")
+
+        accountStore.positionsForWithdrawal = []
+
+        notificationsStore.create({
+            notification: {
+                type: "success",
+                title: "You are signed out",
+                description:
+                    "To work with the application, you definitely need an account :)",
+                autoDestroy: true,
+            },
+        })
+    })
+}
+
+const pkh = computed(() => accountStore.pkh)
 </script>
 
 <template>
@@ -254,9 +208,9 @@ export default defineComponent({
 
         <div :class="$style.base">
             <div :class="$style.left">
-                <router-link to="/explore" :class="$style.logo"
-                    ><img src="@/assets/logo.png"
-                /></router-link>
+                <router-link to="/explore" :class="$style.logo">
+                    <img src="@/assets/logo.png" />
+                </router-link>
 
                 <div :class="$style.links">
                     <router-link
@@ -270,29 +224,7 @@ export default defineComponent({
             </div>
 
             <div :class="$style.right">
-                <!-- <AppStatus :class="$style.app_status" /> -->
-
-                <Tooltip v-if="pkh" position="left">
-                    <div :class="$style.testnet_warning">
-                        <Icon
-                            name="Warning"
-                            size="16"
-                            :class="$style.warning_icon"
-                        />
-                        Granada Testnet
-                    </div>
-
-                    <template v-slot:content>
-                        Granada Testnet in use.
-                        <span>You can change the network in the settings</span>
-                    </template>
-                </Tooltip>
-
-                <Icon
-                    name="Notifications"
-                    size="16"
-                    :class="$style.notifications_icon"
-                />
+                <RewardAlert :class="$style.reward_alert" />
 
                 <div :class="$style.buttons">
                     <!-- todo: sep component -->
@@ -314,13 +246,6 @@ export default defineComponent({
                                 <img
                                     v-if="pkh"
                                     :src="`https://services.tzkt.io/v1/avatars/${pkh}`"
-                                />
-                                <div
-                                    v-if="
-                                        accountStore.positionsForWithdrawal
-                                            .length && accountStore.pkh
-                                    "
-                                    :class="$style.indicator"
                                 />
                             </div>
                         </template>
@@ -354,13 +279,6 @@ export default defineComponent({
                             <DropdownItem @click="handleOpenWithdrawals">
                                 <div :class="$style.dropdown_icon">
                                     <Icon name="money" size="16" />
-                                    <div
-                                        v-if="
-                                            accountStore.positionsForWithdrawal
-                                                .length
-                                        "
-                                        :class="$style.dropdown_indicator"
-                                    />
                                 </div>
                                 Withdrawals
                             </DropdownItem>
@@ -369,39 +287,36 @@ export default defineComponent({
 
                             <router-link to="/releases">
                                 <DropdownItem>
-                                    <Icon name="merge" size="16" />
-                                    Releases
+                                    <Icon name="merge" size="16" />Releases
                                 </DropdownItem>
                             </router-link>
                             <a
                                 href="https://juster.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
                                 target="_blank"
                             >
-                                <DropdownItem
-                                    ><Icon
-                                        name="book"
-                                        size="16"
-                                    />Documentation</DropdownItem
-                                ></a
-                            >
+                                <DropdownItem>
+                                    <Icon name="book" size="16" />Documentation
+                                </DropdownItem>
+                            </a>
                             <DropdownItem
                                 @click="accountStore.showOnboarding = true"
-                                ><Icon name="help" size="16" />
-                                Onboarding</DropdownItem
                             >
+                                <Icon name="help" size="16" />Onboarding
+                            </DropdownItem>
 
                             <DropdownDivider />
 
-                            <DropdownItem @click="handleLogout"
-                                ><Icon name="logout" size="16" />
-                                Logout</DropdownItem
-                            >
+                            <DropdownItem @click="handleLogout">
+                                <Icon name="logout" size="16" />Logout
+                            </DropdownItem>
                         </template>
                     </Dropdown>
                 </div>
             </div>
         </div>
     </div>
+
+    <ThePendingTransaction v-if="accountStore.pendingTransaction.awaiting" />
 </template>
 
 <style module>
@@ -437,29 +352,8 @@ export default defineComponent({
     align-items: center;
 }
 
-.app_status {
-    margin-right: 40px;
-}
-
-.testnet_warning {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    height: 28px;
-    padding: 0 8px 0 6px;
-
-    font-size: 12px;
-    line-height: 1px;
-    font-weight: 600;
-    color: var(--yellow);
-
-    transition: all 0.2s ease;
-}
-
-.testnet_warning svg {
-    fill: var(--yellow);
+.reward_alert {
+    margin-right: 8px;
 }
 
 .left {
@@ -500,19 +394,6 @@ export default defineComponent({
 
 .links a:hover {
     color: var(--text-primary);
-}
-
-.notifications_icon {
-    fill: var(--icon);
-
-    margin-right: 20px;
-    margin-left: 32px;
-
-    transition: fill 0.2s ease;
-}
-
-.notifications_icon:hover {
-    fill: var(--icon-high);
 }
 
 .buttons {
@@ -574,30 +455,20 @@ export default defineComponent({
     position: relative;
 }
 
-.indicator {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--red);
-}
-
 .avatar img {
     display: flex;
-    width: 28px;
-    padding: 2px;
+    width: 24px;
+    padding: 4px;
     box-sizing: content-box;
 
-    background: var(--opacity-05);
-    border-radius: 50px;
+    background: var(--btn-secondary-bg);
+    border-radius: 8px;
 
     transition: all 0.2s ease;
 }
 
 .avatar:hover img {
-    background: var(--opacity-10);
+    background: var(--btn-secondary-bg-hover);
 }
 
 .avatar:active img {
@@ -606,17 +477,6 @@ export default defineComponent({
 
 .dropdown_icon {
     position: relative;
-}
-
-.dropdown_indicator {
-    position: absolute;
-    top: 0;
-    right: 8px;
-
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--red);
 }
 
 .profile {

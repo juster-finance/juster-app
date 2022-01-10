@@ -133,6 +133,13 @@ export default defineComponent({
 
         // eslint-disable-next-line vue/return-in-computed-property
         const buttonState = computed(() => {
+            if (accountStore.pendingTransaction.awaiting) {
+                return {
+                    text: "Previous transaction in process",
+                    disabled: true,
+                }
+            }
+
             if (countdownStatus.value !== "In progress")
                 return { text: "Acceptance of bets is closed", disabled: true }
             if (sendingLiquidity.value)
@@ -150,8 +157,7 @@ export default defineComponent({
         const showConfirmationHint = ref(false)
 
         const handleProvideLiquidity = () => {
-            if (!amount.value) return
-            if (countdownStatus.value !== "In progress") return
+            if (buttonState.value.disabled) return
 
             sendingLiquidity.value = true
 
@@ -168,6 +174,21 @@ export default defineComponent({
                     new BigNumber(amount.value),
                 )
                 .then((op) => {
+                    /** Pending transaction label */
+                    accountStore.pendingTransaction.awaiting = true
+
+                    op.confirmation()
+                        .then((result) => {
+                            accountStore.pendingTransaction.awaiting = false
+
+                            if (!result.completed) {
+                                // todo: handle it?
+                            }
+                        })
+                        .catch((err) => {
+                            accountStore.pendingTransaction.awaiting = false
+                        })
+
                     sendingLiquidity.value = false
                     showConfirmationHint.value = false
 
@@ -178,7 +199,7 @@ export default defineComponent({
                                 type: "success",
                                 title: "Your liquidity has been accepted",
                                 description:
-                                    "We need to process your bet, it will take ~30 seconds",
+                                    "We need to process your bet, it will take 15-30 seconds",
                                 autoDestroy: true,
                             },
                         })
@@ -281,9 +302,8 @@ export default defineComponent({
                 <span
                     @click="amount.value = Math.floor(accountStore.balance)"
                     @dblclick="amount.value = accountStore.balance / 2"
-                    >{{ accountStore.balance }}
-                </span>
-
+                    >{{ accountStore.balance }}</span
+                >
                 XTZ
             </div>
 
@@ -300,18 +320,15 @@ export default defineComponent({
             />
 
             <div :class="$style.stats">
-                <Stat name="Reward for providing">
-                    {{ event.liquidityPercent * 100 }}%
-                </Stat>
-
-                <Stat v-if="liquidityRatio" name="Ratio"
-                    ><Icon
-                        name="close"
-                        size="14"
-                        :class="$style.ratio_icon"
-                    />{{ (1 + liquidityRatio.min).toFixed(2) }} -
-                    {{ (1 + liquidityRatio.max).toFixed(2) }}</Stat
+                <Stat name="Reward for providing"
+                    >{{ event.liquidityPercent * 100 }}%</Stat
                 >
+
+                <Stat v-if="liquidityRatio" name="Ratio">
+                    <Icon name="close" size="14" :class="$style.ratio_icon" />
+                    {{ (1 + liquidityRatio.min).toFixed(2) }} -
+                    {{ (1 + liquidityRatio.max).toFixed(2) }}
+                </Stat>
             </div>
 
             <Button
@@ -325,14 +342,11 @@ export default defineComponent({
                 <Spin v-if="sendingLiquidity" size="16" />
                 <Icon
                     v-else
-                    :name="
-                        countdownStatus == 'In progress' && amount.value
-                            ? 'bolt'
-                            : 'lock'
-                    "
+                    :name="!buttonState.disabled ? 'bolt' : 'lock'"
                     size="16"
-                />{{ buttonState.text }}</Button
-            >
+                />
+                {{ buttonState.text }}
+            </Button>
 
             <div v-if="showConfirmationHint" :class="$style.hint">
                 Confirmation not appearing?
@@ -351,9 +365,9 @@ export default defineComponent({
                 account and connect Temple wallet
             </div>
 
-            <Button @click="handleLogin" size="large" type="primary" block
-                ><Icon name="login" size="16" />Sign in to continue</Button
-            >
+            <Button @click="handleLogin" size="large" type="primary" block>
+                <Icon name="login" size="16" />Sign in to continue
+            </Button>
         </template>
     </Modal>
 </template>

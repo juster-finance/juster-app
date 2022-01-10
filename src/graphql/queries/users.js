@@ -31,3 +31,20 @@ export const getUserWithdrawals = gql`
         }
     }
 `
+
+export const getTopLiquidityProviders = gql`
+    query getTopLiquidityProviders {
+        user(order_by: { totalProviderReward: desc }, limit: 5) {
+            address
+            totalProviderReward
+        }
+    }
+`
+export const getTopBettors = gql`
+    query getTopBettors {
+        user(order_by: { totalBetsCount: desc }, limit: 5) {
+            address
+            totalBetsCount
+        }
+    }
+`

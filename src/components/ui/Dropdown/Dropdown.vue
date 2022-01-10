@@ -24,12 +24,12 @@ export default defineComponent({
             isOpen.value = forceOpen.value
         })
 
-        const toggleDropdown = event => {
+        const toggleDropdown = (event) => {
             event.stopPropagation()
 
             isOpen.value = !isOpen.value
         }
-        const close = event => {
+        const close = (event) => {
             if (event) event.stopPropagation()
 
             isOpen.value = false
@@ -51,8 +51,8 @@ export default defineComponent({
             } else {
                 document.addEventListener("keydown", onKeydown)
 
-                const triggerHeight = trigger.value.getBoundingClientRect()
-                    .height
+                const triggerHeight =
+                    trigger.value.getBoundingClientRect().height
 
                 dropdownStyles.top = `${triggerHeight + 6}px`
 
@@ -62,7 +62,7 @@ export default defineComponent({
             }
         })
 
-        const onKeydown = event => {
+        const onKeydown = (event) => {
             if (event.key == "Escape") close()
         }
 
@@ -112,7 +112,6 @@ export default defineComponent({
     z-index: 10;
     padding: 8px 0;
     border-radius: 8px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
+    background: var(--dropdown-bg);
 }
 </style>

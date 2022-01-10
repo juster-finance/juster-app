@@ -143,10 +143,11 @@ html {
     background: var(--app-background);
 }
 
+/* 
 @font-face {
     font-family: "CalSans";
     src: local("CalSans"), url(./assets/fonts/CalSans.ttf) format("truetype");
-}
+} */
 
 .popup-enter-active,
 .popup-leave-active {
@@ -232,7 +233,13 @@ html {
     --card-bg: #171717;
 
     /** Notification */
-    --notification-bg: rgba(32, 32, 32, 0.85);
+    --notification-bg: #27282b;
+
+    /** Dropdown */
+    --dropdown-bg: rgb(39, 40, 43);
+
+    /** Toggle */
+    --toggle-bg: #393939;
 
     /** Settings */
     --settings-nav-bg: rgba(0, 0, 0, 0.4);
@@ -249,8 +256,10 @@ html {
     --opacity-05: rgba(255, 255, 255, 0.05);
 
     /** Other */
-    --border: rgba(255, 255, 255, 0.1);
-    --border-highlight: rgba(255, 255, 255, 0.2);
+    --border: rgb(48, 50, 54);
+    --border-highlight: rgb(57, 59, 63);
+    --separator: rgba(255, 255, 255, 0.08);
+
     --dot: rgba(255, 255, 255, 0.06);
 }
 

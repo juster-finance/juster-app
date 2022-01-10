@@ -17,7 +17,7 @@ import Banner from "@/components/ui/Banner"
 /**
  * Local
  */
-import EventCard from "@/components/local/EventCard"
+import { EventCard } from "@/components/local/EventCard"
 
 export default defineComponent({
     name: "TopEventsBase",
@@ -68,9 +68,7 @@ export default defineComponent({
 <template>
     <div :class="$style.wrapper">
         <metainfo>
-            <template v-slot:title="{ content }"
-                >{{ content }} • Juster</template
-            >
+            <template v-slot:title="{ content }">{{ content }} • Juster</template>
         </metainfo>
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
@@ -84,11 +82,7 @@ export default defineComponent({
         <div :class="$style.container">
             <div :class="$style.events_base">
                 <div :class="$style.events">
-                    <EventCard
-                        v-for="event in topEvents"
-                        :key="event.id"
-                        :event="event"
-                    />
+                    <EventCard v-for="event in topEvents" :key="event.id" :event="event" />
                 </div>
             </div>
         </div>
@@ -101,10 +95,6 @@ export default defineComponent({
 
 .breadcrumbs {
     margin-bottom: 24px;
-}
-
-.title {
-    font-family: "Cal Sans";
 }
 
 .description {

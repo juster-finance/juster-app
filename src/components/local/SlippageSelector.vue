@@ -13,7 +13,7 @@ export default defineComponent({
         const slippages = reactive([0.0, 2.5, 5.0, 10.0, 15.0])
         const customSlippage = ref(0)
 
-        const handleInput = e => {
+        const handleInput = (e) => {
             if (customSlippage.value > 30) {
                 customSlippage.value = 30
                 context.emit("update:modelValue", customSlippage.value)
@@ -24,7 +24,9 @@ export default defineComponent({
             }
         }
 
-        const selectSlippage = target => {
+        const selectSlippage = (target) => {
+            customSlippage.value = 0
+
             context.emit("update:modelValue", target)
         }
 
@@ -100,7 +102,8 @@ export default defineComponent({
     border-radius: 8px;
     border: 1px solid var(--border);
     height: 36px;
-    padding: 0 14px;
+    padding: 0 4px;
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .slippage {
@@ -108,12 +111,13 @@ export default defineComponent({
     align-items: center;
 
     font-size: 14px;
-    line-height: 1.4;
-    font-weight: 500;
+    font-weight: 600;
+    line-height: 1.1;
     color: var(--text-tertiary);
+    height: 28px;
+    border-radius: 6px;
 
-    border-right: 1px solid var(--border);
-    padding: 0 16px;
+    padding: 0 14px;
 
     cursor: pointer;
 
@@ -121,16 +125,8 @@ export default defineComponent({
 }
 
 .slippage.selected {
+    background: rgba(255, 255, 255, 0.1);
     color: var(--text-primary);
-}
-
-.slippage:first-child {
-    padding: 0 16px 0 0;
-}
-
-.slippage:last-child {
-    border-right: none;
-    padding: 0 0 0 16px;
 }
 
 .custom {

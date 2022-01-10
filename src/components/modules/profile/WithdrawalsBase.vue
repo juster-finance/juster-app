@@ -24,14 +24,13 @@ import Pagination from "@/components/ui/Pagination"
 /**
  * Local
  */
-import EventCard from "@/components/local/EventCard"
+import { EventCard } from "@/components/local/EventCard"
 import WithdrawAllModal from "@/components/local/modals/WithdrawAllModal"
 
 /**
  * API
  */
 import { fetchUserWithdrawals } from "@/api/users"
-import { fetchUserPositionsForWithdraw } from "@/api/positions"
 
 /**
  * Services
@@ -285,9 +284,8 @@ export default defineComponent({
             </div>
 
             <div :class="$style.hint">
-                <Icon name="help" size="14" /><span
-                    >Last week & Last month</span
-                >
+                <Icon name="help" size="14" />
+                <span>Last week & Last month</span>
                 - here we mean a week from the current day minus 7 days / 30
                 days
             </div>
@@ -323,15 +321,13 @@ export default defineComponent({
                 />
             </div>
             <div v-else :class="$style.empty">
-                <Banner
-                    :loading="accountStore.isPositionsLoading"
-                    type="info"
-                    >{{
+                <Banner :loading="accountStore.isPositionsLoading" type="info">
+                    {{
                         accountStore.isPositionsLoading
                             ? "Fetching your positions"
                             : "No positions for withdraw"
-                    }}</Banner
-                >
+                    }}
+                </Banner>
             </div>
 
             <Pagination
@@ -393,7 +389,8 @@ export default defineComponent({
 
                                 <div :class="$style.info">
                                     <div :class="$style.name">
-                                        Withdraw <span>#{{ withdraw.id }}</span>
+                                        Withdraw
+                                        <span>#{{ withdraw.id }}</span>
                                     </div>
                                     <div :class="$style.tier">
                                         {{
@@ -415,12 +412,10 @@ export default defineComponent({
                             <span>XTZ</span>
                         </td>
                         <td>
-                            <router-link :to="`/events/${withdraw.event.id}`"
-                                >Event
-                                <span
-                                    >#{{ withdraw.event.id }}
-                                </span></router-link
-                            >
+                            <router-link :to="`/events/${withdraw.event.id}`">
+                                Event
+                                <span>#{{ withdraw.event.id }}</span>
+                            </router-link>
                         </td>
                         <td>
                             {{
@@ -457,9 +452,9 @@ export default defineComponent({
             </div>
 
             <div :class="$style.hint">
-                <Icon name="help" size="14" />
-                You can withdraw your funds manually, however if not done within
-                24 hours, Juster will do that for you and charge a small fee.
+                <Icon name="help" size="14" />You can withdraw your funds
+                manually, however if not done within 24 hours, Juster will do
+                that for you and charge a small fee.
             </div>
         </div>
     </div>
@@ -473,10 +468,6 @@ export default defineComponent({
 }
 
 .block {
-}
-
-.block h2 {
-    font-family: "CalSans";
 }
 
 .description {
@@ -546,6 +537,8 @@ export default defineComponent({
 
 .withdrawboard table {
     width: 100%;
+    min-height: 372px;
+
     border-spacing: 0;
 }
 

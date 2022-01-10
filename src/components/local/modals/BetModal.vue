@@ -34,6 +34,7 @@ import Input from "@/components/ui/Input"
 import Stat from "@/components/ui/Stat"
 import Button from "@/components/ui/Button"
 import Tooltip from "@/components/ui/Tooltip"
+import Banner from "@/components/ui/Banner"
 
 /**
  * Store
@@ -48,11 +49,11 @@ import { useCountdown } from "@/composable/date"
 
 export default defineComponent({
     name: "BetModal",
-    props: { show: Boolean, event: Object },
+    props: { show: Boolean, event: Object, preselectedSide: String },
     emits: ["onClose"],
 
     setup(props, context) {
-        const { event, show } = toRefs(props)
+        const { event, show, preselectedSide } = toRefs(props)
         const amplitude = inject("amplitude")
 
         const accountStore = useAccountStore()
@@ -71,7 +72,7 @@ export default defineComponent({
         } = useCountdown(eventStartTime)
 
         /** User inputs */
-        const side = ref(null) /** pre-selected side */
+        const side = ref(preselectedSide.value)
         const amount = reactive({ value: 0, error: "" })
         const slippage = ref(2.5)
 
@@ -82,27 +83,26 @@ export default defineComponent({
          */
         const ratio = computed(() => {
             return {
-                higher:
+                rise:
                     event.value.poolBelow /
                     (event.value.poolAboveEq + amount.value),
-                lower:
+                fall:
                     event.value.poolAboveEq /
                     (event.value.poolBelow + amount.value),
             }
         })
-        const ratioBeforeBet = computed(
-            () =>
-                (side.value == "Higher" &&
-                    event.value.poolBelow / event.value.poolAboveEq) ||
-                (side.value == "Lower" &&
-                    event.value.poolAboveEq / event.value.poolBelow),
-        )
+        const ratioBeforeBet = computed(() => {
+            return {
+                rise: event.value.poolBelow / event.value.poolAboveEq,
+                fall: event.value.poolAboveEq / event.value.poolBelow,
+            }
+        })
         const ratioAfterBet = computed(
             () =>
-                (side.value == "Higher" &&
+                (side.value == "Rise" &&
                     (event.value.poolBelow - winDelta.value) /
                         (event.value.poolAboveEq + amount.value)) ||
-                (side.value == "Lower" &&
+                (side.value == "Fall" &&
                     (event.value.poolAboveEq - winDelta.value) /
                         (event.value.poolBelow + amount.value)),
         )
@@ -121,7 +121,7 @@ export default defineComponent({
         /** Reward */
         const winDelta = computed(() => {
             const selectedRatio =
-                side.value == "Higher" ? ratio.value.higher : ratio.value.lower
+                side.value == "Rise" ? ratio.value.rise : ratio.value.fall
 
             return amount.value * selectedRatio * (1 - fee.value)
         })
@@ -138,7 +138,7 @@ export default defineComponent({
 
             if (amount.value) {
                 if (minReward.value == reward.value) {
-                    return reward.value
+                    return reward.value.toFixed(0)
                 } else {
                     return `${minReward.value.toFixed(
                         2,
@@ -161,6 +161,7 @@ export default defineComponent({
         watch(show, () => {
             if (!show.value) {
                 side.value = null
+
                 amount.value = 0
 
                 stop()
@@ -169,9 +170,15 @@ export default defineComponent({
 
                 showConfirmationHint.value = false
             } else {
+                side.value = preselectedSide.value
+
                 document.addEventListener("keydown", onKeydown)
 
                 accountStore.updateBalance()
+
+                nextTick(() => {
+                    amountInput.value.$el.querySelector("input").focus()
+                })
             }
         })
 
@@ -179,17 +186,15 @@ export default defineComponent({
             if (!amount.value) amount.value = ""
         })
 
-        /** focus input on side selection  */
-        watch(side, () => {
-            if (!side.value) return
-            /** nextTick due to v-show */
-            nextTick(() => {
-                amountInput.value.$el.querySelector("input").focus()
-            })
-        })
-
         // eslint-disable-next-line vue/return-in-computed-property
         const buttonState = computed(() => {
+            if (accountStore.pendingTransaction.awaiting) {
+                return {
+                    text: "Previous transaction in process",
+                    disabled: true,
+                }
+            }
+
             if (!side.value) {
                 return { text: "Select your submission", disabled: true }
             }
@@ -203,8 +208,8 @@ export default defineComponent({
                 return { text: "Insufficient funds", disabled: true }
 
             switch (side.value) {
-                case "Higher":
-                case "Lower":
+                case "Rise":
+                case "Fall":
                     if (!amount.value)
                         return { text: "Select the bet amount", disabled: true }
                     if (amount.value)
@@ -218,8 +223,8 @@ export default defineComponent({
             if (buttonState.value.disabled) return
 
             let betType
-            if (side.value == "Higher") betType = "aboveEq"
-            if (side.value == "Lower") betType = "below"
+            if (side.value == "Rise") betType = "aboveEq"
+            if (side.value == "Fall") betType = "below"
 
             sendingBet.value = true
 
@@ -235,6 +240,21 @@ export default defineComponent({
                     BigNumber(minReward.value),
                 )
                 .then((op) => {
+                    /** Pending transaction label */
+                    accountStore.pendingTransaction.awaiting = true
+
+                    op.confirmation()
+                        .then((result) => {
+                            accountStore.pendingTransaction.awaiting = false
+
+                            if (!result.completed) {
+                                // todo: handle it?
+                            }
+                        })
+                        .catch((err) => {
+                            accountStore.pendingTransaction.awaiting = false
+                        })
+
                     sendingBet.value = false
                     showConfirmationHint.value = false
 
@@ -245,7 +265,7 @@ export default defineComponent({
                                 type: "success",
                                 title: "Your bet has been accepted",
                                 description:
-                                    "We need to process your bet, it will take ~30 seconds",
+                                    "We need to process your bet, it will take 15-30 seconds",
                                 autoDestroy: true,
                             },
                         })
@@ -313,6 +333,7 @@ export default defineComponent({
         Stat,
         Button,
         Spin,
+        Banner,
         Tooltip,
         EventPreview,
         SplittedPool,
@@ -332,90 +353,132 @@ export default defineComponent({
         <template v-if="accountStore.isLoggined">
             <div :class="$style.title">Place a bet</div>
 
-            <EventPreview
-                :event="event"
-                :countdown="countdownText"
-                :status="countdownStatus"
-                type="bet"
-                @switch="$emit('switch')"
-                :class="$style.preview"
-            />
+            <div :class="$style.direction">
+                <div :class="$style.from">
+                    <div :class="$style.crc">
+                        <img
+                            :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
+                            :class="$style.image"
+                        />
+                    </div>
+
+                    <div :class="$style.meta">
+                        <div :class="$style.name">
+                            {{
+                                `${accountStore.pkh.slice(
+                                    0,
+                                    6,
+                                )}..${accountStore.pkh.slice(
+                                    accountStore.pkh.length - 4,
+                                    accountStore.pkh.length,
+                                )}`
+                            }}
+                        </div>
+                        <div :class="$style.subname">
+                            <span
+                                @click="
+                                    amount.value = Math.floor(
+                                        accountStore.balance,
+                                    )
+                                "
+                                @dblclick="
+                                    amount.value = accountStore.balance / 2
+                                "
+                                >{{ accountStore.balance }}</span
+                            >
+                            XTZ
+                        </div>
+                    </div>
+                </div>
+
+                <Icon
+                    name="arrowright"
+                    size="16"
+                    :class="$style.direction_icon"
+                />
+
+                <div :class="$style.to">
+                    <div :class="$style.crc">
+                        <Icon name="sides" size="16" />
+                    </div>
+
+                    <div :class="$style.meta">
+                        <div :class="$style.name">
+                            <Icon name="event_new" size="14" />Tezos / Dollar
+                        </div>
+                        <div :class="$style.subname">
+                            <span>{{ countdownText }}</span>
+                            , #{{ event.id }}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div :class="$style.subtitle">The price will</div>
 
             <div :class="$style.tabs">
                 <div
-                    @click="selectTab('Higher')"
-                    :class="[$style.tab, side == 'Higher' && $style.higher]"
+                    @click="selectTab('Rise')"
+                    :class="[$style.tab, side == 'Rise' && $style.higher]"
                 >
                     <div :class="$style.tab_left">
                         <Icon name="higher" size="16" />Rise
                     </div>
                     <div :class="$style.tab_ratio">
                         <Icon name="close" size="10" />
-                        {{ (1 + ratio.higher).toFixed(2) }}
+                        {{ (1 + ratioBeforeBet.rise).toFixed(2) }}
                     </div>
                 </div>
                 <div
-                    @click="selectTab('Lower')"
-                    :class="[$style.tab, side == 'Lower' && $style.lower]"
+                    @click="selectTab('Fall')"
+                    :class="[$style.tab, side == 'Fall' && $style.lower]"
                 >
                     <div :class="$style.tab_ratio">
                         <Icon name="close" size="10" />
-                        {{ (1 + ratio.lower).toFixed(2) }}
+                        {{ (1 + ratioBeforeBet.fall).toFixed(2) }}
                     </div>
 
                     <div :class="$style.tab_left">
-                        <Icon name="lower" size="16" />Fall
+                        Fall
+                        <Icon name="lower" size="16" />
                     </div>
                 </div>
             </div>
 
-            <div v-show="side">
-                <Input
-                    ref="amountInput"
-                    type="number"
-                    :limit="10000"
-                    label="Amount"
-                    placeholder="Bet amount"
-                    subtext="XTZ"
-                    v-model="amount.value"
-                    :error="amount.error"
-                    @clearError="amount.error = ''"
-                    :class="$style.amount_input"
-                />
+            <Input
+                ref="amountInput"
+                type="number"
+                :limit="10000"
+                label="Amount"
+                placeholder="Bet amount"
+                subtext="XTZ"
+                v-model="amount.value"
+                :class="$style.amount_input"
+            >
+                <template v-slot:rightText>
+                    <div :class="$style.potential_reward">
+                        Reward:
+                        <span>{{ rewardText }}</span> XTZ
+                    </div>
+                </template>
+            </Input>
 
-                <div :class="$style.balance">
-                    Available balance
-                    <span
-                        @click="amount.value = Math.floor(accountStore.balance)"
-                        @dblclick="amount.value = accountStore.balance / 2"
-                        >{{ accountStore.balance }}
-                    </span>
+            <SplittedPool
+                :event="event"
+                :amount="amount.value"
+                :winDelta="winDelta"
+                :side="side"
+                :class="$style.pool"
+            />
 
-                    XTZ
-                </div>
+            <SlippageSelector
+                v-model="slippage"
+                :class="$style.slippage_block"
+            />
 
-                <SplittedPool
-                    :event="event"
-                    :amount="amount.value"
-                    :winDelta="winDelta"
-                    :side="side"
-                    :class="$style.pool"
-                />
-
-                <SlippageSelector
-                    v-model="slippage"
-                    :class="$style.slippage_block"
-                />
-
-                <div :class="$style.stats">
-                    <Stat name="Reward">
-                        {{ rewardText }}
-                        <span>XTZ</span></Stat
-                    >
-                </div>
-            </div>
+            <Banner type="warning" size="small" :class="$style.banner">
+                Note that the transaction takes place on the Hangzhou Testnet
+            </Banner>
 
             <Button
                 @click="handleBet"
@@ -428,14 +491,11 @@ export default defineComponent({
                 <Spin v-if="sendingBet" size="16" />
                 <Icon
                     v-else
-                    :name="
-                        countdownStatus == 'In progress' && amount.value
-                            ? 'bolt'
-                            : 'lock'
-                    "
+                    :name="!buttonState.disabled ? 'bolt' : 'lock'"
                     size="16"
-                />{{ buttonState.text }}</Button
-            >
+                />
+                {{ buttonState.text }}
+            </Button>
 
             <div v-if="showConfirmationHint" :class="$style.hint">
                 Confirmation not appearing?
@@ -454,9 +514,9 @@ export default defineComponent({
                 account and connect Temple wallet
             </div>
 
-            <Button @click="handleLogin" size="large" type="primary" block
-                ><Icon name="login" size="16" />Sign in to continue</Button
-            >
+            <Button @click="handleLogin" size="large" type="primary" block>
+                <Icon name="login" size="16" />Sign in to continue
+            </Button>
         </template>
     </Modal>
 </template>
@@ -474,8 +534,76 @@ export default defineComponent({
     margin-bottom: 24px;
 }
 
-.preview {
-    margin-bottom: 24px;
+.direction {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 32px;
+}
+
+.from,
+.to {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.crc {
+    display: flex;
+    border-radius: 50%;
+    background: var(--btn-secondary-bg);
+    overflow: hidden;
+}
+
+.crc img {
+    width: 40px;
+    height: 40px;
+    padding: 4px;
+}
+
+.crc svg {
+    box-sizing: content-box;
+    padding: 12px;
+    fill: var(--text-secondary);
+}
+
+.meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.name svg {
+    fill: var(--green);
+}
+
+.subname {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+.subname span {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.direction_icon {
+    fill: var(--text-tertiary);
 }
 
 .description {
@@ -516,7 +644,7 @@ export default defineComponent({
     background: var(--btn-secondary-bg);
     border-radius: 8px;
     width: 100%;
-    height: 42px;
+    height: 40px;
     padding: 14px;
 
     transition: all 0.15s ease;
@@ -578,19 +706,17 @@ export default defineComponent({
 }
 
 .amount_input {
-    margin-bottom: 8px;
+    margin-bottom: 24px;
 }
 
-.balance {
+.potential_reward {
     font-size: 12px;
     line-height: 1;
     font-weight: 500;
     color: var(--text-tertiary);
-
-    margin-bottom: 24px;
 }
 
-.balance span {
+.potential_reward span {
     cursor: pointer;
     color: var(--text-secondary);
 }
@@ -599,26 +725,12 @@ export default defineComponent({
     margin-bottom: 24px;
 }
 
-.stats {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
-    margin-bottom: 24px;
-}
-
 .slippage_block {
     margin-bottom: 24px;
 }
 
-.ratio_icon {
-    fill: var(--opacity-40);
-}
-
-.ratio {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.banner {
+    margin-bottom: 16px;
 }
 
 .hint {

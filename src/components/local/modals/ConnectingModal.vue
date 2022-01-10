@@ -74,6 +74,7 @@ export default defineComponent({
         :show="show"
         width="500"
         padding="32px 32px 24px 32px"
+        :closeOutside="false"
         @onClose="$emit('onClose')"
     >
         <div :class="$style.wrapper">
@@ -98,9 +99,7 @@ export default defineComponent({
                 </div>
             </div>
 
-            <div :class="$style.title">
-                Connecting to Juster
-            </div>
+            <div :class="$style.title">Connecting to Juster</div>
 
             <div
                 @mouseenter="isAddressHovered = true"
@@ -118,7 +117,7 @@ export default defineComponent({
                     address
                 </div>
                 <div :class="[$style.label, $style.orange]">
-                    <Icon name="warning" size="16" /> Notice, Granada Testnet
+                    <Icon name="warning" size="16" /> Notice, Hangzhou Testnet
                     used
                 </div>
             </div>
@@ -158,7 +157,7 @@ export default defineComponent({
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background: #0c0c0c;
+    background: #242424;
 }
 
 .circle img {

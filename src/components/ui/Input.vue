@@ -18,9 +18,6 @@ export default {
         modelValue: {
             type: [String, Number],
         },
-        error: {
-            type: String,
-        },
         disabled: {
             type: Boolean,
         },
@@ -43,10 +40,6 @@ export default {
         },
     },
     computed: {
-        hasError() {
-            return !!this.error.length
-        },
-
         getInputType() {
             if (!!this.type) return this.type
             return "text"
@@ -92,15 +85,9 @@ export default {
 <template>
     <div :class="$style.wrapper">
         <div v-if="label" :class="$style.header">
-            <div :class="$style.label">
-                {{ label }}
-            </div>
+            <div :class="$style.label">{{ label }}</div>
 
-            <transition name="opacity">
-                <div v-if="error.length" :class="$style.error">
-                    {{ error }}
-                </div>
-            </transition>
+            <slot name="rightText" />
         </div>
 
         <div
@@ -109,7 +96,6 @@ export default {
             :class="[
                 $style.base,
                 isFocused && $style.focused,
-                hasError && $style.error,
                 disabled && $style.disabled,
             ]"
         >
@@ -148,13 +134,6 @@ export default {
     color: var(--text-primary);
 }
 
-.error {
-    font-size: 13px;
-    line-height: 1.2;
-    font-weight: 500;
-    color: var(--red);
-}
-
 .base {
     display: flex;
     align-items: center;
@@ -175,12 +154,8 @@ export default {
 }
 
 .base.focused {
-    box-shadow: 0px 0px 0px 2px rgba(75, 135, 244, 0.4);
-    border: 1px solid rgba(75, 135, 244, 1);
-}
-
-.base.error {
-    box-shadow: 0px 0px 0px 1.5px var(--red);
+    /* box-shadow: 0px 0px 0px 2px rgba(75, 135, 244, 0.5); */
+    border: 1px solid rgba(75, 135, 244, 0.8);
 }
 
 .base.disabled {

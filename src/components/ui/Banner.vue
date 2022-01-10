@@ -1,24 +1,20 @@
-<script>
-import { defineComponent } from "vue"
+<script setup>
+import { defineProps } from "vue"
 
 /**
  * UI
  */
 import Spin from "@/components/ui/Spin"
 
-export default defineComponent({
-    name: "Banner",
-    props: {
-        type: String,
-        loading: Boolean,
-    },
-
-    components: { Spin },
+const props = defineProps({
+    type: String,
+    size: String,
+    loading: Boolean,
 })
 </script>
 
 <template>
-    <div :class="[$style.wrapper, $style[type]]">
+    <div :class="[$style.wrapper, $style[type], $style[size]]">
         <Spin v-if="loading" size="14" />
         <Icon
             v-else
@@ -31,7 +27,7 @@ export default defineComponent({
             size="14"
         />
 
-        <span><slot /> </span>
+        <div :class="$style.base"><slot /></div>
     </div>
 </template>
 
@@ -48,7 +44,12 @@ export default defineComponent({
     border-radius: 8px;
 }
 
-.wrapper span {
+.base {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
     font-size: 12px;
     line-height: 1.6;
     font-weight: 600;
@@ -61,9 +62,9 @@ export default defineComponent({
 }
 
 .wrapper.warning {
-    fill: var(--orange);
-    color: var(--orange);
-    background: rgba(239, 132, 86, 0.15);
+    fill: var(--yellow);
+    color: var(--yellow);
+    background: rgba(245, 183, 43, 0.15);
 }
 
 .wrapper.success {
@@ -76,5 +77,12 @@ export default defineComponent({
     fill: var(--red);
     color: var(--red);
     background: rgba(224, 92, 67, 0.15);
+}
+
+.wrapper.small {
+    padding: 0 10px;
+
+    min-height: 30px;
+    border-radius: 6px;
 }
 </style>

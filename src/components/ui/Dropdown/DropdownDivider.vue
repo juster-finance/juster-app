@@ -2,19 +2,19 @@
 import { defineComponent } from "vue"
 
 export default defineComponent({
-	name: "DropdownDivider",
+    name: "DropdownDivider",
 })
 </script>
 
 <template>
-	<div :class="$style.wrapper" />
+    <div :class="$style.wrapper" />
 </template>
 
 <style module>
 .wrapper {
-	width: 100%;
-	height: 1px;
-	background: var(--border);
-	margin: 8px 0;
+    width: 100%;
+    height: 1px;
+    background: var(--separator);
+    margin: 8px 0;
 }
 </style>

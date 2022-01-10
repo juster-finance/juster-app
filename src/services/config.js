@@ -1,7 +1,7 @@
 export const dipdup = {
     uri: {
-        graphq: `https://api.granadanet.juster.fi/v1/graphql`,
-        subscription: "wss://api.granadanet.juster.fi/v1/graphql",
+        graphq: `https://api.hangzhounet.juster.fi/v1/graphql`,
+        subscription: "wss://api.hangzhounet.juster.fi/v1/graphql",
     },
 }
 
@@ -17,11 +17,11 @@ export const sanity = {
 
 export const rpcNodes = [
     {
-        name: "SmartPy Granadanet",
-        url: "https://granadanet.smartpy.io",
+        name: "TzKT Hangzhou2net",
+        url: "https://rpc.tzkt.io/hangzhou2net",
     },
     {
-        name: "TzKT Granadanet",
-        url: "https://rpc.tzkt.io/granadanet",
+        name: "SmartPy Granadanet",
+        url: "https://granadanet.smartpy.io",
     },
 ]

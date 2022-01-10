@@ -32,7 +32,7 @@ export default defineComponent({
                         >
                         <!-- <router-link to="/rating" :class="$style.link"
                             >Rating</router-link
-                        > -->
+                        >-->
                     </div>
                     <div :class="$style.column">
                         <div :class="$style.name">Follow us</div>
@@ -72,7 +72,10 @@ export default defineComponent({
                 </div>
             </div>
 
-            <div :class="$style.right">Juster v{{ version }}, Testnet</div>
+            <div :class="$style.bottom">
+                <span>Juster v{{ version }}</span
+                >, Hangzhounet
+            </div>
         </div>
     </div>
 </template>
@@ -123,8 +126,6 @@ export default defineComponent({
 }
 
 .name {
-    font-family: "CalSans";
-
     font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
@@ -142,11 +143,16 @@ export default defineComponent({
     color: var(--text-primary);
 }
 
-.right {
+.bottom {
     font-size: 13px;
     color: var(--text-tertiary);
 
     margin-top: 40px;
+}
+
+.bottom span {
+    font-weight: 600;
+    color: var(--text-secondary);
 }
 
 @media (max-width: 850px) {
