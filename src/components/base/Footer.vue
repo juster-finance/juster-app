@@ -42,9 +42,8 @@ export default defineComponent({
                             rel="nofolow noreferrer"
                             :class="$style.link"
                             >Discord</a
-                        >
-                        <a
-                            href="https://t.me/baking_bad_chat"
+                        ><a
+                            href="https://github.com/juster-finance"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"

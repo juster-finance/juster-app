@@ -393,6 +393,11 @@ export default defineComponent({
     background-size: 10px 10px;
 }
 
+.chart > div {
+    /* See #15 and https://github.com/w3c/uievents/issues/135 */
+    position: relative;
+}
+
 .timer {
     display: flex;
     align-items: center;
