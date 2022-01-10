@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onMounted, onBeforeUnmount, inject } from "vue"
+import { defineComponent, onMounted, onBeforeUnmount, inject, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
@@ -7,6 +7,7 @@ import { cloneDeep } from "lodash"
 /**
  * Local
  */
+import RatingCard from "./RatingCard"
 import SymbolCard from "@/components/local/SymbolCard"
 import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
@@ -19,6 +20,7 @@ import Button from "@/components/ui/Button"
  * API
  */
 import { fetchTopEvents } from "@/api/events"
+import { fetchTopBettors, fetchTopLiquidityProviders } from "@/api/users"
 
 /**
  * Store
@@ -35,6 +37,9 @@ export default defineComponent({
 
         const marketStore = useMarketStore()
 
+        const topProviders = ref([])
+        const topBettors = ref([])
+
         const handleViewTopEvents = () => {
             router.push("/events/top")
         }
@@ -43,10 +48,19 @@ export default defineComponent({
             amplitude.logEvent("onPage", { name: "Explore" })
 
             const topEvents = await fetchTopEvents({ limit: 3 })
-
             marketStore.events = cloneDeep(topEvents).sort(
                 (a, b) => b.bets.length - a.bets.length,
             )
+
+            const rawTopProviders = await fetchTopLiquidityProviders()
+            const rawTopBettors = await fetchTopBettors()
+
+            topProviders.value = rawTopProviders.map((el) => {
+                return { address: el.address, value: el.totalProviderReward }
+            })
+            topBettors.value = rawTopBettors.map((el) => {
+                return { address: el.address, value: el.totalBetsCount }
+            })
         })
         onBeforeUnmount(() => {
             marketStore.events = []
@@ -61,11 +75,13 @@ export default defineComponent({
 
         return {
             marketStore,
+            topProviders,
+            topBettors,
             handleViewTopEvents,
         }
     },
 
-    components: { SymbolCard, EventCard, EventCardLoading, Button },
+    components: { RatingCard, SymbolCard, EventCard, EventCardLoading, Button },
 })
 </script>
 
@@ -73,13 +89,17 @@ export default defineComponent({
     <transition name="fade">
         <div :class="$style.wrapper">
             <metainfo>
-                <template v-slot:title="{ content }">{{ content }} • Juster</template>
+                <template v-slot:title="{ content }"
+                    >{{ content }} • Juster</template
+                >
             </metainfo>
 
             <!-- Top markets -->
             <div v-if="marketStore.isSymbolsLoaded" :class="$style.block">
                 <h1>Top markets</h1>
-                <div :class="$style.description">Currency pairs available for betting</div>
+                <div :class="$style.description">
+                    Currency pairs available for betting
+                </div>
 
                 <div :class="$style.items">
                     <SymbolCard
@@ -88,6 +108,20 @@ export default defineComponent({
                         :symbol="symbol"
                     />
                 </div>
+            </div>
+
+            <!-- Top Liquidity -->
+            <div :class="$style.block">
+                <h1>Top Liquidity</h1>
+                <div :class="$style.description">
+                    Rating of users providing liquidity
+                </div>
+
+                <RatingCard
+                    :users="topProviders"
+                    suffix="XTZ"
+                    :class="$style.rating_card"
+                />
             </div>
 
             <!-- Hot events -->
@@ -101,7 +135,11 @@ export default defineComponent({
                         </div>
                     </div>
 
-                    <Button @click="handleViewTopEvents" size="small" type="tertiary">
+                    <Button
+                        @click="handleViewTopEvents"
+                        size="small"
+                        type="tertiary"
+                    >
                         <Icon name="collection" size="16" />All Hot events
                     </Button>
                 </div>
@@ -121,6 +159,20 @@ export default defineComponent({
                         <EventCardLoading />
                     </div>
                 </transition>
+            </div>
+
+            <!-- Top Bettors -->
+            <div :class="$style.block">
+                <h1>Top Bettors</h1>
+                <div :class="$style.description">
+                    Rating of users placing bets
+                </div>
+
+                <RatingCard
+                    :users="topBettors"
+                    suffix="Bets"
+                    :class="$style.rating_card"
+                />
             </div>
         </div>
     </transition>
@@ -153,6 +205,10 @@ export default defineComponent({
     color: var(--text-tertiary);
 
     margin-top: 8px;
+}
+
+.rating_card {
+    margin-top: 24px;
 }
 
 .items {

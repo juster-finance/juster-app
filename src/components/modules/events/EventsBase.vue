@@ -10,6 +10,7 @@ import {
     onUnmounted,
     inject,
 } from "vue"
+import { DateTime } from "luxon"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
 import { gql } from "@/services/tools"
@@ -24,26 +25,36 @@ import { fetchAllEvents } from "@/api/events"
  */
 import Breadcrumbs from "@/components/ui/Breadcrumbs"
 import Banner from "@/components/ui/Banner"
+import Button from "@/components/ui/Button"
 import Pagination from "@/components/ui/Pagination"
 
 /**
  * Local
  */
+import EventsFilters from "./EventsFilters"
 import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
 /**
  * Store
  */
 import { useMarketStore } from "@/store/market"
-
-import EventsFilters from "./EventsFilters"
+import { filter } from "d3-array"
 
 const defaultFilters = {
-    symbols: {
-        xtz: true,
-        btc: false,
-        eth: false,
-    },
+    symbols: [
+        {
+            name: "XTZ-USD",
+            active: true,
+        },
+        {
+            name: "BTC-USD",
+            active: true,
+        },
+        {
+            name: "ETH-USD",
+            active: true,
+        },
+    ],
 
     periods: [
         {
@@ -52,11 +63,11 @@ const defaultFilters = {
         },
         {
             name: "6h",
-            active: true,
+            active: false,
         },
         {
             name: "24h",
-            active: true,
+            active: false,
         },
     ],
 
@@ -86,6 +97,30 @@ const defaultFilters = {
             active: false,
         },
     ],
+
+    advanced: {
+        period: null,
+        participants: [],
+    },
+
+    misc: {
+        startingToday: {
+            active: false,
+            disabled: false,
+        },
+        moreThan: {
+            active: false,
+            disabled: false,
+        },
+        targetDynamics: {
+            active: false,
+            disabled: true,
+        },
+        customEvents: {
+            active: false,
+            disabled: true,
+        },
+    },
 }
 
 export default defineComponent({
@@ -137,15 +172,9 @@ export default defineComponent({
             liquidityFilters.max = value
         }
 
-        const handleSelectPeriod = (target) => {
-            filters.value.periods.forEach((period) => {
-                if (target.name == period.name) period.active = !period.active
-            })
-        }
-
-        const handleSelectStatus = (target) => {
-            filters.value.statuses.forEach((status) => {
-                if (target.name == status.name) status.active = !status.active
+        const handleSelect = (filter, target) => {
+            filters.value[filter].forEach((elem) => {
+                if (target.name == elem.name) elem.active = !elem.active
             })
         }
 
@@ -154,6 +183,27 @@ export default defineComponent({
             liquidityFilters.max = liquidityRange.max
 
             filters.value = cloneDeep(defaultFilters)
+        }
+
+        const handleManageParticipant = ({ address, action }) => {
+            if (action == "add") {
+                if (filters.value.advanced.participants.includes(address))
+                    return
+
+                filters.value.advanced.participants.push(address)
+            }
+
+            if (action == "remove") {
+                const indexOfAddress =
+                    filters.value.advanced.participants.indexOf(address)
+
+                if (indexOfAddress !== -1) {
+                    filters.value.advanced.participants.splice(
+                        indexOfAddress,
+                        1,
+                    )
+                }
+            }
         }
 
         /** Events */
@@ -166,19 +216,13 @@ export default defineComponent({
             let events = cloneDeep(marketStore.events)
 
             /** Filter by Symbol */
-            if (
-                filters.value.symbols.xtz ||
-                filters.value.symbols.btc ||
-                filters.value.symbols.eth
-            ) {
-                const symbols = [
-                    filters.value.symbols.xtz && "XTZ-USD",
-                    filters.value.symbols.btc && "BTC-USD",
-                    filters.value.symbols.eth && "ETH-USD",
-                ].filter(Boolean)
+            if (filters.value.symbols.some((symbol) => symbol.active)) {
+                const selectedSymbols = filters.value.symbols
+                    .filter((symbol) => symbol.active)
+                    .map((symbol) => symbol.name)
 
                 events = events.filter((event) =>
-                    symbols.includes(event.currencyPair.symbol),
+                    selectedSymbols.includes(event.currencyPair.symbol),
                 )
             } else {
                 return []
@@ -226,6 +270,64 @@ export default defineComponent({
                 } else {
                     events = []
                 }
+            }
+
+            /** Advanced */
+            if (filters.value.advanced.period) {
+                events = events.filter((event) =>
+                    DateTime.fromISO(event.betsCloseTime).hasSame(
+                        DateTime.fromFormat(
+                            filters.value.advanced.period,
+                            "yyyy-mm-dd",
+                        ),
+                        "day",
+                    ),
+                )
+            }
+
+            if (filters.value.advanced.participants.length) {
+                events = events.filter((event) => {
+                    const hasBet = event.bets
+                        .map((bet) => bet.userId)
+                        .some((userId) =>
+                            filters.value.advanced.participants.includes(
+                                userId,
+                            ),
+                        )
+                    const hasDeposit = event.deposits
+                        .map((deposit) => deposit.userId)
+                        .some((userId) =>
+                            filters.value.advanced.participants.includes(
+                                userId,
+                            ),
+                        )
+
+                    return hasBet || hasDeposit
+                })
+            }
+
+            /** Filter by Misc */
+            if (filters.value.misc.startingToday.active) {
+                events = events.filter((event) =>
+                    DateTime.fromISO(event.betsCloseTime).hasSame(
+                        DateTime.local(),
+                        "day",
+                    ),
+                )
+            }
+
+            if (filters.value.misc.moreThan.active) {
+                events = events.filter((event) => {
+                    let participants = [
+                        ...event.bets.map((bet) => bet.userId),
+                        ...event.deposits.map((deposit) => deposit.userId),
+                    ]
+
+                    /** remove duplicates */
+                    participants = [...new Set(participants)]
+
+                    return participants.length > 1
+                })
             }
 
             return events
@@ -361,15 +463,16 @@ export default defineComponent({
             liquidityFilters,
             handleNewMin,
             handleNewMax,
-            handleSelectPeriod,
-            handleSelectStatus,
+            handleSelect,
             handleResetFilters,
+            handleManageParticipant,
         }
     },
 
     components: {
         Breadcrumbs,
         Banner,
+        Button,
         Pagination,
         EventsFilters,
         EventCard,
@@ -381,15 +484,17 @@ export default defineComponent({
 <template>
     <div :class="$style.wrapper">
         <metainfo>
-            <template v-slot:title="{ content }">{{ content }} • Juster</template>
+            <template v-slot:title="{ content }"
+                >{{ content }} • Juster</template
+            >
         </metainfo>
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
         <h1>All events</h1>
-        <div
-            :class="$style.description"
-        >List of all new, active, and past events with customizable filtering</div>
+        <div :class="$style.description">
+            List of all new, active, and past events with customizable filtering
+        </div>
 
         <div :class="$style.container">
             <EventsFilters
@@ -399,19 +504,32 @@ export default defineComponent({
                 :events="marketStore.events"
                 @onNewMin="handleNewMin"
                 @onNewMax="handleNewMax"
-                @onSelectPeriod="handleSelectPeriod"
-                @onSelectStatus="handleSelectStatus"
+                @onSelect="handleSelect"
                 @onReset="handleResetFilters"
+                @onManageParticipant="handleManageParticipant"
                 :class="$style.filters_block"
             />
 
             <div :class="$style.events_base">
-                <Banner type="info" v-if="filteredEvents.length == 0 && isAllEventsLoaded">
+                <Banner
+                    type="info"
+                    v-if="filteredEvents.length == 0 && isAllEventsLoaded"
+                >
                     All
                     {{ availableEvents.length - filteredEvents.length }} events
-                    hidden due to filters. Reset filters to see some
+                    hidden due to filters
+
+                    <Button
+                        @click="handleResetFilters"
+                        type="secondary"
+                        size="mini"
+                        >Reset filters</Button
+                    >
                 </Banner>
-                <Banner type="info" v-else-if="filteredEvents.length !== availableEvents.length">
+                <Banner
+                    type="info"
+                    v-else-if="filteredEvents.length !== availableEvents.length"
+                >
                     {{ availableEvents.length - filteredEvents.length }} events
                     hidden due to filters
                 </Banner>

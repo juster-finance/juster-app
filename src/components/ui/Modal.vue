@@ -30,6 +30,10 @@ export default defineComponent({
         closable: {
             type: Boolean,
         },
+        closeOutside: {
+            type: Boolean,
+            default: true,
+        },
     },
     emits: ["onClose"],
 
@@ -37,12 +41,14 @@ export default defineComponent({
         let removeOutside
         const modal = ref(null)
 
-        const { width, padding, show } = toRefs(props)
+        const { width, padding, show, closeOutside } = toRefs(props)
 
         watch(show, () => {
             if (!show.value) {
-                removeOutside()
+                if (removeOutside) removeOutside()
             } else {
+                if (!closeOutside.value) return
+
                 nextTick(() => {
                     removeOutside = useOnOutsidePress(modal, handleClose)
                 })
@@ -129,8 +135,8 @@ export default defineComponent({
 
 .close_icon {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 32px;
+    right: 32px;
 
     fill: var(--icon);
     background: transparent;

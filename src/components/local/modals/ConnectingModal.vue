@@ -74,6 +74,7 @@ export default defineComponent({
         :show="show"
         width="500"
         padding="32px 32px 24px 32px"
+        :closeOutside="false"
         @onClose="$emit('onClose')"
     >
         <div :class="$style.wrapper">
@@ -156,7 +157,7 @@ export default defineComponent({
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background: #0c0c0c;
+    background: #242424;
 }
 
 .circle img {

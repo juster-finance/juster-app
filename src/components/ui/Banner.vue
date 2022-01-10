@@ -27,7 +27,7 @@ const props = defineProps({
             size="14"
         />
 
-        <span><slot /> </span>
+        <div :class="$style.base"><slot /></div>
     </div>
 </template>
 
@@ -44,7 +44,12 @@ const props = defineProps({
     border-radius: 8px;
 }
 
-.wrapper span {
+.base {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
     font-size: 12px;
     line-height: 1.6;
     font-weight: 600;

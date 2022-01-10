@@ -885,7 +885,7 @@ export default defineComponent({
     width: 30px;
     height: 30px;
 
-    background: #121212;
+    background: rgb(35, 35, 35);
     border-radius: 50px;
 
     margin-left: -12px;

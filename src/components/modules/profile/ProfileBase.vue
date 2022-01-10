@@ -19,6 +19,7 @@ import { EventCard } from "@/components/local/EventCard"
  */
 import { juster, fetchBalance } from "@/services/tools"
 import { toClipboard } from "@/services/utils/global"
+import { abbreviateNumber } from "@/services/utils/amounts"
 
 /**
  * API
@@ -149,6 +150,7 @@ export default defineComponent({
             isMyProfile,
             address,
             positions,
+            abbreviateNumber,
         }
     },
 
@@ -159,10 +161,14 @@ export default defineComponent({
 <template>
     <div v-if="user && isProfileLoaded" :class="$style.wrapper">
         <metainfo>
-            <template v-slot:title="{ content }">{{ content }} • Juster</template>
+            <template v-slot:title="{ content }"
+                >{{ content }} • Juster</template
+            >
         </metainfo>
 
-        <h2 :class="$style.profile_title">{{ isMyProfile ? "My profile" : `User account` }}</h2>
+        <h2 :class="$style.profile_title">
+            {{ isMyProfile ? "My profile" : `User account` }}
+        </h2>
 
         <div :class="$style.header">
             <div :class="$style.profile">
@@ -173,7 +179,9 @@ export default defineComponent({
                             :class="$style.image"
                         />
 
-                        <template v-slot:content>This avatar is supported by TzKT.io</template>
+                        <template v-slot:content
+                            >This avatar is supported by TzKT.io</template
+                        >
                     </Tooltip>
                 </div>
 
@@ -216,14 +224,14 @@ export default defineComponent({
                     <div :class="$style.stat">
                         <div :class="$style.key">Liquidity provided</div>
                         <div :class="$style.value">
-                            {{ user.totalLiquidityProvided }}
+                            {{ abbreviateNumber(user.totalLiquidityProvided) }}
                             <span>XTZ</span>
                         </div>
                     </div>
                     <div :class="$style.stat">
                         <div :class="$style.key">Net return</div>
                         <div :class="$style.value">
-                            {{ user.totalProviderReward.toFixed(2) }}
+                            {{ abbreviateNumber(user.totalProviderReward) }}
                             <span>XTZ</span>
                         </div>
                     </div>
@@ -249,13 +257,15 @@ export default defineComponent({
                     <div v-if="user.totalWithdrawn" :class="$style.stat">
                         <div :class="$style.key">Withdrawn</div>
                         <div :class="$style.value">
-                            {{ user.totalWithdrawn.toFixed(2) }}
+                            {{ abbreviateNumber(user.totalWithdrawn) }}
                             <span>XTZ</span>
                         </div>
                     </div>
                     <div :class="$style.stat">
                         <div :class="$style.key">Bets</div>
-                        <div :class="$style.value">{{ user.totalBetsCount }}</div>
+                        <div :class="$style.value">
+                            {{ user.totalBetsCount }}
+                        </div>
                     </div>
                     <div :class="$style.stat">
                         <div :class="$style.key">Favorite Symbol</div>
@@ -267,16 +277,23 @@ export default defineComponent({
 
                 <div :class="$style.additional">
                     <div :class="$style.left">
-                        <a :href="`https://hangzhou2net.tzkt.io/${address}`" target="_blank">
+                        <a
+                            :href="`https://hangzhou2net.tzkt.io/${address}`"
+                            target="_blank"
+                        >
                             <Button type="tertiary" size="small">
-                                <Icon name="open" size="14" />View on
-                                TzKT
+                                <Icon name="open" size="14" />View on TzKT
                             </Button>
                         </a>
                     </div>
 
                     <div :class="$style.right">
-                        <Button @click="handleLogout" type="tertiary" size="small">Logout</Button>
+                        <Button
+                            @click="handleLogout"
+                            type="tertiary"
+                            size="small"
+                            >Logout</Button
+                        >
                     </div>
                 </div>
             </div>
@@ -286,7 +303,9 @@ export default defineComponent({
             <div :class="$style.top">
                 <div>
                     <h2>My submissions</h2>
-                    <div :class="$style.description">List of all current and archived events</div>
+                    <div :class="$style.description">
+                        List of all current and archived events
+                    </div>
                 </div>
             </div>
 
@@ -303,7 +322,9 @@ export default defineComponent({
             </div>
             <div v-else :class="$style.empty">
                 <div :class="$style.empty_title">You dont have submissions</div>
-                <div :class="$style.hint">Make bets on events to be displayed in your profile</div>
+                <div :class="$style.hint">
+                    Make bets on events to be displayed in your profile
+                </div>
             </div>
         </div>
     </div>
@@ -329,7 +350,9 @@ export default defineComponent({
 
             <div :class="$style.error_description">or</div>
 
-            <Button @click="handleBack" type="tertiary" size="small">Go back</Button>
+            <Button @click="handleBack" type="tertiary" size="small"
+                >Go back</Button
+            >
         </div>
     </div>
 </template>

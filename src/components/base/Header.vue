@@ -16,12 +16,12 @@ import {
     DropdownItem,
     DropdownDivider,
 } from "@/components/ui/Dropdown"
-import Tooltip from "@/components/ui/Tooltip"
 
 /**
  * Local
  */
 import ThePendingTransaction from "./ThePendingTransaction"
+import RewardAlert from "@/components/local/RewardAlert"
 
 /**
  * Modals
@@ -151,16 +151,6 @@ const handleDisagree = () => {
         await juster._provider.client.getActiveAccount()
         accountStore.setPkh("")
         router.push("/")
-
-        notificationsStore.create({
-            notification: {
-                type: "success",
-                title: "You are signed out",
-                description:
-                    "You have not confirmed the registration and agreement with the Terms of Use",
-                autoDestroy: true,
-            },
-        })
     })
 }
 
@@ -228,29 +218,24 @@ const pkh = computed(() => accountStore.pkh)
                         :key="link.name"
                         :to="link.url"
                         :class="isActive(link.url) && $style.active"
-                    >{{ link.name }}</router-link>
+                        >{{ link.name }}</router-link
+                    >
                 </div>
             </div>
 
             <div :class="$style.right">
-                <Tooltip v-if="pkh" position="left">
-                    <div :class="$style.testnet_warning">
-                        <Icon name="Warning" size="16" :class="$style.warning_icon" />Hangzhou Testnet
-                    </div>
-
-                    <template v-slot:content>
-                        Hangzhounet Testnet in use.
-                        <span>You can change the network in the settings</span>
-                    </template>
-                </Tooltip>
-
-                <Icon name="Notifications" size="16" :class="$style.notifications_icon" />
+                <RewardAlert :class="$style.reward_alert" />
 
                 <div :class="$style.buttons">
                     <!-- todo: sep component -->
                     <div v-if="!pkh" :class="$style.signin_button">
-                        <div @click="handleLogin" :class="$style.signin">Sign in</div>
-                        <div @click="handleCustomLogin" :class="$style.custom_signin">
+                        <div @click="handleLogin" :class="$style.signin">
+                            Sign in
+                        </div>
+                        <div
+                            @click="handleCustomLogin"
+                            :class="$style.custom_signin"
+                        >
                             <Icon name="settings" size="14" />
                         </div>
                     </div>
@@ -258,19 +243,18 @@ const pkh = computed(() => accountStore.pkh)
                     <Dropdown>
                         <template v-slot:trigger>
                             <div :class="$style.avatar">
-                                <img v-if="pkh" :src="`https://services.tzkt.io/v1/avatars/${pkh}`" />
-                                <div
-                                    v-if="
-                                        accountStore.wonPositions.length &&
-                                        accountStore.pkh
-                                    "
-                                    :class="$style.indicator"
+                                <img
+                                    v-if="pkh"
+                                    :src="`https://services.tzkt.io/v1/avatars/${pkh}`"
                                 />
                             </div>
                         </template>
 
                         <template v-slot:dropdown>
-                            <div @click="handleOpenProfile" :class="$style.profile">
+                            <div
+                                @click="handleOpenProfile"
+                                :class="$style.profile"
+                            >
                                 <Icon name="user" size="16" />
 
                                 <div :class="$style.info">
@@ -295,11 +279,8 @@ const pkh = computed(() => accountStore.pkh)
                             <DropdownItem @click="handleOpenWithdrawals">
                                 <div :class="$style.dropdown_icon">
                                     <Icon name="money" size="16" />
-                                    <div
-                                        v-if="accountStore.wonPositions.length"
-                                        :class="$style.dropdown_indicator"
-                                    />
-                                </div>Withdrawals
+                                </div>
+                                Withdrawals
                             </DropdownItem>
 
                             <DropdownDivider />
@@ -317,7 +298,9 @@ const pkh = computed(() => accountStore.pkh)
                                     <Icon name="book" size="16" />Documentation
                                 </DropdownItem>
                             </a>
-                            <DropdownItem @click="accountStore.showOnboarding = true">
+                            <DropdownItem
+                                @click="accountStore.showOnboarding = true"
+                            >
                                 <Icon name="help" size="16" />Onboarding
                             </DropdownItem>
 
@@ -369,29 +352,8 @@ const pkh = computed(() => accountStore.pkh)
     align-items: center;
 }
 
-.app_status {
-    margin-right: 40px;
-}
-
-.testnet_warning {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    height: 28px;
-    padding: 0 8px 0 6px;
-
-    font-size: 12px;
-    line-height: 1px;
-    font-weight: 600;
-    color: var(--yellow);
-
-    transition: all 0.2s ease;
-}
-
-.testnet_warning svg {
-    fill: var(--yellow);
+.reward_alert {
+    margin-right: 8px;
 }
 
 .left {
@@ -432,19 +394,6 @@ const pkh = computed(() => accountStore.pkh)
 
 .links a:hover {
     color: var(--text-primary);
-}
-
-.notifications_icon {
-    fill: var(--icon);
-
-    margin-right: 20px;
-    margin-left: 32px;
-
-    transition: fill 0.2s ease;
-}
-
-.notifications_icon:hover {
-    fill: var(--icon-high);
 }
 
 .buttons {
@@ -506,30 +455,20 @@ const pkh = computed(() => accountStore.pkh)
     position: relative;
 }
 
-.indicator {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--red);
-}
-
 .avatar img {
     display: flex;
-    width: 28px;
-    padding: 2px;
+    width: 24px;
+    padding: 4px;
     box-sizing: content-box;
 
-    background: var(--opacity-05);
-    border-radius: 50px;
+    background: var(--btn-secondary-bg);
+    border-radius: 8px;
 
     transition: all 0.2s ease;
 }
 
 .avatar:hover img {
-    background: var(--opacity-10);
+    background: var(--btn-secondary-bg-hover);
 }
 
 .avatar:active img {
@@ -538,17 +477,6 @@ const pkh = computed(() => accountStore.pkh)
 
 .dropdown_icon {
     position: relative;
-}
-
-.dropdown_indicator {
-    position: absolute;
-    top: 0;
-    right: 8px;
-
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--red);
 }
 
 .profile {

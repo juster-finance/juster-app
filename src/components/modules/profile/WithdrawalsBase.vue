@@ -230,20 +230,29 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
-        <WithdrawAllModal :show="showWithdrawAllModal" @onClose="showWithdrawAllModal = false" />
+        <WithdrawAllModal
+            :show="showWithdrawAllModal"
+            @onClose="showWithdrawAllModal = false"
+        />
 
         <metainfo>
-            <template v-slot:title="{ content }">{{ content }} • Juster</template>
+            <template v-slot:title="{ content }"
+                >{{ content }} • Juster</template
+            >
         </metainfo>
 
         <div :class="$style.block">
             <h2>Withdraw stats</h2>
-            <div :class="$style.description">Your withdraw statistics for this month & all time</div>
+            <div :class="$style.description">
+                Your withdraw statistics for this month & all time
+            </div>
 
             <div :class="$style.stats">
                 <div :class="$style.stat">
                     <div :class="$style.stat_name">Last week</div>
-                    <div :class="$style.stat_value">{{ statistics.week.value.toFixed(0) }} XTZ</div>
+                    <div :class="$style.stat_value">
+                        {{ statistics.week.value.toFixed(0) }} XTZ
+                    </div>
                     <div :class="$style.stat_avg">
                         Avg
                         <span>{{ statistics.week.avg.toFixed(0) }} XTZ</span>
@@ -252,7 +261,9 @@ export default defineComponent({
                 </div>
                 <div :class="$style.stat">
                     <div :class="$style.stat_name">Last month</div>
-                    <div :class="$style.stat_value">{{ statistics.month.value.toFixed(0) }} XTZ</div>
+                    <div :class="$style.stat_value">
+                        {{ statistics.month.value.toFixed(0) }} XTZ
+                    </div>
                     <div :class="$style.stat_avg">
                         Avg
                         <span>{{ statistics.month.avg.toFixed(0) }} XTZ</span>
@@ -261,7 +272,9 @@ export default defineComponent({
                 </div>
                 <div :class="$style.stat">
                     <div :class="$style.stat_name">All time</div>
-                    <div :class="$style.stat_value">{{ statistics.all.value.toFixed(0) }} XTZ</div>
+                    <div :class="$style.stat_value">
+                        {{ statistics.all.value.toFixed(0) }} XTZ
+                    </div>
                     <div :class="$style.stat_avg">
                         Avg
                         <span>{{ statistics.all.avg.toFixed(0) }} XTZ</span> per
@@ -282,7 +295,9 @@ export default defineComponent({
             <div :class="$style.header">
                 <div :class="$style.left">
                     <h2>Outstanding balances</h2>
-                    <div :class="$style.description">List of events holding your unclaimed profits</div>
+                    <div :class="$style.description">
+                        List of events holding your unclaimed profits
+                    </div>
                 </div>
 
                 <Button
@@ -292,7 +307,8 @@ export default defineComponent({
                     "
                     size="small"
                     :disabled="!positionsForWithdraw.length"
-                >Withdraw all</Button>
+                    >Withdraw all</Button
+                >
             </div>
 
             <div v-if="positionsForWithdraw.length" :class="$style.items">
@@ -361,7 +377,10 @@ export default defineComponent({
                         <th>type</th>
                     </tr>
 
-                    <tr v-for="withdraw in paginatedWithdrawalsHistory" :key="withdraw.id">
+                    <tr
+                        v-for="withdraw in paginatedWithdrawalsHistory"
+                        :key="withdraw.id"
+                    >
                         <td>
                             <div :class="$style.user">
                                 <div :class="$style.money_icon">
@@ -411,7 +430,10 @@ export default defineComponent({
                 <div :class="$style.bottom">
                     <span>{{ withdrawalsHistory.length }} withdrawals</span>
 
-                    <div v-if="withdrawalsHistory.length" :class="$style.tb_pagination">
+                    <div
+                        v-if="withdrawalsHistory.length"
+                        :class="$style.tb_pagination"
+                    >
                         <div
                             v-for="page in Math.ceil(
                                 withdrawalsHistory.length / 5,
@@ -422,14 +444,17 @@ export default defineComponent({
                                 $style.page,
                                 currentPageHistory == page && $style.current,
                             ]"
-                        >{{ page }}</div>
+                        >
+                            {{ page }}
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div :class="$style.hint">
-                <Icon name="help" size="14" />You can withdraw your funds manually, however if not done within
-                24 hours, Juster will do that for you and charge a small fee.
+                <Icon name="help" size="14" />You can withdraw your funds
+                manually, however if not done within 24 hours, Juster will do
+                that for you and charge a small fee.
             </div>
         </div>
     </div>
@@ -512,6 +537,8 @@ export default defineComponent({
 
 .withdrawboard table {
     width: 100%;
+    min-height: 372px;
+
     border-spacing: 0;
 }
 

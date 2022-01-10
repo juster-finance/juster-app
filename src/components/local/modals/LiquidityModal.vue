@@ -134,7 +134,10 @@ export default defineComponent({
         // eslint-disable-next-line vue/return-in-computed-property
         const buttonState = computed(() => {
             if (accountStore.pendingTransaction.awaiting) {
-                return { text: 'Previous transaction in process', disabled: true }
+                return {
+                    text: "Previous transaction in process",
+                    disabled: true,
+                }
             }
 
             if (countdownStatus.value !== "In progress")
@@ -196,7 +199,7 @@ export default defineComponent({
                                 type: "success",
                                 title: "Your liquidity has been accepted",
                                 description:
-                                    "We need to process your bet, it will take ~30 seconds",
+                                    "We need to process your bet, it will take 15-30 seconds",
                                 autoDestroy: true,
                             },
                         })
@@ -299,7 +302,8 @@ export default defineComponent({
                 <span
                     @click="amount.value = Math.floor(accountStore.balance)"
                     @dblclick="amount.value = accountStore.balance / 2"
-                >{{ accountStore.balance }}</span>
+                    >{{ accountStore.balance }}</span
+                >
                 XTZ
             </div>
 
@@ -310,10 +314,15 @@ export default defineComponent({
                 :class="$style.pool"
             />
 
-            <SlippageSelector v-model="slippage" :class="$style.slippage_block" />
+            <SlippageSelector
+                v-model="slippage"
+                :class="$style.slippage_block"
+            />
 
             <div :class="$style.stats">
-                <Stat name="Reward for providing">{{ event.liquidityPercent * 100 }}%</Stat>
+                <Stat name="Reward for providing"
+                    >{{ event.liquidityPercent * 100 }}%</Stat
+                >
 
                 <Stat v-if="liquidityRatio" name="Ratio">
                     <Icon name="close" size="14" :class="$style.ratio_icon" />
@@ -333,11 +342,7 @@ export default defineComponent({
                 <Spin v-if="sendingLiquidity" size="16" />
                 <Icon
                     v-else
-                    :name="
-                        countdownStatus == 'In progress' && amount.value
-                            ? 'bolt'
-                            : 'lock'
-                    "
+                    :name="!buttonState.disabled ? 'bolt' : 'lock'"
                     size="16"
                 />
                 {{ buttonState.text }}
@@ -348,7 +353,8 @@ export default defineComponent({
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
                     target="_blank"
-                >Read about possible solutions</a>
+                    >Read about possible solutions</a
+                >
             </div>
         </template>
 

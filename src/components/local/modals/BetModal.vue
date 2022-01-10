@@ -101,10 +101,10 @@ export default defineComponent({
             () =>
                 (side.value == "Rise" &&
                     (event.value.poolBelow - winDelta.value) /
-                    (event.value.poolAboveEq + amount.value)) ||
+                        (event.value.poolAboveEq + amount.value)) ||
                 (side.value == "Fall" &&
                     (event.value.poolAboveEq - winDelta.value) /
-                    (event.value.poolBelow + amount.value)),
+                        (event.value.poolBelow + amount.value)),
         )
 
         const fee = computed(() =>
@@ -189,7 +189,10 @@ export default defineComponent({
         // eslint-disable-next-line vue/return-in-computed-property
         const buttonState = computed(() => {
             if (accountStore.pendingTransaction.awaiting) {
-                return { text: 'Previous transaction in process', disabled: true }
+                return {
+                    text: "Previous transaction in process",
+                    disabled: true,
+                }
             }
 
             if (!side.value) {
@@ -262,7 +265,7 @@ export default defineComponent({
                                 type: "success",
                                 title: "Your bet has been accepted",
                                 description:
-                                    "We need to process your bet, it will take ~30 seconds",
+                                    "We need to process your bet, it will take 15-30 seconds",
                                 autoDestroy: true,
                             },
                         })
@@ -381,13 +384,18 @@ export default defineComponent({
                                 @dblclick="
                                     amount.value = accountStore.balance / 2
                                 "
-                            >{{ accountStore.balance }}</span>
+                                >{{ accountStore.balance }}</span
+                            >
                             XTZ
                         </div>
                     </div>
                 </div>
 
-                <Icon name="arrowright" size="16" :class="$style.direction_icon" />
+                <Icon
+                    name="arrowright"
+                    size="16"
+                    :class="$style.direction_icon"
+                />
 
                 <div :class="$style.to">
                     <div :class="$style.crc">
@@ -463,11 +471,13 @@ export default defineComponent({
                 :class="$style.pool"
             />
 
-            <SlippageSelector v-model="slippage" :class="$style.slippage_block" />
+            <SlippageSelector
+                v-model="slippage"
+                :class="$style.slippage_block"
+            />
 
             <Banner type="warning" size="small" :class="$style.banner">
-                Note that the transaction takes place on the Hangzhou
-                Testnet
+                Note that the transaction takes place on the Hangzhou Testnet
             </Banner>
 
             <Button
@@ -481,11 +491,7 @@ export default defineComponent({
                 <Spin v-if="sendingBet" size="16" />
                 <Icon
                     v-else
-                    :name="
-                        countdownStatus == 'In progress' && amount.value
-                            ? 'bolt'
-                            : 'lock'
-                    "
+                    :name="!buttonState.disabled ? 'bolt' : 'lock'"
                     size="16"
                 />
                 {{ buttonState.text }}
@@ -496,7 +502,8 @@ export default defineComponent({
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
                     target="_blank"
-                >Read about possible solutions</a>
+                    >Read about possible solutions</a
+                >
             </div>
         </template>
 

@@ -82,9 +82,10 @@ export default defineComponent({
     width: 330px;
     background: var(--notification-bg);
     backdrop-filter: blur(10px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: rgb(0 0 0 / 8%) 0px 4px 13px;
     border-radius: 8px;
-    padding: 20px;
+    border: 1px solid var(--border);
+    padding: 16px;
 
     margin-right: 16px;
     margin-bottom: 16px;

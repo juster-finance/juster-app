@@ -1,29 +1,20 @@
 <script setup>
 import { defineEmits, defineProps, computed, isReactive } from "vue"
 
-/**
- * Services
- */
 import { f } from "@/services/utils/amounts"
-
 
 const props = defineProps({
     isUserWon: Boolean,
     wonPosition: Object,
     disabled: Boolean,
-    event: Object
+    event: Object,
 })
 const emit = defineEmits(["onBet", "onWithdraw"])
 
-
 const ratio = computed(() => {
     return {
-        rise:
-            props.event.poolBelow /
-            (props.event.poolAboveEq),
-        fall:
-            props.event.poolAboveEq /
-            (props.event.poolBelow),
+        rise: props.event.poolBelow / props.event.poolAboveEq,
+        fall: props.event.poolAboveEq / props.event.poolBelow,
     }
 })
 </script>
@@ -41,7 +32,10 @@ const ratio = computed(() => {
                     <span>Rise</span>
                 </div>
 
-                <div :class="$style.ratio">x{{ (1 + ratio.rise).toFixed(2) }}</div>
+                <div v-if="!isNaN(ratio.rise)" :class="$style.ratio">
+                    <Icon name="close" size="10" />
+                    <span>{{ (1 + ratio.rise).toFixed(2) }}</span>
+                </div>
             </div>
 
             <div :class="$style.divider" />
@@ -50,7 +44,10 @@ const ratio = computed(() => {
                 @click.prevent="emit('onBet', 'fall')"
                 :class="[$style.action, disabled && $style.disabled]"
             >
-                <div :class="$style.ratio">x{{ (1 + ratio.fall).toFixed(2) }}</div>
+                <div v-if="!isNaN(ratio.fall)" :class="$style.ratio">
+                    <Icon name="close" size="10" />
+                    <span>{{ (1 + ratio.fall).toFixed(2) }}</span>
+                </div>
 
                 <div :class="$style.left">
                     <span>Fall</span>
@@ -60,7 +57,11 @@ const ratio = computed(() => {
             </div>
         </template>
 
-        <div v-else @click.prevent="emit('onWithdraw')" :class="$style.withdraw">
+        <div
+            v-else
+            @click.prevent="emit('onWithdraw')"
+            :class="$style.withdraw"
+        >
             <Icon name="crown" size="16" />
             Withdraw
             {{ f(wonPosition.value) }} XTZ
@@ -123,10 +124,18 @@ const ratio = computed(() => {
 }
 
 .ratio {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+
     font-size: 11px;
     line-height: 1.1;
     font-weight: 600;
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
+}
+
+.ratio svg {
+    fill: var(--text-tertiary);
 }
 
 .divider {

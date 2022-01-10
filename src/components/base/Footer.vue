@@ -21,9 +21,15 @@ export default defineComponent({
                     <div :class="$style.column">
                         <div :class="$style.name">Juster</div>
 
-                        <router-link to="/explore" :class="$style.link">Explore</router-link>
-                        <router-link to="/events" :class="$style.link">Events</router-link>
-                        <router-link to="/symbols" :class="$style.link">Symbols</router-link>
+                        <router-link to="/explore" :class="$style.link"
+                            >Explore</router-link
+                        >
+                        <router-link to="/events" :class="$style.link"
+                            >Events</router-link
+                        >
+                        <router-link to="/symbols" :class="$style.link"
+                            >Symbols</router-link
+                        >
                         <!-- <router-link to="/rating" :class="$style.link"
                             >Rating</router-link
                         >-->
@@ -35,30 +41,42 @@ export default defineComponent({
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
-                        >Discord</a>
+                            >Discord</a
+                        >
                         <a
                             href="https://t.me/baking_bad_chat"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
-                        >GitHub</a>
+                            >GitHub</a
+                        >
                         <a
                             href="https://twitter.com/TezosBakingBad"
                             target="_blank"
                             rel="nofolow noreferrer"
                             :class="$style.link"
-                        >Twitter</a>
+                            >Twitter</a
+                        >
                     </div>
                     <div :class="$style.column">
                         <div :class="$style.name">Learn</div>
-                        <router-link to="/docs" :class="$style.link">Documentation</router-link>
-                        <router-link to="/terms" :class="$style.link">Terms of Use</router-link>
-                        <router-link to="/policy" :class="$style.link">Privacy Policy</router-link>
+                        <router-link to="/docs" :class="$style.link"
+                            >Documentation</router-link
+                        >
+                        <router-link to="/terms" :class="$style.link"
+                            >Terms of Use</router-link
+                        >
+                        <router-link to="/policy" :class="$style.link"
+                            >Privacy Policy</router-link
+                        >
                     </div>
                 </div>
             </div>
 
-            <div :class="$style.right">Juster v{{ version }}, Testnet</div>
+            <div :class="$style.bottom">
+                <span>Juster v{{ version }}</span
+                >, Hangzhounet
+            </div>
         </div>
     </div>
 </template>
@@ -126,11 +144,16 @@ export default defineComponent({
     color: var(--text-primary);
 }
 
-.right {
+.bottom {
     font-size: 13px;
     color: var(--text-tertiary);
 
     margin-top: 40px;
+}
+
+.bottom span {
+    font-weight: 600;
+    color: var(--text-secondary);
 }
 
 @media (max-width: 850px) {
