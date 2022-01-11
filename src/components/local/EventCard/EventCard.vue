@@ -215,13 +215,16 @@ export default defineComponent({
             return tvl
         })
 
-        const isUserWon = computed(() => {
-            return accountStore.positionsForWithdrawal.some(
-                (position) => position.event.id == event.value.id,
-            )
+        /** Win & Withdraw */
+        const won = computed(() => {
+            if (!event.value) return
+
+            return !!event.value.bets
+                .filter((bet) => bet.userId == accountStore.pkh)
+                .filter((bet) => bet.side == event.value.winnerBets).length
         })
-        const wonPosition = computed(() => {
-            return accountStore.positionsForWithdrawal.find(
+        const positionForWithdraw = computed(() => {
+            return accountStore.wonPositions.find(
                 (position) => position.event.id == event.value.id,
             )
         })
@@ -243,12 +246,32 @@ export default defineComponent({
         }
 
         /** Withdraw */
+        const isWithdrawing = ref(false)
         const handleWithdraw = (e) => {
+            isWithdrawing.value = true
+
             amplitude.logEvent("clickWithdraw", { where: "event_card" })
 
             juster
                 .withdraw(event.value.id, accountStore.pkh)
                 .then((op) => {
+                    /** Pending transaction label */
+                    accountStore.pendingTransaction.awaiting = true
+
+                    op.confirmation()
+                        .then((result) => {
+                            accountStore.pendingTransaction.awaiting = false
+                            isWithdrawing.value = false
+
+                            if (!result.completed) {
+                                // todo: handle it?
+                            }
+                        })
+                        .catch((err) => {
+                            accountStore.pendingTransaction.awaiting = false
+                            isWithdrawing.value = false
+                        })
+
                     notificationsStore.create({
                         notification: {
                             type: "success",
@@ -263,7 +286,9 @@ export default defineComponent({
                         eventId: event.value.id,
                     })
                 })
-                .catch((err) => console.log(err))
+                .catch((err) => {
+                    isWithdrawing.value = false
+                })
         }
 
         const handleParticipants = () => {
@@ -410,11 +435,12 @@ export default defineComponent({
             liquidityLevel,
             participantsAvatars,
             userTVL,
-            isUserWon,
-            wonPosition,
+            won,
+            positionForWithdraw,
             percentage,
             handleBet,
             handleParticipants,
+            isWithdrawing,
             handleWithdraw,
             copy,
             handleSwitch,
@@ -774,32 +800,52 @@ export default defineComponent({
                     </div>
                 </div>
 
-                <div
-                    v-if="event.winnerBets == 'BELOW'"
-                    :class="[$style.hint, $style.red]"
-                >
-                    <Icon name="lower" size="14" />
-                    <div><span>Fall</span> won</div>
-                </div>
-                <div
-                    v-if="event.winnerBets == 'ABOVE_EQ'"
-                    :class="[$style.hint, $style.green]"
-                >
-                    <Icon name="higher" size="14" />
-                    <div><span>Rise</span> won</div>
-                </div>
+                <Tooltip v-if="event.winnerBets == 'BELOW'" side="left">
+                    <div :class="[$style.hint, $style.red]">
+                        <Icon name="lower" size="14" />
+                        <div><span>Fall</span> won</div>
+                    </div>
+
+                    <template #content
+                        ><span>Start rate - Closed rate =</span> <br />
+                        {{
+                            (
+                                event.closedRate * 100 -
+                                event.startRate * 100
+                            ).toFixed(2)
+                        }}</template
+                    >
+                </Tooltip>
+
+                <Tooltip v-if="event.winnerBets == 'ABOVE_EQ'" side="left">
+                    <div :class="[$style.hint, $style.green]">
+                        <Icon name="higher" size="14" />
+                        <div><span>Rise</span> won</div>
+                    </div>
+
+                    <template #content
+                        ><span>Start rate - Closed rate =</span> <br />
+                        {{
+                            (
+                                event.closedRate * 100 -
+                                event.startRate * 100
+                            ).toFixed(2)
+                        }}</template
+                    >
+                </Tooltip>
             </div>
 
             <EventCardActions
                 @onBet="handleBet"
                 @onWithdraw="handleWithdraw"
-                :isUserWon="isUserWon"
-                :wonPosition="wonPosition"
                 :event="event"
+                :won="won"
+                :wonPosition="positionForWithdraw"
                 :disabled="
                     event.totalLiquidityProvided == 0 ||
                     startStatus == 'Finished'
                 "
+                :isWithdrawing="isWithdrawing"
             />
         </div>
     </router-link>

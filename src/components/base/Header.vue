@@ -417,7 +417,7 @@ const pkh = computed(() => accountStore.pkh)
 }
 
 .reward_alert {
-    margin: 0 8px 0 16px;
+    margin-right: 8px;
 }
 
 .testnet_warning {
@@ -427,7 +427,9 @@ const pkh = computed(() => accountStore.pkh)
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.05);
     height: 28px;
+
     padding: 0 8px 0 6px;
+    margin-right: 16px;
 
     font-size: 12px;
     line-height: 1px;

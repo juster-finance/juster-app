@@ -110,7 +110,7 @@ export default defineComponent({
     height: 4px;
     border-radius: 50px;
     background: var(--opacity-10);
-    opacity: 0.5;
+    opacity: 0.8;
 }
 
 .fill {

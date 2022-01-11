@@ -3,25 +3,41 @@ import { defineEmits, defineProps, computed, isReactive } from "vue"
 
 import { f } from "@/services/utils/amounts"
 
+/**
+ * UI
+ */
+import Button from "@/components/ui/Button"
+import Spin from "@/components/ui/Spin"
+
+/**
+ * Store
+ */
+import { useAccountStore } from "@/store/account"
+
 const props = defineProps({
-    isUserWon: Boolean,
+    event: Object,
+    won: Boolean,
     wonPosition: Object,
     disabled: Boolean,
-    event: Object,
+    isWithdrawing: Boolean,
 })
 const emit = defineEmits(["onBet", "onWithdraw"])
 
 const ratio = computed(() => {
+    if (!props.event.poolBelow || !props.event.poolAboveEq) return 0
+
     return {
         rise: props.event.poolBelow / props.event.poolAboveEq,
         fall: props.event.poolAboveEq / props.event.poolBelow,
     }
 })
+
+const accountStore = useAccountStore()
 </script>
 
 <template>
     <div :class="$style.wrapper">
-        <template v-if="!isUserWon">
+        <template v-if="!won && !wonPosition">
             <div
                 @click.prevent="emit('onBet', 'rise')"
                 :class="[$style.action, disabled && $style.disabled]"
@@ -32,9 +48,13 @@ const ratio = computed(() => {
                     <span>Rise</span>
                 </div>
 
-                <div v-if="!isNaN(ratio.rise)" :class="$style.ratio">
+                <div :class="$style.ratio">
                     <Icon name="close" size="10" />
-                    <span>{{ (1 + ratio.rise).toFixed(2) }}</span>
+
+                    <span v-if="ratio.rise">{{
+                        (1 + ratio.rise).toFixed(2)
+                    }}</span>
+                    <span v-else>0.00</span>
                 </div>
             </div>
 
@@ -44,9 +64,13 @@ const ratio = computed(() => {
                 @click.prevent="emit('onBet', 'fall')"
                 :class="[$style.action, disabled && $style.disabled]"
             >
-                <div v-if="!isNaN(ratio.fall)" :class="$style.ratio">
+                <div :class="$style.ratio">
                     <Icon name="close" size="10" />
-                    <span>{{ (1 + ratio.fall).toFixed(2) }}</span>
+
+                    <span v-if="ratio.fall">{{
+                        (1 + ratio.fall).toFixed(2)
+                    }}</span>
+                    <span v-else>0.00</span>
                 </div>
 
                 <div :class="$style.left">
@@ -57,15 +81,35 @@ const ratio = computed(() => {
             </div>
         </template>
 
-        <div
+        <Button
             v-else
             @click.prevent="emit('onWithdraw')"
-            :class="$style.withdraw"
+            :type="
+                (isWithdrawing && 'secondary') ||
+                (won && !wonPosition && 'secondary') ||
+                (won && wonPosition && 'success')
+            "
+            size="small"
+            :disabled="isWithdrawing || (won && !wonPosition)"
+            block
         >
-            <Icon name="crown" size="16" />
-            Withdraw
-            {{ f(wonPosition.value) }} XTZ
-        </div>
+            <template v-if="won && !wonPosition"
+                >Successfully withdrawn</template
+            >
+
+            <template v-else-if="accountStore.pendingTransaction.awaiting">
+                Can`t withdraw now
+            </template>
+
+            <template v-else-if="!isWithdrawing">
+                <Icon name="crown" size="16" />Withdraw
+                {{ f(wonPosition.value) }} XTZ
+            </template>
+
+            <template v-else
+                ><Spin size="12" />Awaiting confirmation..
+            </template>
+        </Button>
     </div>
 </template>
 
