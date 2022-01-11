@@ -76,6 +76,7 @@ const reward = computed(() => {
     font-size: 12px;
     font-weight: 700;
     color: var(--text-tertiary);
+    white-space: nowrap;
 }
 
 .reward span {

@@ -225,17 +225,17 @@ const pkh = computed(() => accountStore.pkh)
             </div>
 
             <div :class="$style.right">
-                <Tooltip v-if="pkh" position="left">
+                <Tooltip v-if="pkh" side="right">
                     <div :class="$style.testnet_warning">
                         <Icon
                             name="Warning"
                             size="16"
                             :class="$style.warning_icon"
-                        />Hangzhounet
+                        /><span>Hangzhounet</span>
                     </div>
 
                     <template v-slot:content>
-                        Testnet in use.
+                        Testnet in use.<br />
                         <span
                             >Use <b>@tezos_faucet_bot</b> to top up your
                             balance</span
@@ -559,9 +559,16 @@ const pkh = computed(() => accountStore.pkh)
     background: var(--opacity-05);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     .links {
         display: none;
+    }
+}
+
+@media (max-width: 450px) {
+    .testnet_warning span {
+        display: none;
+        padding: 0 6px;
     }
 }
 </style>

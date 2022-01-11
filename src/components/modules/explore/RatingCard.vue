@@ -61,11 +61,10 @@ const shorten = (address) => {
     justify-content: space-between;
 
     background: var(--card-bg);
-    height: 40px;
     border-radius: 8px;
     border: 1px solid var(--border);
 
-    padding: 0 24px 0 8px;
+    padding: 8px 24px 8px 8px;
 }
 
 .user {
@@ -145,5 +144,45 @@ const shorten = (address) => {
     text-align: center;
 
     flex: 1;
+    margin: 0 8px;
+}
+
+@media (max-width: 1250px) {
+    .wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .user {
+        width: 100%;
+        padding: 0 8px 8px 8px;
+
+        border-bottom: 1px solid var(--border);
+    }
+
+    .user:last-child {
+        padding-bottom: 0;
+
+        border-bottom: initial;
+    }
+
+    .amount {
+        flex: 1;
+        text-align: right;
+    }
+
+    .separator {
+        display: none;
+    }
+}
+
+@media (max-width: 300px) {
+    .amount {
+        display: none;
+    }
 }
 </style>

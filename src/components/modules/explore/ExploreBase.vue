@@ -140,7 +140,7 @@ export default defineComponent({
                         size="small"
                         type="tertiary"
                     >
-                        <Icon name="collection" size="16" />All Hot events
+                        <Icon name="collection" size="16" />View all
                     </Button>
                 </div>
 
@@ -199,9 +199,14 @@ export default defineComponent({
     justify-content: space-between;
 }
 
+.left {
+    margin-right: 40px;
+}
+
 .description {
     font-size: 14px;
     font-weight: 500;
+    line-height: 1.6;
     color: var(--text-tertiary);
 
     margin-top: 8px;
@@ -217,6 +222,13 @@ export default defineComponent({
     grid-gap: 16px;
 
     margin-top: 24px;
+}
+
+@media (max-width: 500px) {
+    .head {
+        flex-direction: column;
+        gap: 16px;
+    }
 }
 
 @media (max-width: 420px) {

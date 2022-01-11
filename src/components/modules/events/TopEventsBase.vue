@@ -68,7 +68,9 @@ export default defineComponent({
 <template>
     <div :class="$style.wrapper">
         <metainfo>
-            <template v-slot:title="{ content }">{{ content }} • Juster</template>
+            <template v-slot:title="{ content }"
+                >{{ content }} • Juster</template
+            >
         </metainfo>
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
@@ -82,7 +84,11 @@ export default defineComponent({
         <div :class="$style.container">
             <div :class="$style.events_base">
                 <div :class="$style.events">
-                    <EventCard v-for="event in topEvents" :key="event.id" :event="event" />
+                    <EventCard
+                        v-for="event in topEvents"
+                        :key="event.id"
+                        :event="event"
+                    />
                 </div>
             </div>
         </div>
@@ -99,7 +105,7 @@ export default defineComponent({
 
 .description {
     font-size: 14px;
-    line-height: 1;
+    line-height: 1.6;
     font-weight: 500;
     color: var(--text-tertiary);
 
