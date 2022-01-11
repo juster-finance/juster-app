@@ -16,6 +16,7 @@ import {
     DropdownItem,
     DropdownDivider,
 } from "@/components/ui/Dropdown"
+import Tooltip from "@/components/ui/Tooltip"
 
 /**
  * Local
@@ -224,6 +225,24 @@ const pkh = computed(() => accountStore.pkh)
             </div>
 
             <div :class="$style.right">
+                <Tooltip v-if="pkh" position="left">
+                    <div :class="$style.testnet_warning">
+                        <Icon
+                            name="Warning"
+                            size="16"
+                            :class="$style.warning_icon"
+                        />Hangzhounet
+                    </div>
+
+                    <template v-slot:content>
+                        Testnet in use.
+                        <span
+                            >Use <b>@tezos_faucet_bot</b> to top up your
+                            balance</span
+                        >
+                    </template>
+                </Tooltip>
+
                 <RewardAlert :class="$style.reward_alert" />
 
                 <div :class="$style.buttons">
@@ -352,10 +371,6 @@ const pkh = computed(() => accountStore.pkh)
     align-items: center;
 }
 
-.reward_alert {
-    margin-right: 8px;
-}
-
 .left {
     display: flex;
     align-items: center;
@@ -399,6 +414,31 @@ const pkh = computed(() => accountStore.pkh)
 .buttons {
     display: flex;
     gap: 8px;
+}
+
+.reward_alert {
+    margin: 0 8px 0 16px;
+}
+
+.testnet_warning {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    height: 28px;
+    padding: 0 8px 0 6px;
+
+    font-size: 12px;
+    line-height: 1px;
+    font-weight: 600;
+    color: var(--yellow);
+
+    transition: all 0.2s ease;
+}
+
+.testnet_warning svg {
+    fill: var(--yellow);
 }
 
 .signin_button {
