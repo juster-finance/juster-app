@@ -472,11 +472,11 @@ export default defineComponent({
 
 .description {
     font-size: 14px;
-    line-height: 1;
+    line-height: 1.6;
     font-weight: 500;
     color: var(--text-tertiary);
 
-    margin-top: 8px;
+    margin-top: 6px;
     margin-bottom: 24px;
 }
 

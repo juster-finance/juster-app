@@ -74,6 +74,7 @@ export default defineComponent({
 
     color: var(--text-primary);
     font-weight: 600;
+    white-space: nowrap;
 
     transition: all 0.2s ease;
 }
@@ -111,9 +112,10 @@ export default defineComponent({
 }
 
 .wrapper.small {
-    height: 30px;
+    height: 32px;
     padding: 0 10px 0 10px;
     font-size: 13px;
+    border-radius: 6px;
 }
 .wrapper.small.icon {
     padding: 0 10px;
