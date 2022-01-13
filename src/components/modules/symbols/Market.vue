@@ -14,7 +14,7 @@ import {
     calcChange,
     abbreviateNumber,
 } from "@/services/utils/amounts"
-import { supportedSymbols } from "@/services/config"
+import { supportedMarkets } from "@/services/config"
 
 /**
  * Store
@@ -22,15 +22,15 @@ import { supportedSymbols } from "@/services/config"
 import { useMarketStore } from "@/store/market"
 
 export default defineComponent({
-    name: "Symbol",
-    props: { symbol: Object },
+    name: "Market",
+    props: { market: Object },
 
     setup(props, context) {
-        const { symbol } = toRefs(props)
+        const { market } = toRefs(props)
 
         const marketStore = useMarketStore()
         const quotes = computed(() => {
-            return marketStore.symbols[symbol.value.symbol].quotes
+            return marketStore.markets[market.value.symbol].quotes
         })
 
         const price = computed(() => {
@@ -47,11 +47,11 @@ export default defineComponent({
         const change = computed(() => {
             if (!quotes.value) return
 
-            if (!symbol.value.historyPrice) return "Loading"
+            if (!market.value.historyPrice) return "Loading"
 
             const { diff, percent, isIncreased } = calcChange(
                 quotes.value[0].price,
-                symbol.value.historyPrice,
+                market.value.historyPrice,
             )
             color.value = isIncreased ? "green" : "red"
 
@@ -66,12 +66,12 @@ export default defineComponent({
         }
 
         return {
-            symbol,
+            market,
             quotes,
             change,
             color,
             price,
-            supportedSymbols,
+            supportedMarkets,
             handleJoin,
             abbreviateNumber,
         }
@@ -82,11 +82,11 @@ export default defineComponent({
 </script>
 
 <template>
-    <router-link :to="`/symbols/${symbol.symbol}`" :class="$style.wrapper">
+    <router-link :to="`/markets/${market.symbol}`" :class="$style.wrapper">
         <div :class="$style.base">
             <div :class="$style.name">
-                {{ symbol.symbol }},
-                <span>{{ supportedSymbols[symbol.symbol].description }}</span>
+                {{ market.symbol }},
+                <span>{{ supportedMarkets[market.symbol].description }}</span>
             </div>
 
             <h1 v-if="quotes.length" :class="$style.price">
@@ -112,7 +112,7 @@ export default defineComponent({
             <div :class="$style.info">
                 <div :class="$style.param">
                     <span>Events:</span>
-                    <span>{{ symbol.totalEvents }}</span>
+                    <span>{{ market.totalEvents }}</span>
                 </div>
 
                 <div :class="$style.dot" />
@@ -121,7 +121,7 @@ export default defineComponent({
                     <span>TVL:</span>
                     <span
                         >{{
-                            abbreviateNumber(symbol.totalValueLocked.toFixed(0))
+                            abbreviateNumber(market.totalValueLocked.toFixed(0))
                         }}
                         XTZ</span
                     >
@@ -133,7 +133,7 @@ export default defineComponent({
                     <span>Volume (24h):</span>
                     <span
                         >{{
-                            abbreviateNumber(symbol.totalVolume.toFixed(0))
+                            abbreviateNumber(market.totalVolume.toFixed(0))
                         }}
                         XTZ</span
                     >

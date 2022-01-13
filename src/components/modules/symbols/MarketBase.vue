@@ -17,12 +17,12 @@ import { cloneDeep } from "lodash"
 /**
  * API
  */
-import { fetchEventsBySymbol } from "@/api/events"
+import { fetchEventsByMarket } from "@/api/events"
 
 /**
  * Local
  */
-import Symbol from "./Symbol"
+import Market from "./Market"
 import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
 /**
@@ -38,14 +38,14 @@ import Pagination from "@/components/ui/Pagination"
 import Breadcrumbs from "@/components/ui/Breadcrumbs"
 
 export default defineComponent({
-    name: "SymbolBase",
+    name: "MarketBase",
 
     setup() {
         const header = ref(null)
         const breadcrumbs = reactive([
             {
-                name: "All symbols",
-                path: "/symbols",
+                name: "All Markets",
+                path: "/markets",
             },
         ])
 
@@ -53,17 +53,17 @@ export default defineComponent({
 
         const currentPage = ref(1)
 
-        /** Symbol */
+        /** Market */
         const route = useRoute()
         const marketStore = useMarketStore()
 
-        const symbol = computed(() => {
-            return Object.keys(marketStore.symbols)
-                .map((item) => marketStore.symbols[item])
+        const market = computed(() => {
+            return Object.keys(marketStore.markets)
+                .map((item) => marketStore.markets[item])
                 .find((item) => item.symbol == route.params.name)
         })
         const price = computed(
-            () => marketStore.symbols[symbol.value?.symbol]?.quotes[0]?.price,
+            () => marketStore.markets[market.value?.symbol]?.quotes[0]?.price,
         )
 
         const selectedTab = ref("Available")
@@ -77,8 +77,8 @@ export default defineComponent({
         const getEvents = async ({ status }) => {
             marketStore.events = []
 
-            let allEvents = await fetchEventsBySymbol({
-                id: symbol.value.id,
+            let allEvents = await fetchEventsByMarket({
+                id: market.value.id,
                 status,
             })
 
@@ -87,20 +87,20 @@ export default defineComponent({
             )
         }
 
-        if (symbol.value) {
+        if (market.value) {
             breadcrumbs.push({
-                name: symbol.value.symbol,
-                path: `/symbols/${symbol.value.symbol}`,
+                name: market.value.symbol,
+                path: `/markets/${market.value.symbol}`,
             })
 
             getEvents({ status: "NEW" })
         }
-        watch(symbol, () => {
-            if (!symbol.value) return
+        watch(market, () => {
+            if (!market.value) return
 
             breadcrumbs.push({
-                name: symbol.value.symbol,
-                path: `/symbols/${symbol.value.symbol}`,
+                name: market.value.symbol,
+                path: `/markets/${market.value.symbol}`,
             })
 
             getEvents({ status: "NEW" })
@@ -126,24 +126,24 @@ export default defineComponent({
 
         /** Meta */
         const { meta } = useMeta({
-            title: `Symbol`,
+            title: `Market`,
             description:
-                "Available symbols for events, for providing liquidity and accepting bets from users",
+                "Available markets for events, for providing liquidity and accepting bets from users",
         })
 
         if (price.value) {
-            meta.title = `${symbol.value.symbol} • ${price.value.toFixed(2)}`
+            meta.title = `${market.value.symbol} • ${price.value.toFixed(2)}`
         }
 
-        watch(symbol, () => {
-            if (!symbol.value) return
-            meta.title = `${symbol.value.symbol}`
+        watch(market, () => {
+            if (!market.value) return
+            meta.title = `${market.value.symbol}`
         })
         watch(
-            () => marketStore.symbols,
+            () => marketStore.markets,
             () => {
                 if (price.value)
-                    meta.title = `${symbol.value.symbol}, ${price.value.toFixed(
+                    meta.title = `${market.value.symbol}, ${price.value.toFixed(
                         2,
                     )}`
             },
@@ -151,7 +151,7 @@ export default defineComponent({
         )
 
         onMounted(() => {
-            amplitude.logEvent("onPage", { name: "Symbol" })
+            amplitude.logEvent("onPage", { name: "Market" })
         })
 
         onBeforeUnmount(() => {
@@ -163,7 +163,7 @@ export default defineComponent({
             breadcrumbs,
             currentPage,
             DateTime,
-            symbol,
+            market,
             events,
             selectedTab,
             selectTab,
@@ -172,7 +172,7 @@ export default defineComponent({
     },
 
     components: {
-        Symbol,
+        Market,
         Breadcrumbs,
         EventCard,
         EventCardLoading,
@@ -183,7 +183,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <div v-if="symbol" :class="$style.wrapper">
+    <div v-if="market" :class="$style.wrapper">
         <metainfo>
             <template v-slot:title="{ content }"
                 >{{ content }} • Juster</template
@@ -192,7 +192,7 @@ export default defineComponent({
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-        <Symbol :symbol="symbol" @onJoin="handleScrollToEvents" />
+        <Market :market="market" @onJoin="handleScrollToEvents" />
 
         <div ref="header" :class="$style.header">
             <div :class="$style.left">
@@ -280,14 +280,6 @@ export default defineComponent({
 
 .breadcrumbs {
     margin-bottom: 24px;
-}
-
-.symbols {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
-    margin-top: 24px;
 }
 
 .header {

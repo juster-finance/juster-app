@@ -5,7 +5,7 @@ export const dipdup = {
     },
 }
 
-export const supportedSymbols = {
+export const supportedMarkets = {
     "ETH-USD": { description: "Ethereum / US Dollar" },
     "XTZ-USD": { description: "Tezos / US Dollar" },
     "BTC-USD": { description: "Bitcoin / US Dollar" },

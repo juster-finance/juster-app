@@ -49,7 +49,6 @@ const identify = new amplitude.Identify()
 const notificationsStore = useNotificationsStore()
 const accountStore = useAccountStore()
 
-const showSettingsModal = ref(false)
 const showConnectingModal = ref(false)
 
 const route = useRoute()
@@ -65,10 +64,12 @@ const links = reactive([
         url: "/events",
     },
     {
-        name: "Symbols",
-        url: "/symbols",
+        name: "Markets",
+        url: "/markets",
     },
 ])
+
+const showMobileMenu = ref(false)
 
 const isActive = (url) => {
     if (!route.name) return
@@ -207,8 +208,65 @@ const pkh = computed(() => accountStore.pkh)
             @onClose="handleDisagree"
         />
 
+        <!-- Mobile menu -->
+        <transition name="fade">
+            <div
+                v-if="showMobileMenu"
+                @click="showMobileMenu = false"
+                :class="$style.mobile_menu"
+            >
+                <div :class="$style.mobile_menu__title">Navigation</div>
+
+                <div :class="$style.mobile_menu__links">
+                    <router-link
+                        to="/explore"
+                        :class="$style.mobile_menu__link"
+                    >
+                        <div :class="$style.left">
+                            <Icon name="search" size="14" />
+                            <span>Explore</span>
+                        </div>
+
+                        <div :class="$style.mobile_menu__description">
+                            Top markets, ranking, etc
+                        </div>
+                    </router-link>
+                    <router-link to="/events" :class="$style.mobile_menu__link">
+                        <div :class="$style.left">
+                            <Icon name="collection" size="14" />
+                            <span>Events</span>
+                        </div>
+
+                        <div :class="$style.mobile_menu__description">
+                            Events with filtering
+                        </div>
+                    </router-link>
+                    <router-link
+                        to="/markets"
+                        :class="$style.mobile_menu__link"
+                    >
+                        <div :class="$style.left">
+                            <Icon name="chart" size="14" />
+                            <span>Markets</span>
+                        </div>
+
+                        <div :class="$style.mobile_menu__description">
+                            Currency pairs for events
+                        </div>
+                    </router-link>
+                </div>
+            </div>
+        </transition>
+
         <div :class="$style.base">
             <div :class="$style.left">
+                <div
+                    @click="showMobileMenu = !showMobileMenu"
+                    :class="$style.mobile_menu_icon"
+                >
+                    <Icon :name="showMobileMenu ? 'close' : 'menu'" size="16" />
+                </div>
+
                 <router-link to="/explore" :class="$style.logo">
                     <img src="@/assets/logo.png" />
                 </router-link>
@@ -335,7 +393,7 @@ const pkh = computed(() => accountStore.pkh)
         </div>
     </div>
 
-    <ThePendingTransaction v-if="accountStore.pendingTransaction.awaiting" />
+    <ThePendingTransaction v-if="!accountStore.pendingTransaction.awaiting" />
 </template>
 
 <style module>
@@ -350,7 +408,7 @@ const pkh = computed(() => accountStore.pkh)
     justify-content: center;
 
     border-bottom: 1px solid var(--border);
-    z-index: 1;
+    z-index: 2;
 
     backdrop-filter: blur(5px);
 }
@@ -371,7 +429,7 @@ const pkh = computed(() => accountStore.pkh)
     align-items: center;
 }
 
-.left {
+.base .left {
     display: flex;
     align-items: center;
 }
@@ -562,6 +620,10 @@ const pkh = computed(() => accountStore.pkh)
 }
 
 @media (max-width: 700px) {
+    .base {
+        margin: 0 24px;
+    }
+
     .links {
         display: none;
     }
@@ -571,6 +633,108 @@ const pkh = computed(() => accountStore.pkh)
     .testnet_warning span {
         display: none;
         padding: 0 6px;
+    }
+}
+
+/* Mobile navigation */
+.mobile_menu {
+    display: none;
+
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+
+    padding: 20px 24px 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--app-bg);
+
+    z-index: 100;
+}
+
+.mobile_menu__title {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-secondary);
+
+    margin-bottom: 16px;
+}
+
+.mobile_menu__links {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.mobile_menu__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mobile_menu__link .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mobile_menu__link .left svg {
+    padding: 5px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.06);
+    fill: var(--text-secondary);
+    box-sizing: content-box;
+}
+
+.mobile_menu__link .left span {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.mobile_menu__description {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+.mobile_menu_icon {
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--btn-secondary-bg);
+
+    transition: all 0.2s ease;
+
+    margin-right: 16px;
+}
+
+.mobile_menu_icon svg {
+    fill: var(--text-primary);
+}
+
+.mobile_menu_icon:hover {
+    background: var(--btn-secondary-bg-hover);
+}
+
+.mobile_menu_icon:active {
+    transform: translateY(1px);
+}
+
+@media (max-width: 700px) {
+    .mobile_menu {
+        display: initial;
+    }
+
+    .mobile_menu_icon {
+        display: flex;
     }
 }
 </style>

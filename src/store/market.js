@@ -5,11 +5,11 @@ export const useMarketStore = defineStore({
 
     state() {
         return {
-            isSymbolsLoaded: false,
+            isMarketsLoaded: false,
 
             events: [],
 
-            symbols: {
+            markets: {
                 "BTC-USD": {
                     events: [],
                     quotes: [],
@@ -29,21 +29,21 @@ export const useMarketStore = defineStore({
         }
     },
     actions: {
-        setSymbol({ target, symbol }) {
-            this.symbols[target] = { ...this.symbols[target], ...symbol }
+        setMarket({ target, symbol }) {
+            this.markets[target] = { ...this.markets[target], ...symbol }
         },
 
         setQuotes({ target, quotes }) {
-            this.symbols[target].quotes = [...quotes]
+            this.markets[target].quotes = [...quotes]
         },
         clearQuotes() {
-            Object.keys(this.symbols).forEach(symbol => {
-                this.symbols[symbol].quotes = []
+            Object.keys(this.markets).forEach(symbol => {
+                this.markets[symbol].quotes = []
             })
         },
 
         setHistoryPrice({ target, price }) {
-            this.symbols[target].historyPrice = price
+            this.markets[target].historyPrice = price
         },
 
         updEvent(newEvent) {
@@ -58,10 +58,10 @@ export const useMarketStore = defineStore({
         },
 
         updateQuotes({ target, quote }) {
-            if (quote.timestamp == this.symbols[target].quotes[0].timestamp)
+            if (quote.timestamp == this.markets[target].quotes[0].timestamp)
                 return
 
-            this.symbols[target].quotes.unshift(quote)
+            this.markets[target].quotes.unshift(quote)
         },
     },
 })

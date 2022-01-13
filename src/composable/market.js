@@ -5,13 +5,13 @@ import { gql } from "@/services/tools"
 /**
  * Services
  */
-import { supportedSymbols } from "@/services/config"
+import { supportedMarkets } from "@/services/config"
 
 /**
  * API
  */
-import { fetchSymbols } from "@/api/symbols"
-import { fetchQuotesBySymbol, fetchQuoteByTimestamp } from "@/api/quotes"
+import { fetchMarkets } from "@/api/markets"
+import { fetchQuotesByMarket, fetchQuoteByTimestamp } from "@/api/quotes"
 import { fetchUserPositionsForWithdraw } from "@/api/positions"
 
 /**
@@ -29,7 +29,7 @@ export const useMarket = () => {
     const marketStore = useMarketStore()
     const accountStore = useAccountStore()
 
-    const symbols = reactive([])
+    const markets = reactive([])
 
     const setupUser = async () => {
         /** All positions for withdraw */
@@ -113,17 +113,17 @@ export const useMarket = () => {
     }
 
     const setupMarket = async () => {
-        const allSymbols = await fetchSymbols()
+        const allMarkets = await fetchMarkets()
 
         /** only available */
-        symbols.value = allSymbols.filter(
-            symbol => supportedSymbols[symbol.symbol],
+        markets.value = allMarkets.filter(
+            market => supportedMarkets[market.symbol],
         )
 
-        symbols.value.forEach(symbol => {
-            marketStore.setSymbol({ target: symbol.symbol, symbol })
+        markets.value.forEach(market => {
+            marketStore.setMarket({ target: market.symbol, symbol: market })
         })
-        marketStore.isSymbolsLoaded = true
+        marketStore.isMarketsLoaded = true
 
         /** quotes */
         const prevWeekDt = DateTime.now()
@@ -131,20 +131,20 @@ export const useMarket = () => {
             .minus({ day: 7 })
             .toISO()
 
-        symbols.value.forEach(async symbol => {
-            const quotes = await fetchQuotesBySymbol({
-                id: symbol.id,
+        markets.value.forEach(async market => {
+            const quotes = await fetchQuotesByMarket({
+                id: market.id,
                 limit: 1000,
             })
-            marketStore.setQuotes({ target: symbol.symbol, quotes })
+            marketStore.setQuotes({ target: market.symbol, quotes })
 
             /** weekly diff */
             const historyQuote = await fetchQuoteByTimestamp({
-                id: symbol.id,
+                id: market.id,
                 ts: prevWeekDt,
             })
             marketStore.setHistoryPrice({
-                target: symbol.symbol,
+                target: market.symbol,
                 price: historyQuote[0] ? historyQuote[0].price : 0,
             })
 
@@ -157,7 +157,7 @@ export const useMarket = () => {
                 quotesWma: [
                     {
                         where: {
-                            currencyPairId: { _eq: symbol.id },
+                            currencyPairId: { _eq: market.id },
                         },
                         order_by: { timestamp: "desc" },
                         limit: 1,
@@ -172,7 +172,7 @@ export const useMarket = () => {
                 next: data => {
                     const quote = data.quotesWma[0]
                     marketStore.updateQuotes({
-                        target: symbol.symbol,
+                        target: market.symbol,
                         quote,
                     })
                 },
@@ -181,5 +181,5 @@ export const useMarket = () => {
         })
     }
 
-    return { setupMarket, setupUser, symbols }
+    return { setupMarket, setupUser, markets }
 }

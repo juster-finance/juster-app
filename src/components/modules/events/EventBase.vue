@@ -34,7 +34,6 @@ import {
  */
 import EventChart from "./EventChart"
 import EventPoolCard from "./EventPoolCard"
-import EventSymbolCard from "./EventSymbolCard"
 import EventDetailsCard from "./EventDetailsCard"
 import EventTargetsCard from "./EventTargetsCard"
 
@@ -66,7 +65,7 @@ import { useNotificationsStore } from "@/store/notifications"
  */
 import { numberWithSymbol, abbreviateNumber } from "@/services/utils/amounts"
 import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
-import { supportedSymbols } from "@/services/config"
+import { supportedMarkets } from "@/services/config"
 import { juster, gql } from "@/services/tools"
 
 export default defineComponent({
@@ -172,17 +171,17 @@ export default defineComponent({
 
         const price = computed(() => {
             return {
-                rate: marketStore.symbols[event.value?.currencyPair.symbol]
+                rate: marketStore.markets[event.value?.currencyPair.symbol]
                     ?.quotes[0]?.price,
                 integer: numberWithSymbol(
-                    marketStore.symbols[
+                    marketStore.markets[
                         event.value?.currencyPair.symbol
                     ]?.quotes[0]?.price
                         .toString()
                         .split(".")[0],
                     ",",
                 ),
-                fraction: marketStore.symbols[
+                fraction: marketStore.markets[
                     event.value?.currencyPair.symbol
                 ]?.quotes[0]?.price
                     .toString()
@@ -483,7 +482,7 @@ export default defineComponent({
         const { meta } = useMeta({
             title: `Event`,
             description:
-                "Available symbols for events, for providing liquidity and accepting bets from users",
+                "Available markets for events, for providing liquidity and accepting bets from users",
         })
 
         return {
@@ -525,7 +524,7 @@ export default defineComponent({
             getCurrencyIcon,
             abbreviateNumber,
             cloneDeep,
-            supportedSymbols,
+            supportedMarkets,
         }
     },
 
@@ -546,7 +545,6 @@ export default defineComponent({
         DepositCard,
         EventChart,
         EventPoolCard,
-        EventSymbolCard,
         EventDetailsCard,
         EventTargetsCard,
     },
@@ -626,7 +624,7 @@ export default defineComponent({
                                     />
                                 </div>
 
-                                {{ supportedSymbols[symbol].description }}
+                                {{ supportedMarkets[symbol].description }}
                             </h3>
 
                             <!-- Timing -->

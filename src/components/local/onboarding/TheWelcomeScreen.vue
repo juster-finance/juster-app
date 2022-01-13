@@ -85,7 +85,7 @@ export default defineComponent({
             },
         ])
         const currentStep = ref(0)
-        const selectStep = num => {
+        const selectStep = (num) => {
             if (num == currentStep.value) return
 
             const prevStep = currentStep.value
@@ -134,9 +134,7 @@ export default defineComponent({
 
             <img src="@/assets/logo.png" :class="$style.logo" />
 
-            <div :class="$style.title">
-                Hi, welcome to Juster ✌️
-            </div>
+            <div :class="$style.title">Hi, welcome to Juster ✌️</div>
 
             <div :class="$style.description">
                 Let us guide you through the main application pages and use case
@@ -144,9 +142,7 @@ export default defineComponent({
             </div>
 
             <div :class="$style.block">
-                <div :class="$style.block_title">
-                    Basic Workflow
-                </div>
+                <div :class="$style.block_title">Basic Workflow</div>
 
                 <div :class="$style.block_description">
                     A step-by-step tutorial explaining how to work with Juster
@@ -331,7 +327,7 @@ export default defineComponent({
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--app-background);
+    background: var(--app-bg);
     z-index: 2;
 
     display: flex;

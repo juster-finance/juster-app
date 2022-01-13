@@ -4,9 +4,8 @@ import { onBeforeUnmount, onMounted, ref } from "vue"
 /**
  * UI
  */
-import Spin from '@/components/ui/Spin'
+import Spin from "@/components/ui/Spin"
 import Tooltip from "@/components/ui/Tooltip"
-
 
 let timerInterval = null
 const timer = ref(0)
@@ -37,10 +36,13 @@ onBeforeUnmount(() => {
                     <Icon name="help" size="14" />
                 </div>
 
-                <template v-slot:content>Wait for the completion of the sent transaction to continue</template>
+                <template v-slot:content
+                    >Wait for the completion of the sent transaction to
+                    continue</template
+                >
             </Tooltip>
 
-            <div :class="$style.timer">{{ timer }}s</div>
+            <div :class="$style.timer">{{ timer }}<span>s</span></div>
         </div>
     </div>
 </template>
@@ -49,6 +51,11 @@ onBeforeUnmount(() => {
 .wrapper {
     display: flex;
     justify-content: center;
+
+    position: sticky;
+    top: 80px;
+    z-index: 1;
+    backdrop-filter: blur(5px);
 
     border-bottom: 1px solid var(--border);
 }
@@ -101,5 +108,15 @@ onBeforeUnmount(() => {
     line-height: 1;
     font-weight: 600;
     color: var(--text-secondary);
+}
+
+.timer span {
+    color: var(--text-tertiary);
+}
+
+@media (max-width: 700px) {
+    .base {
+        margin: 0 24px;
+    }
 }
 </style>

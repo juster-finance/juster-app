@@ -268,7 +268,7 @@ export default defineComponent({
                         </div>
                     </div>
                     <div :class="$style.stat">
-                        <div :class="$style.key">Favorite Symbol</div>
+                        <div :class="$style.key">Favorite Market</div>
                         <div :class="$style.value">TBD</div>
                     </div>
                 </div>

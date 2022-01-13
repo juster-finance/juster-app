@@ -5,7 +5,7 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { supportedSymbols } from "@/services/config"
+import { supportedMarkets } from "@/services/config"
 
 export default defineComponent({
     name: "EventPreview",
@@ -16,7 +16,7 @@ export default defineComponent({
 
         // eslint-disable-next-line vue/return-in-computed-property
         const name = computed(() => {
-            return supportedSymbols[event.value.currencyPair.symbol].description
+            return supportedMarkets[event.value.currencyPair.symbol].description
         })
 
         /** Event day */

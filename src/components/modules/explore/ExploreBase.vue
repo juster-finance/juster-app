@@ -8,7 +8,8 @@ import { cloneDeep } from "lodash"
  * Local
  */
 import RatingCard from "./RatingCard"
-import SymbolCard from "@/components/local/SymbolCard"
+import RatingCardLoading from "./RatingCardLoading"
+import MarketCard from "@/components/local/MarketCard"
 import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
 /**
@@ -37,6 +38,9 @@ export default defineComponent({
 
         const marketStore = useMarketStore()
 
+        /** Ranking */
+        const isTopProvidersLoading = ref(true)
+        const isTopBettorsLoading = ref(true)
         const topProviders = ref([])
         const topBettors = ref([])
 
@@ -58,9 +62,12 @@ export default defineComponent({
             topProviders.value = rawTopProviders.map((el) => {
                 return { address: el.address, value: el.totalProviderReward }
             })
+            isTopProvidersLoading.value = false
+
             topBettors.value = rawTopBettors.map((el) => {
                 return { address: el.address, value: el.totalBetsCount }
             })
+            isTopBettorsLoading.value = false
         })
         onBeforeUnmount(() => {
             marketStore.events = []
@@ -77,11 +84,20 @@ export default defineComponent({
             marketStore,
             topProviders,
             topBettors,
+            isTopBettorsLoading,
+            isTopProvidersLoading,
             handleViewTopEvents,
         }
     },
 
-    components: { RatingCard, SymbolCard, EventCard, EventCardLoading, Button },
+    components: {
+        RatingCard,
+        RatingCardLoading,
+        MarketCard,
+        EventCard,
+        EventCardLoading,
+        Button,
+    },
 })
 </script>
 
@@ -95,17 +111,17 @@ export default defineComponent({
             </metainfo>
 
             <!-- Top markets -->
-            <div v-if="marketStore.isSymbolsLoaded" :class="$style.block">
-                <h1>Top markets</h1>
+            <div v-if="marketStore.isMarketsLoaded" :class="$style.block">
+                <h1>Top Markets</h1>
                 <div :class="$style.description">
                     Currency pairs available for betting
                 </div>
 
                 <div :class="$style.items">
-                    <SymbolCard
-                        v-for="symbol in marketStore.symbols"
-                        :key="symbol.id"
-                        :symbol="symbol"
+                    <MarketCard
+                        v-for="market in marketStore.markets"
+                        :key="market.id"
+                        :market="market"
                     />
                 </div>
             </div>
@@ -118,10 +134,12 @@ export default defineComponent({
                 </div>
 
                 <RatingCard
+                    v-if="!isTopProvidersLoading"
                     :users="topProviders"
                     suffix="XTZ"
                     :class="$style.rating_card"
                 />
+                <RatingCardLoading v-else :class="$style.rating_card" />
             </div>
 
             <!-- Hot events -->
@@ -169,10 +187,12 @@ export default defineComponent({
                 </div>
 
                 <RatingCard
+                    v-if="!isTopBettorsLoading"
                     :users="topBettors"
                     suffix="Bets"
                     :class="$style.rating_card"
                 />
+                <RatingCardLoading v-else :class="$style.rating_card" />
             </div>
         </div>
     </transition>

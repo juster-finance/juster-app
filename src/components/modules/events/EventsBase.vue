@@ -38,7 +38,6 @@ import { EventCard, EventCardLoading } from "@/components/local/EventCard"
  * Store
  */
 import { useMarketStore } from "@/store/market"
-import { filter } from "d3-array"
 
 const defaultFilters = {
     symbols: [

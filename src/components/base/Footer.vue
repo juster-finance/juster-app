@@ -27,12 +27,9 @@ export default defineComponent({
                         <router-link to="/events" :class="$style.link"
                             >Events</router-link
                         >
-                        <router-link to="/symbols" :class="$style.link"
-                            >Symbols</router-link
+                        <router-link to="/markets" :class="$style.link"
+                            >Markets</router-link
                         >
-                        <!-- <router-link to="/rating" :class="$style.link"
-                            >Rating</router-link
-                        >-->
                     </div>
                     <div :class="$style.column">
                         <div :class="$style.name">Follow us</div>

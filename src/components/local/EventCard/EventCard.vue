@@ -44,7 +44,7 @@ import {
 } from "@/services/utils/global"
 import { juster } from "@/services/tools"
 import { abbreviateNumber } from "@/services/utils/amounts"
-import { supportedSymbols } from "@/services/config"
+import { supportedMarkets } from "@/services/config"
 
 /**
  * Composable
@@ -446,7 +446,7 @@ export default defineComponent({
             handleSwitch,
             getCurrencyIcon,
             abbreviateNumber,
-            supportedSymbols,
+            supportedMarkets,
         }
     },
 
@@ -581,8 +581,8 @@ export default defineComponent({
                 />
                 <Icon v-else name="sides" size="16" />
                 {{
-                    supportedSymbols[symbol] &&
-                    supportedSymbols[symbol].description
+                    supportedMarkets[symbol] &&
+                    supportedMarkets[symbol].description
                 }}
                 <span>price event</span>
             </div>

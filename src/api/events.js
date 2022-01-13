@@ -7,7 +7,7 @@ import {
     getAllEvents,
     getTopEvents,
     getEventById,
-    getEventsBySymbol,
+    getEventsByMarket,
     getEventParticipants,
 } from "@/graphql/queries/events"
 
@@ -26,10 +26,10 @@ export const fetchAllEvents = async () => {
     }
 }
 
-export const fetchEventsBySymbol = async ({ id, status }) => {
+export const fetchEventsByMarket = async ({ id, status }) => {
     try {
         const { data } = await apollo.query({
-            query: getEventsBySymbol,
+            query: getEventsByMarket,
             variables: { id, status },
         })
 
