@@ -30,9 +30,7 @@ export default defineComponent({
                     :class="$style.user_avatar"
                 >
                     <img
-                        :src="
-                            `https://services.tzkt.io/v1/avatars/${deposit.userId}`
-                        "
+                        :src="`https://services.tzkt.io/v1/avatars/${deposit.userId}`"
                 /></router-link>
             </div>
 
@@ -95,7 +93,7 @@ export default defineComponent({
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background: var(--opacity-10);
+    background: var(--opacity-05);
     fill: var(--icon);
 
     margin-right: 16px;

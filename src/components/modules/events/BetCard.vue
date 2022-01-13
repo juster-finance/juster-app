@@ -40,7 +40,7 @@ export default defineComponent({
             <div :class="[$style.icon, isWon && $style.won]">
                 <Icon
                     v-if="!pending"
-                    :name="isWon ? 'check' : 'bet'"
+                    :name="isWon ? 'checkcircle' : 'bet'"
                     size="16"
                 />
                 <Spin v-else size="16" />
@@ -119,14 +119,13 @@ export default defineComponent({
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background: var(--opacity-10);
+    background: var(--opacity-05);
     fill: var(--icon);
 
     margin-right: 16px;
 }
 
 .icon.won {
-    background: rgba(26, 161, 104, 0.2);
     fill: var(--green);
 }
 
