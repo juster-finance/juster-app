@@ -393,7 +393,7 @@ const pkh = computed(() => accountStore.pkh)
         </div>
     </div>
 
-    <ThePendingTransaction v-if="!accountStore.pendingTransaction.awaiting" />
+    <ThePendingTransaction v-if="accountStore.pendingTransaction.awaiting" />
 </template>
 
 <style module>
