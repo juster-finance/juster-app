@@ -128,7 +128,8 @@ export default defineComponent({
 
             <div :class="$style.hint">
                 By processing, you agree to <span>Terms of Use</span> and
-                <span>18+</span>
+                participation in gambling is prohibited for persons under the
+                age of <span>21+</span>
             </div>
         </div>
     </Modal>
@@ -263,9 +264,12 @@ export default defineComponent({
 
 .hint {
     font-size: 12px;
-    line-height: 1.4;
+    line-height: 1.6;
     font-weight: 600;
     color: var(--text-tertiary);
+    text-align: center;
+
+    max-width: 400px;
 
     margin-top: 16px;
 }
