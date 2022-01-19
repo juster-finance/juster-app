@@ -8,6 +8,7 @@ import { useMeta } from "vue-meta"
  */
 import Button from "@/components/ui/Button"
 import Tooltip from "@/components/ui/Tooltip"
+import Pagination from "@/components/ui/Pagination"
 
 /**
  * Local
@@ -55,7 +56,15 @@ export default defineComponent({
         )
 
         const events = ref([])
-        const positions = ref([])
+
+        /** pagination */
+        const selectedPageForEvents = ref(1)
+        const paginatedEvents = computed(() =>
+            events.value.slice(
+                (selectedPageForEvents.value - 1) * 6,
+                selectedPageForEvents.value * 6,
+            ),
+        )
 
         /** Balance */
         const getUserBalance = async () => {
@@ -75,10 +84,12 @@ export default defineComponent({
 
             isProfileLoaded.value = true
 
-            positions.value = await fetchAllUserPositions({
+            const positions = await fetchAllUserPositions({
                 address: address.value,
             })
-            events.value = positions.value.map((position) => position.event)
+            events.value = positions
+                .filter((position) => position.value)
+                .map((position) => position.event)
         }
 
         onMounted(() => {
@@ -149,12 +160,14 @@ export default defineComponent({
             balance,
             isMyProfile,
             address,
-            positions,
+            events,
+            selectedPageForEvents,
+            paginatedEvents,
             abbreviateNumber,
         }
     },
 
-    components: { Button, Tooltip, EventCard },
+    components: { Button, Tooltip, EventCard, Pagination },
 })
 </script>
 
@@ -281,7 +294,7 @@ export default defineComponent({
                             :href="`https://hangzhou2net.tzkt.io/${address}`"
                             target="_blank"
                         >
-                            <Button type="tertiary" size="small">
+                            <Button type="secondary" size="small">
                                 <Icon name="open" size="14" />View on TzKT
                             </Button>
                         </a>
@@ -290,16 +303,16 @@ export default defineComponent({
                     <div :class="$style.right">
                         <Button
                             @click="handleLogout"
-                            type="tertiary"
+                            type="secondary"
                             size="small"
-                            >Logout</Button
+                            ><Icon name="open" size="14" />Logout</Button
                         >
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="isMyProfile" :class="$style.submissions">
+        <div v-if="isMyProfile && events.length" :class="$style.submissions">
             <div :class="$style.top">
                 <div>
                     <h2>My submissions</h2>
@@ -309,23 +322,21 @@ export default defineComponent({
                 </div>
             </div>
 
-            <div v-if="positions.length" :class="$style.items">
+            <div :class="$style.items">
                 <EventCard
-                    v-for="position in positions.filter(
-                        (position) => position.value,
-                    )"
-                    :key="position.event.id"
-                    :event="position.event"
-                    :won="position.value !== 0 && !position.withdrawn"
-                    showSymbol
+                    v-for="event in paginatedEvents"
+                    :key="event.id"
+                    :event="event"
                 />
             </div>
-            <div v-else :class="$style.empty">
-                <div :class="$style.empty_title">You dont have submissions</div>
-                <div :class="$style.hint">
-                    Make bets on events to be displayed in your profile
-                </div>
-            </div>
+
+            <Pagination
+                v-if="events.length > 6"
+                v-model="selectedPageForEvents"
+                :total="events.length"
+                :limit="6"
+                :class="$style.pagination"
+            />
         </div>
     </div>
 
@@ -585,30 +596,6 @@ export default defineComponent({
     margin-top: 6px;
 }
 
-.empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    padding: 32px 0;
-}
-
-.empty_title {
-    font-size: 14px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-primary);
-
-    margin-bottom: 8px;
-}
-
-.hint {
-    font-size: 13px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-tertiary);
-}
-
 /* empty profile styles */
 
 .empty_profile {
@@ -654,6 +641,10 @@ export default defineComponent({
     align-items: center;
     gap: 16px;
 
+    margin-top: 24px;
+}
+
+.pagination {
     margin-top: 24px;
 }
 </style>

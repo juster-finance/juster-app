@@ -4,7 +4,6 @@ import { defineComponent, ref, toRefs, watch, computed, onMounted } from "vue"
 /**
  * Local
  */
-import EventPreview from "@/components/local/EventPreview"
 import UserCard from "@/components/local/UserCard"
 
 /**
@@ -72,7 +71,6 @@ export default defineComponent({
     components: {
         Modal,
         Button,
-        EventPreview,
         UserCard,
     },
 })
@@ -87,13 +85,6 @@ export default defineComponent({
         @onClose="$emit('onClose')"
     >
         <div :class="$style.title">Event participants</div>
-
-        <EventPreview
-            :event="event"
-            :countdown="countdownText"
-            :status="countdownStatus"
-            :class="$style.preview"
-        />
 
         <div :class="$style.subtitle">Creator</div>
         <div :class="$style.users">
@@ -144,10 +135,6 @@ export default defineComponent({
     color: var(--text-tertiary);
 
     margin-bottom: 12px;
-}
-
-.preview {
-    margin-bottom: 24px;
 }
 
 .users {

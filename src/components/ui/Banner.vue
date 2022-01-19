@@ -7,8 +7,8 @@ import { defineProps } from "vue"
 import Spin from "@/components/ui/Spin"
 
 const props = defineProps({
-    type: String,
-    size: String,
+    type: { type: String, default: "warning" },
+    size: { type: String, default: "small" },
     loading: Boolean,
 })
 </script>
@@ -48,17 +48,21 @@ const props = defineProps({
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 6px;
 
     font-size: 12px;
     line-height: 1.6;
     font-weight: 600;
 }
 
+.base span {
+    font-weight: 800;
+}
+
 .wrapper.info {
     fill: var(--text-secondary);
     color: var(--text-secondary);
-    background: var(--opacity-10);
+    background: var(--opacity-05);
 }
 
 .wrapper.warning {

@@ -7,10 +7,6 @@ export const getAllUserPositions = gql`
             value
             withdrawn
             event {
-                id
-                status
-                betsCloseTime
-                creatorId
                 currencyPair {
                     symbol
                 }
@@ -31,7 +27,10 @@ export const getAllUserPositions = gql`
                     createdTime
                     shares
                 }
-                winnerBets
+                id
+                status
+                betsCloseTime
+                creatorId
                 poolAboveEq
                 poolBelow
                 totalBetsAmount
@@ -42,6 +41,9 @@ export const getAllUserPositions = gql`
                 measurePeriod
                 closedOracleTime
                 createdTime
+                startRate
+                closedRate
+                winnerBets
                 targetDynamics
             }
         }

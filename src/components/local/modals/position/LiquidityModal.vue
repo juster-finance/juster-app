@@ -20,9 +20,10 @@ import { juster } from "@/services/tools"
 /**
  * Local
  */
-import EventPreview from "@/components/local/EventPreview"
 import SplittedPool from "@/components/local/SplittedPool"
 import SlippageSelector from "@/components/local/SlippageSelector"
+
+import PositionDirection from "./PositionDirection"
 
 /**
  * UI
@@ -33,6 +34,7 @@ import Stat from "@/components/ui/Stat"
 import Button from "@/components/ui/Button"
 import Spin from "@/components/ui/Spin"
 import Tooltip from "@/components/ui/Tooltip"
+import Banner from "@/components/ui/Banner"
 
 /**
  * Store
@@ -257,7 +259,8 @@ export default defineComponent({
         Button,
         Spin,
         Tooltip,
-        EventPreview,
+        Banner,
+        PositionDirection,
         SplittedPool,
         SlippageSelector,
     },
@@ -275,13 +278,11 @@ export default defineComponent({
         <template v-if="accountStore.isLoggined">
             <div :class="$style.title">Providing liquidity</div>
 
-            <EventPreview
+            <PositionDirection
                 :event="event"
+                :amount="amount"
                 :countdown="countdownText"
-                :status="countdownStatus"
-                type="liquidity"
-                @switch="$emit('switch')"
-                :class="$style.preview"
+                :class="$style.direction"
             />
 
             <Input
@@ -296,16 +297,6 @@ export default defineComponent({
                 @clearError="amount.error = ''"
                 :class="$style.amount_input"
             />
-
-            <div :class="$style.balance">
-                Available balance
-                <span
-                    @click="amount.value = Math.floor(accountStore.balance)"
-                    @dblclick="amount.value = accountStore.balance / 2"
-                    >{{ accountStore.balance }}</span
-                >
-                XTZ
-            </div>
 
             <SplittedPool
                 :event="event"
@@ -330,6 +321,10 @@ export default defineComponent({
                     {{ (1 + liquidityRatio.max).toFixed(2) }}
                 </Stat>
             </div>
+
+            <Banner type="warning" size="small" :class="$style.banner">
+                Note that the transaction takes place on the Hangzhounet
+            </Banner>
 
             <Button
                 @click="handleProvideLiquidity"
@@ -385,8 +380,8 @@ export default defineComponent({
     margin-bottom: 24px;
 }
 
-.preview {
-    margin-bottom: 24px;
+.direction {
+    margin-bottom: 32px;
 }
 
 .description {
@@ -399,21 +394,7 @@ export default defineComponent({
 }
 
 .amount_input {
-    margin-bottom: 8px;
-}
-
-.balance {
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-tertiary);
-
     margin-bottom: 24px;
-}
-
-.balance span {
-    cursor: pointer;
-    color: var(--text-secondary);
 }
 
 .pool {
@@ -448,5 +429,9 @@ export default defineComponent({
 
 .hint a {
     color: var(--text-blue);
+}
+
+.banner {
+    margin-bottom: 16px;
 }
 </style>

@@ -23,6 +23,11 @@ import { fetchQuoteByRange } from "@/api/quotes"
 import { prepareQuotesForD3 } from "@/services/utils/quotes"
 import { gql } from "@/services/tools"
 
+/**
+ * UI
+ */
+import Banner from "@/components/ui/Banner"
+
 export default defineComponent({
     name: "EventPriceChart",
     props: {
@@ -33,7 +38,7 @@ export default defineComponent({
         const { event } = toRefs(props)
         const classes = useCssModule()
 
-        const symbol = reactive({ quotes: [] })
+        const symbol = reactive({ quotes: [], isQuotesLoaded: false })
         const subscription = ref({})
 
         /**
@@ -49,6 +54,8 @@ export default defineComponent({
             const startRate = event.value.startRate * 100
             const closedRate = event.value.closedRate * 100
 
+            if (!symbol.quotes.length) return 0
+
             const diff =
                 event.value.status == "FINISHED"
                     ? closedRate - startRate
@@ -58,6 +65,8 @@ export default defineComponent({
         })
 
         const draw = () => {
+            if (!symbol.quotes.length) return
+
             const margin = { top: 20, right: 100, bottom: 30, left: 0 },
                 width = `100%`,
                 height = 194 - margin.top - margin.bottom
@@ -129,19 +138,19 @@ export default defineComponent({
 
             scale.x = d3
                 .scaleTime()
-                .domain(d3.extent(eventPeriod, d => d.date))
+                .domain(d3.extent(eventPeriod, (d) => d.date))
                 .range([0, canvas.node().getBoundingClientRect().width - 130])
             scale.y = d3
                 .scaleLinear()
                 .domain([
-                    d3.min(data, d => +d.value),
-                    d3.max(data, d => +d.value),
+                    d3.min(data, (d) => +d.value),
+                    d3.max(data, (d) => +d.value),
                 ])
                 .range([height, 0])
 
             /** Price line */
             startData.value = data.find(
-                d =>
+                (d) =>
                     new Date(d.date).getTime() ==
                     new Date(event.value.betsCloseTime).getTime(),
             )
@@ -165,7 +174,7 @@ export default defineComponent({
             /** Ticks */
             const format = d3.timeFormat("%H:%M")
 
-            scale.x.ticks(10).forEach(tick => {
+            scale.x.ticks(10).forEach((tick) => {
                 const tickG = canvas
                     .append("g")
                     .attr("transform", `translate(${scale.x(tick)}, 0)`)
@@ -184,10 +193,7 @@ export default defineComponent({
                 ) {
                     tickG.attr("class", classes.start)
 
-                    tickG
-                        .append("text")
-                        .attr("y", 190)
-                        .text("Start")
+                    tickG.append("text").attr("y", 190).text("Start")
                 } else if (
                     DateTime.fromJSDate(tick).ordinal ==
                         DateTime.fromISO(event.value.betsCloseTime).plus({
@@ -201,21 +207,15 @@ export default defineComponent({
                 ) {
                     tickG.attr("class", classes.start)
 
-                    tickG
-                        .append("text")
-                        .attr("y", 190)
-                        .text("Finish")
+                    tickG.append("text").attr("y", 190).text("Finish")
                 } else {
-                    tickG
-                        .append("text")
-                        .attr("y", 190)
-                        .text(format(tick))
+                    tickG.append("text").attr("y", 190).text(format(tick))
                 }
             })
 
             /** find Start & Finish tick for 24h */
             if (event.value.measurePeriod == 86400) {
-                scale.x.ticks(40).forEach(tick => {
+                scale.x.ticks(40).forEach((tick) => {
                     const tickG = canvas
                         .append("g")
                         .attr("transform", `translate(${scale.x(tick)}, 0)`)
@@ -234,10 +234,7 @@ export default defineComponent({
                     ) {
                         tickG.attr("class", classes.start)
 
-                        tickG
-                            .append("text")
-                            .attr("y", 190)
-                            .text("Start")
+                        tickG.append("text").attr("y", 190).text("Start")
                     } else if (
                         DateTime.fromJSDate(tick).ordinal ==
                             DateTime.fromISO(event.value.betsCloseTime).plus({
@@ -251,17 +248,14 @@ export default defineComponent({
                     ) {
                         tickG.attr("class", classes.start)
 
-                        tickG
-                            .append("text")
-                            .attr("y", 190)
-                            .text("Finish")
+                        tickG.append("text").attr("y", 190).text("Finish")
                     }
                 })
             }
 
             /** Draw chart Before start */
             const dataBeforeStart = data.filter(
-                quote =>
+                (quote) =>
                     DateTime.fromJSDate(quote.date).ts <
                     DateTime.fromISO(event.value.betsCloseTime).ts,
             )
@@ -275,13 +269,13 @@ export default defineComponent({
                     "d",
                     d3
                         .line()
-                        .x(d => scale.x(d.date))
-                        .y(d => scale.y(d.value)),
+                        .x((d) => scale.x(d.date))
+                        .y((d) => scale.y(d.value)),
                 )
 
             /** Draw chart After start */
             const dataAfterStart = data.filter(
-                quote =>
+                (quote) =>
                     DateTime.fromJSDate(quote.date).ts >=
                     DateTime.fromISO(event.value.betsCloseTime).ts,
             )
@@ -300,13 +294,13 @@ export default defineComponent({
                     "d",
                     d3
                         .line()
-                        .x(d => scale.x(d.date))
-                        .y(d => scale.y(d.value)),
+                        .x((d) => scale.x(d.date))
+                        .y((d) => scale.y(d.value)),
                 )
 
             /** Circle - Current Price */
             const currentData = data.find(
-                d =>
+                (d) =>
                     new Date(d.date).getTime() ==
                     new Date(symbol.quotes[0].timestamp).getTime(),
             )
@@ -358,7 +352,7 @@ export default defineComponent({
             const data = prepareQuotesForD3({ quotes: symbol.quotes })
 
             const exactDate = scale.x.invert(layerX)
-            const diffs = data.map(d => Math.abs(d.date - exactDate))
+            const diffs = data.map((d) => Math.abs(d.date - exactDate))
             const snapIndex = diffs.indexOf(Math.min(...diffs))
 
             selectedQuote.value = data[snapIndex]
@@ -432,6 +426,7 @@ export default defineComponent({
             })
 
             symbol.quotes = [...quotes]
+            symbol.isQuotesLoaded = true
 
             draw()
 
@@ -456,7 +451,7 @@ export default defineComponent({
                         ],
                     })
                     .subscribe({
-                        next: data => {
+                        next: (data) => {
                             const newQuote = data.quotesWma[0]
 
                             if (
@@ -478,9 +473,10 @@ export default defineComponent({
 
                             if (
                                 !symbol.quotes.some(
-                                    quote =>
+                                    (quote) =>
                                         quote.timestamp == newQuote.timestamp,
-                                )
+                                ) &&
+                                symbol.quotes.length
                             ) {
                                 symbol.quotes.unshift(newQuote)
 
@@ -493,12 +489,13 @@ export default defineComponent({
         })
         onBeforeUnmount(() => {
             if (
-                subscription.value.hasOwnProperty("closed") &&
+                subscription.value.hasOwnProperty("_state") &&
                 !subscription.value?.closed
             ) {
                 subscription.value.unsubscribe()
-                d3.select(`#chart > *`).remove()
             }
+
+            d3.select(`#chart > *`).remove()
         })
 
         return {
@@ -509,47 +506,59 @@ export default defineComponent({
             onMouseLeave,
         }
     },
+    components: { Banner },
 })
 </script>
 
 <template>
     <div :class="$style.wrapper">
-        <!-- Chart -->
-        <div
-            @mousemove="onMouseMove"
-            @mouseleave="onMouseLeave"
-            id="chart"
-            :class="$style.chart"
-        />
+        <Banner
+            v-if="symbol.isQuotesLoaded && !symbol.quotes.length"
+            type="info"
+            >Quotes for the event are not yet available, please wait for the
+            pre-launch period</Banner
+        >
 
-        <!-- Elements -->
-        <div v-if="scale.x" :class="$style.price_axis">
-            <!-- Current Price -->
+        <template v-else>
+            <!-- Chart -->
             <div
-                v-if="symbol.quotes[0]"
-                :class="$style.price_badge"
-                :style="{
-                    top: `${scale.y(symbol.quotes[0].price) + 20 - 25 / 2}px`,
-                }"
-            >
-                <div :class="$style.dot" />
-                $
-                {{ symbol.quotes[0].price.toFixed(2) }}
-            </div>
+                @mousemove="onMouseMove"
+                @mouseleave="onMouseLeave"
+                id="chart"
+                :class="$style.chart"
+            />
 
-            <!-- Start Price -->
-            <div
-                v-if="startData"
-                :class="$style.price_badge"
-                :style="{
-                    top: `${scale.y(startData.value) + 20 - 25 / 2}px`,
-                }"
-            >
-                <Icon name="go" size="10" />
-                $
-                {{ (event.startRate * 100).toFixed(2) }}
+            <!-- Elements -->
+            <div v-if="scale.x" :class="$style.price_axis">
+                <!-- Current Price -->
+                <div
+                    v-if="symbol.quotes[0]"
+                    :class="$style.price_badge"
+                    :style="{
+                        top: `${
+                            scale.y(symbol.quotes[0].price) + 20 - 25 / 2
+                        }px`,
+                    }"
+                >
+                    <div :class="$style.dot" />
+                    $
+                    {{ symbol.quotes[0].price.toFixed(2) }}
+                </div>
+
+                <!-- Start Price -->
+                <div
+                    v-if="startData"
+                    :class="$style.price_badge"
+                    :style="{
+                        top: `${scale.y(startData.value) + 20 - 25 / 2}px`,
+                    }"
+                >
+                    <Icon name="go" size="10" />
+                    $
+                    {{ (event.startRate * 100).toFixed(2) }}
+                </div>
             </div>
-        </div>
+        </template>
     </div>
 </template>
 

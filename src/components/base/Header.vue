@@ -195,7 +195,7 @@ const pkh = computed(() => accountStore.pkh)
 </script>
 
 <template>
-    <div :class="$style.wrapper">
+    <header :class="$style.wrapper">
         <CustomLoginModal
             :show="showCustomLoginModal"
             @onSelectCustomNode="handleSelectCustomNode"
@@ -391,14 +391,14 @@ const pkh = computed(() => accountStore.pkh)
                 </div>
             </div>
         </div>
-    </div>
+    </header>
 
     <ThePendingTransaction v-if="accountStore.pendingTransaction.awaiting" />
 </template>
 
 <style module>
 .wrapper {
-    position: sticky;
+    position: fixed;
     top: 0;
     width: 100%;
     min-height: 80px;

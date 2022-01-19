@@ -156,7 +156,7 @@ export default defineComponent({
                     <Button
                         @click="handleViewTopEvents"
                         size="small"
-                        type="tertiary"
+                        type="secondary"
                     >
                         <Icon name="collection" size="16" />View all
                     </Button>

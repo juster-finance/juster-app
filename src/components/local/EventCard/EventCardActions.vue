@@ -13,6 +13,7 @@ import Spin from "@/components/ui/Spin"
  * Store
  */
 import { useAccountStore } from "@/store/account"
+const accountStore = useAccountStore()
 
 const props = defineProps({
     event: Object,
@@ -32,7 +33,11 @@ const ratio = computed(() => {
     }
 })
 
-const accountStore = useAccountStore()
+const successfulWithdrawal = computed(() =>
+    accountStore.withdrawals.find(
+        (withdrawal) => withdrawal.event.id == props.event.id,
+    ),
+)
 </script>
 
 <template>
@@ -94,7 +99,8 @@ const accountStore = useAccountStore()
             block
         >
             <template v-if="won && !wonPosition"
-                >Successfully withdrawn</template
+                >Successfully withdrawn
+                {{ successfulWithdrawal.amount.toFixed(2) }} XTZ</template
             >
 
             <template v-else-if="accountStore.pendingTransaction.awaiting">

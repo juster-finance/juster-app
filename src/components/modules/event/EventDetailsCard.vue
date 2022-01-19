@@ -7,35 +7,27 @@ export default {
 
 <template>
     <div :class="$style.wrapper">
-        <div :class="$style.title">Details <Icon name="help" size="14" /></div>
+        <div :class="$style.title">Details</div>
 
         <div :class="$style.params">
             <div :class="$style.param">
-                <span>ID</span>
-                <span><Icon name="hash" size="12" />{{ event.id }}</span>
+                <span><Icon name="users" size="12" />Participants</span>
+                <span>{{ participants }}</span>
             </div>
             <div :class="$style.param">
-                <span>Participants</span>
-                <span><Icon name="users" size="12" />{{ participants }}</span>
-            </div>
-            <div :class="$style.param">
-                <span>Highest ratio</span>
-                <span><Icon name="close" size="12" />{{ highestRatio }}</span>
+                <span><Icon name="close" size="12" />Highest ratio</span>
+                <span>{{ highestRatio }}</span>
             </div>
         </div>
 
         <div :class="$style.params">
             <div :class="$style.subtitle">LIQUIDITY</div>
             <div :class="$style.param">
-                <span>Total provided</span>
-                <span
-                    ><Icon name="liquidity" size="12" />{{
-                        event.totalLiquidityProvided
-                    }}</span
-                >
+                <span><Icon name="liquidity" size="12" />Provided</span>
+                <span>{{ event.totalLiquidityProvided }}</span>
             </div>
             <div :class="$style.param">
-                <span>Liquidity percent</span>
+                <span><Icon name="bolt" size="12" />Percent</span>
                 <span>{{ event.liquidityPercent * 100 }}%</span>
             </div>
         </div>
@@ -86,24 +78,22 @@ export default {
 .param {
     display: flex;
     justify-content: space-between;
+
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 600;
 }
 
 .param span:nth-child(1) {
-    font-size: 14px;
-    line-height: 1;
-    font-weight: 500;
     color: var(--text-tertiary);
-}
 
-.param span:nth-child(2) {
     display: flex;
     align-items: center;
     gap: 6px;
-
-    font-size: 14px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-primary);
     fill: var(--opacity-40);
+}
+
+.param span:nth-child(2) {
+    color: var(--text-primary);
 }
 </style>

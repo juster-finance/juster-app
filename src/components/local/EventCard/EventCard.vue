@@ -29,8 +29,8 @@ import Tooltip from "@/components/ui/Tooltip"
  * Local
  */
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
-import LiquidityModal from "@/components/local/modals/LiquidityModal"
-import BetModal from "@/components/local/modals/BetModal"
+import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
+import BetModal from "@/components/local/modals/position/BetModal"
 
 import EventCardActions from "./EventCardActions"
 
@@ -99,7 +99,7 @@ export default defineComponent({
         const {
             status: startStatus,
             time: startTime,
-            stop: startStopCb,
+            stop: destroyStartCountdown,
         } = useCountdown(startDt)
 
         // eslint-disable-next-line vue/return-in-computed-property
@@ -128,7 +128,7 @@ export default defineComponent({
         const {
             status: finishStatus,
             time: finishTime,
-            stop: finishStopCb,
+            stop: destroyFinishCountdown,
         } = useCountdown(finishDt)
 
         // eslint-disable-next-line vue/return-in-computed-property
@@ -407,12 +407,15 @@ export default defineComponent({
         })
 
         onUnmounted(() => {
-            if (subscription.value.unsubscribe && !subscription.value?.closed) {
+            if (
+                subscription.value.hasOwnProperty("_state") &&
+                !subscription.value?.closed
+            ) {
                 subscription.value.unsubscribe()
             }
 
-            startStopCb()
-            finishStopCb()
+            destroyStartCountdown()
+            destroyFinishCountdown()
         })
 
         return {
@@ -629,7 +632,7 @@ export default defineComponent({
                     side="left"
                 >
                     <Badge color="yellow" :class="$style.main_badge">
-                        <Icon name="event_new" size="12" />Starting soon
+                        <Icon name="event_new" size="12" />Starting
                     </Badge>
 
                     <template v-slot:content
@@ -727,7 +730,7 @@ export default defineComponent({
                     :class="[$style.hint, $style.gray]"
                 >
                     <Icon name="time" size="14" />
-                    <div>Starting soon</div>
+                    <div>Starting</div>
                 </div>
 
                 <div
@@ -773,32 +776,45 @@ export default defineComponent({
                     <div><span>Start price</span> is not determined</div>
                 </div>
 
-                <div
+                <Tooltip
                     v-if="event.status !== 'FINISHED'"
-                    :class="[
-                        $style.hint,
-                        liquidityLevel == 'Low' && $style.red,
-                        liquidityLevel == 'Medium' && $style.yellow,
-                        liquidityLevel == 'High' && $style.green,
-                        liquidityLevel == 'Ultra' && $style.red,
-                    ]"
+                    side="left"
+                    textAlign="left"
                 >
-                    <Icon
-                        :name="
-                            (liquidityLevel == 'Low' && 'liquidity_low') ||
-                            (liquidityLevel == 'Medium' &&
-                                'liquidity_medium') ||
-                            (liquidityLevel == 'High' && 'liquidity_high') ||
-                            (liquidityLevel == 'Ultra' && 'liquidity_ultra')
-                        "
-                        size="14"
-                    />
+                    <div
+                        :class="[
+                            $style.hint,
+                            liquidityLevel == 'Low' && $style.red,
+                            liquidityLevel == 'Medium' && $style.yellow,
+                            liquidityLevel == 'High' && $style.green,
+                            liquidityLevel == 'Ultra' && $style.red,
+                        ]"
+                    >
+                        <Icon
+                            :name="
+                                (liquidityLevel == 'Low' && 'liquidity_low') ||
+                                (liquidityLevel == 'Medium' &&
+                                    'liquidity_medium') ||
+                                (liquidityLevel == 'High' &&
+                                    'liquidity_high') ||
+                                (liquidityLevel == 'Ultra' && 'liquidity_ultra')
+                            "
+                            size="14"
+                        />
 
-                    <div>
-                        <span>{{ liquidityLevel }}</span>
-                        liquidity
+                        <div>
+                            <span>{{ liquidityLevel }}</span>
+                            liquidity
+                        </div>
                     </div>
-                </div>
+
+                    <template #content>
+                        <span>Total Value Locked:</span>
+                        {{ event.totalValueLocked }} <br />
+                        <span>Total Liquidity Provided:</span>
+                        {{ event.totalLiquidityProvided }}
+                    </template>
+                </Tooltip>
 
                 <Tooltip v-if="event.winnerBets == 'BELOW'" side="left">
                     <div :class="[$style.hint, $style.red]">

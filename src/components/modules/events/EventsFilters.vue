@@ -698,6 +698,8 @@ export default defineComponent({
     border-radius: 6px;
     border: 1px solid var(--border);
     padding: 0 8px;
+
+    transition: border 0.2s ease;
 }
 
 .range_input svg {

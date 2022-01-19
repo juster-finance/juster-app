@@ -9,7 +9,7 @@ import Page from "@/components/base/Page"
 /**
  * Module
  */
-import EventBase from "@/components/modules/events/EventBase"
+import EventBase from "@/components/modules/event/EventBase"
 
 export default defineComponent({
     name: "EventPage",

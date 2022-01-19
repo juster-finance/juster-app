@@ -80,7 +80,9 @@ export default defineComponent({
             {{ bet.amount }}&nbsp;<span>XTZ</span>
         </div>
         <div v-else :class="$style.param">
-            {{ isWon ? bet.reward.toFixed(2) : 0 }}&nbsp;<span>XTZ</span>
+            {{
+                isWon ? `+${(bet.reward - bet.amount).toFixed(2)}` : 0
+            }}&nbsp;<span>XTZ</span>
         </div>
     </div>
 </template>
@@ -166,7 +168,7 @@ export default defineComponent({
 
     font-size: 14px;
     line-height: 1;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
 
     flex: 1;

@@ -13,6 +13,7 @@ import { supportedMarkets } from "@/services/config"
 import { fetchMarkets } from "@/api/markets"
 import { fetchQuotesByMarket, fetchQuoteByTimestamp } from "@/api/quotes"
 import { fetchUserPositionsForWithdraw } from "@/api/positions"
+import { fetchUserWithdrawals } from "@/api/users"
 
 /**
  * Store
@@ -40,6 +41,11 @@ export const useMarket = () => {
             accountStore.positionsForWithdrawal = userPositions
             accountStore.isPositionsLoading = false
         }
+
+        /** Withdrawals */
+        accountStore.withdrawals = await fetchUserWithdrawals({
+            address: accountStore.pkh,
+        })
 
         /**
          * Subscriptions

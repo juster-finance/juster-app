@@ -59,24 +59,24 @@ export default defineComponent({
                 .append("g")
                 .attr("transform", `translate(${margin.left},${margin.top})`)
 
-            const data = symbol.tvl.map(el => {
+            const data = symbol.tvl.map((el) => {
                 return { value: el.cumSum, date: new Date(el.createdTime) }
             })
 
             scale.x = d3
                 .scaleTime()
-                .domain(d3.extent(data, d => d.date))
+                .domain(d3.extent(data, (d) => d.date))
                 .range([0, canvas.node().getBoundingClientRect().width - 130])
             scale.y = d3
                 .scaleLinear()
                 .domain([
-                    d3.min(data, d => +d.value),
-                    d3.max(data, d => +d.value),
+                    d3.min(data, (d) => +d.value),
+                    d3.max(data, (d) => +d.value),
                 ])
                 .range([height, 0])
 
             /** Ticks */
-            scale.x.ticks(10).forEach(tick => {
+            scale.x.ticks(10).forEach((tick) => {
                 const format = d3.timeFormat("%H:%M")
 
                 const tickG = canvas
@@ -88,10 +88,7 @@ export default defineComponent({
                     .attr("y2", 170)
                     .attr("class", classes.time_line)
 
-                tickG
-                    .append("text")
-                    .attr("y", 190)
-                    .text(format(tick))
+                tickG.append("text").attr("y", 190).text(format(tick))
             })
 
             /** Chart */
@@ -105,8 +102,8 @@ export default defineComponent({
                     "d",
                     d3
                         .line()
-                        .x(d => scale.x(d.date))
-                        .y(d => scale.y(d.value)),
+                        .x((d) => scale.x(d.date))
+                        .y((d) => scale.y(d.value)),
                 )
         }
 
@@ -120,7 +117,7 @@ export default defineComponent({
             const data = prepareQuotesForD3({ quotes: symbol.quotes })
 
             const exactDate = scale.x.invert(layerX)
-            const diffs = data.map(d => Math.abs(d.date - exactDate))
+            const diffs = data.map((d) => Math.abs(d.date - exactDate))
             const snapIndex = diffs.indexOf(Math.min(...diffs))
 
             selectedQuote.value = data[snapIndex]
@@ -187,12 +184,12 @@ export default defineComponent({
                         ],
                     })
                     .subscribe({
-                        next: data => {
+                        next: (data) => {
                             const newQuote = data.quotesWma[0]
 
                             if (
                                 !symbol.quotes.some(
-                                    quote =>
+                                    (quote) =>
                                         quote.timestamp == newQuote.timestamp,
                                 )
                             ) {
@@ -206,7 +203,7 @@ export default defineComponent({
         })
         onBeforeUnmount(() => {
             if (
-                subscription.value.hasOwnProperty("closed") &&
+                subscription.value.hasOwnProperty("_state") &&
                 !subscription.value?.closed
             ) {
                 subscription.value.unsubscribe()

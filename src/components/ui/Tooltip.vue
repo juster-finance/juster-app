@@ -9,6 +9,7 @@ export default defineComponent({
         },
         side: { type: String },
         position: { type: String },
+        textAlign: { type: String, default: "center" },
     },
 
     setup(props) {
@@ -36,8 +37,9 @@ export default defineComponent({
                 styles.right = `${triggerRect.width + 8}px`
             } else {
                 if (!side.value) {
-                    styles.left = `-${tipRect.width / 2 -
-                        triggerRect.width / 2}px`
+                    styles.left = `-${
+                        tipRect.width / 2 - triggerRect.width / 2
+                    }px`
                 } else if (side.value == "left") {
                     styles.left = `0px`
                 } else if (side.value == "right") {
@@ -62,7 +64,7 @@ export default defineComponent({
         </div>
 
         <div ref="tip" :class="[$style.content]" :style="styles">
-            <div :class="$style.text">
+            <div :class="[$style.text]" :style="{ textAlign }">
                 <slot name="content" />
             </div>
         </div>
@@ -106,8 +108,6 @@ export default defineComponent({
     font-size: 12px;
     font-weight: 600;
     color: var(--text-primary);
-
-    text-align: center;
 }
 
 .text span {

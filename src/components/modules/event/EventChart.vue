@@ -4,8 +4,8 @@ import { defineComponent, ref } from "vue"
 /**
  * Charts
  */
-import EventPriceChart from "./charts/EventPriceChart"
-import EventTVLChart from "./charts/EventTVLChart"
+import EventPriceChart from "@/components/modules/events/charts/EventPriceChart"
+import EventTVLChart from "@/components/modules/events/charts/EventTVLChart"
 
 export default defineComponent({
     name: "EventChart",

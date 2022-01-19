@@ -184,15 +184,17 @@ html {
     display: flex;
     flex-direction: column;
 
-    overflow-y: auto;
     overflow-x: hidden;
 
-    height: 100vh;
+    /* overflow-y: auto; */
+    /* height: 100vh; */
 }
 
 .app_wrapper {
     display: flex;
     flex-direction: column;
+
+    padding-top: 80px;
 }
 
 :root {

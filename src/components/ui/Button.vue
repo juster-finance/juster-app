@@ -155,7 +155,6 @@ export default defineComponent({
 
 .wrapper.secondary {
     background: var(--btn-secondary-bg);
-    border: 1px solid var(--border);
     fill: var(--text-tertiary);
 }
 .wrapper.secondary:hover {
@@ -164,7 +163,6 @@ export default defineComponent({
 
 .wrapper.tertiary {
     background: transparent;
-    border: 1px solid var(--border);
     fill: var(--text-tertiary);
 }
 .wrapper.tertiary:hover {

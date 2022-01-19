@@ -136,7 +136,7 @@ export default defineComponent({
 
     font-size: 14px;
     line-height: 1;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
 
     flex: 1;
