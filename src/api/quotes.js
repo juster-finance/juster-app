@@ -4,13 +4,13 @@ import { apollo } from "@/apollo"
  * GQL: Queries
  */
 import {
-    getQuotesBySymbol,
+    getQuotesByMarket,
     getQuoteByTimestamp,
     getQuoteByRange,
     getTVLByEventId,
 } from "@/graphql/queries/quotes"
 
-export const fetchQuotesBySymbol = async ({ id, limit, offset }) => {
+export const fetchQuotesByMarket = async ({ id, limit, offset }) => {
     try {
         if (!id || !limit)
             throw new Error(
@@ -21,7 +21,7 @@ export const fetchQuotesBySymbol = async ({ id, limit, offset }) => {
         if (typeof limit !== "number") throw new Error("Limit must be a Number")
 
         const { data } = await apollo.query({
-            query: getQuotesBySymbol,
+            query: getQuotesByMarket,
             variables: { id, limit, offset },
         })
         return data.quotesWma

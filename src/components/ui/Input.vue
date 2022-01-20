@@ -141,7 +141,7 @@ export default {
 
     height: 44px;
     border-radius: 8px;
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     background: var(--input-background);
     padding: 0 14px;
     cursor: text;
@@ -150,12 +150,12 @@ export default {
 }
 
 .base:hover {
-    border: 1px solid var(--border-highlight);
+    border: 2px solid var(--border-highlight);
 }
 
 .base.focused {
-    /* box-shadow: 0px 0px 0px 2px rgba(75, 135, 244, 0.5); */
-    border: 1px solid rgba(75, 135, 244, 0.8);
+    box-shadow: rgb(75 135 244 / 15%) 0px 0px 0px 4px;
+    border: 2px solid rgba(75, 135, 244, 0.8);
 }
 
 .base.disabled {

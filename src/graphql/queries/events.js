@@ -92,8 +92,8 @@ export const getAllEvents = gql`
     }
 `
 
-export const getEventsBySymbol = gql`
-    query getEventsBySymbol($id: Int, $status: String) {
+export const getEventsByMarket = gql`
+    query getEventsByMarket($id: Int, $status: String) {
         event(
             where: { currencyPairId: { _eq: $id }, status: { _eq: $status } }
             order_by: { createdTime: desc }

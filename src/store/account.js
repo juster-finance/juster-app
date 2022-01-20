@@ -21,6 +21,8 @@ export const useAccountStore = defineStore({
             isPositionsLoading: false,
             positionsForWithdrawal: [],
 
+            withdrawals: [],
+
             showOnboarding: false,
         }
     },

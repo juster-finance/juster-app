@@ -51,16 +51,16 @@ const routes = [
     },
 
     {
-        path: "/symbols",
-        name: "Symbols",
+        path: "/markets",
+        name: "Markets",
         component: () =>
-            import(/* webpackChunkName: "symbols" */ "@/views/SymbolsPage"),
+            import(/* webpackChunkName: "markets" */ "@/views/MarketsPage"),
     },
     {
-        path: "/symbols/:name",
-        name: "Symbol",
+        path: "/markets/:name",
+        name: "Market",
         component: () =>
-            import(/* webpackChunkName: "symbol" */ "@/views/SymbolPage"),
+            import(/* webpackChunkName: "market" */ "@/views/MarketPage"),
     },
 
     {

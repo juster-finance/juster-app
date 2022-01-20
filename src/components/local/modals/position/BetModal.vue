@@ -21,9 +21,10 @@ import { juster } from "@/services/tools"
 /**
  * Local
  */
-import EventPreview from "@/components/local/EventPreview"
 import SplittedPool from "@/components/local/SplittedPool"
 import SlippageSelector from "@/components/local/SlippageSelector"
+
+import PositionDirection from "./PositionDirection"
 
 /**
  * UI
@@ -49,7 +50,11 @@ import { useCountdown } from "@/composable/date"
 
 export default defineComponent({
     name: "BetModal",
-    props: { show: Boolean, event: Object, preselectedSide: String },
+    props: {
+        show: Boolean,
+        event: Object,
+        preselectedSide: { type: String, default: "Rise" },
+    },
     emits: ["onClose"],
 
     setup(props, context) {
@@ -168,7 +173,7 @@ export default defineComponent({
 
                 document.removeEventListener("keydown", onKeydown)
 
-                showConfirmationHint.value = false
+                showHint.value = false
             } else {
                 side.value = preselectedSide.value
 
@@ -217,7 +222,7 @@ export default defineComponent({
             }
         })
 
-        const showConfirmationHint = ref(false)
+        const showHint = ref(false)
 
         const handleBet = () => {
             if (buttonState.value.disabled) return
@@ -229,7 +234,7 @@ export default defineComponent({
             sendingBet.value = true
 
             setTimeout(() => {
-                showConfirmationHint.value = true
+                showHint.value = true
             }, 5000)
 
             juster
@@ -256,7 +261,7 @@ export default defineComponent({
                         })
 
                     sendingBet.value = false
-                    showConfirmationHint.value = false
+                    showHint.value = false
 
                     /** slow notification to get attention */
                     setTimeout(() => {
@@ -288,8 +293,26 @@ export default defineComponent({
                     })
                 })
                 .catch((err) => {
+                    /** analytics */
+                    amplitude.logEvent("onError", {
+                        eventId: event.value.id,
+                        error: err.description,
+                    })
+
+                    /** slow notification to get attention */
+                    setTimeout(() => {
+                        notificationsStore.create({
+                            notification: {
+                                type: "warning",
+                                title: "Your bet was not accepted",
+                                description: err.description,
+                                autoDestroy: true,
+                            },
+                        })
+                    }, 700)
+
                     sendingBet.value = false
-                    showConfirmationHint.value = false
+                    showHint.value = false
                 })
         }
 
@@ -320,7 +343,7 @@ export default defineComponent({
             fee,
             rewardText,
             handleBet,
-            showConfirmationHint,
+            showHint,
             handleLogin,
             buttonState,
         }
@@ -335,9 +358,9 @@ export default defineComponent({
         Spin,
         Banner,
         Tooltip,
-        EventPreview,
         SplittedPool,
         SlippageSelector,
+        PositionDirection,
     },
 })
 </script>
@@ -353,66 +376,12 @@ export default defineComponent({
         <template v-if="accountStore.isLoggined">
             <div :class="$style.title">Place a bet</div>
 
-            <div :class="$style.direction">
-                <div :class="$style.from">
-                    <div :class="$style.crc">
-                        <img
-                            :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-                            :class="$style.image"
-                        />
-                    </div>
-
-                    <div :class="$style.meta">
-                        <div :class="$style.name">
-                            {{
-                                `${accountStore.pkh.slice(
-                                    0,
-                                    6,
-                                )}..${accountStore.pkh.slice(
-                                    accountStore.pkh.length - 4,
-                                    accountStore.pkh.length,
-                                )}`
-                            }}
-                        </div>
-                        <div :class="$style.subname">
-                            <span
-                                @click="
-                                    amount.value = Math.floor(
-                                        accountStore.balance,
-                                    )
-                                "
-                                @dblclick="
-                                    amount.value = accountStore.balance / 2
-                                "
-                                >{{ accountStore.balance }}</span
-                            >
-                            XTZ
-                        </div>
-                    </div>
-                </div>
-
-                <Icon
-                    name="arrowright"
-                    size="16"
-                    :class="$style.direction_icon"
-                />
-
-                <div :class="$style.to">
-                    <div :class="$style.crc">
-                        <Icon name="sides" size="16" />
-                    </div>
-
-                    <div :class="$style.meta">
-                        <div :class="$style.name">
-                            <Icon name="event_new" size="14" />Tezos / Dollar
-                        </div>
-                        <div :class="$style.subname">
-                            <span>{{ countdownText }}</span>
-                            , #{{ event.id }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <PositionDirection
+                :event="event"
+                :amount="amount"
+                :countdown="countdownText"
+                :class="$style.direction"
+            />
 
             <div :class="$style.subtitle">The price will</div>
 
@@ -477,7 +446,7 @@ export default defineComponent({
             />
 
             <Banner type="warning" size="small" :class="$style.banner">
-                Note that the transaction takes place on the Hangzhou Testnet
+                Note that the transaction takes place on the Hangzhounet
             </Banner>
 
             <Button
@@ -497,7 +466,7 @@ export default defineComponent({
                 {{ buttonState.text }}
             </Button>
 
-            <div v-if="showConfirmationHint" :class="$style.hint">
+            <div v-if="showHint" :class="$style.hint">
                 Confirmation not appearing?
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
@@ -505,6 +474,10 @@ export default defineComponent({
                     >Read about possible solutions</a
                 >
             </div>
+            <!-- <div :class="$style.hint">
+                If you did not cancel the last transaction, then
+                <a>reconnect</a> the wallet
+            </div> -->
         </template>
 
         <template v-else>
@@ -535,75 +508,7 @@ export default defineComponent({
 }
 
 .direction {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
     margin-bottom: 32px;
-}
-
-.from,
-.to {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.crc {
-    display: flex;
-    border-radius: 50%;
-    background: var(--btn-secondary-bg);
-    overflow: hidden;
-}
-
-.crc img {
-    width: 40px;
-    height: 40px;
-    padding: 4px;
-}
-
-.crc svg {
-    box-sizing: content-box;
-    padding: 12px;
-    fill: var(--text-secondary);
-}
-
-.meta {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.name {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    font-size: 14px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.name svg {
-    fill: var(--green);
-}
-
-.subname {
-    font-size: 13px;
-    line-height: 1.1;
-    font-weight: 500;
-    color: var(--text-tertiary);
-}
-
-.subname span {
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.direction_icon {
-    fill: var(--text-tertiary);
 }
 
 .description {

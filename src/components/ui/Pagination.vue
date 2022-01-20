@@ -162,7 +162,7 @@ export default defineComponent({
     <div :class="$style.wrapper">
         <Button
             @click="prevPage"
-            type="tertiary"
+            type="secondary"
             size="small"
             icon="arrow"
             :class="[$style.arrow_btn, $style.left]"
@@ -171,14 +171,14 @@ export default defineComponent({
 
         <Button
             @click="selectPage(1)"
-            type="tertiary"
+            type="secondary"
             size="small"
             :class="[$style.page, currentPage == 1 && $style.current]"
             >1</Button
         >
         <Button
             v-if="currentPage > 3 && isLimitExceeded"
-            type="tertiary"
+            type="secondary"
             size="small"
             disabled
             >...</Button
@@ -188,7 +188,7 @@ export default defineComponent({
             v-for="page in pages"
             :key="page"
             @click="selectPage(page)"
-            type="tertiary"
+            type="secondary"
             size="small"
             :class="[$style.page, currentPage == page && $style.current]"
             >{{ page }}</Button
@@ -197,14 +197,14 @@ export default defineComponent({
         <template v-if="isLimitExceeded">
             <Button
                 v-if="currentPage <= totalPages - 3"
-                type="tertiary"
+                type="secondary"
                 size="small"
                 disabled
                 >...</Button
             >
             <Button
                 @click="selectPage(totalPages)"
-                type="tertiary"
+                type="secondary"
                 size="small"
                 :class="[
                     $style.page,
@@ -216,7 +216,7 @@ export default defineComponent({
 
         <Button
             @click="nextPage"
-            type="tertiary"
+            type="secondary"
             size="small"
             icon="arrow"
             :class="[$style.arrow_btn, $style.right]"
@@ -227,7 +227,7 @@ export default defineComponent({
             <Tooltip position="bottom" side="right">
                 <Button
                     @click="handleJump"
-                    type="tertiary"
+                    type="secondary"
                     size="small"
                     :class="$style.jump_btn"
                 >

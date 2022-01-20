@@ -31,6 +31,7 @@ export const fetchUserWithdrawals = async ({ address }) => {
             query: getUserWithdrawals,
             variables: { address },
         })
+
         return data.withdrawal
     } catch (error) {
         console.error(

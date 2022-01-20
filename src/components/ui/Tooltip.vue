@@ -9,6 +9,7 @@ export default defineComponent({
         },
         side: { type: String },
         position: { type: String },
+        textAlign: { type: String, default: "center" },
     },
 
     setup(props) {
@@ -18,7 +19,10 @@ export default defineComponent({
         const tip = ref(null)
 
         const styles = reactive({
-            top: 0,
+            left: "initial",
+            right: "initial",
+            top: "initial",
+            bottom: "initial",
         })
 
         onMounted(() => {
@@ -26,18 +30,19 @@ export default defineComponent({
             const triggerRect = trigger.value.getBoundingClientRect()
 
             /** todo: refactor -> left / right / top / bottom + auto-positioning */
-            if (position.value == "bottom" && side.value == "left") {
+            if (position.value == "top") {
+                styles.bottom = `${triggerRect.height + 8}px`
+            } else if (position.value == "bottom" && side.value == "left") {
                 styles.left = 0
                 styles.top = `${triggerRect.height + 8}px`
             } else if (position.value == "bottom" && side.value == "left") {
                 styles.right = 0
                 styles.top = `${triggerRect.height + 8}px`
-            } else if (position.value == "left") {
-                styles.right = `${triggerRect.width + 8}px`
             } else {
                 if (!side.value) {
-                    styles.left = `-${tipRect.width / 2 -
-                        triggerRect.width / 2}px`
+                    styles.left = `-${
+                        tipRect.width / 2 - triggerRect.width / 2
+                    }px`
                 } else if (side.value == "left") {
                     styles.left = `0px`
                 } else if (side.value == "right") {
@@ -62,7 +67,7 @@ export default defineComponent({
         </div>
 
         <div ref="tip" :class="[$style.content]" :style="styles">
-            <div :class="$style.text">
+            <div :class="[$style.text]" :style="{ textAlign }">
                 <slot name="content" />
             </div>
         </div>
@@ -106,8 +111,6 @@ export default defineComponent({
     font-size: 12px;
     font-weight: 600;
     color: var(--text-primary);
-
-    text-align: center;
 }
 
 .text span {

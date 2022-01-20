@@ -5,7 +5,7 @@ import { useMeta } from "vue-meta"
 /**
  * Local
  */
-import Symbol from "./Symbol"
+import Market from "./Market"
 
 /**
  * UI
@@ -18,13 +18,13 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs"
 import { useMarketStore } from "@/store/market"
 
 export default defineComponent({
-    name: "SymbolsBase",
+    name: "MarketsBase",
 
     setup() {
         const breadcrumbs = reactive([
             {
-                name: "All symbols",
-                path: "/symbols",
+                name: "All Markets",
+                path: "/markets",
             },
         ])
 
@@ -33,21 +33,21 @@ export default defineComponent({
         const marketStore = useMarketStore()
 
         onMounted(() => {
-            amplitude.logEvent("onPage", { name: "Symbols" })
+            amplitude.logEvent("onPage", { name: "Markets" })
         })
 
         /** Meta */
         useMeta({
-            title: "All Symbols",
+            title: "All Markets",
             description:
-                "Available symbols for events, for providing liquidity and accepting bets from users",
+                "Available markets for events, for providing liquidity and accepting bets from users",
         })
 
         return { breadcrumbs, marketStore }
     },
 
     components: {
-        Symbol,
+        Market,
         Breadcrumbs,
     },
 })
@@ -63,17 +63,17 @@ export default defineComponent({
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-        <h1 :class="$style.title">Available symbols</h1>
+        <h1 :class="$style.title">Available Markets</h1>
         <div :class="$style.description">
             List of all currency pairs available for betting
         </div>
 
         <transition name="fade">
-            <div v-if="marketStore.isSymbolsLoaded" :class="$style.symbols">
-                <Symbol
-                    v-for="symbol in marketStore.symbols"
-                    :key="symbol.id"
-                    :symbol="symbol"
+            <div v-if="marketStore.isMarketsLoaded" :class="$style.markets">
+                <Market
+                    v-for="market in marketStore.markets"
+                    :key="market.id"
+                    :market="market"
                 />
             </div>
         </transition>
@@ -97,7 +97,7 @@ export default defineComponent({
     margin-top: 8px;
 }
 
-.symbols {
+.markets {
     display: flex;
     flex-direction: column;
     gap: 8px;

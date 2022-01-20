@@ -33,8 +33,8 @@ export default defineComponent({
             if (docsStore.article.title) {
                 let articleBySlug
 
-                Object.keys(docsStore.sections).forEach(section => {
-                    docsStore.sections[section].forEach(article => {
+                Object.keys(docsStore.sections).forEach((section) => {
+                    docsStore.sections[section].forEach((article) => {
                         if (article.slug.current == route.params.slug) {
                             articleBySlug = article
                         }
@@ -46,7 +46,7 @@ export default defineComponent({
                 /** Sections */
                 allSections
                     .sort((a, b) => a.position - b.position)
-                    .forEach(section => {
+                    .forEach((section) => {
                         if (!docsStore.sections[section.title]) {
                             docsStore.sections[section.title] = []
                         }
@@ -55,7 +55,7 @@ export default defineComponent({
                 /** Sort articles */
                 articles
                     .sort((a, b) => a.position - b.position)
-                    .forEach(article => {
+                    .forEach((article) => {
                         if (docsStore.sections[article.section.title]) {
                             docsStore.sections[article.section.title].push(
                                 article,
@@ -67,8 +67,8 @@ export default defineComponent({
                 if (route.params.slug) {
                     let articleBySlug
 
-                    Object.keys(docsStore.sections).forEach(section => {
-                        docsStore.sections[section].forEach(article => {
+                    Object.keys(docsStore.sections).forEach((section) => {
+                        docsStore.sections[section].forEach((article) => {
                             if (article.slug.current == route.params.slug) {
                                 articleBySlug = article
                             }
@@ -82,7 +82,7 @@ export default defineComponent({
             }
         })
 
-        const selectArticle = article => {
+        const selectArticle = (article) => {
             docsStore.article = article
 
             router.push(`/docs/${article.slug.current}`)
@@ -95,7 +95,7 @@ export default defineComponent({
 
             anchors.value =
                 content &&
-                content.map(anchor =>
+                content.map((anchor) =>
                     anchor.replaceAll("<h2>", "").replaceAll("</h2>", ""),
                 )
         }
@@ -168,7 +168,7 @@ export default defineComponent({
     width: 200px;
     padding-top: 50px;
     border-right: 1px solid var(--border);
-    background: var(--app-background);
+    background: var(--app-bg);
 }
 
 .section {

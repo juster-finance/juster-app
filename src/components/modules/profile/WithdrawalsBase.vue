@@ -195,7 +195,7 @@ export default defineComponent({
 
         onUnmounted(() => {
             if (
-                subToNewPositions.value.unsubscribe &&
+                subToNewPositions.value.hasOwnProperty("_state") &&
                 !subToNewPositions.value?.closed
             ) {
                 subToNewPositions.value.unsubscribe()

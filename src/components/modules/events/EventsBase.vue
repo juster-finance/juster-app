@@ -23,10 +23,10 @@ import { fetchAllEvents } from "@/api/events"
 /**
  * UI
  */
+import Pagination from "@/components/ui/Pagination"
 import Breadcrumbs from "@/components/ui/Breadcrumbs"
 import Banner from "@/components/ui/Banner"
 import Button from "@/components/ui/Button"
-import Pagination from "@/components/ui/Pagination"
 
 /**
  * Local
@@ -38,7 +38,6 @@ import { EventCard, EventCardLoading } from "@/components/local/EventCard"
  * Store
  */
 import { useMarketStore } from "@/store/market"
-import { filter } from "d3-array"
 
 const defaultFilters = {
     symbols: [
@@ -438,7 +437,7 @@ export default defineComponent({
         onUnmounted(() => {
             if (
                 subscription.value &&
-                subscription.value.unsubscribe &&
+                subscription.value.hasOwnProperty("_state") &&
                 !subscription.value?.closed
             ) {
                 subscription.value.unsubscribe()

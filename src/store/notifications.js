@@ -21,7 +21,7 @@ export const useNotificationsStore = defineStore({
             if (notification.autoDestroy) {
                 setTimeout(() => {
                     this.remove({ id })
-                }, 6000)
+                }, 8000)
             }
 
             this.notifications.push({ ...notification, id })

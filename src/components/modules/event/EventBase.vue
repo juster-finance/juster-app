@@ -23,6 +23,7 @@ import Label from "@/components/ui/Label"
 import Spin from "@/components/ui/Spin"
 import Tooltip from "@/components/ui/Tooltip"
 import Banner from "@/components/ui/Banner"
+import Pagination from "@/components/ui/Pagination"
 import {
     Dropdown,
     DropdownItem,
@@ -34,15 +35,16 @@ import {
  */
 import EventChart from "./EventChart"
 import EventPoolCard from "./EventPoolCard"
-import EventSymbolCard from "./EventSymbolCard"
 import EventDetailsCard from "./EventDetailsCard"
 import EventTargetsCard from "./EventTargetsCard"
+import EventPersonalStats from "./EventPersonalStats"
+
+import BetCard from "@/components/modules/events/BetCard"
+import DepositCard from "@/components/modules/events/DepositCard"
 
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
-import LiquidityModal from "@/components/local/modals/LiquidityModal"
-import BetModal from "@/components/local/modals/BetModal"
-import BetCard from "./BetCard"
-import DepositCard from "./DepositCard"
+import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
+import BetModal from "@/components/local/modals/position/BetModal"
 
 /**
  * Composable
@@ -66,7 +68,7 @@ import { useNotificationsStore } from "@/store/notifications"
  */
 import { numberWithSymbol, abbreviateNumber } from "@/services/utils/amounts"
 import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
-import { supportedSymbols } from "@/services/config"
+import { supportedMarkets } from "@/services/config"
 import { juster, gql } from "@/services/tools"
 
 export default defineComponent({
@@ -172,17 +174,17 @@ export default defineComponent({
 
         const price = computed(() => {
             return {
-                rate: marketStore.symbols[event.value?.currencyPair.symbol]
+                rate: marketStore.markets[event.value?.currencyPair.symbol]
                     ?.quotes[0]?.price,
                 integer: numberWithSymbol(
-                    marketStore.symbols[
+                    marketStore.markets[
                         event.value?.currencyPair.symbol
                     ]?.quotes[0]?.price
                         .toString()
                         .split(".")[0],
                     ",",
                 ),
-                fraction: marketStore.symbols[
+                fraction: marketStore.markets[
                     event.value?.currencyPair.symbol
                 ]?.quotes[0]?.price
                     .toString()
@@ -218,6 +220,16 @@ export default defineComponent({
             }
         })
 
+        /** for personal stats */
+        const userDeposits = computed(() =>
+            event.value.deposits.filter(
+                (deposit) => deposit.userId == accountStore.pkh,
+            ),
+        )
+        const userBets = computed(() =>
+            event.value.bets.filter((bet) => bet.userId == accountStore.pkh),
+        )
+
         const selectedPageForDeposits = ref(1)
         const paginatedDeposits = computed(() =>
             cloneDeep(filteredDeposits.value)
@@ -247,13 +259,6 @@ export default defineComponent({
         )
 
         const pendingBet = ref(null)
-        const userBets = computed(() =>
-            event.value
-                ? event.value.bets.filter(
-                      (bet) => bet.userId == accountStore.pkh,
-                  )
-                : [],
-        )
 
         const highestRatio = computed(() => {
             const hRatio = event.value?.poolBelow / event.value?.poolAboveEq + 1
@@ -483,7 +488,7 @@ export default defineComponent({
         const { meta } = useMeta({
             title: `Event`,
             description:
-                "Available symbols for events, for providing liquidity and accepting bets from users",
+                "Available markets for events, for providing liquidity and accepting bets from users",
         })
 
         return {
@@ -497,12 +502,13 @@ export default defineComponent({
             filters,
             filteredDeposits,
             filteredBets,
+            userDeposits,
+            userBets,
             selectedPageForDeposits,
             selectedPageForBets,
             paginatedDeposits,
             paginatedBets,
             pendingBet,
-            userBets,
             timeLeft,
             price,
             symbol,
@@ -525,7 +531,7 @@ export default defineComponent({
             getCurrencyIcon,
             abbreviateNumber,
             cloneDeep,
-            supportedSymbols,
+            supportedMarkets,
         }
     },
 
@@ -539,6 +545,7 @@ export default defineComponent({
         Dropdown,
         DropdownItem,
         DropdownDivider,
+        Pagination,
         ParticipantsModal,
         LiquidityModal,
         BetModal,
@@ -546,9 +553,9 @@ export default defineComponent({
         DepositCard,
         EventChart,
         EventPoolCard,
-        EventSymbolCard,
         EventDetailsCard,
         EventTargetsCard,
+        EventPersonalStats,
     },
 })
 </script>
@@ -587,10 +594,6 @@ export default defineComponent({
 
         <div v-if="event" :class="$style.container">
             <div :class="$style.base">
-                <Banner v-if="won" type="success" :class="$style.banner"
-                    >You have chosen the correct outcome of the event. You can
-                    withdraw your reward ✨</Banner
-                >
                 <Banner
                     v-if="event.status == 'CANCELED'"
                     type="error"
@@ -626,7 +629,7 @@ export default defineComponent({
                                     />
                                 </div>
 
-                                {{ supportedSymbols[symbol].description }}
+                                {{ supportedMarkets[symbol].description }}
                             </h3>
 
                             <!-- Timing -->
@@ -859,6 +862,24 @@ export default defineComponent({
                 />
 
                 <div :class="$style.block">
+                    <div :class="$style.title">Personal stats</div>
+                    <div :class="$style.description">
+                        Aggregated data for all your positions for this event
+                    </div>
+
+                    <Banner v-if="won" type="success" :class="$style.banner"
+                        ><span>You won.</span> One, several or all of your bets
+                        have been placed in the winning direction</Banner
+                    >
+
+                    <EventPersonalStats
+                        :event="event"
+                        :userDeposits="userDeposits"
+                        :userBets="userBets"
+                    />
+                </div>
+
+                <div :class="$style.block">
                     <div :class="$style.title">Bets</div>
                     <div :class="$style.description">
                         All the bets placed for this event
@@ -897,7 +918,7 @@ export default defineComponent({
                     </div>
 
                     <!-- todo: new component BetsTable -->
-                    <div v-if="filteredBets.length" :class="$style.bets_head">
+                    <div v-if="filteredBets.length" :class="$style.columns">
                         <span>TYPE</span>
                         <span>SIDE</span>
                         <span>AMOUNT</span>
@@ -925,29 +946,13 @@ export default defineComponent({
                             : `If you have placed a bet, but it is not in this list yet — please wait for the transaction confirmation`
                     }}</Banner>
 
-                    <div
+                    <Pagination
                         v-if="filteredBets.length > 3"
-                        :class="$style.block_bottom"
-                    >
-                        <div :class="$style.pagination">
-                            <Button
-                                @click="selectedPageForBets = index"
-                                :type="
-                                    selectedPageForBets == index
-                                        ? 'secondary'
-                                        : 'tertiary'
-                                "
-                                size="small"
-                                v-for="index in Math.round(
-                                    filteredBets.length / 3,
-                                )"
-                                :key="index"
-                                >{{ index }}</Button
-                            >
-                        </div>
-
-                        <span>{{ filteredBets.length }} bets</span>
-                    </div>
+                        v-model="selectedPageForBets"
+                        :total="filteredBets.length"
+                        :limit="3"
+                        :class="$style.pagination"
+                    />
                 </div>
 
                 <div :class="$style.block">
@@ -988,10 +993,7 @@ export default defineComponent({
                         </div>
                     </div>
 
-                    <div
-                        v-if="filteredDeposits.length"
-                        :class="$style.bets_head"
-                    >
+                    <div v-if="filteredDeposits.length" :class="$style.columns">
                         <span>TYPE</span>
                         <span>RISE</span>
                         <span>FALL</span>
@@ -1010,29 +1012,13 @@ export default defineComponent({
                             : `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
                     }}</Banner>
 
-                    <div
+                    <Pagination
                         v-if="filteredDeposits.length > 3"
-                        :class="$style.block_bottom"
-                    >
-                        <div :class="$style.pagination">
-                            <Button
-                                @click="selectedPageForDeposits = index"
-                                :type="
-                                    selectedPageForDeposits == index
-                                        ? 'secondary'
-                                        : 'tertiary'
-                                "
-                                size="small"
-                                v-for="index in Math.round(
-                                    filteredDeposits.length / 3,
-                                )"
-                                :key="index"
-                                >{{ index }}</Button
-                            >
-                        </div>
-
-                        <span>{{ filteredDeposits.length }} deposits</span>
-                    </div>
+                        v-model="selectedPageForDeposits"
+                        :total="filteredDeposits.length"
+                        :limit="3"
+                        :class="$style.pagination"
+                    />
                 </div>
             </div>
 
@@ -1048,14 +1034,15 @@ export default defineComponent({
                 />
 
                 <div :class="$style.additional_buttons">
-                    <Button type="tertiary" size="small" disabled
+                    <Button type="secondary" size="mini" disabled
                         ><Icon name="flag" size="16" />Report this event</Button
                     >
                     <router-link to="/docs/how-to-bet">
-                        <Button type="tertiary" size="small"
+                        <Button type="secondary" size="mini"
                             ><Icon name="book" size="16" /><span
-                                >Read how to</span
-                            >Make a bet</Button
+                                >Learn how to
+                            </span>
+                            Make a bet</Button
                         >
                     </router-link>
                 </div>
@@ -1227,7 +1214,7 @@ export default defineComponent({
     fill: var(--text-tertiary);
 }
 
-.bets_head {
+.columns {
     display: flex;
     align-items: center;
 
@@ -1235,26 +1222,26 @@ export default defineComponent({
     margin-bottom: 8px;
 }
 
-.bets_head span {
+.columns span {
     font-size: 12px;
     line-height: 1;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-tertiary);
 }
 
-.bets_head span:nth-child(1) {
+.columns span:nth-child(1) {
     flex: 2;
 }
 
-.bets_head span:nth-child(2) {
+.columns span:nth-child(2) {
     flex: 1;
 }
 
-.bets_head span:nth-child(3) {
+.columns span:nth-child(3) {
     flex: 1;
 }
 
-.bets_head span:nth-child(4) {
+.columns span:nth-child(4) {
     flex: 1;
 }
 
@@ -1267,6 +1254,8 @@ export default defineComponent({
 .additional_buttons {
     display: flex;
     justify-content: space-between;
+
+    margin-top: 8px;
 }
 
 .filters {
@@ -1319,24 +1308,7 @@ export default defineComponent({
     color: var(--text-primary);
 }
 
-.block_bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
 .pagination {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
     margin-top: 16px;
-}
-
-.block_bottom span {
-    font-size: 13px;
-    line-height: 1.1;
-    font-weight: 600;
-    color: var(--text-tertiary);
 }
 </style>

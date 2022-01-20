@@ -459,7 +459,7 @@ export default defineComponent({
         <div :class="$style.divider" />
 
         <div :class="$style.actions">
-            <Button @click="handleReset" type="tertiary" size="small"
+            <Button @click="handleReset" type="secondary" size="small"
                 >Reset filters</Button
             >
         </div>
@@ -698,6 +698,8 @@ export default defineComponent({
     border-radius: 6px;
     border: 1px solid var(--border);
     padding: 0 8px;
+
+    transition: border 0.2s ease;
 }
 
 .range_input svg {

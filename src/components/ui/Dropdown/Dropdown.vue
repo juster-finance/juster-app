@@ -10,11 +10,15 @@ export default defineComponent({
     name: "Dropdown",
     props: {
         forceOpen: Boolean,
+        side: {
+            type: String,
+            default: "bottom",
+        },
     },
     emits: ["onClose"],
 
     setup(props, context) {
-        const { forceOpen } = toRefs(props)
+        const { side, forceOpen } = toRefs(props)
 
         const trigger = ref(null)
         const dropdown = ref(null)
@@ -38,8 +42,9 @@ export default defineComponent({
         }
 
         const dropdownStyles = reactive({
-            top: 0,
+            top: `initial`,
             right: 0,
+            bottom: `initial`,
         })
 
         let removeOutside
@@ -54,7 +59,12 @@ export default defineComponent({
                 const triggerHeight =
                     trigger.value.getBoundingClientRect().height
 
-                dropdownStyles.top = `${triggerHeight + 6}px`
+                if (side.value == "bottom") {
+                    dropdownStyles.top = `${triggerHeight + 6}px`
+                }
+                if (side.value == "top") {
+                    dropdownStyles.bottom = `${triggerHeight + 6}px`
+                }
 
                 nextTick(() => {
                     removeOutside = useOnOutsidePress(dropdown, close)
@@ -109,7 +119,7 @@ export default defineComponent({
 .dropdown {
     position: absolute;
 
-    z-index: 10;
+    z-index: 1000;
     padding: 8px 0;
     border-radius: 8px;
     background: var(--dropdown-bg);

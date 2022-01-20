@@ -86,7 +86,7 @@ export default defineComponent({
         })
 
         /**
-         * Setup Market (Symbols & Quotes & Subscriptinos)
+         * Setup Market (Markets & Quotes & Subscriptinos)
          */
         setupMarket()
 
@@ -140,7 +140,7 @@ html {
     -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
 
-    background: var(--app-background);
+    background: var(--app-bg);
 }
 
 /* 
@@ -184,21 +184,23 @@ html {
     display: flex;
     flex-direction: column;
 
-    overflow-y: auto;
     overflow-x: hidden;
 
+    /* overflow-y: auto; */
     height: 100vh;
 }
 
 .app_wrapper {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+
+    height: 100%;
+    padding-top: 80px;
 }
 
 :root {
     /** Application */
-    --app-background: #1b1b1b;
+    --app-bg: #1b1b1b;
 
     /** General */
     --blue: #457ee8;
@@ -265,7 +267,7 @@ html {
 
 [theme="light"] {
     /** Application */
-    --app-background: #f6f6f6;
+    --app-bg: #f6f6f6;
 
     /** General */
     --blue: #276ef1;

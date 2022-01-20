@@ -7,14 +7,14 @@ import { defineComponent, ref, watch, nextTick } from "vue"
 import { useOnOutsidePress } from "@/composable/onOutside"
 
 export default defineComponent({
-    name: "SymbolStatus",
+    name: "MarketStatus",
 
     setup() {
         const popup = ref(null)
 
         const isOpen = ref(false)
 
-        const openPopup = e => {
+        const openPopup = (e) => {
             e.stopPropagation()
 
             isOpen.value = !isOpen.value
@@ -38,7 +38,7 @@ export default defineComponent({
             }
         })
 
-        const onKeydown = event => {
+        const onKeydown = (event) => {
             if (event.key == "Escape") close()
         }
 

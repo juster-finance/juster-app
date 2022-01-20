@@ -10,12 +10,12 @@ import Button from "@/components/ui/Button"
 /**
  * Local
  */
-import SymbolStatus from "./SymbolStatus"
+import MarketStatus from "./MarketStatus"
 
 /**
  * Services
  */
-import { supportedSymbols } from "@/services/config"
+import { supportedMarkets } from "@/services/config"
 import { prepareQuotesForD3 } from "@/services/utils/quotes"
 import { numberWithSymbol, calcChange } from "@/services/utils/amounts"
 
@@ -25,17 +25,17 @@ import { numberWithSymbol, calcChange } from "@/services/utils/amounts"
 import { useMarketStore } from "@/store/market"
 
 export default defineComponent({
-    name: "SymbolCard",
+    name: "MarketCard",
     props: {
-        symbol: Object,
+        market: Object,
     },
 
     setup(props) {
-        const { symbol } = toRefs(props)
+        const { market } = toRefs(props)
         const marketStore = useMarketStore()
 
         const quotes = computed(() => {
-            return marketStore.symbols[symbol.value.symbol]?.quotes
+            return marketStore.markets[market.value.symbol]?.quotes
         })
 
         const price = computed(() => {
@@ -52,11 +52,11 @@ export default defineComponent({
         const change = computed(() => {
             if (!quotes.value) return
 
-            if (!symbol.value.historyPrice) return { text: "Loading" }
+            if (!market.value.historyPrice) return { text: "Loading" }
 
             const { diff, percent, isIncreased } = calcChange(
                 quotes.value[0].price,
-                symbol.value.historyPrice,
+                market.value.historyPrice,
             )
             color.value = isIncreased ? "green" : "red"
 
@@ -74,10 +74,10 @@ export default defineComponent({
                 width = 500 - margin.left - margin.right,
                 height = 140 - margin.top - margin.bottom
 
-            d3.select(`#chart_${symbol.value.id} > *`).remove()
+            d3.select(`#chart_${market.value.id} > *`).remove()
 
             const svg = d3
-                .select(`#chart_${symbol.value.id}`)
+                .select(`#chart_${market.value.id}`)
                 .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -88,14 +88,14 @@ export default defineComponent({
 
             const x = d3
                 .scaleTime()
-                .domain(d3.extent(data, d => d.date))
+                .domain(d3.extent(data, (d) => d.date))
                 .range([0, width])
 
             const y = d3
                 .scaleLinear()
                 .domain([
-                    d3.min(data, d => +d.value),
-                    d3.max(data, d => +d.value),
+                    d3.min(data, (d) => +d.value),
+                    d3.max(data, (d) => +d.value),
                 ])
                 .range([height, 0])
 
@@ -111,8 +111,8 @@ export default defineComponent({
                     "d",
                     d3
                         .line()
-                        .x(d => x(d.date))
-                        .y(d => y(d.value)),
+                        .x((d) => x(d.date))
+                        .y((d) => y(d.value)),
                 )
 
             svg.append("circle")
@@ -168,22 +168,22 @@ export default defineComponent({
 
             const xScale = d3
                 .scaleTime()
-                .domain(d3.extent(data, d => d.date))
+                .domain(d3.extent(data, (d) => d.date))
                 .range([0, 500])
 
             const exactDate = xScale.invert(layerX)
-            const diffs = data.map(d => Math.abs(d.date - exactDate))
+            const diffs = data.map((d) => Math.abs(d.date - exactDate))
             const snapIndex = diffs.indexOf(Math.min(...diffs))
 
             selectedQuote.value = data[snapIndex]
 
             /** draw dots */
             const circles = d3.selectAll(
-                `#chart_${symbol.value.id} > svg > line`,
+                `#chart_${market.value.id} > svg > line`,
             )
             circles.remove()
 
-            const svg = d3.select(`#chart_${symbol.value.id} > svg`)
+            const svg = d3.select(`#chart_${market.value.id} > svg`)
             svg.append("line")
                 .attr("x1", layerX)
                 .attr("x2", layerX)
@@ -197,7 +197,7 @@ export default defineComponent({
             selectedQuote.value = {}
 
             const circles = d3.selectAll(
-                `#chart_${symbol.value.id} > svg > line`,
+                `#chart_${market.value.id} > svg > line`,
             )
             circles.remove()
         }
@@ -209,14 +209,14 @@ export default defineComponent({
             price,
             selectedPrice,
             numberWithSymbol,
-            supportedSymbols,
+            supportedMarkets,
             onMouseMove,
             onMouseLeave,
             selectedQuote,
         }
     },
 
-    components: { SymbolStatus, Button },
+    components: { MarketStatus, Button },
 })
 </script>
 
@@ -225,12 +225,12 @@ export default defineComponent({
         <div :class="$style.header">
             <div :class="$style.left">
                 <h3 :class="$style.symbol">
-                    {{ symbol.symbol }}
+                    {{ market.symbol }}
 
-                    <SymbolStatus />
+                    <MarketStatus />
                 </h3>
                 <div :class="$style.description">
-                    {{ supportedSymbols[symbol.symbol].description }}
+                    {{ supportedMarkets[market.symbol].description }}
                 </div>
             </div>
 
@@ -269,7 +269,7 @@ export default defineComponent({
 
         <div :class="$style.chart">
             <div
-                :id="`chart_${symbol.id}`"
+                :id="`chart_${market.id}`"
                 @mousemove="onMouseMove"
                 @mouseleave="onMouseLeave"
             />
@@ -278,9 +278,9 @@ export default defineComponent({
         <div :class="$style.bottom">
             <div :class="$style.actions">
                 <router-link
-                    :to="`/symbols/${symbol.symbol}`"
+                    :to="`/markets/${market.symbol}`"
                     :class="$style.action"
-                    >Open symbol</router-link
+                    >Open Market</router-link
                 >
             </div>
 

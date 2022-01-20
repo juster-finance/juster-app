@@ -77,37 +77,38 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
-        <div :class="$style.title">
-            Targets
-        </div>
+        <div :class="$style.title">Targets</div>
 
         <div :class="$style.targets">
             <div :class="$style.names">
-                <div :class="$style.name">
-                    Start price
-                </div>
+                <div :class="$style.name">Start price</div>
 
-                <div :class="$style.name">
-                    Close price
-                </div>
+                <div :class="$style.name">Close price</div>
             </div>
 
             <div :class="$style.items">
-                <div :class="$style.item">
-                    <div
-                        :class="[
-                            $style.target,
-                            event.status == 'NEW' && $style.tbd,
-                        ]"
-                    >
-                        <Icon name="go" size="14" />
-                        {{
-                            event.status == "NEW"
-                                ? "TBD"
-                                : `$ ${(event.startRate * 100).toFixed(2)}`
-                        }}
+                <Tooltip side="left">
+                    <div :class="$style.item">
+                        <div
+                            :class="[
+                                $style.target,
+                                event.status == 'NEW' && $style.tbd,
+                            ]"
+                        >
+                            <Icon name="go" size="14" />
+                            {{
+                                event.status == "NEW"
+                                    ? "TBD"
+                                    : `$ ${(event.startRate * 100).toFixed(2)}`
+                            }}
+                        </div>
                     </div>
-                </div>
+
+                    <template v-if="event.status == 'NEW'" #content
+                        >To Be Defined soon</template
+                    >
+                    <template v-else #content>Defined price</template>
+                </Tooltip>
 
                 <div :class="$style.line">
                     <div :class="$style.line_dot" />
@@ -129,14 +130,12 @@ export default defineComponent({
                             />
                             {{
                                 (event.status == "CANCELED" && "Not Defined") ||
-                                    (event.status == "FINISHED" &&
-                                        `$ ${(event.closedRate * 100).toFixed(
-                                            2,
-                                        )}`) ||
-                                    (["NEW", "STARTED"].includes(
-                                        event.status,
-                                    ) &&
-                                        "TBD")
+                                (event.status == "FINISHED" &&
+                                    `$ ${(event.closedRate * 100).toFixed(
+                                        2,
+                                    )}`) ||
+                                (["NEW", "STARTED"].includes(event.status) &&
+                                    "TBD")
                             }}
                         </div>
                     </div>
@@ -188,6 +187,7 @@ export default defineComponent({
             </div>
             <div v-else :class="$style.param">
                 <span>Winning Side</span>
+
                 <span v-if="price.rate">
                     <Icon
                         v-if="event.status == 'FINISHED'"
@@ -195,8 +195,11 @@ export default defineComponent({
                         size="16"
                         :class="wonSide == 'Up' ? $style.up : $style.down"
                     />
-                    {{ wonSide }}</span
-                ><Spin size="16" v-else />
+
+                    {{ wonSide }}
+                </span>
+
+                <Spin size="16" v-else />
             </div>
         </div>
 

@@ -63,6 +63,7 @@ const shorten = (address) => {
     background: var(--card-bg);
     border-radius: 8px;
     border: 1px solid var(--border);
+    min-height: 42px;
 
     padding: 8px 24px 8px 8px;
 }

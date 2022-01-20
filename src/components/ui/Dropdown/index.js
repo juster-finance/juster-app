@@ -1,5 +1,6 @@
-import Dropdown from './Dropdown'
-import DropdownItem from './DropdownItem'
-import DropdownDivider from './DropdownDivider'
+import Dropdown from "./Dropdown"
+import DropdownItem from "./DropdownItem"
+import DropdownTitle from "./DropdownTitle"
+import DropdownDivider from "./DropdownDivider"
 
-export { Dropdown, DropdownItem, DropdownDivider }
+export { Dropdown, DropdownItem, DropdownTitle, DropdownDivider }
