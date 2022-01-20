@@ -18,7 +18,7 @@ import { EventCard } from "@/components/local/EventCard"
 /**
  * Services
  */
-import { juster, fetchBalance } from "@/services/tools"
+import { fetchBalance } from "@/services/tools"
 import { toClipboard } from "@/services/utils/global"
 import { abbreviateNumber } from "@/services/utils/amounts"
 
@@ -108,26 +108,6 @@ export default defineComponent({
             getUserData()
         })
 
-        const handleLogout = () => {
-            juster._provider.client.clearActiveAccount().then(async () => {
-                await juster._provider.client.getActiveAccount()
-                accountStore.setPkh("")
-                router.push("/")
-
-                accountStore.positionsForWithdrawal = []
-
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "You are signed out",
-                        description:
-                            "To work with the application, you definitely need an account :)",
-                        autoDestroy: true,
-                    },
-                })
-            })
-        }
-
         const handleCopyAddress = () => {
             toClipboard(address.value)
 
@@ -151,7 +131,6 @@ export default defineComponent({
         })
 
         return {
-            handleLogout,
             handleCopyAddress,
             handleBack,
             isProfileLoaded,
@@ -300,14 +279,7 @@ export default defineComponent({
                         </a>
                     </div>
 
-                    <div :class="$style.right">
-                        <Button
-                            @click="handleLogout"
-                            type="secondary"
-                            size="small"
-                            ><Icon name="open" size="14" />Logout</Button
-                        >
-                    </div>
+                    <div :class="$style.right"></div>
                 </div>
             </div>
         </div>

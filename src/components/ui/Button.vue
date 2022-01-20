@@ -68,7 +68,7 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
 
     border-radius: 7px;
 
@@ -113,7 +113,7 @@ export default defineComponent({
 
 .wrapper.small {
     height: 32px;
-    padding: 0 10px 0 10px;
+    padding: 0 12px 0 12px;
     font-size: 13px;
     border-radius: 6px;
 }
@@ -154,11 +154,11 @@ export default defineComponent({
 }
 
 .wrapper.secondary {
-    background: var(--btn-secondary-bg);
+    background: var(--opacity-05);
     fill: var(--text-tertiary);
 }
 .wrapper.secondary:hover {
-    background: var(--btn-secondary-bg-hover);
+    background: var(--opacity-10);
 }
 
 .wrapper.tertiary {

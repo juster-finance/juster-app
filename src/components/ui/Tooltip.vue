@@ -19,7 +19,10 @@ export default defineComponent({
         const tip = ref(null)
 
         const styles = reactive({
-            top: 0,
+            left: "initial",
+            right: "initial",
+            top: "initial",
+            bottom: "initial",
         })
 
         onMounted(() => {
@@ -27,14 +30,14 @@ export default defineComponent({
             const triggerRect = trigger.value.getBoundingClientRect()
 
             /** todo: refactor -> left / right / top / bottom + auto-positioning */
-            if (position.value == "bottom" && side.value == "left") {
+            if (position.value == "top") {
+                styles.bottom = `${triggerRect.height + 8}px`
+            } else if (position.value == "bottom" && side.value == "left") {
                 styles.left = 0
                 styles.top = `${triggerRect.height + 8}px`
             } else if (position.value == "bottom" && side.value == "left") {
                 styles.right = 0
                 styles.top = `${triggerRect.height + 8}px`
-            } else if (position.value == "left") {
-                styles.right = `${triggerRect.width + 8}px`
             } else {
                 if (!side.value) {
                     styles.left = `-${

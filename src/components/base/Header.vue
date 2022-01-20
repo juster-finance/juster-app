@@ -58,14 +58,20 @@ const links = reactive([
     {
         name: "Explore",
         url: "/explore",
+        icon: "bolt",
+        isAvailable: true,
     },
     {
         name: "Events",
         url: "/events",
+        icon: "arrows",
+        isAvailable: true,
     },
     {
         name: "Markets",
         url: "/markets",
+        icon: "collection",
+        isAvailable: true,
     },
 ])
 
@@ -223,7 +229,7 @@ const pkh = computed(() => accountStore.pkh)
                         :class="$style.mobile_menu__link"
                     >
                         <div :class="$style.left">
-                            <Icon name="search" size="14" />
+                            <Icon name="bolt" size="14" />
                             <span>Explore</span>
                         </div>
 
@@ -233,7 +239,7 @@ const pkh = computed(() => accountStore.pkh)
                     </router-link>
                     <router-link to="/events" :class="$style.mobile_menu__link">
                         <div :class="$style.left">
-                            <Icon name="collection" size="14" />
+                            <Icon name="arrows" size="14" />
                             <span>Events</span>
                         </div>
 
@@ -246,7 +252,7 @@ const pkh = computed(() => accountStore.pkh)
                         :class="$style.mobile_menu__link"
                     >
                         <div :class="$style.left">
-                            <Icon name="chart" size="14" />
+                            <Icon name="collection" size="14" />
                             <span>Markets</span>
                         </div>
 
@@ -268,18 +274,24 @@ const pkh = computed(() => accountStore.pkh)
                 </div>
 
                 <router-link to="/explore" :class="$style.logo">
-                    <img src="@/assets/logo.png" />
+                    <Icon name="logo_symbol" size="24" />
+                    <img src="@/assets/icons/logo_text.svg" />
                 </router-link>
+            </div>
 
-                <div :class="$style.links">
-                    <router-link
-                        v-for="link in links"
-                        :key="link.name"
-                        :to="link.url"
-                        :class="isActive(link.url) && $style.active"
-                        >{{ link.name }}</router-link
-                    >
-                </div>
+            <div :class="$style.links">
+                <router-link
+                    v-for="link in links"
+                    :key="link.name"
+                    :to="link.url"
+                    :class="[
+                        $style.link,
+                        isActive(link.url) && $style.active,
+                        !link.isAvailable && $style.disabled,
+                    ]"
+                >
+                    <Icon :name="link.icon" size="12" />{{ link.name }}
+                </router-link>
             </div>
 
             <div :class="$style.right">
@@ -289,11 +301,11 @@ const pkh = computed(() => accountStore.pkh)
                             name="Warning"
                             size="16"
                             :class="$style.warning_icon"
-                        /><span>Hangzhounet</span>
+                        />
                     </div>
 
                     <template v-slot:content>
-                        Testnet in use.<br />
+                        Hangzhounet in use.<br />
                         <span
                             >Use <b>@tezos_faucet_bot</b> to top up your
                             balance</span
@@ -318,7 +330,7 @@ const pkh = computed(() => accountStore.pkh)
                     </div>
 
                     <Dropdown>
-                        <template v-slot:trigger>
+                        <template #trigger>
                             <div :class="$style.avatar">
                                 <img
                                     v-if="pkh"
@@ -327,7 +339,7 @@ const pkh = computed(() => accountStore.pkh)
                             </div>
                         </template>
 
-                        <template v-slot:dropdown>
+                        <template #dropdown>
                             <div
                                 @click="handleOpenProfile"
                                 :class="$style.profile"
@@ -436,37 +448,52 @@ const pkh = computed(() => accountStore.pkh)
 
 .logo {
     display: flex;
+    gap: 12px;
 }
 
-.logo img {
-    cursor: pointer;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: #fff;
-    padding: 4px;
+.logo svg {
+    fill: var(--text-primary);
 }
 
 .links {
-    margin-left: 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-.links a {
-    font-size: 14px;
+.link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    font-size: 13px;
+    line-height: 1.1;
     font-weight: 600;
     color: var(--text-tertiary);
+    fill: var(--text-tertiary);
 
-    margin-right: 32px;
+    padding: 0 12px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
 
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
-.links a.active {
+.link.active {
+    background: var(--opacity-05);
     color: var(--text-primary);
+    fill: var(--text-primary);
 }
 
-.links a:hover {
+.link.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.link:hover {
     color: var(--text-primary);
+    background: var(--opacity-05);
 }
 
 .buttons {
@@ -486,7 +513,7 @@ const pkh = computed(() => accountStore.pkh)
     background: rgba(255, 255, 255, 0.05);
     height: 28px;
 
-    padding: 0 8px 0 6px;
+    padding: 0 8px;
     margin-right: 16px;
 
     font-size: 12px;
@@ -622,6 +649,10 @@ const pkh = computed(() => accountStore.pkh)
 @media (max-width: 700px) {
     .base {
         margin: 0 24px;
+    }
+
+    .logo img {
+        display: none;
     }
 
     .links {

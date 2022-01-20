@@ -187,13 +187,14 @@ html {
     overflow-x: hidden;
 
     /* overflow-y: auto; */
-    /* height: 100vh; */
+    height: 100vh;
 }
 
 .app_wrapper {
     display: flex;
     flex-direction: column;
 
+    height: 100%;
     padding-top: 80px;
 }
 
