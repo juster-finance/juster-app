@@ -44,7 +44,7 @@ import {
 } from "@/services/utils/global"
 import { juster } from "@/services/tools"
 import { abbreviateNumber } from "@/services/utils/amounts"
-import { supportedMarkets } from "@/services/config"
+import { supportedMarkets, justerLiquidityAddress } from "@/services/config"
 
 /**
  * Composable
@@ -450,6 +450,7 @@ export default defineComponent({
             getCurrencyIcon,
             abbreviateNumber,
             supportedMarkets,
+            justerLiquidityAddress,
         }
     },
 
@@ -553,22 +554,30 @@ export default defineComponent({
 
                     <Tooltip position="bottom" side="right">
                         <div :class="$style.creator">
-                            <img
-                                :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
-                                :class="$style.user_avatar"
-                            />
-                            <Icon name="verified" size="14" />
+                            <template
+                                v-if="event.creatorId == justerLiquidityAddress"
+                            >
+                                <Icon name="logo_symbol" size="24" />
+                                <Icon
+                                    name="verified"
+                                    size="16"
+                                    :class="$style.verified_icon"
+                                />
+                            </template>
+
+                            <template v-else>
+                                <img
+                                    :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
+                                    :class="$style.user_avatar"
+                                />
+                            </template>
                         </div>
 
-                        <template v-slot:content>
-                            Creator:
-                            {{
-                                `${event.creatorId.slice(
-                                    0,
-                                    4,
-                                )}....${event.creatorId.slice(32, 36)}`
-                            }}
-                        </template>
+                        <template v-slot:content>{{
+                            event.creatorId == justerLiquidityAddress
+                                ? "Recurring event from Juster Team"
+                                : "Custom event from user"
+                        }}</template>
                     </Tooltip>
                 </div>
             </div>
@@ -685,14 +694,16 @@ export default defineComponent({
                     <Icon name="hot" size="12" />
                 </Badge>
 
-                <Tooltip position="bottom" side="left">
-                    <Badge color="gray" :class="$style.badge">
-                        <Icon name="infinite" size="12" />
+                <Tooltip
+                    v-if="event.creatorId !== justerLiquidityAddress"
+                    position="bottom"
+                    side="left"
+                >
+                    <Badge color="yellow" :class="$style.badge">
+                        <Icon name="bolt" size="12" /> Custom
                     </Badge>
 
-                    <template v-slot:content
-                        >Recurring, created automatically</template
-                    >
+                    <template v-slot:content>Custom event from user</template>
                 </Tooltip>
 
                 <Tooltip position="bottom" side="right">
@@ -923,7 +934,7 @@ export default defineComponent({
 .users {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
 }
 
 .participants {
@@ -931,16 +942,26 @@ export default defineComponent({
 }
 
 .creator {
-    display: flex;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    fill: var(--text-secondary);
+
+    width: 30px;
+    height: 30px;
 }
 
-.creator svg {
-    position: absolute;
-    top: -2px;
-    right: -2px;
+.verified_icon {
+    fill: var(--orange);
+    background: var(--card-bg);
+    border-radius: 50%;
 
-    fill: var(--yellow);
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    box-sizing: content-box;
 }
 
 .user_avatar {
@@ -949,8 +970,6 @@ export default defineComponent({
 
     background: rgb(35, 35, 35);
     border-radius: 50px;
-
-    margin-left: -12px;
 
     padding: 2px;
 }

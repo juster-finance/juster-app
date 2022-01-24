@@ -19,7 +19,7 @@ const props = defineProps({
         <Icon
             v-else
             :name="
-                (type == 'warning' && 'help') ||
+                (type == 'warning' && 'warning') ||
                 (type == 'success' && 'checkcircle') ||
                 (type == 'error' && 'close') ||
                 (type == 'info' && 'help')

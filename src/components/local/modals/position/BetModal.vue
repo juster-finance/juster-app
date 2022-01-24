@@ -383,6 +383,10 @@ export default defineComponent({
                 :class="$style.direction"
             />
 
+            <Banner type="warning" size="small" :class="$style.banner">
+                This event is Custom, its behavior may depend on the parameters
+            </Banner>
+
             <div :class="$style.subtitle">The price will</div>
 
             <div :class="$style.tabs">
@@ -445,7 +449,7 @@ export default defineComponent({
                 :class="$style.slippage_block"
             />
 
-            <Banner type="warning" size="small" :class="$style.banner">
+            <Banner type="info" size="small" :class="$style.banner">
                 Note that the transaction takes place on the Hangzhounet
             </Banner>
 

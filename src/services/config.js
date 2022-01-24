@@ -25,3 +25,5 @@ export const rpcNodes = [
         url: "https://granadanet.smartpy.io",
     },
 ]
+
+export const justerLiquidityAddress = "tz1U2zsFffCTcTvWddAfHfc2gUvEHepaVT1L"
