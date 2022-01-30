@@ -1,5 +1,5 @@
-<script>
-import { computed, defineComponent, toRefs } from "vue"
+<script setup>
+import { computed } from "vue"
 import { DateTime } from "luxon"
 
 /**
@@ -11,27 +11,18 @@ import Spin from "@/components/ui/Spin"
  * Store
  */
 import { useAccountStore } from "@/store/account"
+const accountStore = useAccountStore()
 
-export default defineComponent({
-    name: "BetCard",
-    props: { bet: Object, pending: Boolean, event: Object },
+/**
+ * Services
+ */
+import { abbreviateNumber, numberWithSymbol } from "@/services/utils/amounts"
 
-    setup(props) {
-        const { bet, event } = toRefs(props)
+const props = defineProps({ bet: Object, pending: Boolean, event: Object })
 
-        const accountStore = useAccountStore()
+const side = computed(() => (props.bet.side == "ABOVE_EQ" ? "Up" : "Down"))
 
-        const side = computed(() =>
-            bet.value.side == "ABOVE_EQ" ? "Up" : "Down",
-        )
-
-        const isWon = computed(() => bet.value.side == event.value?.winnerBets)
-
-        return { isWon, side, DateTime, pkh: accountStore.pkh }
-    },
-
-    components: { Spin },
-})
+const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 </script>
 
 <template>
@@ -46,12 +37,12 @@ export default defineComponent({
                 <Spin v-else size="16" />
 
                 <router-link
-                    :to="`/profile/${bet.userId}`"
+                    :to="`/profile/${pending ? accountStore.pkh : bet.userId}`"
                     :class="$style.user_avatar"
                 >
                     <img
                         :src="`https://services.tzkt.io/v1/avatars/${
-                            pending ? pkh : bet.userId
+                            pending ? accountStore.pkh : bet.userId
                         }`"
                     />
                 </router-link>
@@ -59,7 +50,7 @@ export default defineComponent({
 
             <div :class="$style.info">
                 <div v-if="!pending" :class="$style.title">
-                    {{ pkh == bet.userId ? "My" : "" }} Bet
+                    {{ accountStore.pkh == bet.userId ? "My" : "" }} Bet
                 </div>
                 <div v-else :class="$style.title">Pending Bet</div>
 
@@ -74,14 +65,25 @@ export default defineComponent({
             <Icon name="higher" size="12" />{{ side }}
         </div>
 
-        <div :class="$style.param">{{ bet.amount }}&nbsp;<span>XTZ</span></div>
+        <div :class="$style.param">
+            {{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;<span
+                >XTZ</span
+            >
+        </div>
 
         <div v-if="event && event.status == 'CANCELED'" :class="$style.param">
-            {{ bet.amount }}&nbsp;<span>XTZ</span>
+            {{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;<span
+                >XTZ</span
+            >
         </div>
         <div v-else :class="$style.param">
             {{
-                isWon ? `+${(bet.reward - bet.amount).toFixed(2)}` : 0
+                isWon
+                    ? `+${numberWithSymbol(
+                          (bet.reward - bet.amount).toFixed(2),
+                          ",",
+                      )}`
+                    : 0
             }}&nbsp;<span>XTZ</span>
         </div>
     </div>

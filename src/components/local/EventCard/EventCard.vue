@@ -541,7 +541,10 @@ export default defineComponent({
                                 )"
                                 :key="participantAvatar"
                                 :src="`https://services.tzkt.io/v1/avatars/${participantAvatar}`"
-                                :class="$style.user_avatar"
+                                :class="[
+                                    $style.user_avatar,
+                                    $style.participant,
+                                ]"
                             />
                         </div>
 
@@ -939,6 +942,10 @@ export default defineComponent({
 
 .participants {
     display: flex;
+}
+
+.participant {
+    margin-left: -12px;
 }
 
 .creator {

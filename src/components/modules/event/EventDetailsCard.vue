@@ -1,8 +1,15 @@
-<script>
-export default {
-    name: "EventDetailsCard",
-    props: { event: Object, participants: Number, highestRatio: String },
-}
+<script setup>
+/**
+ * Services
+ */
+import { abbreviateNumber } from "@/services/utils/amounts"
+import { justerLiquidityAddress } from "@/services/config"
+
+const props = defineProps({
+    event: Object,
+    participants: Number,
+    highestRatio: String,
+})
 </script>
 
 <template>
@@ -11,12 +18,40 @@ export default {
 
         <div :class="$style.params">
             <div :class="$style.param">
+                <span><Icon name="user" size="12" />Creator</span>
+
+                <router-link
+                    v-if="justerLiquidityAddress == event.creatorId"
+                    :to="`/profile/${event.creatorId}`"
+                >
+                    <Icon name="logo_symbol" size="14" />{{ "Juster" }}
+                </router-link>
+                <router-link v-else :to="`/profile/${event.creatorId}`">
+                    <img
+                        :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
+                        :class="$style.user_avatar"
+                    />{{
+                        `${event.creatorId.slice(
+                            0,
+                            4,
+                        )}..${event.creatorId.slice(
+                            event.creatorId.length - 4,
+                            event.creatorId.length,
+                        )}`
+                    }}
+                </router-link>
+            </div>
+            <div :class="$style.param">
                 <span><Icon name="users" size="12" />Participants</span>
                 <span>{{ participants }}</span>
             </div>
             <div :class="$style.param">
                 <span><Icon name="close" size="12" />Highest ratio</span>
                 <span>{{ highestRatio }}</span>
+            </div>
+            <div :class="$style.param">
+                <span><Icon name="wallet" size="12" />Total Value</span>
+                <span>{{ abbreviateNumber(event.totalValueLocked) }}</span>
             </div>
         </div>
 
@@ -94,6 +129,36 @@ export default {
 }
 
 .param span:nth-child(2) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
     color: var(--text-primary);
+}
+
+.param span:nth-child(2) svg {
+    fill: var(--text-tertiary);
+}
+
+.param span:nth-child(2) img {
+    width: 14px;
+    height: 14px;
+}
+
+.param a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: var(--text-primary);
+}
+
+.param a svg {
+    fill: var(--text-tertiary);
+}
+
+.param a img {
+    width: 14px;
+    height: 14px;
 }
 </style>

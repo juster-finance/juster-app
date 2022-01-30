@@ -1,6 +1,5 @@
-<script>
+<script setup>
 import {
-    defineComponent,
     ref,
     reactive,
     watch,
@@ -19,10 +18,10 @@ import { cloneDeep } from "lodash"
  */
 import Breadcrumbs from "@/components/ui/Breadcrumbs"
 import Button from "@/components/ui/Button"
-import Label from "@/components/ui/Label"
 import Spin from "@/components/ui/Spin"
 import Tooltip from "@/components/ui/Tooltip"
 import Banner from "@/components/ui/Banner"
+import Badge from "@/components/ui/Badge"
 import Pagination from "@/components/ui/Pagination"
 import {
     Dropdown,
@@ -57,506 +56,418 @@ import { useCountdown } from "@/composable/date"
 import { fetchEventById, fetchEventParticipants } from "@/api/events"
 
 /**
+ * Services
+ */
+import { numberWithSymbol } from "@/services/utils/amounts"
+import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
+import { juster, gql } from "@/services/tools"
+import { supportedMarkets, justerLiquidityAddress } from "@/services/config"
+
+/**
  * Store
  */
 import { useMarketStore } from "@/store/market"
 import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
+const marketStore = useMarketStore()
+const accountStore = useAccountStore()
+const notificationsStore = useNotificationsStore()
+
+const amplitude = inject("amplitude")
+
+const router = useRouter()
+
+const breadcrumbs = reactive([
+    {
+        name: "All events",
+        path: "/events",
+    },
+])
 
 /**
- * Services
+ * Modals
  */
-import { numberWithSymbol, abbreviateNumber } from "@/services/utils/amounts"
-import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
-import { supportedMarkets } from "@/services/config"
-import { juster, gql } from "@/services/tools"
+const showBetModal = ref(false)
+const showLiquidityModal = ref(false)
+const showParticipantsModal = ref(false)
 
-export default defineComponent({
-    name: "EventBase",
+/**
+ * Switch between Liquidity <-> Bet
+ */
+const handleSwitch = () => {
+    showBetModal.value = !showBetModal.value
+    showLiquidityModal.value = !showLiquidityModal.value
+}
 
-    setup() {
-        const amplitude = inject("amplitude")
+/**
+ * Filters
+ */
+const filters = reactive({
+    bets: "all",
+    liquidity: "all",
+})
+const handleSelectFilter = ({ target, value }) => {
+    filters[target] = value
+}
 
-        const router = useRouter()
+/**
+ * Local Event
+ */
+const event = ref(null)
+const getEvent = async () => {
+    if (event.value) return
 
-        const breadcrumbs = reactive([
-            {
-                name: "All events",
-                path: "/events",
+    const { id: eventId } = router.currentRoute.value.params
+    event.value = await fetchEventById({ id: eventId })
+
+    /** breadcrumbs */
+    breadcrumbs.push({
+        name: `Event #${event.value.id}`,
+        path: `/events/${event.value.id}`,
+    })
+}
+
+const won = computed(() => {
+    if (!event.value) return
+
+    return !!event.value.bets
+        .filter((bet) => bet.userId == accountStore.pkh)
+        .filter((bet) => bet.side == event.value.winnerBets).length
+})
+
+const canWithdraw = computed(() => {
+    return accountStore.positionsForWithdrawal.some(
+        (position) => position.event.id == event.value.id,
+    )
+})
+
+/** Countdown setup */
+const eventStartTime = computed(() =>
+    new Date(event.value?.betsCloseTime).getTime(),
+)
+const { status: startStatus, time, stop } = useCountdown(eventStartTime)
+
+// eslint-disable-next-line vue/return-in-computed-property
+const timeLeft = computed(() => {
+    if (time.h > 0) {
+        return { num: time.h, suffix: time.h > 1 ? "hrs" : "hr" }
+    }
+    if (time.h == 0) {
+        return { num: time.m, suffix: time.m > 1 ? "mins" : "min" }
+    }
+})
+
+const symbol = computed(() => event.value.currencyPair.symbol)
+
+const price = computed(() => {
+    return {
+        rate: marketStore.markets[event.value?.currencyPair.symbol]?.quotes[0]
+            ?.price,
+        integer: numberWithSymbol(
+            marketStore.markets[
+                event.value?.currencyPair.symbol
+            ]?.quotes[0]?.price
+                .toString()
+                .split(".")[0],
+            ",",
+        ),
+        fraction: marketStore.markets[
+            event.value?.currencyPair.symbol
+        ]?.quotes[0]?.price
+            .toString()
+            .split(".")[1],
+    }
+})
+
+const participants = ref(0)
+
+/**
+ * Liquidity (Deposits) & Bets
+ */
+const filteredDeposits = computed(() => {
+    if (!event.value) return []
+
+    if (filters.liquidity == "all") {
+        return event.value.deposits
+    } else {
+        return event.value.deposits.filter(
+            (deposit) => deposit.userId == accountStore.pkh,
+        )
+    }
+})
+const filteredBets = computed(() => {
+    if (!event.value) return []
+
+    if (filters.bets == "all") {
+        return event.value.bets
+    } else {
+        return event.value.bets.filter((bet) => bet.userId == accountStore.pkh)
+    }
+})
+
+/** for personal stats */
+const userDeposits = computed(() =>
+    event.value.deposits.filter(
+        (deposit) => deposit.userId == accountStore.pkh,
+    ),
+)
+const userBets = computed(() =>
+    event.value.bets.filter((bet) => bet.userId == accountStore.pkh),
+)
+
+const selectedPageForDeposits = ref(1)
+const paginatedDeposits = computed(() =>
+    cloneDeep(filteredDeposits.value)
+        .sort(
+            (a, b) =>
+                new Date(b.createdTime).getTime() -
+                new Date(a.createdTime).getTime(),
+        )
+        .slice(
+            (selectedPageForDeposits.value - 1) * 3,
+            selectedPageForDeposits.value * 3,
+        ),
+)
+
+const selectedPageForBets = ref(1)
+const paginatedBets = computed(() =>
+    cloneDeep(filteredBets.value)
+        .sort(
+            (a, b) =>
+                new Date(b.createdTime).getTime() -
+                new Date(a.createdTime).getTime(),
+        )
+        .slice(
+            (selectedPageForBets.value - 1) * 3,
+            selectedPageForBets.value * 3,
+        ),
+)
+
+const pendingBet = ref(null)
+
+const highestRatio = computed(() => {
+    const hRatio = event.value?.poolBelow / event.value?.poolAboveEq + 1
+    const lRatio = event.value?.poolAboveEq / event.value?.poolBelow + 1
+
+    return Math.max(hRatio, lRatio).toFixed(2)
+})
+
+const percentage = computed(() => {
+    return event.value?.targetDynamics * 100 - 100
+})
+
+/** Event day */
+const todayDt = DateTime.now()
+const eventDt = computed(() => DateTime.fromISO(event.value?.betsCloseTime))
+const day = computed(() =>
+    todayDt.hasSame(eventDt.value, "day")
+        ? "Today"
+        : eventDt.value.toLocaleString({
+              month: "long",
+              day: "numeric",
+          }),
+)
+
+const timing = computed(() => {
+    const eventDt = DateTime.fromISO(event.value.betsCloseTime).setLocale("ru")
+
+    const endDt = eventDt.plus(event.value.measurePeriod * 1000)
+
+    return {
+        start: {
+            time: eventDt.toLocaleString({
+                hour: "numeric",
+                minute: "numeric",
+            }),
+            day: eventDt.toLocaleString({
+                day: "numeric",
+                month: "short",
+            }),
+        },
+        end: {
+            time: endDt.toLocaleString({
+                hour: "numeric",
+                minute: "numeric",
+            }),
+            day: endDt.toLocaleString({
+                day: "numeric",
+                month: "short",
+            }),
+        },
+        showDay: eventDt.ordinal < endDt.ordinal,
+    }
+})
+
+const handleJoin = (event) => {
+    event.stopPropagation()
+    showBetModal.value = true
+
+    amplitude.logEvent("showBetModal", { where: "event_base" })
+}
+
+const handleBet = (bet) => {
+    pendingBet.value = bet
+    showBetModal.value = false
+}
+
+const handleLiquidity = () => {
+    showLiquidityModal.value = true
+
+    amplitude.logEvent("showLiquidityModal", { where: "event_base" })
+}
+
+const handleWithdraw = (e) => {
+    e.stopPropagation()
+
+    amplitude.logEvent("clickWithdraw", { where: "event_base" })
+
+    juster
+        .withdraw(event.value.id, accountStore.pkh)
+        .then((op) => {
+            console.log(`Hash: ${op.opHash}`)
+
+            /** rm won position from store */
+            accountStore.positionsForWithdrawal =
+                accountStore.positionsForWithdrawal.filter(
+                    (position) => position.event.id != event.value.id,
+                )
+
+            notificationsStore.create({
+                notification: {
+                    type: "success",
+                    title: "Withdrawal request sent",
+                    description:
+                        "Processing takes about 10-30 seconds. Funds will appear in your wallet soon",
+                    autoDestroy: true,
+                },
+            })
+        })
+        .catch((err) => console.log(err))
+}
+
+const handleParticipants = () => {
+    showParticipantsModal.value = true
+
+    amplitude.logEvent("showParticipantsModal", { where: "event_base" })
+}
+
+const copy = (target) => {
+    if (target == "id") {
+        notificationsStore.create({
+            notification: {
+                type: "success",
+                title: "Event ID copied to clipboard",
+                description: "Use Ctrl+V to paste",
+                autoDestroy: true,
             },
-        ])
-
-        /**
-         * Stores
-         */
-        const marketStore = useMarketStore()
-        const accountStore = useAccountStore()
-        const notificationsStore = useNotificationsStore()
-
-        /**
-         * Modals
-         */
-        const showBetModal = ref(false)
-        const showLiquidityModal = ref(false)
-        const showParticipantsModal = ref(false)
-
-        /**
-         * Switch between Liquidity <-> Bet
-         */
-        const handleSwitch = () => {
-            showBetModal.value = !showBetModal.value
-            showLiquidityModal.value = !showLiquidityModal.value
-        }
-
-        /**
-         * Filters
-         */
-        const filters = reactive({
-            bets: "all",
-            liquidity: "all",
-        })
-        const handleSelectFilter = ({ target, value }) => {
-            filters[target] = value
-        }
-
-        /**
-         * Local Event
-         */
-        const event = ref(null)
-        const getEvent = async () => {
-            if (event.value) return
-
-            const { id: eventId } = router.currentRoute.value.params
-            event.value = await fetchEventById({ id: eventId })
-
-            /** breadcrumbs */
-            breadcrumbs.push({
-                name: `Event #${event.value.id}`,
-                path: `/events/${event.value.id}`,
-            })
-        }
-
-        const won = computed(() => {
-            if (!event.value) return
-
-            return !!event.value.bets
-                .filter((bet) => bet.userId == accountStore.pkh)
-                .filter((bet) => bet.side == event.value.winnerBets).length
         })
 
-        const canWithdraw = computed(() => {
-            return accountStore.positionsForWithdrawal.some(
-                (position) => position.event.id == event.value.id,
-            )
+        toClipboard(event.value.id)
+    }
+    if (target == "url") {
+        notificationsStore.create({
+            notification: {
+                type: "success",
+                title: "Event URL copied to clipboard",
+                description: "Use Ctrl+V to paste",
+                autoDestroy: true,
+            },
         })
 
-        /** Countdown setup */
-        const eventStartTime = computed(() =>
-            new Date(event.value?.betsCloseTime).getTime(),
-        )
-        const {
-            status: countdownStatus,
-            time,
-            stop,
-        } = useCountdown(eventStartTime)
+        toClipboard(location)
+    }
+}
 
-        // eslint-disable-next-line vue/return-in-computed-property
-        const timeLeft = computed(() => {
-            if (time.h > 0) {
-                return { num: time.h, suffix: time.h > 1 ? "hrs" : "hr" }
-            }
-            if (time.h == 0) {
-                return { num: time.m, suffix: time.m > 1 ? "mins" : "min" }
-            }
-        })
+watch(event, async () => {
+    await getEvent()
+})
 
-        const symbol = computed(() => event.value.currencyPair.symbol)
+/**
+ * Get event -> Subscribe (refactor needed) -> Participants
+ */
+onMounted(async () => {
+    await getEvent()
 
-        const price = computed(() => {
-            return {
-                rate: marketStore.markets[event.value?.currencyPair.symbol]
-                    ?.quotes[0]?.price,
-                integer: numberWithSymbol(
-                    marketStore.markets[
-                        event.value?.currencyPair.symbol
-                    ]?.quotes[0]?.price
-                        .toString()
-                        .split(".")[0],
-                    ",",
-                ),
-                fraction: marketStore.markets[
-                    event.value?.currencyPair.symbol
-                ]?.quotes[0]?.price
-                    .toString()
-                    .split(".")[1],
-            }
-        })
-
-        const participants = ref(0)
-
-        /**
-         * Liquidity (Deposits) & Bets
-         */
-        const filteredDeposits = computed(() => {
-            if (!event.value) return []
-
-            if (filters.liquidity == "all") {
-                return event.value.deposits
-            } else {
-                return event.value.deposits.filter(
-                    (deposit) => deposit.userId == accountStore.pkh,
-                )
-            }
-        })
-        const filteredBets = computed(() => {
-            if (!event.value) return []
-
-            if (filters.bets == "all") {
-                return event.value.bets
-            } else {
-                return event.value.bets.filter(
-                    (bet) => bet.userId == accountStore.pkh,
-                )
-            }
-        })
-
-        /** for personal stats */
-        const userDeposits = computed(() =>
-            event.value.deposits.filter(
-                (deposit) => deposit.userId == accountStore.pkh,
-            ),
-        )
-        const userBets = computed(() =>
-            event.value.bets.filter((bet) => bet.userId == accountStore.pkh),
-        )
-
-        const selectedPageForDeposits = ref(1)
-        const paginatedDeposits = computed(() =>
-            cloneDeep(filteredDeposits.value)
-                .sort(
-                    (a, b) =>
-                        new Date(b.createdTime).getTime() -
-                        new Date(a.createdTime).getTime(),
-                )
-                .slice(
-                    (selectedPageForDeposits.value - 1) * 3,
-                    selectedPageForDeposits.value * 3,
-                ),
-        )
-
-        const selectedPageForBets = ref(1)
-        const paginatedBets = computed(() =>
-            cloneDeep(filteredBets.value)
-                .sort(
-                    (a, b) =>
-                        new Date(b.createdTime).getTime() -
-                        new Date(a.createdTime).getTime(),
-                )
-                .slice(
-                    (selectedPageForBets.value - 1) * 3,
-                    selectedPageForBets.value * 3,
-                ),
-        )
-
-        const pendingBet = ref(null)
-
-        const highestRatio = computed(() => {
-            const hRatio = event.value?.poolBelow / event.value?.poolAboveEq + 1
-            const lRatio = event.value?.poolAboveEq / event.value?.poolBelow + 1
-
-            return Math.max(hRatio, lRatio).toFixed(2)
-        })
-
-        const percentage = computed(() => {
-            return event.value?.targetDynamics * 100 - 100
-        })
-
-        /** Event day */
-        const todayDt = DateTime.now()
-        const eventDt = computed(() =>
-            DateTime.fromISO(event.value?.betsCloseTime),
-        )
-        const day = computed(() =>
-            todayDt.hasSame(eventDt.value, "day")
-                ? "Today"
-                : eventDt.value.toLocaleString({
-                      month: "long",
-                      day: "numeric",
-                  }),
-        )
-
-        const timing = computed(() => {
-            const eventDt = DateTime.fromISO(
-                event.value.betsCloseTime,
-            ).setLocale("ru")
-
-            const endDt = eventDt.plus(event.value.measurePeriod * 1000)
-
-            return {
-                start: {
-                    time: eventDt.toLocaleString({
-                        hour: "numeric",
-                        minute: "numeric",
-                    }),
-                    day: eventDt.toLocaleString({
-                        day: "numeric",
-                        month: "short",
-                    }),
+    /** Subscribe to event, TODO: refactor */
+    await gql
+        .subscription({
+            event: [
+                {
+                    where: { id: { _eq: event.value.id } },
                 },
-                end: {
-                    time: endDt.toLocaleString({
-                        hour: "numeric",
-                        minute: "numeric",
-                    }),
-                    day: endDt.toLocaleString({
-                        day: "numeric",
-                        month: "short",
-                    }),
+                {
+                    id: true,
+                    status: true,
+                    betsCloseTime: true,
+                    creatorId: true,
+                    poolAboveEq: true,
+                    poolBelow: true,
+                    totalBetsAmount: true,
+                    totalLiquidityProvided: true,
+                    totalLiquidityShares: true,
+                    totalValueLocked: true,
+                    liquidityPercent: true,
+                    measurePeriod: true,
+                    closedOracleTime: true,
+                    createdTime: true,
+                    startRate: true,
+                    closedRate: true,
+                    winnerBets: true,
+                    targetDynamics: true,
+                    currencyPair: {
+                        id: true,
+                        symbol: true,
+                    },
+                    bets: {
+                        id: true,
+                        side: true,
+                        reward: true,
+                        amount: true,
+                        createdTime: true,
+                        userId: true,
+                    },
+                    deposits: {
+                        amountAboveEq: true,
+                        amountBelow: true,
+                        eventId: true,
+                        id: true,
+                        userId: true,
+                        createdTime: true,
+                        shares: true,
+                    },
                 },
-                showDay: eventDt.ordinal < endDt.ordinal,
-            }
+            ],
+        })
+        .subscribe({
+            next: (data) => {
+                const { event: newEvent } = data
+
+                /** Clear pending bet on update */
+                if (event.value.bets.length !== newEvent[0].bets.length) {
+                    pendingBet.value = null
+                }
+
+                event.value = newEvent[0]
+            },
+            error: console.error,
         })
 
-        const handleJoin = (event) => {
-            event.stopPropagation()
-            showBetModal.value = true
+    /** Participants */
+    const eventParticipants = await fetchEventParticipants({
+        id: event.value.id,
+    })
+    participants.value = eventParticipants.length
+})
 
-            amplitude.logEvent("showBetModal", { where: "event_base" })
-        }
+onUnmounted(() => {
+    stop()
+})
 
-        const handleBet = (bet) => {
-            pendingBet.value = bet
-            showBetModal.value = false
-        }
-
-        const handleLiquidity = () => {
-            showLiquidityModal.value = true
-
-            amplitude.logEvent("showLiquidityModal", { where: "event_base" })
-        }
-
-        const handleWithdraw = (e) => {
-            e.stopPropagation()
-
-            amplitude.logEvent("clickWithdraw", { where: "event_base" })
-
-            juster
-                .withdraw(event.value.id, accountStore.pkh)
-                .then((op) => {
-                    console.log(`Hash: ${op.opHash}`)
-
-                    /** rm won position from store */
-                    accountStore.positionsForWithdrawal =
-                        accountStore.positionsForWithdrawal.filter(
-                            (position) => position.event.id != event.value.id,
-                        )
-
-                    notificationsStore.create({
-                        notification: {
-                            type: "success",
-                            title: "Withdrawal request sent",
-                            description:
-                                "Processing takes about 10-30 seconds. Funds will appear in your wallet soon",
-                            autoDestroy: true,
-                        },
-                    })
-                })
-                .catch((err) => console.log(err))
-        }
-
-        const handleParticipants = () => {
-            showParticipantsModal.value = true
-
-            amplitude.logEvent("showParticipantsModal", { where: "event_base" })
-        }
-
-        const copy = (target) => {
-            if (target == "id") {
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "Event ID copied to clipboard",
-                        description: "Use Ctrl+V to paste",
-                        autoDestroy: true,
-                    },
-                })
-
-                toClipboard(event.value.id)
-            }
-            if (target == "url") {
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "Event URL copied to clipboard",
-                        description: "Use Ctrl+V to paste",
-                        autoDestroy: true,
-                    },
-                })
-
-                toClipboard(location)
-            }
-        }
-
-        watch(event, async () => {
-            await getEvent()
-        })
-
-        /**
-         * Get event -> Subscribe (refactor needed) -> Participants
-         */
-        onMounted(async () => {
-            await getEvent()
-
-            /** Subscribe to event, TODO: refactor */
-            await gql
-                .subscription({
-                    event: [
-                        {
-                            where: { id: { _eq: event.value.id } },
-                        },
-                        {
-                            id: true,
-                            status: true,
-                            betsCloseTime: true,
-                            creatorId: true,
-                            poolAboveEq: true,
-                            poolBelow: true,
-                            totalBetsAmount: true,
-                            totalLiquidityProvided: true,
-                            totalLiquidityShares: true,
-                            totalValueLocked: true,
-                            liquidityPercent: true,
-                            measurePeriod: true,
-                            closedOracleTime: true,
-                            createdTime: true,
-                            startRate: true,
-                            closedRate: true,
-                            winnerBets: true,
-                            targetDynamics: true,
-                            currencyPair: {
-                                id: true,
-                                symbol: true,
-                            },
-                            bets: {
-                                id: true,
-                                side: true,
-                                reward: true,
-                                amount: true,
-                                createdTime: true,
-                                userId: true,
-                            },
-                            deposits: {
-                                amountAboveEq: true,
-                                amountBelow: true,
-                                eventId: true,
-                                id: true,
-                                userId: true,
-                                createdTime: true,
-                                shares: true,
-                            },
-                        },
-                    ],
-                })
-                .subscribe({
-                    next: (data) => {
-                        const { event: newEvent } = data
-
-                        /** Clear pending bet on update */
-                        if (
-                            event.value.bets.length !== newEvent[0].bets.length
-                        ) {
-                            pendingBet.value = null
-                        }
-
-                        event.value = newEvent[0]
-                    },
-                    error: console.error,
-                })
-
-            /** Participants */
-            const eventParticipants = await fetchEventParticipants({
-                id: event.value.id,
-            })
-            participants.value = eventParticipants.length
-        })
-
-        onUnmounted(() => {
-            stop()
-        })
-
-        /** Meta */
-        const { meta } = useMeta({
-            title: `Event`,
-            description:
-                "Available markets for events, for providing liquidity and accepting bets from users",
-        })
-
-        return {
-            breadcrumbs,
-            marketStore,
-            accountStore,
-            event,
-            won,
-            canWithdraw,
-            handleSelectFilter,
-            filters,
-            filteredDeposits,
-            filteredBets,
-            userDeposits,
-            userBets,
-            selectedPageForDeposits,
-            selectedPageForBets,
-            paginatedDeposits,
-            paginatedBets,
-            pendingBet,
-            timeLeft,
-            price,
-            symbol,
-            participants,
-            highestRatio,
-            percentage,
-            countdownStatus,
-            day,
-            timing,
-            showBetModal,
-            showLiquidityModal,
-            showParticipantsModal,
-            handleSwitch,
-            handleJoin,
-            handleLiquidity,
-            handleParticipants,
-            handleBet,
-            handleWithdraw,
-            copy,
-            getCurrencyIcon,
-            abbreviateNumber,
-            cloneDeep,
-            supportedMarkets,
-        }
-    },
-
-    components: {
-        Breadcrumbs,
-        Button,
-        Label,
-        Banner,
-        Spin,
-        Tooltip,
-        Dropdown,
-        DropdownItem,
-        DropdownDivider,
-        Pagination,
-        ParticipantsModal,
-        LiquidityModal,
-        BetModal,
-        BetCard,
-        DepositCard,
-        EventChart,
-        EventPoolCard,
-        EventDetailsCard,
-        EventTargetsCard,
-        EventPersonalStats,
-    },
+/** Meta */
+const { meta } = useMeta({
+    title: `Event`,
+    description:
+        "Available markets for events, for providing liquidity and accepting bets from users",
 })
 </script>
 
@@ -639,43 +550,140 @@ export default defineComponent({
                                 ->
                                 {{ timing.end.day }}
                                 <span>{{ timing.end.time }}</span>
+
+                                ({{ event.measurePeriod / 3600 }}h)
                             </div>
                             <div v-else :class="$style.timing">
                                 {{ timing.start.day }}
                                 <span>{{ timing.start.time }}</span> ->
                                 <span>{{ timing.end.time }}</span>
+
+                                ({{ event.measurePeriod / 3600 }}h)
                             </div>
 
                             <!-- Labels -->
                             <div :class="$style.labels">
                                 <Tooltip
-                                    v-if="event.status == 'CANCELED'"
+                                    v-if="
+                                        startStatus == 'In progress' &&
+                                        event.status == 'NEW'
+                                    "
                                     position="bottom"
                                     side="left"
                                 >
-                                    <Label icon="stop" color="red"
-                                        >Canceled</Label
+                                    <Badge
+                                        size="medium"
+                                        color="green"
+                                        :class="$style.main_badge"
                                     >
+                                        <Icon name="event_new" size="14" />New
+                                    </Badge>
 
                                     <template v-slot:content>
-                                        Event canceled due to problems with
-                                        starting or finishing price
+                                        The event is available for betting and
+                                        providing liquidity
                                     </template>
+                                </Tooltip>
+                                <Tooltip
+                                    v-else-if="
+                                        startStatus == 'Finished' &&
+                                        event.status == 'NEW'
+                                    "
+                                    position="bottom"
+                                    side="left"
+                                >
+                                    <Badge
+                                        size="medium"
+                                        color="yellow"
+                                        :class="$style.main_badge"
+                                    >
+                                        <Icon
+                                            name="event_new"
+                                            size="14"
+                                        />Starting
+                                    </Badge>
+
+                                    <template v-slot:content
+                                        >Betting is closed. The event is
+                                        starting</template
+                                    >
+                                </Tooltip>
+                                <Tooltip
+                                    v-else-if="event.status == 'STARTED'"
+                                    position="bottom"
+                                    side="left"
+                                >
+                                    <Badge
+                                        size="medium"
+                                        color="yellow"
+                                        :class="$style.main_badge"
+                                    >
+                                        <Icon
+                                            name="event_active"
+                                            size="14"
+                                        />Active
+                                    </Badge>
+                                    <template v-slot:content
+                                        >Betting is closed. The end of the event
+                                        is pending</template
+                                    >
+                                </Tooltip>
+                                <Tooltip
+                                    v-else-if="event.status == 'FINISHED'"
+                                    position="bottom"
+                                    side="left"
+                                >
+                                    <Badge
+                                        size="medium"
+                                        color="gray"
+                                        :class="$style.main_badge"
+                                    >
+                                        <Icon
+                                            name="event_finished"
+                                            size="14"
+                                        />Finished
+                                    </Badge>
+                                    <template v-slot:content
+                                        >The event is closed, winning side
+                                        determined</template
+                                    >
+                                </Tooltip>
+                                <Tooltip
+                                    v-else-if="event.status == 'CANCELED'"
+                                    position="bottom"
+                                    side="left"
+                                >
+                                    <Badge
+                                        size="medium"
+                                        color="orange"
+                                        :class="$style.main_badge"
+                                    >
+                                        <Icon name="stop" size="14" />Canceled
+                                    </Badge>
+                                    <template v-slot:content
+                                        >This event has been canceled, funds
+                                        returned</template
+                                    >
                                 </Tooltip>
 
                                 <Tooltip
-                                    v-else-if="countdownStatus == 'In progress'"
+                                    v-else-if="startStatus == 'In progress'"
                                     position="bottom"
                                     side="left"
                                 >
-                                    <Label icon="flag" color="orange"
-                                        >Start in&nbsp;
-                                        <span>{{
+                                    <Badge
+                                        size="medium"
+                                        color="gray"
+                                        :class="$style.header_badge"
+                                    >
+                                        <Icon name="time" size="14" />
+                                        <span>Start in</span>
+                                        {{
                                             timeLeft.num == 0
                                                 ? "<1"
                                                 : timeLeft.num
-                                        }}</span>
-                                        {{ timeLeft.suffix }}</Label
+                                        }}
+                                        {{ timeLeft.suffix }}</Badge
                                     >
 
                                     <template v-slot:content>
@@ -684,87 +692,26 @@ export default defineComponent({
                                     </template>
                                 </Tooltip>
 
+                                <!-- Custom event warning -->
                                 <Tooltip
-                                    v-else-if="
-                                        countdownStatus == 'Finished' &&
-                                        event.status == 'NEW'
+                                    v-if="
+                                        event.creatorId !==
+                                        justerLiquidityAddress
                                     "
                                     position="bottom"
                                     side="left"
                                 >
-                                    <Label icon="flag" color="orange"
-                                        >Soon</Label
+                                    <Badge
+                                        size="medium"
+                                        color="yellow"
+                                        :class="$style.badge"
                                     >
+                                        <Icon name="bolt" size="14" /> Custom
+                                    </Badge>
 
-                                    <template v-slot:content>
-                                        Bets are no longer accepted, the event
-                                        will start soon
-                                    </template>
-                                </Tooltip>
-
-                                <Tooltip
-                                    v-else-if="
-                                        countdownStatus == 'Finished' &&
-                                        event.status == 'STARTED'
-                                    "
-                                    position="bottom"
-                                    side="left"
-                                >
-                                    <Label icon="time" color="orange" loading
-                                        >In progress</Label
+                                    <template v-slot:content
+                                        >Custom event from user</template
                                     >
-
-                                    <template v-slot:content>
-                                        Start price is fixed, waiting for event
-                                        completion
-                                    </template>
-                                </Tooltip>
-
-                                <Tooltip
-                                    v-else-if="
-                                        countdownStatus == 'Finished' &&
-                                        event.status == 'FINISHED'
-                                    "
-                                    position="bottom"
-                                    side="left"
-                                >
-                                    <Label icon="check">Finished</Label>
-
-                                    <template v-slot:content>
-                                        Event is over, winners are determined
-                                    </template>
-                                </Tooltip>
-
-                                <Tooltip position="bottom" side="left">
-                                    <Label icon="money" color="green"
-                                        ><span>{{
-                                            abbreviateNumber(
-                                                event.totalValueLocked,
-                                            )
-                                        }}</span
-                                        >XTZ</Label
-                                    >
-
-                                    <template v-slot:content>
-                                        Total value locked: Liquidity + Bets
-                                    </template>
-                                </Tooltip>
-                                <Tooltip position="bottom" side="left">
-                                    <Label icon="time" color="yellow"
-                                        >Duration&nbsp;
-                                        <span>{{
-                                            event.measurePeriod / 3600
-                                        }}</span
-                                        >{{
-                                            event.measurePeriod / 3600 == 1
-                                                ? "hour"
-                                                : "hours"
-                                        }}
-                                    </Label>
-
-                                    <template v-slot:content>
-                                        Price measurement period
-                                    </template>
                                 </Tooltip>
                             </div>
                         </div>
@@ -827,7 +774,7 @@ export default defineComponent({
                             <template
                                 v-else-if="
                                     event.status == 'NEW' &&
-                                    countdownStatus == 'In progress'
+                                    startStatus == 'In progress'
                                 "
                             >
                                 <Button
@@ -1081,6 +1028,10 @@ export default defineComponent({
     margin-bottom: 16px;
 }
 
+.header_badge span {
+    color: var(--text-tertiary);
+}
+
 .event {
     background: var(--card-bg);
     border-radius: 8px;
@@ -1154,7 +1105,7 @@ export default defineComponent({
     font-weight: 500;
     color: var(--text-tertiary);
 
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .timing span {

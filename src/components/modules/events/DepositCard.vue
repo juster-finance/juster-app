@@ -1,22 +1,18 @@
-<script>
-import { defineComponent, toRefs } from "vue"
+<script setup>
 import { DateTime } from "luxon"
+
+/**
+ * Services
+ */
+import { numberWithSymbol } from "@/services/utils/amounts"
 
 /**
  * Store
  */
 import { useAccountStore } from "@/store/account"
+const accountStore = useAccountStore()
 
-export default defineComponent({
-    name: "DepositCard",
-    props: { deposit: Object },
-
-    setup() {
-        const accountStore = useAccountStore()
-
-        return { DateTime, pkh: accountStore.pkh }
-    },
-})
+const props = defineProps({ deposit: { type: Object } })
 </script>
 
 <template>
@@ -36,7 +32,8 @@ export default defineComponent({
 
             <div :class="$style.info">
                 <div :class="$style.title">
-                    {{ pkh == deposit.userId ? "My" : "" }} Liquidity
+                    {{ accountStore.pkh == deposit.userId ? "My" : "" }}
+                    Liquidity
                 </div>
                 <div :class="$style.time">
                     {{ DateTime.fromISO(deposit.createdTime).toRelative() }}
@@ -46,14 +43,14 @@ export default defineComponent({
 
         <div :class="[$style.param, $style.up]">
             <Icon name="higher" size="12" />{{
-                deposit.amountAboveEq.toFixed(0)
+                numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
             }}
             &nbsp;<span>XTZ</span>
         </div>
 
         <div :class="[$style.param, $style.down]">
             <Icon name="higher" size="12" />{{
-                deposit.amountBelow.toFixed(0)
+                numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
             }}
             &nbsp;<span>XTZ</span>
         </div>

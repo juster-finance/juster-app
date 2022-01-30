@@ -1,34 +1,28 @@
-<script>
-import { computed, defineComponent, toRefs } from "vue"
+<script setup>
+import { computed } from "vue"
 
 /**
  * Local
  */
 import Pool from "@/components/local/Pool"
 
-export default defineComponent({
-    name: "EventDetailsCard",
-    props: { event: Object },
+/**
+ * Services
+ */
+import { abbreviateNumber } from "@/services/utils/amounts"
 
-    setup(props) {
-        const { event } = toRefs(props)
+const props = defineProps({ event: { type: Object } })
 
-        const risePool = computed(() =>
-            event.value.bets
-                .filter(bet => bet.side == "ABOVE_EQ")
-                .reduce((acc, { amount }) => acc + amount, 0),
-        )
-        const fallPool = computed(() =>
-            event.value.bets
-                .filter(bet => bet.side == "BELOW")
-                .reduce((acc, { amount }) => acc + amount, 0),
-        )
-
-        return { risePool, fallPool }
-    },
-
-    components: { Pool },
-})
+const risePool = computed(() =>
+    props.event.bets
+        .filter((bet) => bet.side == "ABOVE_EQ")
+        .reduce((acc, { amount }) => acc + amount, 0),
+)
+const fallPool = computed(() =>
+    props.event.bets
+        .filter((bet) => bet.side == "BELOW")
+        .reduce((acc, { amount }) => acc + amount, 0),
+)
 </script>
 
 <template>
@@ -40,8 +34,9 @@ export default defineComponent({
         <Pool :event="event" />
 
         <div :class="$style.hint">
-            Users bet <span>{{ risePool }} XTZ</span> for the fact that the
-            price will rise and <span>{{ fallPool }} XTZ</span> for a fall. Make
+            Users bet <span>{{ abbreviateNumber(risePool) }} XTZ</span> for the
+            fact that the price will rise and
+            <span>{{ abbreviateNumber(fallPool) }} XTZ</span> for a fall. Make
             your choice.
         </div>
     </div>
