@@ -185,18 +185,20 @@ onBeforeUnmount(() => {
                 <div :class="$style.block">
                     <div :class="$style.left">
                         <Tooltip position="top">
-                            <Button
-                                type="secondary"
-                                size="small"
-                                :class="[
-                                    $style.footer_btn,
-                                    $style[statusBlock.color],
-                                ]"
-                            >
-                                <Icon name="bolt" size="12" />{{
-                                    statusBlock.text
-                                }}
-                            </Button>
+                            <a href="https://status.juster.fi" target="_blank">
+                                <Button
+                                    type="secondary"
+                                    size="small"
+                                    :class="[
+                                        $style.footer_btn,
+                                        $style[statusBlock.color],
+                                    ]"
+                                >
+                                    <Icon name="bolt" size="12" />{{
+                                        statusBlock.text
+                                    }}
+                                </Button>
+                            </a>
 
                             <template #content
                                 ><span>DipDup:</span> {{ status.dipdup
