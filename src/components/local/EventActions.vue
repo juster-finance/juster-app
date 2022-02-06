@@ -98,12 +98,7 @@ const successfulWithdrawal = computed(() =>
         <Button
             v-else
             @click.prevent="emit('onWithdraw')"
-            :type="
-                (accountStore.pendingTransaction.awaiting && 'secondary') ||
-                (isWithdrawing && 'secondary') ||
-                (won && !wonPosition && 'secondary') ||
-                (won && wonPosition && 'success')
-            "
+            :type="won && wonPosition ? 'success' : 'secondary'"
             size="small"
             :disabled="isWithdrawing || (won && !wonPosition)"
             block
