@@ -614,12 +614,16 @@ const { meta } = useMeta({
 
                     <!-- todo: new component BetsTable -->
                     <div v-if="filteredBets.length" :class="$style.columns">
-                        <span>TYPE</span>
-                        <span>SIDE</span>
-                        <span>AMOUNT</span>
-                        <span>{{
-                            event.status !== "CANCELED" ? "REWARD" : "REFUND"
-                        }}</span>
+                        <div :class="$style.column">TYPE</div>
+                        <div :class="$style.column">SIDE</div>
+                        <div :class="$style.column">AMOUNT</div>
+                        <div :class="$style.column">
+                            {{
+                                event.status !== "CANCELED"
+                                    ? "REWARD"
+                                    : "REFUND"
+                            }}
+                        </div>
                     </div>
 
                     <div
@@ -689,10 +693,24 @@ const { meta } = useMeta({
                     </div>
 
                     <div v-if="filteredDeposits.length" :class="$style.columns">
-                        <span>TYPE</span>
-                        <span>RISE</span>
-                        <span>FALL</span>
-                        <span>REWARD</span>
+                        <div :class="$style.column">TYPE</div>
+                        <div :class="$style.column">RISE</div>
+                        <div :class="$style.column">FALL</div>
+
+                        <Tooltip
+                            position="bottom"
+                            side="left"
+                            :class="$style.column"
+                        >
+                            <div>REWARD</div>
+
+                            <template #content
+                                ><span><b>Formula:</b></span> pool
+                                <span>x</span> myShares
+                                <span>x</span> eventShares
+                                <span>-</span> depositAmount</template
+                            >
+                        </Tooltip>
                     </div>
                     <div v-if="filteredDeposits.length" :class="$style.bets">
                         <DepositCard
@@ -946,26 +964,26 @@ const { meta } = useMeta({
     margin-bottom: 8px;
 }
 
-.columns span {
+.column {
     font-size: 12px;
     line-height: 1;
     font-weight: 700;
     color: var(--text-tertiary);
 }
 
-.columns span:nth-child(1) {
+.column:nth-child(1) {
     flex: 2;
 }
 
-.columns span:nth-child(2) {
+.column:nth-child(2) {
     flex: 1;
 }
 
-.columns span:nth-child(3) {
+.column:nth-child(3) {
     flex: 1;
 }
 
-.columns span:nth-child(4) {
+.column:nth-child(4) {
     flex: 1;
 }
 
