@@ -43,7 +43,7 @@ import {
 } from "@/services/utils/global"
 import { juster } from "@/services/tools"
 import { abbreviateNumber } from "@/services/utils/amounts"
-import { supportedMarkets, justerLiquidityAddress } from "@/services/config"
+import { supportedMarkets, verifiedMakers } from "@/services/config"
 
 /**
  * Composable
@@ -456,7 +456,7 @@ export default defineComponent({
             getCurrencyIcon,
             abbreviateNumber,
             supportedMarkets,
-            justerLiquidityAddress,
+            verifiedMakers,
         }
     },
 
@@ -562,7 +562,10 @@ export default defineComponent({
                     <Tooltip position="bottom" side="right">
                         <div :class="$style.creator">
                             <template
-                                v-if="event.creatorId == justerLiquidityAddress"
+                                v-if="
+                                    event.creatorId ==
+                                    verifiedMakers.hangzhounet
+                                "
                             >
                                 <Icon name="logo_symbol" size="24" />
                                 <Icon
@@ -581,8 +584,8 @@ export default defineComponent({
                         </div>
 
                         <template v-slot:content>{{
-                            event.creatorId == justerLiquidityAddress
-                                ? "Recurring event from Juster Team"
+                            event.creatorId == verifiedMakers.hangzhounet
+                                ? "Recurring event from Juster"
                                 : "Custom event from user"
                         }}</template>
                     </Tooltip>
@@ -702,7 +705,7 @@ export default defineComponent({
                 </Badge>
 
                 <Tooltip
-                    v-if="event.creatorId !== justerLiquidityAddress"
+                    v-if="event.creatorId !== verifiedMakers.hangzhounet"
                     position="bottom"
                     side="left"
                 >

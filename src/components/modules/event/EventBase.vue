@@ -67,7 +67,7 @@ import {
     capitalizeFirstLetter,
 } from "@/services/utils/global"
 import { juster, gql } from "@/services/tools"
-import { supportedMarkets, justerLiquidityAddress } from "@/services/config"
+import { supportedMarkets } from "@/services/config"
 
 /**
  * Store

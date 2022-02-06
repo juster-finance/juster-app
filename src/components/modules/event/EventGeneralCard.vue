@@ -15,7 +15,7 @@ import EventActions from "@/components/local/EventActions"
 /**
  * Services
  */
-import { supportedMarkets, justerLiquidityAddress } from "@/services/config"
+import { supportedMarkets, verifiedMakers } from "@/services/config"
 
 const props = defineProps({
     event: {
@@ -161,7 +161,7 @@ const priceDynamics = computed(() => {
                 <Tooltip position="bottom" side="right">
                     <div :class="$style.creator">
                         <template
-                            v-if="event.creatorId == justerLiquidityAddress"
+                            v-if="event.creatorId == verifiedMakers.hangzhounet"
                         >
                             <Icon name="logo_symbol" size="24" />
                             <Icon
@@ -180,8 +180,8 @@ const priceDynamics = computed(() => {
                     </div>
 
                     <template v-slot:content>{{
-                        event.creatorId == justerLiquidityAddress
-                            ? "Recurring event from Juster Team"
+                        event.creatorId == verifiedMakers.hangzhounet
+                            ? "Recurring event from Juster"
                             : "Custom event from user"
                     }}</template>
                 </Tooltip>

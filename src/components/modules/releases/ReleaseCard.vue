@@ -80,7 +80,7 @@ export default defineComponent({
                 <h2 :class="$style.title">{{ release.title }}</h2>
 
                 <div :class="$style.badges">
-                    <div :class="$style.badge">By <span>Juster Team</span></div>
+                    <div :class="$style.badge">By <span>Juster</span></div>
 
                     <div :class="$style.dot" />
 

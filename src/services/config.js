@@ -26,4 +26,7 @@ export const rpcNodes = [
     },
 ]
 
-export const justerLiquidityAddress = "tz1U2zsFffCTcTvWddAfHfc2gUvEHepaVT1L"
+export const verifiedMakers = {
+    hangzhounet: "tz1U2zsFffCTcTvWddAfHfc2gUvEHepaVT1L",
+    mainnet: "tz1h5frRwDbJMGyTPntdwMC8i745q2Z1fzyF",
+}

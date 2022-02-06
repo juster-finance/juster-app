@@ -16,7 +16,7 @@ import { DateTime } from "luxon"
  * Services
  */
 import { juster } from "@/services/tools"
-import { justerLiquidityAddress } from "@/services/config"
+import { verifiedMakers } from "@/services/config"
 
 /**
  * Local
@@ -249,7 +249,7 @@ export default defineComponent({
             handleProvideLiquidity,
             handleLogin,
             buttonState,
-            justerLiquidityAddress,
+            verifiedMakers,
         }
     },
 
@@ -288,7 +288,7 @@ export default defineComponent({
             />
 
             <Banner
-                v-if="event.creatorId !== justerLiquidityAddress"
+                v-if="event.creatorId !== verifiedMakers.hangzhounet"
                 type="warning"
                 size="small"
                 :class="$style.banner"
