@@ -1,11 +1,11 @@
 import { reactive } from "vue"
 import { DateTime } from "luxon"
-import { gql } from "@/services/tools"
 
 /**
  * Services
  */
 import { supportedMarkets } from "@/services/config"
+import { juster } from "@/services/sdk"
 
 /**
  * API
@@ -52,70 +52,76 @@ export const useMarket = () => {
          */
 
         /** New Positions */
-        gql.subscription({
-            position: [
-                {
-                    where: {
-                        userId: {
-                            _eq: accountStore.pkh,
+        juster.gql
+            .subscription({
+                position: [
+                    {
+                        where: {
+                            userId: {
+                                _eq: accountStore.pkh,
+                            },
+                            withdrawn: { _eq: false },
+                            event: { status: { _eq: "FINISHED" } },
                         },
-                        withdrawn: { _eq: false },
-                        event: { status: { _eq: "FINISHED" } },
                     },
-                },
-                {
-                    ...position,
-                },
-            ],
-        }).subscribe({
-            next: data => {
-                const newPositions = data.position
+                    {
+                        ...position,
+                    },
+                ],
+            })
+            .subscribe({
+                next: data => {
+                    const newPositions = data.position
 
-                newPositions.forEach(newPosition => {
-                    if (
-                        accountStore.positionsForWithdrawal.some(
-                            position => position.id == newPosition.id,
+                    newPositions.forEach(newPosition => {
+                        if (
+                            accountStore.positionsForWithdrawal.some(
+                                position => position.id == newPosition.id,
+                            )
                         )
-                    )
-                        return
+                            return
 
-                    accountStore.positionsForWithdrawal.push(newPosition)
-                })
-            },
-            error: console.error,
-        })
+                        accountStore.positionsForWithdrawal.push(newPosition)
+                    })
+                },
+                error: console.error,
+            })
 
         /** Newly withdrawn positions */
-        gql.subscription({
-            position: [
-                {
-                    where: {
-                        userId: { _eq: accountStore.pkh },
-                        withdrawn: { _eq: true },
-                        event: { status: { _eq: "FINISHED" } },
+        juster.gql
+            .subscription({
+                position: [
+                    {
+                        where: {
+                            userId: { _eq: accountStore.pkh },
+                            withdrawn: { _eq: true },
+                            event: { status: { _eq: "FINISHED" } },
+                        },
                     },
-                },
-                {
-                    ...position,
-                },
-            ],
-        }).subscribe({
-            next: data => {
-                const { position: withdrawnPositions } = data
+                    {
+                        ...position,
+                    },
+                ],
+            })
+            .subscribe({
+                next: data => {
+                    const { position: withdrawnPositions } = data
 
-                const positionsIdsForWithdrawal = accountStore.positionsForWithdrawal.map(
-                    pos => pos.id,
-                )
-                withdrawnPositions.forEach(withdrawnPosition => {
-                    if (
-                        positionsIdsForWithdrawal.includes(withdrawnPosition.id)
-                    ) {
-                        accountStore.removePosition(withdrawnPosition.id)
-                    }
-                })
-            },
-            error: console.error,
-        })
+                    const positionsIdsForWithdrawal = accountStore.positionsForWithdrawal.map(
+                        pos => pos.id,
+                    )
+                    withdrawnPositions.forEach(withdrawnPosition => {
+                        if (
+                            positionsIdsForWithdrawal.includes(
+                                withdrawnPosition.id,
+                            )
+                        ) {
+                            accountStore.removePosition(withdrawnPosition.id)
+                        }
+                    })
+                },
+                error: console.error,
+            })
     }
 
     const updateWithdrawals = async () => {
@@ -165,31 +171,33 @@ export const useMarket = () => {
              */
 
             /** Quotes */
-            gql.subscription({
-                quotesWma: [
-                    {
-                        where: {
-                            currencyPairId: { _eq: market.id },
+            juster.gql
+                .subscription({
+                    quotesWma: [
+                        {
+                            where: {
+                                currencyPairId: { _eq: market.id },
+                            },
+                            order_by: { timestamp: "desc" },
+                            limit: 1,
                         },
-                        order_by: { timestamp: "desc" },
-                        limit: 1,
+                        {
+                            currencyPairId: true,
+                            price: true,
+                            timestamp: true,
+                        },
+                    ],
+                })
+                .subscribe({
+                    next: data => {
+                        const quote = data.quotesWma[0]
+                        marketStore.updateQuotes({
+                            target: market.symbol,
+                            quote,
+                        })
                     },
-                    {
-                        currencyPairId: true,
-                        price: true,
-                        timestamp: true,
-                    },
-                ],
-            }).subscribe({
-                next: data => {
-                    const quote = data.quotesWma[0]
-                    marketStore.updateQuotes({
-                        target: market.symbol,
-                        quote,
-                    })
-                },
-                error: console.error,
-            })
+                    error: console.error,
+                })
         })
     }
 

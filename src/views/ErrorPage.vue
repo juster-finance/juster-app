@@ -32,7 +32,7 @@ export default {
         </div>
 
         <router-link to="/explore">
-            <Button type="tertiary" size="small" :class="$style.back_btn"
+            <Button type="secondary" size="small" :class="$style.back_btn"
                 ><Icon name="back" size="16" /> Back to
                 <span>Explore</span></Button
             ></router-link

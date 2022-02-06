@@ -1,4 +1,7 @@
-import { apollo } from "@/apollo"
+/**
+ * Services
+ */
+import { juster } from "@/services/sdk"
 
 /**
  * GQL: Queries
@@ -13,7 +16,7 @@ import {
 
 export const fetchAllEvents = async () => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getAllEvents,
         })
 
@@ -28,7 +31,7 @@ export const fetchAllEvents = async () => {
 
 export const fetchEventsByMarket = async ({ id, status }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getEventsByMarket,
             variables: { id, status },
         })
@@ -44,7 +47,7 @@ export const fetchEventsByMarket = async ({ id, status }) => {
 
 export const fetchEventById = async ({ id }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getEventById,
             variables: { id },
         })
@@ -60,7 +63,7 @@ export const fetchEventById = async ({ id }) => {
 
 export const fetchEventParticipants = async ({ id }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getEventParticipants,
             variables: { id },
         })
@@ -76,7 +79,7 @@ export const fetchEventParticipants = async ({ id }) => {
 
 export const fetchTopEvents = async ({ limit }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getTopEvents,
             variables: { limit },
         })

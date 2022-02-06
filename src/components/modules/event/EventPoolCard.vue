@@ -42,6 +42,7 @@ const fallPool = computed(() =>
             type="secondary"
             size="small"
             block
+            :disabled="event.status !== 'NEW'"
             :class="$style.liquidity_btn"
             ><Icon name="liquidity" size="12" />Add Liquidity</Button
         >

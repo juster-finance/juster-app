@@ -1,4 +1,5 @@
 <script setup>
+import { computed, watch } from "vue"
 import { DateTime } from "luxon"
 
 /**
@@ -10,7 +11,6 @@ import { numberWithSymbol } from "@/services/utils/amounts"
  * Store
  */
 import { useAccountStore } from "@/store/account"
-import { computed } from "vue-demi"
 const accountStore = useAccountStore()
 
 const props = defineProps({
@@ -79,7 +79,12 @@ const liquidityProfit = computed(() =>
         </div>
 
         <div :class="[$style.param]">
-            {{ liquidityProfit.toFixed(2) }} &nbsp;<span>XTZ</span>
+            {{
+                liquidityProfit < 0.01 && liquidityProfit !== 0
+                    ? `< 0.01`
+                    : liquidityProfit.toFixed(2)
+            }}
+            &nbsp;<span>XTZ</span>
         </div>
     </div>
 </template>

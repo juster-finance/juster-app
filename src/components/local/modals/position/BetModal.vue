@@ -16,7 +16,7 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { juster } from "@/services/tools"
+import { juster, currentNetwork } from "@/services/sdk"
 import { verifiedMakers } from "@/services/config"
 
 /**
@@ -238,7 +238,7 @@ export default defineComponent({
                 showHint.value = true
             }, 5000)
 
-            juster
+            juster.sdk
                 .bet(
                     event.value.id,
                     betType,
@@ -319,8 +319,8 @@ export default defineComponent({
 
         /** Login */
         const handleLogin = async () => {
-            await juster.sync()
-            juster.getPkh().then((pkh) => {
+            await juster.sdk.sync()
+            juster.sdk.getPkh().then((pkh) => {
                 accountStore.setPkh(pkh)
             })
 
@@ -348,6 +348,7 @@ export default defineComponent({
             handleLogin,
             buttonState,
             verifiedMakers,
+            currentNetwork,
         }
     },
 
@@ -386,7 +387,7 @@ export default defineComponent({
             />
 
             <Banner
-                v-if="event.creatorId !== verifiedMakers.hangzhounet"
+                v-if="event.creatorId !== verifiedMakers[currentNetwork]"
                 type="warning"
                 size="small"
                 :class="$style.banner"
@@ -456,7 +457,12 @@ export default defineComponent({
                 :class="$style.slippage_block"
             />
 
-            <Banner type="info" size="small" :class="$style.banner">
+            <Banner
+                v-if="currentNetwork !== 'mainnet'"
+                type="info"
+                size="small"
+                :class="$style.banner"
+            >
                 Note that the transaction takes place on the Hangzhounet
             </Banner>
 

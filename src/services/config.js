@@ -1,7 +1,11 @@
 export const dipdup = {
-    uri: {
+    mainnet: {
+        graphq: "https://juster.dipdup.net/v1/graphql",
+        ws: "wss://juster.dipdup.net/v1/graphql",
+    },
+    hangzhounet: {
         graphq: `https://api.hangzhounet.juster.fi/v1/graphql`,
-        subscription: "wss://api.hangzhounet.juster.fi/v1/graphql",
+        ws: "wss://api.hangzhounet.juster.fi/v1/graphql",
     },
 }
 

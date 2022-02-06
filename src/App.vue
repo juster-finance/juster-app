@@ -18,7 +18,7 @@ import Notifications from "@/components/local/Notifications"
 /**
  * Services
  */
-import { juster } from "@/services/tools"
+import { juster } from "@/services/sdk"
 
 /**
  * Store
@@ -71,18 +71,20 @@ export default defineComponent({
         const accountStore = useAccountStore()
 
         onBeforeMount(() => {
-            juster._provider.client.getActiveAccount().then(async (account) => {
-                if (!account) return
+            juster.sdk._provider.client
+                .getActiveAccount()
+                .then(async (account) => {
+                    if (!account) return
 
-                identify.set("address", account.address)
-                identify.set("network", account.network.type)
-                amplitude.identify(identify)
+                    identify.set("address", account.address)
+                    identify.set("network", account.network.type)
+                    amplitude.identify(identify)
 
-                accountStore.setPkh(account.address)
-                accountStore.updateBalance()
+                    accountStore.setPkh(account.address)
+                    accountStore.updateBalance()
 
-                setupUser()
-            })
+                    setupUser()
+                })
         })
 
         /**

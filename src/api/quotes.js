@@ -1,4 +1,7 @@
-import { apollo } from "@/apollo"
+/**
+ * Services
+ */
+import { juster } from "@/services/sdk"
 
 /**
  * GQL: Queries
@@ -20,7 +23,7 @@ export const fetchQuotesByMarket = async ({ id, limit, offset }) => {
         if (typeof id !== "number") throw new Error("ID must be a Number")
         if (typeof limit !== "number") throw new Error("Limit must be a Number")
 
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getQuotesByMarket,
             variables: { id, limit, offset },
         })
@@ -35,7 +38,7 @@ export const fetchQuotesByMarket = async ({ id, limit, offset }) => {
 
 export const fetchQuoteByRange = async ({ id, tsGt, tsLt }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getQuoteByRange,
             variables: { id, tsGt, tsLt },
         })
@@ -51,7 +54,7 @@ export const fetchQuoteByRange = async ({ id, tsGt, tsLt }) => {
 
 export const fetchQuoteByTimestamp = async ({ id, ts }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getQuoteByTimestamp,
             variables: { id, ts },
         })
@@ -68,7 +71,7 @@ export const fetchQuoteByTimestamp = async ({ id, ts }) => {
 /** TVL */
 export const fetchEventTVL = async ({ id }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getTVLByEventId,
             variables: { id },
         })

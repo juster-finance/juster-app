@@ -1,9 +1,13 @@
-import { juster } from "@/services/tools"
 import { OpKind } from "@taquito/taquito"
+
+/**
+ * Services
+ */
+import { juster } from "@/services/sdk"
 
 export const withdrawAll = async ({ eventIds, address }) => {
     try {
-        const contract = await juster._tezos.contract.at(
+        const contract = await juster.sdk._tezos.contract.at(
             "KT197iHRJaAGw3oGpQj21YYV1vK9Fa5ShoMn",
         )
 
@@ -17,7 +21,7 @@ export const withdrawAll = async ({ eventIds, address }) => {
             })
         })
 
-        const batch = await juster._tezos.wallet.batch(transactions)
+        const batch = await juster.sdk._tezos.wallet.batch(transactions)
 
         const batchOp = await batch.send()
 

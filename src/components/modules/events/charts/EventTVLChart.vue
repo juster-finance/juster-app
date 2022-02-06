@@ -19,7 +19,7 @@ import { fetchEventTVL } from "@/api/quotes"
 /**
  * Services
  */
-import { gql } from "@/services/tools"
+import { juster } from "@/services/sdk"
 
 export default defineComponent({
     name: "EventTVLChart",
@@ -164,7 +164,7 @@ export default defineComponent({
             draw()
 
             if (event.value.status !== "FINISHED") {
-                subscription.value = await gql
+                subscription.value = await juster.gql
                     .subscription({
                         quotesWma: [
                             {

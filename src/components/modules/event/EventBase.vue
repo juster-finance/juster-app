@@ -66,7 +66,7 @@ import {
     getCurrencyIcon,
     capitalizeFirstLetter,
 } from "@/services/utils/global"
-import { juster, gql } from "@/services/tools"
+import { juster, gql } from "@/services/sdk"
 import { supportedMarkets } from "@/services/config"
 
 /**
@@ -121,11 +121,15 @@ const getEvent = async () => {
     const { id: eventId } = router.currentRoute.value.params
     event.value = await fetchEventById({ id: eventId })
 
-    /** breadcrumbs */
-    breadcrumbs.push({
-        name: `Event #${event.value.id}`,
-        path: `/events/${event.value.id}`,
-    })
+    if (!event.value) {
+        router.push("/events")
+    } else {
+        /** breadcrumbs */
+        breadcrumbs.push({
+            name: `Event #${event.value.id}`,
+            path: `/events/${event.value.id}`,
+        })
+    }
 }
 
 const won = computed(() => {
@@ -327,6 +331,8 @@ const handleBet = (bet) => {
 }
 
 const handleLiquidity = () => {
+    if (event.value.status !== "NEW") return
+
     showLiquidityModal.value = true
 
     amplitude.logEvent("showLiquidityModal", { where: "event_base" })
@@ -338,7 +344,7 @@ const handleWithdraw = () => {
 
     amplitude.logEvent("clickWithdraw", { where: "event_base" })
 
-    juster
+    juster.sdk
         .withdraw(event.value.id, accountStore.pkh)
         .then((op) => {
             /** Pending transaction label */
@@ -429,7 +435,7 @@ onMounted(async () => {
     await getEvent()
 
     /** Subscribe to event, TODO: refactor */
-    await gql
+    await juster.gql
         .subscription({
             event: [
                 {

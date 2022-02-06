@@ -15,6 +15,7 @@ import EventActions from "@/components/local/EventActions"
 /**
  * Services
  */
+import { currentNetwork } from "@/services/sdk"
 import { supportedMarkets, verifiedMakers } from "@/services/config"
 
 const props = defineProps({
@@ -161,7 +162,10 @@ const priceDynamics = computed(() => {
                 <Tooltip position="bottom" side="right">
                     <div :class="$style.creator">
                         <template
-                            v-if="event.creatorId == verifiedMakers.hangzhounet"
+                            v-if="
+                                event.creatorId ==
+                                verifiedMakers[currentNetwork]
+                            "
                         >
                             <Icon name="logo_symbol" size="24" />
                             <Icon
@@ -180,7 +184,7 @@ const priceDynamics = computed(() => {
                     </div>
 
                     <template v-slot:content>{{
-                        event.creatorId == verifiedMakers.hangzhounet
+                        event.creatorId == verifiedMakers[currentNetwork]
                             ? "Recurring event from Juster"
                             : "Custom event from user"
                     }}</template>

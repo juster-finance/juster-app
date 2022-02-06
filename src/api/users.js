@@ -1,4 +1,7 @@
-import { apollo } from "@/apollo"
+/**
+ * Services
+ */
+import { juster } from "@/services/sdk"
 
 /**
  * GQL: Queries
@@ -12,7 +15,7 @@ import {
 
 export const fetchUser = async ({ address }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getUser,
             variables: { address },
         })
@@ -27,7 +30,7 @@ export const fetchUser = async ({ address }) => {
 
 export const fetchUserWithdrawals = async ({ address }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getUserWithdrawals,
             variables: { address },
         })
@@ -43,7 +46,7 @@ export const fetchUserWithdrawals = async ({ address }) => {
 
 export const fetchTopLiquidityProviders = async () => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getTopLiquidityProviders,
         })
         return data.user
@@ -57,7 +60,7 @@ export const fetchTopLiquidityProviders = async () => {
 
 export const fetchTopBettors = async () => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getTopBettors,
         })
         return data.user

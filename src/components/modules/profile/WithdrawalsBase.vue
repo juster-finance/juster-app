@@ -11,9 +11,6 @@ import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
 import { cloneDeep } from "lodash"
 
-import { test } from "@/services/sdk"
-// test()
-
 /**
  * UI
  */

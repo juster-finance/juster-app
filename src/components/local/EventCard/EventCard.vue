@@ -11,7 +11,6 @@ import {
     inject,
 } from "vue"
 import { DateTime } from "luxon"
-import { gql } from "@/services/tools"
 
 /**
  * UI
@@ -41,7 +40,7 @@ import {
     getCurrencyIcon,
     capitalizeFirstLetter,
 } from "@/services/utils/global"
-import { juster } from "@/services/tools"
+import { juster, currentNetwork } from "@/services/sdk"
 import { abbreviateNumber } from "@/services/utils/amounts"
 import { supportedMarkets, verifiedMakers } from "@/services/config"
 
@@ -186,10 +185,10 @@ export default defineComponent({
         })
 
         const liquidityLevel = computed(() => {
-            if (event.value.totalLiquidityProvided < 1000) return "Low"
-            if (event.value.totalLiquidityProvided == 1000) return "Medium"
-            if (event.value.totalLiquidityProvided > 1000) return "High"
-            if (event.value.totalLiquidityProvided > 5000) return "Super"
+            if (event.value.totalLiquidityProvided < 500) return "Low"
+            if (event.value.totalLiquidityProvided == 500) return "Medium"
+            if (event.value.totalLiquidityProvided > 500) return "High"
+            if (event.value.totalLiquidityProvided > 1000) return "Super"
         })
 
         const participantsAvatars = computed(() => {
@@ -254,7 +253,7 @@ export default defineComponent({
 
             amplitude.logEvent("clickWithdraw", { where: "event_card" })
 
-            juster
+            juster.sdk
                 .withdraw(event.value.id, accountStore.pkh)
                 .then((op) => {
                     /** Pending transaction label */
@@ -358,7 +357,7 @@ export default defineComponent({
             if (event.value.status === "FINISHED") return
 
             /** Subscription, TODO: refactor */
-            subscription.value = await gql
+            subscription.value = await juster.gql
                 .subscription({
                     event: [
                         {
@@ -457,6 +456,7 @@ export default defineComponent({
             abbreviateNumber,
             supportedMarkets,
             verifiedMakers,
+            currentNetwork,
         }
     },
 
@@ -564,7 +564,7 @@ export default defineComponent({
                             <template
                                 v-if="
                                     event.creatorId ==
-                                    verifiedMakers.hangzhounet
+                                    verifiedMakers[currentNetwork]
                                 "
                             >
                                 <Icon name="logo_symbol" size="24" />
@@ -584,7 +584,7 @@ export default defineComponent({
                         </div>
 
                         <template v-slot:content>{{
-                            event.creatorId == verifiedMakers.hangzhounet
+                            event.creatorId == verifiedMakers[currentNetwork]
                                 ? "Recurring event from Juster"
                                 : "Custom event from user"
                         }}</template>
@@ -705,7 +705,7 @@ export default defineComponent({
                 </Badge>
 
                 <Tooltip
-                    v-if="event.creatorId !== verifiedMakers.hangzhounet"
+                    v-if="event.creatorId !== verifiedMakers[currentNetwork]"
                     position="bottom"
                     side="left"
                 >

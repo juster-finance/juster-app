@@ -13,7 +13,11 @@ import {
 import { DateTime } from "luxon"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
-import { gql } from "@/services/tools"
+
+/**
+ * Services
+ */
+import { juster } from "@/services/sdk"
 
 /**
  * API
@@ -62,11 +66,11 @@ const defaultFilters = {
         },
         {
             name: "6h",
-            active: false,
+            active: true,
         },
         {
             name: "24h",
-            active: false,
+            active: true,
         },
     ],
 
@@ -359,7 +363,7 @@ export default defineComponent({
             marketStore.events = cloneDeep(allNewEvents)
 
             // subscribe to new events
-            subscription.value = await gql
+            subscription.value = await juster.gql
                 .subscription({
                     event: [
                         {
@@ -517,13 +521,6 @@ export default defineComponent({
                     All
                     {{ availableEvents.length - filteredEvents.length }} events
                     hidden due to filters
-
-                    <Button
-                        @click="handleResetFilters"
-                        type="secondary"
-                        size="mini"
-                        >Reset filters</Button
-                    >
                 </Banner>
                 <Banner
                     type="info"

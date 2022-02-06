@@ -16,9 +16,9 @@ export default defineComponent({
                     return require(`@/assets/onboarding/guide_icon_1.svg`)
                 case "orange":
                     return require(`@/assets/onboarding/guide_icon_2.svg`)
-                case "yellow":
-                    return require(`@/assets/onboarding/guide_icon_3.svg`)
                 case "green":
+                    return require(`@/assets/onboarding/guide_icon_3.svg`)
+                case "yellow":
                     return require(`@/assets/onboarding/guide_icon_4.svg`)
             }
         }

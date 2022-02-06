@@ -18,7 +18,7 @@ import { useAccountStore } from "@/store/account"
 /**
  * SDK
  */
-import { withdrawAll } from "@/services/sdk"
+import { withdraw } from "@/services/sdk"
 
 export default defineComponent({
     name: "WithdrawAllModal",
@@ -97,7 +97,7 @@ export default defineComponent({
 
             awaitingConfirmation.value = true
 
-            const result = await withdrawAll({
+            const result = await withdraw.withdrawAll({
                 eventIds: selectedEventsIds,
                 address: accountStore.pkh,
             })

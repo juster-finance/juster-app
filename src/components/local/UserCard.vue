@@ -14,6 +14,7 @@ import {
 /**
  * Services
  */
+import { currentNetwork } from "@/services/sdk"
 import { toClipboard } from "@/services/utils/global"
 
 /**
@@ -61,7 +62,7 @@ export default defineComponent({
             }
         }
 
-        return { handleCopy, accountStore }
+        return { handleCopy, accountStore, currentNetwork }
     },
 
     components: { Button, Dropdown, DropdownItem, DropdownDivider },
@@ -137,7 +138,9 @@ export default defineComponent({
                 </router-link>
 
                 <a
-                    :href="`https://hangzhou2net.tzkt.io/${user.userId}`"
+                    :href="`https://${
+                        currentNetwork == 'mainnet' ? '' : 'hangzhou2net.'
+                    }tzkt.io/${user.userId}`"
                     target="_blank"
                 >
                     <DropdownItem

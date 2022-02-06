@@ -1,7 +1,19 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, reactive } from "vue"
+import { useRouter } from "vue-router"
 import axios from "axios"
 import { DateTime } from "luxon"
+
+/**
+ * Services
+ */
+import { juster, switchNetwork, currentNetwork } from "@/services/sdk"
+import { capitalizeFirstLetter } from "@/services/utils/global"
+
+/**
+ * Constants
+ */
+import { Networks } from "@/services/constants"
 
 /**
  * Store
@@ -16,7 +28,9 @@ import Button from "@/components/ui/Button"
 import Tooltip from "@/components/ui/Tooltip"
 import { Dropdown, DropdownItem, DropdownTitle } from "@/components/ui/Dropdown"
 
-/** Watch for DipDup, Quotes, Hangzhounet */
+const router = useRouter()
+
+/** Watch for DipDup, Quotes, Network */
 let checkInterval = null
 
 const initCurrentDt = DateTime.now()
@@ -29,26 +43,26 @@ const STATUSES = {
 
 const status = reactive({
     dipdup: STATUSES.LOADING,
-    hangzhounet: STATUSES.LOADING,
+    network: STATUSES.LOADING,
     quotes: STATUSES.LOADING,
 })
 
 const statusBlock = computed(() => {
     if (
         status.dipdup === STATUSES.GOOD &&
-        status.hangzhounet === STATUSES.GOOD &&
+        status.network === STATUSES.GOOD &&
         status.quotes == STATUSES.GOOD
     ) {
         return { text: "All systems online", color: "green" }
     } else if (
         status.dipdup === STATUSES.DELAYED &&
-        status.hangzhounet === STATUSES.DELAYED &&
+        status.network === STATUSES.DELAYED &&
         status.quotes == STATUSES.DELAYED
     ) {
         return { text: "All systems delayed", color: "red" }
     } else if (
         status.dipdup !== STATUSES.GOOD ||
-        status.hangzhounet !== STATUSES.GOOD ||
+        status.network !== STATUSES.GOOD ||
         status.quotes !== STATUSES.GOOD
     ) {
         return { text: "Some systems delayed", color: "yellow" }
@@ -56,11 +70,13 @@ const statusBlock = computed(() => {
 })
 
 const checkDipdup = async () => {
+    const urlToCheck =
+        currentNetwork.value == "mainnet"
+            ? "https://juster.dipdup.net/api/rest/dipdupHead?name=https://api.tzkt.io"
+            : "https://api.hangzhounet.juster.fi/api/rest/dipdupHead?name=https://api.hangzhou2net.tzkt.io"
     const {
         data: { dipdupHeadByPk },
-    } = await axios.get(
-        "https://api.hangzhounet.juster.fi/api/rest/dipdupHead?name=https://api.hangzhou2net.tzkt.io",
-    )
+    } = await axios.get(urlToCheck)
 
     const dipdupDt = DateTime.fromISO(dipdupHeadByPk.timestamp)
     const dipdupDiff = initCurrentDt
@@ -74,20 +90,22 @@ const checkDipdup = async () => {
     }
 }
 
-const checkHangzhounet = async () => {
+const checkNetwork = async () => {
     const { data } = await axios.get(
-        "https://rpc.tzkt.io/mainnet/chains/main/blocks/head/header",
+        `https://rpc.tzkt.io/${
+            currentNetwork.value == "mainnet" ? "mainnet" : "hangzhou2net"
+        }/chains/main/blocks/head/header`,
     )
 
-    const hanghzhounetDt = DateTime.fromISO(data.timestamp)
-    const hanghzhounetDiff = initCurrentDt
-        .diff(hanghzhounetDt, ["minutes", "seconds"])
+    const networkDt = DateTime.fromISO(data.timestamp)
+    const networkDiff = initCurrentDt
+        .diff(networkDt, ["minutes", "seconds"])
         .toObject()
 
-    if (hanghzhounetDiff.minutes >= 1) {
-        status.hangzhounet = STATUSES.DELAYED
+    if (networkDiff.minutes >= 1) {
+        status.network = STATUSES.DELAYED
     } else {
-        status.hangzhounet = STATUSES.GOOD
+        status.network = STATUSES.GOOD
     }
 }
 
@@ -108,6 +126,12 @@ const checkQuotes = () => {
     }
 }
 
+const handleSwitch = (network) => {
+    juster.sdk._provider.client.clearActiveAccount().then(async () => {
+        switchNetwork(network)
+    })
+}
+
 marketStore.$subscribe((mutation, state) => {
     if (state.markets["XTZ-USD"].quotes.length) {
         checkQuotes()
@@ -116,11 +140,11 @@ marketStore.$subscribe((mutation, state) => {
 
 onMounted(async () => {
     checkDipdup()
-    checkHangzhounet()
+    checkNetwork()
 
     checkInterval = setInterval(async () => {
         checkDipdup()
-        checkHangzhounet()
+        checkNetwork()
         checkQuotes()
     }, 30000)
 })
@@ -202,10 +226,8 @@ onBeforeUnmount(() => {
 
                             <template #content
                                 ><span>DipDup:</span> {{ status.dipdup
-                                }}<br /><span>Hangzhounet:</span>
-                                {{ status.hangzhounet }}<br /><span
-                                    >Quotes:</span
-                                >
+                                }}<br /><span>Network:</span> {{ status.network
+                                }}<br /><span>Quotes:</span>
                                 {{ status.quotes }}</template
                             >
                         </Tooltip>
@@ -215,24 +237,39 @@ onBeforeUnmount(() => {
                                 <Button
                                     type="secondary"
                                     size="small"
-                                    :class="[$style.footer_btn, $style.yellow]"
+                                    :class="[
+                                        $style.footer_btn,
+                                        currentNetwork == 'mainnet'
+                                            ? $style.green
+                                            : $style.yellow,
+                                    ]"
                                 >
-                                    <Icon name="network" size="12" />Hangzhounet
+                                    <Icon name="network" size="12" />{{
+                                        capitalizeFirstLetter(currentNetwork)
+                                    }}
                                     <Icon name="arrow" size="12" />
                                 </Button>
                             </template>
 
                             <template #dropdown>
                                 <DropdownTitle>Network</DropdownTitle>
-                                <DropdownItem
+                                <DropdownItem @click="handleSwitch('mainnet')"
                                     ><Icon
-                                        name="network"
+                                        :name="
+                                            currentNetwork == 'mainnet'
+                                                ? 'checkcircle'
+                                                : 'network'
+                                        "
                                         size="12"
                                     />Mainnet</DropdownItem
                                 >
-                                <DropdownItem
+                                <DropdownItem @click="handleSwitch('testnet')"
                                     ><Icon
-                                        name="network"
+                                        :name="
+                                            currentNetwork == 'hangzhounet'
+                                                ? 'checkcircle'
+                                                : 'network'
+                                        "
                                         size="12"
                                     />Hangzhounet</DropdownItem
                                 >

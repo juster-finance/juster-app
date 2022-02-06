@@ -6,7 +6,12 @@ import { NetworkType } from "@airgap/beacon-sdk"
 /**
  * Services
  */
-import { juster } from "@/services/tools"
+import { juster, currentNetwork } from "@/services/sdk"
+
+/**
+ * Constants
+ */
+import { Networks } from "@/services/constants"
 
 /**
  * UI
@@ -83,7 +88,7 @@ const isActive = (url) => {
 }
 
 const login = () => {
-    juster._provider.client.getActiveAccount().then(async (account) => {
+    juster.sdk._provider.client.getActiveAccount().then(async (account) => {
         if (!localStorage["connectingModal"]) {
             showConnectingModal.value = true
 
@@ -110,7 +115,7 @@ const login = () => {
 const address = ref("")
 const network = ref("")
 const handleLogin = async () => {
-    await juster.sync()
+    await juster.sdk.sync()
     login()
 }
 
@@ -122,7 +127,7 @@ const handleCustomLogin = () => {
     showCustomLoginModal.value = true
 }
 const handleSelectCustomNode = async (node) => {
-    await juster._provider.requestPermissions({
+    await juster.sdk._provider.requestPermissions({
         network: {
             type: NetworkType.CUSTOM,
             name: node.value.name,
@@ -155,8 +160,8 @@ const handleDisagree = () => {
 
     address.value = ""
 
-    juster._provider.client.clearActiveAccount().then(async () => {
-        await juster._provider.client.getActiveAccount()
+    juster.sdk._provider.client.clearActiveAccount().then(async () => {
+        await juster.sdk._provider.client.getActiveAccount()
         accountStore.setPkh("")
         router.push("/")
     })
@@ -175,8 +180,8 @@ const handleOpenWithdrawals = () => {
 }
 
 const handleLogout = () => {
-    juster._provider.client.clearActiveAccount().then(async () => {
-        await juster._provider.client.getActiveAccount()
+    juster.sdk._provider.client.clearActiveAccount().then(async () => {
+        await juster.sdk._provider.client.getActiveAccount()
 
         amplitude.logEvent("logout", { address: accountStore.pkh })
 
@@ -295,7 +300,10 @@ const pkh = computed(() => accountStore.pkh)
             </div>
 
             <div :class="$style.right">
-                <Tooltip v-if="pkh" side="right">
+                <Tooltip
+                    v-if="currentNetwork !== Networks.MAINNET"
+                    side="right"
+                >
                     <div :class="$style.testnet_warning">
                         <Icon
                             name="Warning"
