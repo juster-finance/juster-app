@@ -84,8 +84,11 @@ const disaggregate = (num) => {
         <div :class="$style.labels">
             <div :class="$style.label">Start price</div>
 
-            <span v-if="event.status == 'STARTED'"
+            <span v-if="event.status == 'STARTED' && finishTime.m > 0"
                 >{{ finishTime.h }}h {{ finishTime.m }}m</span
+            >
+            <span v-if="event.status == 'STARTED' && finishTime.m <= 0"
+                >Ending</span
             >
 
             <div
