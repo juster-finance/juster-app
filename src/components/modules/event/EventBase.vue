@@ -697,20 +697,18 @@ const { meta } = useMeta({
                         <div :class="$style.column">RISE</div>
                         <div :class="$style.column">FALL</div>
 
-                        <Tooltip
-                            position="bottom"
-                            side="left"
-                            :class="$style.column"
-                        >
-                            <div>REWARD</div>
+                        <div :class="$style.column">
+                            <Tooltip position="bottom" side="left">
+                                REWARD&nbsp;<Icon name="help" size="12" />
 
-                            <template #content
-                                ><span><b>Formula:</b></span> pool
-                                <span>x</span> myShares
-                                <span>x</span> eventShares
-                                <span>-</span> depositAmount</template
-                            >
-                        </Tooltip>
+                                <template #content
+                                    ><span><b>Formula:</b></span> pool
+                                    <span>x</span> myShares
+                                    <span>x</span> eventShares
+                                    <span>-</span> depositAmount</template
+                                >
+                            </Tooltip>
+                        </div>
                     </div>
                     <div v-if="filteredDeposits.length" :class="$style.bets">
                         <DepositCard
@@ -965,10 +963,15 @@ const { meta } = useMeta({
 }
 
 .column {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
     font-size: 12px;
     line-height: 1;
     font-weight: 700;
     color: var(--text-tertiary);
+    fill: var(--text-tertiary);
 }
 
 .column:nth-child(1) {
