@@ -31,8 +31,7 @@ import Tooltip from "@/components/ui/Tooltip"
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
 import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
 import BetModal from "@/components/local/modals/position/BetModal"
-
-import EventCardActions from "./EventCardActions"
+import EventActions from "@/components/local/EventActions"
 
 /**
  * Services
@@ -50,6 +49,7 @@ import { supportedMarkets, justerLiquidityAddress } from "@/services/config"
  * Composable
  */
 import { useCountdown } from "@/composable/date"
+import { useMarket } from "@/composable/market"
 
 /**
  * Store
@@ -74,6 +74,8 @@ export default defineComponent({
         const notificationsStore = useNotificationsStore()
         const accountStore = useAccountStore()
         const marketStore = useMarketStore()
+
+        const { updateWithdrawals } = useMarket()
 
         const card = ref(null)
         const openContextMenu = ref(false)
@@ -263,6 +265,15 @@ export default defineComponent({
                             accountStore.pendingTransaction.awaiting = false
                             isWithdrawing.value = false
 
+                            /** rm won position from store */
+                            accountStore.positionsForWithdrawal =
+                                accountStore.positionsForWithdrawal.filter(
+                                    (position) =>
+                                        position.event.id != event.value.id,
+                                )
+
+                            updateWithdrawals()
+
                             if (!result.completed) {
                                 // todo: handle it?
                             }
@@ -287,6 +298,7 @@ export default defineComponent({
                     })
                 })
                 .catch((err) => {
+                    accountStore.pendingTransaction.awaiting = false
                     isWithdrawing.value = false
                 })
         }
@@ -338,11 +350,6 @@ export default defineComponent({
             contextMenuStyles.left = `${e.clientX}px`
 
             openContextMenu.value = !openContextMenu.value
-        }
-
-        const handleSwitch = () => {
-            showBetModal.value = !showBetModal.value
-            showLiquidityModal.value = !showLiquidityModal.value
         }
 
         onMounted(async () => {
@@ -446,7 +453,6 @@ export default defineComponent({
             isWithdrawing,
             handleWithdraw,
             copy,
-            handleSwitch,
             getCurrencyIcon,
             abbreviateNumber,
             supportedMarkets,
@@ -455,7 +461,7 @@ export default defineComponent({
     },
 
     components: {
-        EventCardActions,
+        EventActions,
         Button,
         Badge,
         Tooltip,
@@ -476,14 +482,12 @@ export default defineComponent({
                 :show="showBetModal"
                 :event="event"
                 :preselectedSide="preselectedSide"
-                @switch="handleSwitch"
                 @onBet="showBetModal = false"
                 @onClose="showBetModal = false"
             />
             <LiquidityModal
                 :show="showLiquidityModal"
                 :event="event"
-                @switch="handleSwitch"
                 @onClose="showLiquidityModal = false"
             />
             <ParticipantsModal
@@ -865,7 +869,7 @@ export default defineComponent({
                 </Tooltip>
             </div>
 
-            <EventCardActions
+            <EventActions
                 @onBet="handleBet"
                 @onWithdraw="handleWithdraw"
                 :event="event"

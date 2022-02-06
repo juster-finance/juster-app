@@ -118,6 +118,12 @@ export const useMarket = () => {
         })
     }
 
+    const updateWithdrawals = async () => {
+        accountStore.withdrawals = await fetchUserWithdrawals({
+            address: accountStore.pkh,
+        })
+    }
+
     const setupMarket = async () => {
         const allMarkets = await fetchMarkets()
 
@@ -187,5 +193,5 @@ export const useMarket = () => {
         })
     }
 
-    return { setupMarket, setupUser, markets }
+    return { setupMarket, setupUser, updateWithdrawals, markets }
 }

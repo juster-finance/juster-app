@@ -2,6 +2,11 @@
 import { computed } from "vue"
 
 /**
+ * UI
+ */
+import Button from "@/components/ui/Button"
+
+/**
  * Local
  */
 import Pool from "@/components/local/Pool"
@@ -9,9 +14,10 @@ import Pool from "@/components/local/Pool"
 /**
  * Services
  */
-import { abbreviateNumber } from "@/services/utils/amounts"
+import { numberWithSymbol } from "@/services/utils/amounts"
 
 const props = defineProps({ event: { type: Object } })
+const emit = defineEmits(["onLiquidity"])
 
 const risePool = computed(() =>
     props.event.bets
@@ -27,17 +33,34 @@ const fallPool = computed(() =>
 
 <template>
     <div :class="$style.wrapper">
-        <div :class="$style.title">
-            Liquidity Pool <Icon name="help" size="14" />
-        </div>
+        <div :class="$style.title">Liquidity</div>
 
         <Pool :event="event" />
 
-        <div :class="$style.hint">
-            Users bet <span>{{ abbreviateNumber(risePool) }} XTZ</span> for the
-            fact that the price will rise and
-            <span>{{ abbreviateNumber(fallPool) }} XTZ</span> for a fall. Make
-            your choice.
+        <Button
+            @click="emit('onLiquidity')"
+            type="secondary"
+            size="small"
+            block
+            :class="$style.liquidity_btn"
+            ><Icon name="liquidity" size="12" />Add Liquidity</Button
+        >
+
+        <div :class="$style.params">
+            <div :class="$style.param">
+                <span><Icon name="liquidity" size="12" />Provided</span>
+
+                <span
+                    >{{ numberWithSymbol(event.totalLiquidityProvided, ",") }}
+                    <span>XTZ</span></span
+                >
+            </div>
+
+            <div :class="$style.param">
+                <span><Icon name="bolt" size="12" />Percent</span>
+
+                <span>{{ event.liquidityPercent * 100 }}% </span>
+            </div>
         </div>
     </div>
 </template>
@@ -51,28 +74,50 @@ const fallPool = computed(() =>
 }
 
 .title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
     font-size: 14px;
     line-height: 1;
     font-weight: 500;
     color: var(--text-primary);
-    fill: var(--opacity-40);
 
     margin-bottom: 20px;
 }
 
-.hint {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--text-tertiary);
-
+.liquidity_btn {
     margin-top: 16px;
 }
 
-.hint span {
+/* Params */
+.params {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    margin-top: 32px;
+}
+
+.param {
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 600;
+}
+
+.param span:nth-child(1) {
+    color: var(--text-tertiary);
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    fill: var(--opacity-40);
+}
+
+.param span:nth-child(2) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
     color: var(--text-secondary);
 }
 </style>

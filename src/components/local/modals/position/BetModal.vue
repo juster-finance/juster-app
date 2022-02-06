@@ -17,6 +17,7 @@ import { DateTime } from "luxon"
  * Services
  */
 import { juster } from "@/services/tools"
+import { justerLiquidityAddress } from "@/services/config"
 
 /**
  * Local
@@ -346,10 +347,11 @@ export default defineComponent({
             showHint,
             handleLogin,
             buttonState,
+            justerLiquidityAddress,
         }
     },
 
-    emits: ["switch", "onClose", "onBet"],
+    emits: ["onClose", "onBet"],
     components: {
         Modal,
         Input,
@@ -383,7 +385,12 @@ export default defineComponent({
                 :class="$style.direction"
             />
 
-            <Banner type="warning" size="small" :class="$style.banner">
+            <Banner
+                v-if="event.creatorId !== justerLiquidityAddress"
+                type="warning"
+                size="small"
+                :class="$style.banner"
+            >
                 This event is Custom, its behavior may depend on the parameters
             </Banner>
 

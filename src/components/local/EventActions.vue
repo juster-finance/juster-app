@@ -16,6 +16,7 @@ import { useAccountStore } from "@/store/account"
 const accountStore = useAccountStore()
 
 const props = defineProps({
+    primary: Boolean,
     event: Object,
     won: Boolean,
     wonPosition: Object,
@@ -45,7 +46,11 @@ const successfulWithdrawal = computed(() =>
         <template v-if="!won && !wonPosition">
             <div
                 @click.prevent="emit('onBet', 'rise')"
-                :class="[$style.action, disabled && $style.disabled]"
+                :class="[
+                    $style.action,
+                    primary && $style.primary,
+                    disabled && $style.disabled,
+                ]"
             >
                 <div :class="$style.left">
                     <Icon name="higher" size="14" :class="$style.higher_icon" />
@@ -67,7 +72,11 @@ const successfulWithdrawal = computed(() =>
 
             <div
                 @click.prevent="emit('onBet', 'fall')"
-                :class="[$style.action, disabled && $style.disabled]"
+                :class="[
+                    $style.action,
+                    primary && $style.primary,
+                    disabled && $style.disabled,
+                ]"
             >
                 <div :class="$style.ratio">
                     <Icon name="close" size="10" />
@@ -90,6 +99,7 @@ const successfulWithdrawal = computed(() =>
             v-else
             @click.prevent="emit('onWithdraw')"
             :type="
+                (accountStore.pendingTransaction.awaiting && 'secondary') ||
                 (isWithdrawing && 'secondary') ||
                 (won && !wonPosition && 'secondary') ||
                 (won && wonPosition && 'success')
@@ -100,7 +110,7 @@ const successfulWithdrawal = computed(() =>
         >
             <template v-if="won && !wonPosition"
                 >Successfully withdrawn
-                {{ successfulWithdrawal.amount.toFixed(2) }} XTZ</template
+                {{ successfulWithdrawal?.amount.toFixed(2) }} XTZ</template
             >
 
             <template v-else-if="accountStore.pendingTransaction.awaiting">
@@ -143,6 +153,10 @@ const successfulWithdrawal = computed(() =>
     transition: background 0.2s ease;
 }
 
+.action.primary {
+    background: #285dbf;
+}
+
 .action.disabled {
     pointer-events: none;
     opacity: 0.5;
@@ -150,6 +164,10 @@ const successfulWithdrawal = computed(() =>
 
 .action:hover {
     background: #313133;
+}
+
+.action.primary:hover {
+    background: #1f4fa8;
 }
 
 .left {
@@ -165,15 +183,23 @@ const successfulWithdrawal = computed(() =>
     color: var(--text-primary);
 }
 
-.higher_icon {
+.action .higher_icon {
     fill: var(--green);
 }
 
-.lower_icon {
+.action .lower_icon {
     fill: var(--orange);
 }
 
-.ratio {
+.action.primary .higher_icon {
+    fill: var(--text-secondary);
+}
+
+.action.primary .lower_icon {
+    fill: var(--text-secondary);
+}
+
+.action .ratio {
     display: flex;
     align-items: center;
     gap: 1px;
@@ -186,6 +212,10 @@ const successfulWithdrawal = computed(() =>
 
 .ratio svg {
     fill: var(--text-tertiary);
+}
+
+.action.primary .ratio {
+    color: var(--text-tertiary);
 }
 
 .divider {

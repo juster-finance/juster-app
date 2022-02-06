@@ -33,9 +33,9 @@ import {
  * Local
  */
 import EventChart from "./EventChart"
+import EventGeneralCard from "./EventGeneralCard"
+import EventPriceCard from "./EventPriceCard"
 import EventPoolCard from "./EventPoolCard"
-import EventDetailsCard from "./EventDetailsCard"
-import EventTargetsCard from "./EventTargetsCard"
 import EventPersonalStats from "./EventPersonalStats"
 
 import BetCard from "@/components/modules/events/BetCard"
@@ -44,11 +44,13 @@ import DepositCard from "@/components/modules/events/DepositCard"
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
 import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
 import BetModal from "@/components/local/modals/position/BetModal"
+import EventDetailsModal from "@/components/local/modals/EventDetailsModal"
 
 /**
  * Composable
  */
 import { useCountdown } from "@/composable/date"
+import { useMarket } from "@/composable/market"
 
 /**
  * API
@@ -59,7 +61,11 @@ import { fetchEventById, fetchEventParticipants } from "@/api/events"
  * Services
  */
 import { numberWithSymbol } from "@/services/utils/amounts"
-import { toClipboard, getCurrencyIcon } from "@/services/utils/global"
+import {
+    toClipboard,
+    getCurrencyIcon,
+    capitalizeFirstLetter,
+} from "@/services/utils/global"
 import { juster, gql } from "@/services/tools"
 import { supportedMarkets, justerLiquidityAddress } from "@/services/config"
 
@@ -72,6 +78,8 @@ import { useNotificationsStore } from "@/store/notifications"
 const marketStore = useMarketStore()
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
+
+const { updateWithdrawals } = useMarket()
 
 const amplitude = inject("amplitude")
 
@@ -90,14 +98,7 @@ const breadcrumbs = reactive([
 const showBetModal = ref(false)
 const showLiquidityModal = ref(false)
 const showParticipantsModal = ref(false)
-
-/**
- * Switch between Liquidity <-> Bet
- */
-const handleSwitch = () => {
-    showBetModal.value = !showBetModal.value
-    showLiquidityModal.value = !showLiquidityModal.value
-}
+const showEventDetailsModal = ref(false)
 
 /**
  * Filters
@@ -134,28 +135,34 @@ const won = computed(() => {
         .filter((bet) => bet.userId == accountStore.pkh)
         .filter((bet) => bet.side == event.value.winnerBets).length
 })
-
-const canWithdraw = computed(() => {
-    return accountStore.positionsForWithdrawal.some(
+const positionForWithdraw = computed(() => {
+    return accountStore.wonPositions.find(
         (position) => position.event.id == event.value.id,
     )
 })
 
-/** Countdown setup */
-const eventStartTime = computed(() =>
-    new Date(event.value?.betsCloseTime).getTime(),
-)
-const { status: startStatus, time, stop } = useCountdown(eventStartTime)
+/** Countdown setup: Time to start */
+const startDt = computed(() => new Date(event.value?.betsCloseTime).getTime())
+const {
+    countdownText: startCountdownText,
+    status: startStatus,
+    time: startTime,
+    stop: destroyStartCountdown,
+} = useCountdown(startDt)
 
-// eslint-disable-next-line vue/return-in-computed-property
-const timeLeft = computed(() => {
-    if (time.h > 0) {
-        return { num: time.h, suffix: time.h > 1 ? "hrs" : "hr" }
-    }
-    if (time.h == 0) {
-        return { num: time.m, suffix: time.m > 1 ? "mins" : "min" }
-    }
-})
+/** Countdown setup: Time to finish */
+const finishDt = computed(() =>
+    DateTime.fromISO(event.value?.betsCloseTime)
+        .plus({ second: event.value?.measurePeriod })
+        .toJSDate()
+        .getTime(),
+)
+const {
+    countdownText: finishCountdownText,
+    status: finishStatus,
+    time: finishTime,
+    stop: destroyFinishCountdown,
+} = useCountdown(finishDt)
 
 const symbol = computed(() => event.value.currencyPair.symbol)
 
@@ -298,11 +305,20 @@ const timing = computed(() => {
     }
 })
 
-const handleJoin = (event) => {
-    event.stopPropagation()
-    showBetModal.value = true
+const preselectedSide = ref("Rise")
+const handleJoin = (target) => {
+    preselectedSide.value = capitalizeFirstLetter(target)
+
+    /** disable Bet / Liquidity right after betsCloseTime */
+    if (
+        startStatus.value == "Finished" ||
+        event.value.totalLiquidityProvided == 0
+    )
+        return
 
     amplitude.logEvent("showBetModal", { where: "event_base" })
+
+    showBetModal.value = true
 }
 
 const handleBet = (bet) => {
@@ -316,21 +332,39 @@ const handleLiquidity = () => {
     amplitude.logEvent("showLiquidityModal", { where: "event_base" })
 }
 
-const handleWithdraw = (e) => {
-    e.stopPropagation()
+const isWithdrawing = ref(false)
+const handleWithdraw = () => {
+    isWithdrawing.value = true
 
     amplitude.logEvent("clickWithdraw", { where: "event_base" })
 
     juster
         .withdraw(event.value.id, accountStore.pkh)
         .then((op) => {
-            console.log(`Hash: ${op.opHash}`)
+            /** Pending transaction label */
+            accountStore.pendingTransaction.awaiting = true
 
-            /** rm won position from store */
-            accountStore.positionsForWithdrawal =
-                accountStore.positionsForWithdrawal.filter(
-                    (position) => position.event.id != event.value.id,
-                )
+            op.confirmation()
+                .then((result) => {
+                    accountStore.pendingTransaction.awaiting = false
+                    isWithdrawing.value = false
+
+                    /** rm won position from store */
+                    accountStore.positionsForWithdrawal =
+                        accountStore.positionsForWithdrawal.filter(
+                            (position) => position.event.id != event.value.id,
+                        )
+
+                    updateWithdrawals()
+
+                    if (!result.completed) {
+                        // todo: handle it?
+                    }
+                })
+                .catch((err) => {
+                    accountStore.pendingTransaction.awaiting = false
+                    isWithdrawing.value = false
+                })
 
             notificationsStore.create({
                 notification: {
@@ -341,8 +375,14 @@ const handleWithdraw = (e) => {
                     autoDestroy: true,
                 },
             })
+
+            amplitude.logEvent("onWithdraw", {
+                eventId: event.value.id,
+            })
         })
-        .catch((err) => console.log(err))
+        .catch((err) => {
+            isWithdrawing.value = false
+        })
 }
 
 const handleParticipants = () => {
@@ -460,7 +500,8 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-    stop()
+    destroyStartCountdown()
+    destroyFinishCountdown()
 })
 
 /** Meta */
@@ -483,7 +524,7 @@ const { meta } = useMeta({
             v-if="event"
             :show="showBetModal"
             :event="event"
-            @switch="handleSwitch"
+            :preselectedSide="preselectedSide"
             @onBet="handleBet"
             @onClose="showBetModal = false"
         />
@@ -491,7 +532,6 @@ const { meta } = useMeta({
             v-if="event"
             :show="showLiquidityModal"
             :event="event"
-            @switch="handleSwitch"
             @onClose="showLiquidityModal = false"
         />
         <ParticipantsModal
@@ -500,309 +540,17 @@ const { meta } = useMeta({
             :event="event"
             @onClose="showParticipantsModal = false"
         />
+        <EventDetailsModal
+            v-if="event"
+            :show="showEventDetailsModal"
+            :event="event"
+            @onClose="showEventDetailsModal = false"
+        />
 
         <Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
         <div v-if="event" :class="$style.container">
             <div :class="$style.base">
-                <Banner
-                    v-if="event.status == 'CANCELED'"
-                    type="error"
-                    :class="$style.banner"
-                    >The event was canceled due to problems with the start of
-                    price measurement. All bets and liquidity are
-                    refunded</Banner
-                >
-
-                <div v-if="event" :class="$style.event">
-                    <div :class="$style.header">
-                        <div :class="$style.info">
-                            <!-- Name -->
-                            <h3 :class="$style.name">
-                                <div :class="$style.symbol_image">
-                                    <img
-                                        :src="
-                                            getCurrencyIcon(
-                                                symbol.split('-')[0],
-                                            )
-                                        "
-                                    />
-
-                                    <Icon
-                                        v-if="event.winnerBets"
-                                        name="higher"
-                                        size="16"
-                                        :class="
-                                            event.winnerBets == 'ABOVE_EQ'
-                                                ? $style.higher
-                                                : $style.lower
-                                        "
-                                    />
-                                </div>
-
-                                {{ supportedMarkets[symbol].description }}
-                            </h3>
-
-                            <!-- Timing -->
-                            <div v-if="timing.showDay" :class="$style.timing">
-                                {{ timing.start.day }}
-                                <span>{{ timing.start.time }}</span>
-                                ->
-                                {{ timing.end.day }}
-                                <span>{{ timing.end.time }}</span>
-
-                                ({{ event.measurePeriod / 3600 }}h)
-                            </div>
-                            <div v-else :class="$style.timing">
-                                {{ timing.start.day }}
-                                <span>{{ timing.start.time }}</span> ->
-                                <span>{{ timing.end.time }}</span>
-
-                                ({{ event.measurePeriod / 3600 }}h)
-                            </div>
-
-                            <!-- Labels -->
-                            <div :class="$style.labels">
-                                <Tooltip
-                                    v-if="
-                                        startStatus == 'In progress' &&
-                                        event.status == 'NEW'
-                                    "
-                                    position="bottom"
-                                    side="left"
-                                >
-                                    <Badge
-                                        size="medium"
-                                        color="green"
-                                        :class="$style.main_badge"
-                                    >
-                                        <Icon name="event_new" size="14" />New
-                                    </Badge>
-
-                                    <template v-slot:content>
-                                        The event is available for betting and
-                                        providing liquidity
-                                    </template>
-                                </Tooltip>
-                                <Tooltip
-                                    v-else-if="
-                                        startStatus == 'Finished' &&
-                                        event.status == 'NEW'
-                                    "
-                                    position="bottom"
-                                    side="left"
-                                >
-                                    <Badge
-                                        size="medium"
-                                        color="yellow"
-                                        :class="$style.main_badge"
-                                    >
-                                        <Icon
-                                            name="event_new"
-                                            size="14"
-                                        />Starting
-                                    </Badge>
-
-                                    <template v-slot:content
-                                        >Betting is closed. The event is
-                                        starting</template
-                                    >
-                                </Tooltip>
-                                <Tooltip
-                                    v-else-if="event.status == 'STARTED'"
-                                    position="bottom"
-                                    side="left"
-                                >
-                                    <Badge
-                                        size="medium"
-                                        color="yellow"
-                                        :class="$style.main_badge"
-                                    >
-                                        <Icon
-                                            name="event_active"
-                                            size="14"
-                                        />Active
-                                    </Badge>
-                                    <template v-slot:content
-                                        >Betting is closed. The end of the event
-                                        is pending</template
-                                    >
-                                </Tooltip>
-                                <Tooltip
-                                    v-else-if="event.status == 'FINISHED'"
-                                    position="bottom"
-                                    side="left"
-                                >
-                                    <Badge
-                                        size="medium"
-                                        color="gray"
-                                        :class="$style.main_badge"
-                                    >
-                                        <Icon
-                                            name="event_finished"
-                                            size="14"
-                                        />Finished
-                                    </Badge>
-                                    <template v-slot:content
-                                        >The event is closed, winning side
-                                        determined</template
-                                    >
-                                </Tooltip>
-                                <Tooltip
-                                    v-else-if="event.status == 'CANCELED'"
-                                    position="bottom"
-                                    side="left"
-                                >
-                                    <Badge
-                                        size="medium"
-                                        color="orange"
-                                        :class="$style.main_badge"
-                                    >
-                                        <Icon name="stop" size="14" />Canceled
-                                    </Badge>
-                                    <template v-slot:content
-                                        >This event has been canceled, funds
-                                        returned</template
-                                    >
-                                </Tooltip>
-
-                                <Tooltip
-                                    v-else-if="startStatus == 'In progress'"
-                                    position="bottom"
-                                    side="left"
-                                >
-                                    <Badge
-                                        size="medium"
-                                        color="gray"
-                                        :class="$style.header_badge"
-                                    >
-                                        <Icon name="time" size="14" />
-                                        <span>Start in</span>
-                                        {{
-                                            timeLeft.num == 0
-                                                ? "<1"
-                                                : timeLeft.num
-                                        }}
-                                        {{ timeLeft.suffix }}</Badge
-                                    >
-
-                                    <template v-slot:content>
-                                        Time left to make a bet or provide
-                                        liquidity
-                                    </template>
-                                </Tooltip>
-
-                                <!-- Custom event warning -->
-                                <Tooltip
-                                    v-if="
-                                        event.creatorId !==
-                                        justerLiquidityAddress
-                                    "
-                                    position="bottom"
-                                    side="left"
-                                >
-                                    <Badge
-                                        size="medium"
-                                        color="yellow"
-                                        :class="$style.badge"
-                                    >
-                                        <Icon name="bolt" size="14" /> Custom
-                                    </Badge>
-
-                                    <template v-slot:content
-                                        >Custom event from user</template
-                                    >
-                                </Tooltip>
-                            </div>
-                        </div>
-
-                        <div :class="$style.actions">
-                            <Dropdown>
-                                <template v-slot:trigger>
-                                    <Button
-                                        type="tertiary"
-                                        size="small"
-                                        icon="dots"
-                                    />
-                                </template>
-
-                                <template v-slot:dropdown>
-                                    <DropdownItem @click="handleParticipants"
-                                        ><Icon name="users" size="16" />View
-                                        participants
-                                    </DropdownItem>
-                                    <DropdownItem disabled
-                                        ><Icon
-                                            name="notifications"
-                                            size="16"
-                                        />Notifiy me
-                                    </DropdownItem>
-
-                                    <DropdownDivider />
-
-                                    <DropdownItem @click="copy('id')"
-                                        ><Icon name="copy" size="16" />Copy ID
-                                    </DropdownItem>
-                                    <DropdownItem @click="copy('url')"
-                                        ><Icon name="copy" size="16" />Copy URL
-                                    </DropdownItem>
-                                </template>
-                            </Dropdown>
-
-                            <Button
-                                v-if="
-                                    event.status == 'FINISHED' &&
-                                    won &&
-                                    canWithdraw
-                                "
-                                @click="handleWithdraw"
-                                type="success"
-                                size="small"
-                                :disabled="event.totalLiquidityProvided == 0"
-                                :class="$style.action"
-                                >Withdraw</Button
-                            >
-
-                            <Button
-                                v-if="won && !canWithdraw"
-                                type="success"
-                                size="small"
-                                disabled
-                                >Withdrawn</Button
-                            >
-
-                            <template
-                                v-else-if="
-                                    event.status == 'NEW' &&
-                                    startStatus == 'In progress'
-                                "
-                            >
-                                <Button
-                                    @click="handleLiquidity"
-                                    type="secondary"
-                                    size="small"
-                                    :disabled="
-                                        event.totalLiquidityProvided == 0
-                                    "
-                                    :class="$style.action"
-                                    ><Icon name="liquidity" size="16" />Add
-                                    liquidity</Button
-                                >
-                                <Button
-                                    @click="handleJoin"
-                                    type="primary"
-                                    size="small"
-                                    :disabled="
-                                        event.totalLiquidityProvided == 0
-                                    "
-                                    :class="$style.action"
-                                    >Make a bet</Button
-                                >
-                            </template>
-                        </div>
-                    </div>
-                </div>
-
                 <EventChart
                     v-if="event && event.status !== 'CANCELED'"
                     :event="event"
@@ -970,17 +718,40 @@ const { meta } = useMeta({
             </div>
 
             <div v-if="event" :class="$style.side">
-                <EventTargetsCard :event="event" :price="price" />
-
-                <EventPoolCard :event="event" />
-
-                <EventDetailsCard
+                <EventGeneralCard
                     :event="event"
-                    :participants="participants"
-                    :highestRatio="highestRatio"
+                    :startStatus="startStatus"
+                    :finishStatus="finishStatus"
+                    :startCountdown="startCountdownText"
+                    :finishCountdown="finishCountdownText"
+                    :price="price"
+                    :won="won"
+                    :positionForWithdraw="positionForWithdraw"
+                    :isWithdrawing="isWithdrawing"
+                    @openParticipants="handleParticipants"
+                    @onBet="handleJoin"
+                    @onWithdraw="handleWithdraw"
                 />
 
-                <div :class="$style.additional_buttons">
+                <EventPriceCard
+                    v-if="event.status !== 'CANCELED'"
+                    :event="event"
+                    :price="price"
+                    :finishTime="finishTime"
+                />
+
+                <EventPoolCard :event="event" @onLiquidity="handleLiquidity" />
+
+                <Button
+                    @click="showEventDetailsModal = true"
+                    type="secondary"
+                    size="small"
+                    block
+                    :class="$style.details_btn"
+                    ><Icon name="menu" size="12" />View event details</Button
+                >
+
+                <!-- <div :class="$style.additional_buttons">
                     <Button type="secondary" size="mini" disabled
                         ><Icon name="flag" size="16" />Report this event</Button
                     >
@@ -992,7 +763,7 @@ const { meta } = useMeta({
                             Make a bet</Button
                         >
                     </router-link>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -1202,11 +973,13 @@ const { meta } = useMeta({
     gap: 4px;
 }
 
+.details_btn {
+    margin-top: 8px;
+}
+
 .additional_buttons {
     display: flex;
     justify-content: space-between;
-
-    margin-top: 8px;
 }
 
 .filters {

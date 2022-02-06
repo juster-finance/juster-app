@@ -16,6 +16,7 @@ import { DateTime } from "luxon"
  * Services
  */
 import { juster } from "@/services/tools"
+import { justerLiquidityAddress } from "@/services/config"
 
 /**
  * Local
@@ -248,10 +249,11 @@ export default defineComponent({
             handleProvideLiquidity,
             handleLogin,
             buttonState,
+            justerLiquidityAddress,
         }
     },
 
-    emits: ["switch", "onClose"],
+    emits: ["onClose"],
     components: {
         Modal,
         Input,
@@ -284,6 +286,15 @@ export default defineComponent({
                 :countdown="countdownText"
                 :class="$style.direction"
             />
+
+            <Banner
+                v-if="event.creatorId !== justerLiquidityAddress"
+                type="warning"
+                size="small"
+                :class="$style.banner"
+            >
+                This event is Custom, its behavior may depend on the parameters
+            </Banner>
 
             <Input
                 ref="amountInput"
@@ -322,7 +333,7 @@ export default defineComponent({
                 </Stat>
             </div>
 
-            <Banner type="warning" size="small" :class="$style.banner">
+            <Banner type="info" size="small" :class="$style.banner">
                 Note that the transaction takes place on the Hangzhounet
             </Banner>
 
