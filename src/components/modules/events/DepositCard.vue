@@ -10,9 +10,32 @@ import { numberWithSymbol } from "@/services/utils/amounts"
  * Store
  */
 import { useAccountStore } from "@/store/account"
+import { computed } from "vue-demi"
 const accountStore = useAccountStore()
 
-const props = defineProps({ deposit: { type: Object } })
+const props = defineProps({
+    deposit: { type: Object },
+    event: { type: Object },
+})
+
+const aboveEqProfit = computed(
+    () =>
+        (props.event.poolAboveEq * props.deposit.shares) /
+            props.event.totalLiquidityShares -
+        props.deposit.amountAboveEq,
+)
+const belowProfit = computed(
+    () =>
+        (props.event.poolBelow * props.deposit.shares) /
+            props.event.totalLiquidityShares -
+        props.deposit.amountBelow,
+)
+
+const liquidityProfit = computed(() =>
+    aboveEqProfit.value > 0
+        ? aboveEqProfit.value * 0.01
+        : belowProfit.value * 0.01,
+)
 </script>
 
 <template>
@@ -53,6 +76,10 @@ const props = defineProps({ deposit: { type: Object } })
                 numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
             }}
             &nbsp;<span>XTZ</span>
+        </div>
+
+        <div :class="[$style.param]">
+            {{ liquidityProfit.toFixed(2) }} &nbsp;<span>XTZ</span>
         </div>
     </div>
 </template>

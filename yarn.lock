@@ -1046,10 +1046,10 @@
     "@genql/runtime" "2.6.0"
     graphql "^15.5.0"
 
-"@juster-finance/sdk@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@juster-finance/sdk/-/sdk-0.0.4.tgz#c0c2462b43b46cc5b33473d2577ed5563955c073"
-  integrity sha512-wj7Mh2/d7JT/252MlsNnKZyxnKdDebYiv8MwrEqPoCzAIDJ3928RvEWOaukDHyu4qOFOfw440NxsmWC/nMqvNg==
+"@juster-finance/sdk@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@juster-finance/sdk/-/sdk-0.0.5.tgz#c4e87163d9009a84e29ee0d485d10745c7b0280a"
+  integrity sha512-u2D9+a8BQUJOeLz1uZGmLFSyRqpKy9NJAJPUQB0whCsugZnJSNVneG0XdRfceVlvh4xSpYm9JibAUcTe5yiPNQ==
   dependencies:
     "@juster-finance/gql-client" "^0.0.7"
     "@taquito/beacon-wallet" "^11.1.0"

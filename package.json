@@ -10,7 +10,7 @@
     "dependencies": {
         "@apollo/client": "^3.3.21",
         "@juster-finance/gql-client": "^0.0.6",
-        "@juster-finance/sdk": "^0.0.4",
+        "@juster-finance/sdk": "^0.0.5",
         "@taquito/taquito": "^10.1.0",
         "@vue/apollo-composable": "4.0.0-alpha.12",
         "amplitude-js": "^8.12.0",

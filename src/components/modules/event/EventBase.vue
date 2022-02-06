@@ -692,12 +692,14 @@ const { meta } = useMeta({
                         <span>TYPE</span>
                         <span>RISE</span>
                         <span>FALL</span>
+                        <span>REWARD</span>
                     </div>
                     <div v-if="filteredDeposits.length" :class="$style.bets">
                         <DepositCard
                             v-for="deposit in paginatedDeposits"
                             :key="deposit.id"
                             :deposit="deposit"
+                            :event="event"
                         />
                     </div>
 
