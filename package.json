@@ -1,6 +1,6 @@
 {
     "name": "juster-web",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "private": true,
     "scripts": {
         "serve": "genversion --es6 src/version.js && vue-cli-service serve",
