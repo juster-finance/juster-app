@@ -39,6 +39,18 @@ const successfulWithdrawal = computed(() =>
         (withdrawal) => withdrawal.event.id == props.event.id,
     ),
 )
+
+const btnType = computed(() => {
+    if (props.isWithdrawing || accountStore.pendingTransaction.awaiting) {
+        return "secondary"
+    }
+
+    if (props.won && props.wonPosition) {
+        return "success"
+    } else {
+        return "secondary"
+    }
+})
 </script>
 
 <template>
@@ -98,9 +110,13 @@ const successfulWithdrawal = computed(() =>
         <Button
             v-else
             @click.prevent="emit('onWithdraw')"
-            :type="won && wonPosition ? 'success' : 'secondary'"
+            :type="btnType"
             size="small"
-            :disabled="isWithdrawing || (won && !wonPosition)"
+            :disabled="
+                isWithdrawing ||
+                (won && !wonPosition) ||
+                accountStore.pendingTransaction.awaiting
+            "
             block
         >
             <template v-if="won && !wonPosition"
