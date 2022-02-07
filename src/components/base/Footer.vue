@@ -323,7 +323,7 @@ onBeforeUnmount(() => {
                 <div :class="$style.block">
                     <div :class="$style.copyrights">
                         <div :class="$style.year">© 2022</div>
-                        <span>Juster 0.9.</span> Market data provided by
+                        <span>Juster 0.10.</span> Market data provided by
                         Coinbase Harbinger
                     </div>
 

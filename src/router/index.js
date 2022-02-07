@@ -122,6 +122,14 @@ const routes = [
         component: () =>
             import(/* webpackChunkName: "policy" */ "@/views/Other/PolicyPage"),
     },
+    {
+        path: "/sitemap",
+        name: "Sitemap",
+        component: () =>
+            import(
+                /* webpackChunkName: "sitemap" */ "@/views/Other/SitemapPage"
+            ),
+    },
 
     {
         path: "/docs",
