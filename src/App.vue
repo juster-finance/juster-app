@@ -23,8 +23,6 @@ import { juster } from "@/services/sdk"
 /**
  * Store
  */
-import { useAppStore } from "@/store/app"
-import { useNotificationsStore } from "@/store/notifications"
 import { useAccountStore } from "@/store/account"
 
 /**
@@ -39,32 +37,7 @@ export default defineComponent({
         const amplitude = inject("amplitude")
         const identify = new amplitude.Identify()
 
-        const notificationsStore = useNotificationsStore()
-
         /**
-         * App Version
-         */
-        const appStore = useAppStore()
-        const { version } = require("@/version")
-        appStore.version = version
-
-        setInterval(() => {
-            const { version } = require("@/version")
-
-            if (version !== appStore.version) {
-                notificationsStore.create({
-                    notification: {
-                        type: "info",
-                        title: "New version is ready",
-                        description: "Refresh the page to get new features",
-                        autoDestroy: false,
-                    },
-                })
-
-                appStore.version = version
-            }
-        }, 60000)
-
         /**
          * Setup account & user
          */
