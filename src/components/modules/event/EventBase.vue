@@ -226,6 +226,16 @@ const userBets = computed(() =>
     event.value.bets.filter((bet) => bet.userId == accountStore.pkh),
 )
 
+const wonText = computed(() => {
+    if (userBets.value.every((bet) => bet.side == event.value.winnerBets)) {
+        return "All of your bets won were in the winning direction"
+    } else if (
+        userBets.value.some((bet) => bet.side == event.value.winnerBets)
+    ) {
+        return "One or more (not all) of your bets were in the winning direction"
+    }
+})
+
 const selectedPageForDeposits = ref(1)
 const paginatedDeposits = computed(() =>
     cloneDeep(filteredDeposits.value)
@@ -568,10 +578,9 @@ const { meta } = useMeta({
                         Aggregated data for all your positions for this event
                     </div>
 
-                    <Banner v-if="won" type="success" :class="$style.banner"
-                        ><span>You won.</span> One, several or all of your bets
-                        have been placed in the winning direction</Banner
-                    >
+                    <Banner v-if="won" type="success" :class="$style.banner">{{
+                        wonText
+                    }}</Banner>
 
                     <EventPersonalStats
                         :event="event"
