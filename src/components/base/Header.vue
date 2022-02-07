@@ -556,34 +556,34 @@ const pkh = computed(() => accountStore.pkh)
     line-height: 28px;
     font-weight: 600;
     color: var(--text-primary);
-    background: var(--btn-secondary-bg);
+    background: var(--btn-primary-bg);
 
     padding: 0 10px 0 12px;
-    border-radius: 8px 0 0 8px;
-    border-right: 1px solid var(--border);
+    border-radius: 6px 0 0 6px;
+    border-right: 2px solid rgba(0, 0, 0, 0.1);
 
     transition: background 0.2s ease;
 }
 
 .signin:hover {
-    background: var(--btn-secondary-bg-hover);
+    background: var(--btn-primary-bg-hover);
 }
 
 .custom_signin {
     display: flex;
     align-items: center;
     height: 28px;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 6px 6px 0;
     padding: 0 10px;
 
     fill: var(--text-secondary);
-    background: var(--btn-secondary-bg);
+    background: var(--btn-primary-bg);
 
     transition: background 0.2s ease;
 }
 
 .custom_signin:hover {
-    background: var(--btn-secondary-bg-hover);
+    background: var(--btn-primary-bg-hover);
 }
 
 .avatar {

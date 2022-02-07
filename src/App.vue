@@ -189,7 +189,7 @@ html {
     --btn-success-bg-hover: #24af75;
 
     --btn-primary-bg: #276ef1;
-    --btn-primary-bg-hover: #3e7ef5;
+    --btn-primary-bg-hover: #1f60da;
 
     --btn-secondary-bg: #252628;
     --btn-secondary-bg-hover: #2d2f31;
