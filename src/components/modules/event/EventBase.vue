@@ -719,7 +719,7 @@ const { meta } = useMeta({
                                 <template #content
                                     ><span><b>Formula:</b></span> pool
                                     <span>x</span> myShares
-                                    <span>x</span> eventShares
+                                    <span>÷</span> eventShares
                                     <span>-</span> depositAmount</template
                                 >
                             </Tooltip>
