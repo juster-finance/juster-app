@@ -59,7 +59,11 @@ const liquidityProfit = computed(() =>
                     Liquidity
                 </div>
                 <div :class="$style.time">
-                    {{ DateTime.fromISO(deposit.createdTime).toRelative() }}
+                    {{
+                        DateTime.fromISO(deposit.createdTime, {
+                            locale: "en",
+                        }).toRelative()
+                    }}
                 </div>
             </div>
         </div>

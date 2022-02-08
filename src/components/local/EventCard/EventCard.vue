@@ -781,7 +781,9 @@ export default defineComponent({
                         Ended
                         <span>
                             {{
-                                DateTime.fromISO(event.betsCloseTime)
+                                DateTime.fromISO(event.betsCloseTime, {
+                                    locale: "en",
+                                })
                                     .plus({ second: event.measurePeriod })
                                     .toRelative()
                             }}

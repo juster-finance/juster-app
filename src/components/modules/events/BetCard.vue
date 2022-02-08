@@ -55,7 +55,11 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
                 <div v-else :class="$style.title">Pending Bet</div>
 
                 <div v-if="!pending" :class="$style.time">
-                    {{ DateTime.fromISO(bet.createdTime).toRelative() }}
+                    {{
+                        DateTime.fromISO(bet.createdTime, {
+                            locale: "en",
+                        }).toRelative()
+                    }}
                 </div>
                 <div v-else :class="$style.time">Just now</div>
             </div>

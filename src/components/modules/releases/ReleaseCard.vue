@@ -72,7 +72,11 @@ export default defineComponent({
         :class="$style.wrapper"
     >
         <div :class="$style.when">
-            {{ DateTime.fromISO(release._updatedAt).toRelative() }}
+            {{
+                DateTime.fromISO(release._updatedAt, {
+                    locale: "en",
+                }).toRelative()
+            }}
         </div>
 
         <div>
