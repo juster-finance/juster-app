@@ -60,7 +60,7 @@ const fallPool = computed(() =>
             <div :class="$style.param">
                 <span><Icon name="bolt" size="12" />Percent</span>
 
-                <span>{{ event.liquidityPercent * 100 }}% </span>
+                <span>{{ parseInt(event.liquidityPercent * 100) }}% </span>
             </div>
         </div>
     </div>
