@@ -42,7 +42,7 @@ const props = defineProps({ show: { type: Boolean }, event: { type: Object } })
 
             <div :class="$style.param">
                 <span><Icon name="sides" size="12" />Target Dynamics</span>
-                <span>{{ event.targetDynamics * 100 }}%</span>
+                <span>{{ event.targetDynamics }}</span>
             </div>
 
             <div :class="$style.param">

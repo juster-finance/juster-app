@@ -438,7 +438,7 @@ const priceDynamics = computed(() => {
                         }"
                     />
 
-                    {{ event.targetDynamics * 100 }}%</span
+                    {{ event.targetDynamics * 100 - 100 }}%</span
                 >
             </div>
 

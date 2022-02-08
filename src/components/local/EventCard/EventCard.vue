@@ -126,11 +126,8 @@ export default defineComponent({
                 .toJSDate()
                 .getTime(),
         )
-        const {
-            status: finishStatus,
-            time: finishTime,
-            stop: destroyFinishCountdown,
-        } = useCountdown(finishDt)
+        const { time: finishTime, stop: destroyFinishCountdown } =
+            useCountdown(finishDt)
 
         // eslint-disable-next-line vue/return-in-computed-property
         const timeToFinish = computed(() => {
@@ -146,10 +143,6 @@ export default defineComponent({
                     suffix: finishTime.m > 1 ? "mins" : "min",
                 }
             }
-        })
-
-        const percentage = computed(() => {
-            return event.value?.targetDynamics * 100 - 100
         })
 
         const timing = computed(() => {
@@ -439,14 +432,12 @@ export default defineComponent({
             timeToStart,
             startStatus,
             timeToFinish,
-            finishStatus,
             symbol,
             liquidityLevel,
             participantsAvatars,
             userTVL,
             won,
             positionForWithdraw,
-            percentage,
             handleBet,
             handleParticipants,
             isWithdrawing,
