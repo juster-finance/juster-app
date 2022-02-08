@@ -202,6 +202,7 @@ export default defineComponent({
 .avatar img {
     width: 28px;
     height: 28px;
+    border-radius: 50%;
 }
 
 .base {
