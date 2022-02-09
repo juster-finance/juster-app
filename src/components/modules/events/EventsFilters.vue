@@ -407,17 +407,10 @@ const handleKeydown = (e) => {
                         />
                     </div>
                     <div :class="$style.toggle_filter">
-                        <div :class="$style.left">With Target Dynamics</div>
+                        <div :class="$style.left">Custom Target Dynamics</div>
                         <Toggle
                             v-model="filters.misc.targetDynamics.active"
                             :disabled="filters.misc.targetDynamics.disabled"
-                        />
-                    </div>
-                    <div :class="$style.toggle_filter">
-                        <div :class="$style.left">Custom events</div>
-                        <Toggle
-                            v-model="filters.misc.customEvents.active"
-                            :disabled="filters.misc.customEvents.disabled"
                         />
                     </div>
                 </div>
