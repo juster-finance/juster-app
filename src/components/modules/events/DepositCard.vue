@@ -18,24 +18,39 @@ const props = defineProps({
     event: { type: Object },
 })
 
-const aboveEqProfit = computed(
-    () =>
-        (props.event.poolAboveEq * props.deposit.shares) /
-            props.event.totalLiquidityShares -
-        props.deposit.amountAboveEq,
-)
-const belowProfit = computed(
-    () =>
+const aboveEqProfit = computed(() => {
+    let profit =
         (props.event.poolBelow * props.deposit.shares) /
             props.event.totalLiquidityShares -
-        props.deposit.amountBelow,
-)
+        props.deposit.amountAboveEq
 
-const liquidityProfit = computed(() =>
-    aboveEqProfit.value > 0
-        ? aboveEqProfit.value * 0.01
-        : belowProfit.value * 0.01,
-)
+    if (profit > 0) {
+        profit = profit * (1 - 0.01)
+    }
+
+    return profit
+})
+const belowProfit = computed(() => {
+    let profit =
+        (props.event.poolAboveEq * props.deposit.shares) /
+            props.event.totalLiquidityShares -
+        props.deposit.amountBelow
+
+    if (profit > 0) {
+        profit = profit * (1 - 0.01)
+    }
+
+    return profit
+})
+
+const returnForLiquidity = computed(() => {
+    if (props.event.winnerBets == "ABOVE_EQ")
+        return aboveEqProfit.value + props.deposit.amountAboveEq
+    if (props.event.winnerBets == "BELOW")
+        return belowProfit.value + props.deposit.amountBelow
+
+    return 0
+})
 </script>
 
 <template>
@@ -71,24 +86,19 @@ const liquidityProfit = computed(() =>
         <div :class="[$style.param, $style.up]">
             <Icon name="higher" size="12" />{{
                 numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
-            }}
-            &nbsp;<span>XTZ</span>
+            }}&nbsp;<span>XTZ</span>
         </div>
 
         <div :class="[$style.param, $style.down]">
             <Icon name="higher" size="12" />{{
                 numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
-            }}
-            &nbsp;<span>XTZ</span>
+            }}&nbsp;<span>XTZ</span>
         </div>
 
         <div :class="[$style.param]">
             {{
-                liquidityProfit < 0.01 && liquidityProfit !== 0
-                    ? `< 0.01`
-                    : liquidityProfit.toFixed(2)
-            }}
-            &nbsp;<span>XTZ</span>
+                returnForLiquidity > 0 ? returnForLiquidity.toFixed(2) : "TBD"
+            }}&nbsp;<span v-if="returnForLiquidity">XTZ</span>
         </div>
     </div>
 </template>

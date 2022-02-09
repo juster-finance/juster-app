@@ -60,10 +60,6 @@ const defaultFilters = {
 
     periods: [
         {
-            name: "5m",
-            active: true,
-        },
-        {
             name: "1h",
             active: true,
         },
@@ -261,14 +257,11 @@ const filteredEvents = computed(() => {
             .filter((period) => period.active)
             .map(
                 (period) =>
-                    (period.name == "5m" && 300) ||
                     (period.name == "1h" && 3600) ||
                     (period.name == "6h" && 21600) ||
                     (period.name == "24h" && 86400) ||
                     (period.name == "7d" && 604800),
             )
-
-        console.log(periods)
 
         if (periods.length) {
             events = events.filter((event) =>

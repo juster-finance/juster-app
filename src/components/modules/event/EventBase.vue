@@ -702,18 +702,7 @@ const { meta } = useMeta({
                         <div :class="$style.column">RISE</div>
                         <div :class="$style.column">FALL</div>
 
-                        <div :class="$style.column">
-                            <Tooltip position="bottom" side="left">
-                                REWARD&nbsp;<Icon name="help" size="12" />
-
-                                <template #content
-                                    ><span><b>Formula:</b></span> pool
-                                    <span>x</span> myShares
-                                    <span>÷</span> eventShares
-                                    <span>-</span> depositAmount</template
-                                >
-                            </Tooltip>
-                        </div>
+                        <div :class="$style.column">RETURN</div>
                     </div>
                     <div v-if="filteredDeposits.length" :class="$style.bets">
                         <DepositCard
