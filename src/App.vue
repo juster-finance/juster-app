@@ -35,7 +35,6 @@ export default defineComponent({
         const { setupMarket, setupUser } = useMarket()
 
         const amplitude = inject("amplitude")
-        const identify = new amplitude.Identify()
 
         /**
         /**
@@ -48,10 +47,6 @@ export default defineComponent({
                 .getActiveAccount()
                 .then(async (account) => {
                     if (!account) return
-
-                    identify.set("address", account.address)
-                    identify.set("network", account.network.type)
-                    amplitude.identify(identify)
 
                     accountStore.setPkh(account.address)
                     accountStore.updateBalance()
