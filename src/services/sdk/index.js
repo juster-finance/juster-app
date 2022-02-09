@@ -1,5 +1,5 @@
 import { juster, currentNetwork, switchNetwork } from "./juster"
-import withdraw from "./withdraw"
+import { withdrawAll } from "./withdraw"
 import { fetchBalance } from "./misc"
 
-export { juster, currentNetwork, switchNetwork, withdraw, fetchBalance }
+export { juster, currentNetwork, switchNetwork, withdrawAll, fetchBalance }
