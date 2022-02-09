@@ -341,7 +341,7 @@ export default defineComponent({
             () => {
                 const allLiquidity = cloneDeep(marketStore.events)
                     .filter((event) =>
-                        ["NEW", "STARTED"].includes(event.status),
+                        ["NEW", "STARTED", "FINISHED"].includes(event.status),
                     )
                     .map((event) => event.totalLiquidityProvided)
 
