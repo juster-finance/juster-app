@@ -10,7 +10,7 @@ import {
     computed,
     inject,
 } from "vue"
-import { DateTime } from "luxon"
+import { DateTime, Duration } from "luxon"
 
 /**
  * UI
@@ -43,6 +43,7 @@ import {
 import { juster, currentNetwork } from "@/services/sdk"
 import { abbreviateNumber } from "@/services/utils/amounts"
 import { supportedMarkets, verifiedMakers } from "@/services/config"
+import { toReadableDuration } from "@/services/utils/date"
 
 /**
  * Composable
@@ -144,6 +145,10 @@ export default defineComponent({
                 }
             }
         })
+
+        const eventDuration = computed(() =>
+            toReadableDuration({ seconds: event.value.measurePeriod }),
+        )
 
         const timing = computed(() => {
             const eventDt = DateTime.fromISO(
@@ -448,6 +453,7 @@ export default defineComponent({
             supportedMarkets,
             verifiedMakers,
             currentNetwork,
+            eventDuration,
         }
     },
 
@@ -615,7 +621,7 @@ export default defineComponent({
                     {{ timing.start.time }}
                     ->
                     {{ timing.end.time }}
-                    <span>({{ event.measurePeriod / 3600 }}h)</span>
+                    <span>({{ eventDuration }})</span>
                 </div>
             </div>
 

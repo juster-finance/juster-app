@@ -11,6 +11,7 @@ import {
     getTopEvents,
     getEventById,
     getEventsByMarket,
+    getEventsByStatus,
     getEventParticipants,
 } from "@/graphql/queries/events"
 
@@ -24,6 +25,22 @@ export const fetchAllEvents = async () => {
     } catch (error) {
         console.error(
             `Error during fetching all events \n\n ${error.name}: ${error.message}`,
+        )
+        return []
+    }
+}
+
+export const fetchEventsByStatus = async ({ status }) => {
+    try {
+        const { data } = await juster.apollo.query({
+            query: getEventsByStatus,
+            variables: { status },
+        })
+
+        return data.event
+    } catch (error) {
+        console.error(
+            `Error during fetching events by status \n\n ${error.name}: ${error.message}`,
         )
         return []
     }

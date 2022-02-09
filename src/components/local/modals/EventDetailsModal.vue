@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from "vue"
 import { DateTime } from "luxon"
 
 /**
@@ -6,7 +7,16 @@ import { DateTime } from "luxon"
  */
 import Modal from "@/components/ui/Modal"
 
+/**
+ * Services
+ */
+import { toReadableDuration } from "@/services/utils/date"
+
 const props = defineProps({ show: { type: Boolean }, event: { type: Object } })
+
+const eventDuration = computed(() =>
+    toReadableDuration({ seconds: props.event.measurePeriod }),
+)
 </script>
 
 <template>
@@ -52,7 +62,7 @@ const props = defineProps({ show: { type: Boolean }, event: { type: Object } })
 
             <div :class="$style.param">
                 <span><Icon name="time" size="12" />Measure Period</span>
-                <span>{{ (event.measurePeriod / 3600).toFixed(2) }}h</span>
+                <span>{{ eventDuration }}</span>
             </div>
         </div>
 

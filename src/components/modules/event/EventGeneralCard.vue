@@ -16,6 +16,7 @@ import EventActions from "@/components/local/EventActions"
  * Services
  */
 import { currentNetwork } from "@/services/sdk"
+import { toReadableDuration } from "@/services/utils/date"
 import { supportedMarkets, verifiedMakers } from "@/services/config"
 
 const props = defineProps({
@@ -65,6 +66,10 @@ const participantsAvatars = computed(() => {
 
     return avatars
 })
+
+const eventDuration = computed(() =>
+    toReadableDuration({ seconds: props.event.measurePeriod }),
+)
 
 const timing = computed(() => {
     const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("ru")
@@ -306,13 +311,9 @@ const priceDynamics = computed(() => {
                     ]"
                 />
 
-                <span :class="$style.period__duration"
-                    >{{
-                        (event.measurePeriod / 3600) % 1 == 0
-                            ? event.measurePeriod / 3600
-                            : (event.measurePeriod / 3600).toFixed(2)
-                    }}h</span
-                >
+                <span :class="$style.period__duration">{{
+                    eventDuration
+                }}</span>
 
                 <div
                     :class="[
