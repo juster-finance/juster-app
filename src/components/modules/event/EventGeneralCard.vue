@@ -72,7 +72,7 @@ const eventDuration = computed(() =>
 )
 
 const timing = computed(() => {
-    const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("ru")
+    const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("en")
 
     const endDt = eventDt.plus(props.event.measurePeriod * 1000)
 

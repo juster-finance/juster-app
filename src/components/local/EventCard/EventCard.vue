@@ -150,7 +150,7 @@ export default defineComponent({
         const timing = computed(() => {
             const eventDt = DateTime.fromISO(
                 event.value.betsCloseTime,
-            ).setLocale("ru")
+            ).setLocale("en")
 
             const endDt = eventDt.plus(event.value.measurePeriod * 1000)
 
