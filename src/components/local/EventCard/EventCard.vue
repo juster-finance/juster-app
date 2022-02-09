@@ -8,7 +8,6 @@ import {
     ref,
     reactive,
     computed,
-    inject,
 } from "vue"
 import { DateTime, Duration } from "luxon"
 
@@ -40,7 +39,7 @@ import {
     getCurrencyIcon,
     capitalizeFirstLetter,
 } from "@/services/utils/global"
-import { juster, currentNetwork } from "@/services/sdk"
+import { juster, analytics, currentNetwork } from "@/services/sdk"
 import { abbreviateNumber } from "@/services/utils/amounts"
 import { supportedMarkets, verifiedMakers } from "@/services/config"
 import { toReadableDuration } from "@/services/utils/date"
@@ -67,8 +66,6 @@ export default defineComponent({
 
     setup(props) {
         const { event } = toRefs(props)
-
-        const amplitude = inject("amplitude")
 
         /** Stores */
         const notificationsStore = useNotificationsStore()
@@ -239,7 +236,7 @@ export default defineComponent({
             )
                 return
 
-            amplitude.logEvent("showBetModal", { where: "event_card" })
+            analytics.log("showBetModal", { where: "event_card" })
 
             showBetModal.value = true
         }
@@ -249,7 +246,7 @@ export default defineComponent({
         const handleWithdraw = (e) => {
             isWithdrawing.value = true
 
-            amplitude.logEvent("clickWithdraw", { where: "event_card" })
+            analytics.log("clickWithdraw", { where: "event_card" })
 
             juster.sdk
                 .withdraw(event.value.id, accountStore.pkh)
@@ -290,7 +287,7 @@ export default defineComponent({
                         },
                     })
 
-                    amplitude.logEvent("onWithdraw", {
+                    analytics.log("onWithdraw", {
                         eventId: event.value.id,
                     })
                 })
@@ -303,7 +300,7 @@ export default defineComponent({
         const handleParticipants = () => {
             showParticipantsModal.value = true
 
-            amplitude.logEvent("showParticipantsModal", { where: "event_card" })
+            analytics.log("showParticipantsModal", { where: "event_card" })
         }
 
         const copy = (target) => {
@@ -341,7 +338,7 @@ export default defineComponent({
         const contextMenuHandler = (e) => {
             e.preventDefault()
 
-            amplitude.logEvent("showContextMenu")
+            analytics.log("showContextMenu")
 
             contextMenuStyles.top = `${e.clientY}px`
             contextMenuStyles.left = `${e.clientX}px`

@@ -6,7 +6,6 @@ import {
     computed,
     toRefs,
     watch,
-    inject,
     nextTick,
 } from "vue"
 import BigNumber from "bignumber.js"
@@ -16,7 +15,7 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { juster, currentNetwork } from "@/services/sdk"
+import { juster, analytics, currentNetwork } from "@/services/sdk"
 import { verifiedMakers } from "@/services/config"
 
 /**
@@ -60,7 +59,6 @@ export default defineComponent({
 
     setup(props, context) {
         const { event, show, preselectedSide } = toRefs(props)
-        const amplitude = inject("amplitude")
 
         const accountStore = useAccountStore()
         const notificationsStore = useNotificationsStore()
@@ -278,7 +276,7 @@ export default defineComponent({
                     }, 700)
 
                     /** analytics */
-                    amplitude.logEvent("onBet", {
+                    analytics.log("onBet", {
                         eventId: event.value.id,
                         amount: amount.value,
                         fm: fee.value.toNumber(),
@@ -295,7 +293,7 @@ export default defineComponent({
                 })
                 .catch((err) => {
                     /** analytics */
-                    amplitude.logEvent("onError", {
+                    analytics.log("onError", {
                         eventId: event.value.id,
                         error: err.description,
                     })

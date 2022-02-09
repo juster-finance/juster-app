@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onBeforeMount, ref, inject } from "vue"
+import { defineComponent, onBeforeMount, ref } from "vue"
 
 /**
  * Base
@@ -18,7 +18,7 @@ import Notifications from "@/components/local/Notifications"
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster, analytics } from "@/services/sdk"
 
 /**
  * Store
@@ -33,8 +33,6 @@ import { useMarket } from "@/composable/market"
 export default defineComponent({
     setup() {
         const { setupMarket, setupUser } = useMarket()
-
-        const amplitude = inject("amplitude")
 
         /**
         /**

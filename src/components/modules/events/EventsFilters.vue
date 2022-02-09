@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, toRefs, watch, inject, computed } from "vue"
+import { reactive, ref, toRefs, watch, computed } from "vue"
 
 /**
  * Modals
@@ -19,6 +19,11 @@ import Tooltip from "@/components/ui/Tooltip"
  */
 import { useAccountStore } from "@/store/account"
 
+/**
+ * Services
+ */
+import { analytics } from "@/services/sdk"
+
 const props = defineProps({
     filters: { type: Object },
     liquidityFilters: { type: Object },
@@ -31,8 +36,6 @@ const emit = defineEmits([
     "onNewMax",
     "onSelect",
 ])
-
-const amplitude = inject("amplitude")
 
 const selectedTab = ref("Basic")
 
@@ -55,7 +58,7 @@ const minInputEl = ref(null)
 const maxInputEl = ref(null)
 
 const handleReset = () => {
-    amplitude.logEvent("onResetFilters")
+    analytics.log("onResetFilters")
 
     inputs.min = 0
     inputs.max = 50000

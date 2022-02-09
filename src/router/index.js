@@ -74,6 +74,12 @@ const routes = [
         name: "MyProfile",
         beforeEnter: (to, from, next) => {
             const accountStore = useAccountStore()
+
+            if (to.params.address) {
+                next()
+                return
+            }
+
             if (accountStore.isLoggined) {
                 next()
             } else {

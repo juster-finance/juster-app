@@ -7,7 +7,6 @@ import {
     computed,
     onBeforeUnmount,
     onUnmounted,
-    inject,
 } from "vue"
 import { DateTime } from "luxon"
 import { useMeta } from "vue-meta"
@@ -16,7 +15,7 @@ import { cloneDeep } from "lodash"
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster, analytics } from "@/services/sdk"
 
 /**
  * API
@@ -135,8 +134,6 @@ const breadcrumbs = reactive([
         path: "/events",
     },
 ])
-
-const amplitude = inject("amplitude")
 
 const marketStore = useMarketStore()
 
@@ -323,7 +320,7 @@ const filteredEvents = computed(() => {
 })
 
 onMounted(async () => {
-    amplitude.logEvent("onPage", { name: "AllEvents" })
+    analytics.log("onPage", { name: "AllEvents" })
 
     let allNewEvents = await fetchAllEvents()
 

@@ -1,12 +1,12 @@
 <script setup>
-import { ref, reactive, computed, inject } from "vue"
+import { ref, reactive, computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { NetworkType } from "@airgap/beacon-sdk"
 
 /**
  * Services
  */
-import { juster, currentNetwork } from "@/services/sdk"
+import { juster, analytics, currentNetwork } from "@/services/sdk"
 
 /**
  * Constants
@@ -47,9 +47,6 @@ import { useNotificationsStore } from "@/store/notifications"
 import { useMarket } from "@/composable/market"
 
 const { setupUser } = useMarket()
-
-const amplitude = inject("amplitude")
-const identify = new amplitude.Identify()
 
 const notificationsStore = useNotificationsStore()
 const accountStore = useAccountStore()
@@ -95,11 +92,7 @@ const login = () => {
             address.value = account.address
             network.value = account.network.type
         } else {
-            /** analytics */
-            identify.set("address", account.address)
-            identify.set("network", account.network.type)
-            amplitude.identify(identify)
-            amplitude.logEvent("login", { address: account.address })
+            analytics.log("login", { address: account.address })
 
             accountStore.pkh = account.address
             accountStore.updateBalance()
@@ -143,10 +136,7 @@ const handleAgree = () => {
     localStorage["connectingModal"] = true
 
     /** analytics */
-    identify.set("address", address.value)
-    identify.set("network", network.value)
-    amplitude.identify(identify)
-    amplitude.logEvent("registration", { address: address.value })
+    analytics.log("registration", { address: address.value })
 
     accountStore.pkh = address.value
     address.value = ""
@@ -170,20 +160,20 @@ const handleDisagree = () => {
 const handleOpenProfile = () => {
     router.push("/profile")
 
-    amplitude.logEvent("openProfile")
+    analytics.log("openProfile")
 }
 
 const handleOpenWithdrawals = () => {
     router.push("/withdrawals")
 
-    amplitude.logEvent("openWithdrawals")
+    analytics.log("openWithdrawals")
 }
 
 const handleLogout = () => {
     juster.sdk._provider.client.clearActiveAccount().then(async () => {
         await juster.sdk._provider.client.getActiveAccount()
 
-        amplitude.logEvent("logout", { address: accountStore.pkh })
+        analytics.log("logout", { address: accountStore.pkh })
 
         accountStore.setPkh("")
         router.push("/")

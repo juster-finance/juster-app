@@ -1,13 +1,5 @@
 <script setup>
-import {
-    ref,
-    reactive,
-    watch,
-    computed,
-    onMounted,
-    onUnmounted,
-    inject,
-} from "vue"
+import { ref, reactive, watch, computed, onMounted, onUnmounted } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
 import { useRouter } from "vue-router"
@@ -66,7 +58,7 @@ import {
     getCurrencyIcon,
     capitalizeFirstLetter,
 } from "@/services/utils/global"
-import { juster, gql } from "@/services/sdk"
+import { juster, gql, analytics } from "@/services/sdk"
 import { supportedMarkets } from "@/services/config"
 
 /**
@@ -80,8 +72,6 @@ const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 
 const { updateWithdrawals } = useMarket()
-
-const amplitude = inject("amplitude")
 
 const router = useRouter()
 
@@ -330,7 +320,7 @@ const handleJoin = (target) => {
     )
         return
 
-    amplitude.logEvent("showBetModal", { where: "event_base" })
+    analytics.log("showBetModal", { where: "event_base" })
 
     showBetModal.value = true
 }
@@ -345,14 +335,14 @@ const handleLiquidity = () => {
 
     showLiquidityModal.value = true
 
-    amplitude.logEvent("showLiquidityModal", { where: "event_base" })
+    analytics.log("showLiquidityModal", { where: "event_base" })
 }
 
 const isWithdrawing = ref(false)
 const handleWithdraw = () => {
     isWithdrawing.value = true
 
-    amplitude.logEvent("clickWithdraw", { where: "event_base" })
+    analytics.log("clickWithdraw", { where: "event_base" })
 
     juster.sdk
         .withdraw(event.value.id, accountStore.pkh)
@@ -392,7 +382,7 @@ const handleWithdraw = () => {
                 },
             })
 
-            amplitude.logEvent("onWithdraw", {
+            analytics.log("onWithdraw", {
                 eventId: event.value.id,
             })
         })
@@ -404,7 +394,7 @@ const handleWithdraw = () => {
 const handleParticipants = () => {
     showParticipantsModal.value = true
 
-    amplitude.logEvent("showParticipantsModal", { where: "event_base" })
+    analytics.log("showParticipantsModal", { where: "event_base" })
 }
 
 const copy = (target) => {
