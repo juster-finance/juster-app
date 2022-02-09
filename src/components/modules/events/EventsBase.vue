@@ -15,7 +15,8 @@ import { cloneDeep } from "lodash"
 /**
  * Services
  */
-import { juster, analytics } from "@/services/sdk"
+import { juster, analytics, currentNetwork } from "@/services/sdk"
+import { verifiedMakers } from "@/services/config"
 
 /**
  * API
@@ -108,6 +109,19 @@ const defaultFilters = {
         participants: [],
     },
 
+    author: [
+        {
+            name: "Juster",
+            icon: "logo_symbol",
+            active: true,
+        },
+        {
+            name: "Users",
+            icon: "users",
+            active: false,
+        },
+    ],
+
     misc: {
         startingToday: {
             active: false,
@@ -119,11 +133,11 @@ const defaultFilters = {
         },
         targetDynamics: {
             active: false,
-            disabled: true,
+            disabled: false,
         },
         customEvents: {
             active: false,
-            disabled: true,
+            disabled: false,
         },
     },
 }
@@ -290,6 +304,20 @@ const filteredEvents = computed(() => {
 
             return hasBet || hasDeposit
         })
+    }
+
+    /** Filter by Author */
+    if (!filters.value.author[0].active) {
+        /** juster */
+        events = events.filter(
+            (event) => event.creatorId !== verifiedMakers[currentNetwork.value],
+        )
+    }
+    if (!filters.value.author[1].active) {
+        /** other users */
+        events = events.filter(
+            (event) => event.creatorId == verifiedMakers[currentNetwork.value],
+        )
     }
 
     /** Filter by Misc */

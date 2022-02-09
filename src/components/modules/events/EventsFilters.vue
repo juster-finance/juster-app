@@ -324,7 +324,9 @@ const handleKeydown = (e) => {
                     >
                         <Icon name="plus" size="14" /> Add user
                     </div>
+
                     <div
+                        v-if="accountStore.isLoggined"
                         @click="manageParticipant(accountStore.pkh, 'add')"
                         :class="[$style.badge, $style.active]"
                     >
@@ -367,6 +369,22 @@ const handleKeydown = (e) => {
                         id="filter_day"
                         name="filter_day"
                     />
+                </div>
+            </div>
+
+            <div :class="$style.block">
+                <div :class="$style.subtitle">Created by</div>
+
+                <div :class="$style.badges">
+                    <div
+                        v-for="(author, index) in filters.author"
+                        :key="index"
+                        @click="$emit('onSelect', 'author', author)"
+                        :class="[$style.badge, author.active && $style.active]"
+                    >
+                        <Icon :name="author.icon" size="14" />
+                        {{ author.name }}
+                    </div>
                 </div>
             </div>
 
