@@ -103,10 +103,7 @@ const returnForLiquidity = computed(() => {
         <div v-else-if="event.status == 'CANCELED'" :class="$style.param">
             Refund
         </div>
-        <div
-            v-else-if="['NEW', 'STARTED'].includes(event.status)"
-            :class="$style.param"
-        >
+        <div v-else :class="$style.param">
             <span>TBD</span>
         </div>
     </div>
