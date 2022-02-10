@@ -480,22 +480,6 @@ const { meta } = useMeta({
             />
 
             <div :class="$style.events_base">
-                <Banner
-                    type="info"
-                    v-if="filteredEvents.length == 0 && isAllEventsLoaded"
-                >
-                    All
-                    {{ availableEvents.length - filteredEvents.length }} events
-                    hidden due to filters
-                </Banner>
-                <Banner
-                    type="info"
-                    v-else-if="filteredEvents.length !== availableEvents.length"
-                >
-                    {{ availableEvents.length - filteredEvents.length }} events
-                    hidden due to filters
-                </Banner>
-
                 <transition name="fastfade" mode="out-in">
                     <div v-if="filteredEvents.length" :class="$style.events">
                         <EventCard
@@ -566,10 +550,6 @@ const { meta } = useMeta({
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-gap: 16px;
-}
-
-.pagination {
-    margin-top: 16px;
 }
 
 @media (max-width: 420px) {

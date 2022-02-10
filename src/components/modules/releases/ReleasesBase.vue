@@ -65,14 +65,14 @@ export default defineComponent({
             </div>
 
             <div :class="$style.buttons">
-                <a href="https://discord.gg/RfbYR2Zj" target="_blank">
-                    <Button type="tertiary" size="small"
+                <a href="https://discord.gg/FeGDCkHhnB" target="_blank">
+                    <Button type="secondary" size="small"
                         ><Icon name="discord" size="16" />Join our Discord
                         Server</Button
                     ></a
                 >
                 <a href="https://twitter.com/TezosBakingBad" target="_blank">
-                    <Button type="tertiary" size="small"
+                    <Button type="secondary" size="small"
                         ><Icon name="twitter" size="16" />Read our
                         Twitter</Button
                     >

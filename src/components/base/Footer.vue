@@ -279,7 +279,7 @@ onBeforeUnmount(() => {
 
                     <div :class="$style.right">
                         <a
-                            href="https://discord.gg/RfbYR2Zj"
+                            href="https://discord.gg/FeGDCkHhnB"
                             target="_blank"
                             rel="nofolow noreferrer"
                         >

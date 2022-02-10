@@ -23,6 +23,12 @@ const routes = [
         component: () =>
             import(/* webpackChunkName: "landing" */ "@/views/LandingPage"),
     },
+    {
+        path: "/launch",
+        name: "Launch",
+        component: () =>
+            import(/* webpackChunkName: "launch" */ "@/views/LaunchPage"),
+    },
 
     {
         path: "/explore",
