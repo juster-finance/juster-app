@@ -148,6 +148,7 @@ const handleSwitch = () => {
 <style module>
 .wrapper {
     margin: 0 auto;
+    padding: 0 40px;
 
     display: flex;
     flex-direction: column;
@@ -185,7 +186,7 @@ const handleSwitch = () => {
 .header svg {
     fill: var(--text-primary);
 
-    margin: 30px 0 40px 0;
+    margin: 70px 0 40px 0;
 }
 
 .when {
@@ -245,5 +246,11 @@ const handleSwitch = () => {
 
 .switch_btn svg {
     fill: var(--blue);
+}
+
+@media (max-width: 450px) {
+    .wrapper {
+        padding: 0 20px;
+    }
 }
 </style>
