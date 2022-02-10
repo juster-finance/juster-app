@@ -276,7 +276,7 @@ const priceDynamics = computed(() => {
 
                 <div :class="$style.status__info">
                     <span>Canceled</span>
-                    <span>Due to lack of participants, liquidity refund</span>
+                    <span>Event canceled due to measurement delay</span>
                 </div>
             </template>
         </div>

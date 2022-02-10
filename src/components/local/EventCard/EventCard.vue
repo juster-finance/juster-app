@@ -790,7 +790,7 @@ export default defineComponent({
                     :class="[$style.hint, $style.red]"
                 >
                     <Icon name="flag" size="14" />
-                    <div><span>Start price</span> is not determined</div>
+                    <div><span>Canceled</span> due to measurement delay</div>
                 </div>
 
                 <Tooltip
