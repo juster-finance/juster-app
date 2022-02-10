@@ -169,7 +169,7 @@ export default defineComponent({
 
     border-radius: 8px;
     border: 1px solid var(--border);
-    height: 50px;
+    min-height: 50px;
     padding: 0 10px;
 }
 
