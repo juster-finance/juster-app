@@ -95,10 +95,19 @@ const returnForLiquidity = computed(() => {
             }}&nbsp;<span>XTZ</span>
         </div>
 
-        <div :class="[$style.param]">
-            {{
-                returnForLiquidity > 0 ? returnForLiquidity.toFixed(2) : "TBD"
-            }}&nbsp;<span v-if="returnForLiquidity">XTZ</span>
+        <div v-if="event.status == 'FINISHED'" :class="[$style.param]">
+            {{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
+                >XTZ</span
+            >
+        </div>
+        <div v-else-if="event.status == 'CANCELED'" :class="$style.param">
+            Refund
+        </div>
+        <div
+            v-else-if="['NEW', 'STARTED'].includes(event.status)"
+            :class="$style.param"
+        >
+            <span>TBD</span>
         </div>
     </div>
 </template>
