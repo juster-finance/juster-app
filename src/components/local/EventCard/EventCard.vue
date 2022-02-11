@@ -730,10 +730,13 @@ export default defineComponent({
                 >
                     <Icon name="time" size="14" />
                     <div>
-                        Starting in
+                        Starting
                         <span>
-                            {{ timeToStart.num == 0 ? "<1" : timeToStart.num }}
-                            {{ timeToStart.suffix }}
+                            {{
+                                DateTime.fromISO(event.betsCloseTime)
+                                    .setLocale("en")
+                                    .toRelative()
+                            }}
                         </span>
                     </div>
                 </div>
