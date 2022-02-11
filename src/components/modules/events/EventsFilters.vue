@@ -28,6 +28,7 @@ const props = defineProps({
     filters: { type: Object },
     liquidityFilters: { type: Object },
     events: { type: Array },
+    filteredEventsCount: { type: Number },
 })
 const emit = defineEmits([
     "onReset",
@@ -420,9 +421,30 @@ const handleKeydown = (e) => {
         <div :class="$style.divider" />
 
         <div :class="$style.actions">
-            <Button @click="handleReset" type="secondary" size="small"
+            <Button @click="handleReset" type="tertiary" border size="small"
                 >Reset filters</Button
             >
+
+            <div :class="$style.counters">
+                <div :class="$style.counter">
+                    <div :class="$style.counter__left">
+                        <Icon name="collection" size="16" /> Total:
+                    </div>
+
+                    <div :class="$style.counter__value">
+                        {{ events.length }}
+                    </div>
+                </div>
+                <div :class="$style.counter">
+                    <div :class="$style.counter__left">
+                        <Icon name="filter" size="16" /> Filtered:
+                    </div>
+
+                    <div :class="$style.counter__value">
+                        {{ filteredEventsCount }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -435,7 +457,7 @@ const handleKeydown = (e) => {
     background: var(--card-bg);
     border-radius: 8px;
     border: 1px solid var(--border);
-    padding: 20px 0;
+    padding: 20px 0 12px 0;
     height: fit-content;
 }
 
@@ -507,6 +529,47 @@ const handleKeydown = (e) => {
     margin-bottom: 32px;
 }
 
+/* Counter: Total & Filtered */
+.counters {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+
+    margin-top: 16px;
+}
+
+.counter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+
+    height: 32px;
+    border-radius: 6px;
+}
+
+.counter svg {
+    fill: var(--text-tertiary);
+}
+
+.counter__left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-tertiary);
+}
+
+.counter__value {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
 .subtitle {
     display: flex;
     align-items: center;
@@ -542,8 +605,8 @@ const handleKeydown = (e) => {
 
 .actions {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    flex-direction: column;
 
     padding: 0 20px;
 }

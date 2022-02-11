@@ -372,13 +372,16 @@ const pkh = computed(() => accountStore.pkh)
 
                             <DropdownDivider />
 
-                            <router-link to="/releases">
+                            <a
+                                href="https://github.com/juster-finance/juster-app/releases"
+                                target="_blank"
+                            >
                                 <DropdownItem>
                                     <Icon name="merge" size="16" />Releases
                                 </DropdownItem>
-                            </router-link>
+                            </a>
                             <a
-                                href="https://juster.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
+                                href="https://app.juster.fi/docs"
                                 target="_blank"
                             >
                                 <DropdownItem>

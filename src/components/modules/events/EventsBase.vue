@@ -471,6 +471,7 @@ const { meta } = useMeta({
                 :filters="filters"
                 :liquidityFilters="liquidityFilters"
                 :events="marketStore.events"
+                :filteredEventsCount="filteredEvents.length"
                 @onNewMin="handleNewMin"
                 @onNewMax="handleNewMax"
                 @onSelect="handleSelect"
@@ -497,6 +498,14 @@ const { meta } = useMeta({
                         <EventCardLoading />
                         <EventCardLoading />
                     </div>
+
+                    <Banner
+                        v-else-if="!filteredEvents.length && isAllEventsLoaded"
+                        type="info"
+                        size="small"
+                    >
+                        No events with the selected filters were found
+                    </Banner>
                 </transition>
 
                 <Pagination
