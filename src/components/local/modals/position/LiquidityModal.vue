@@ -114,7 +114,8 @@ export default defineComponent({
 
                 document.removeEventListener("keydown", onKeydown)
 
-                showConfirmationHint.value = false
+                showHint.confirmationDelay = false
+                showHint.aborted = false
             } else {
                 accountStore.updateBalance()
 
@@ -154,7 +155,10 @@ export default defineComponent({
                 return { text: "Provide liquidity", disabled: false }
         })
 
-        const showConfirmationHint = ref(false)
+        const showHint = reactive({
+            confirmationDelay: false,
+            aborted: false,
+        })
 
         const handleProvideLiquidity = () => {
             if (buttonState.value.disabled) return
@@ -162,7 +166,7 @@ export default defineComponent({
             sendingLiquidity.value = true
 
             setTimeout(() => {
-                showConfirmationHint.value = true
+                showHint.confirmationDelay = true
             }, 5000)
 
             juster.sdk
@@ -190,7 +194,8 @@ export default defineComponent({
                         })
 
                     sendingLiquidity.value = false
-                    showConfirmationHint.value = false
+                    showHint.confirmationDelay = false
+                    showHint.aborted = false
 
                     /** slow notification to get attention */
                     setTimeout(() => {
@@ -218,7 +223,9 @@ export default defineComponent({
                 })
                 .catch((err) => {
                     sendingLiquidity.value = false
-                    showConfirmationHint.value = false
+                    showHint.confirmationDelay = false
+
+                    if (err.title == "Aborted") showHint.aborted = true
                 })
         }
 
@@ -242,7 +249,7 @@ export default defineComponent({
             sendingLiquidity,
             liquidityRatio,
             shares,
-            showConfirmationHint,
+            showHint,
             handleProvideLiquidity,
             handleLogin,
             buttonState,
@@ -357,7 +364,11 @@ export default defineComponent({
                 {{ buttonState.text }}
             </Button>
 
-            <div v-if="showConfirmationHint" :class="$style.hint">
+            <div v-if="showHint.aborted" :class="$style.hint">
+                If you did not cancel the last transaction, then
+                <a>reconnect</a> the wallet
+            </div>
+            <div v-else-if="showHint.confirmationDelay" :class="$style.hint">
                 Confirmation not appearing?
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"

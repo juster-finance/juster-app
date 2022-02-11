@@ -172,7 +172,8 @@ export default defineComponent({
 
                 document.removeEventListener("keydown", onKeydown)
 
-                showHint.value = false
+                showHint.confirmationDelay = false
+                showHint.aborted = false
             } else {
                 side.value = preselectedSide.value
 
@@ -221,7 +222,10 @@ export default defineComponent({
             }
         })
 
-        const showHint = ref(false)
+        const showHint = reactive({
+            confirmationDelay: false,
+            aborted: false,
+        })
 
         const handleBet = () => {
             if (buttonState.value.disabled) return
@@ -233,7 +237,7 @@ export default defineComponent({
             sendingBet.value = true
 
             setTimeout(() => {
-                showHint.value = true
+                showHint.confirmationDelay = true
             }, 5000)
 
             juster.sdk
@@ -260,7 +264,8 @@ export default defineComponent({
                         })
 
                     sendingBet.value = false
-                    showHint.value = false
+                    showHint.confirmationDelay = false
+                    showHint.aborted = false
 
                     /** slow notification to get attention */
                     setTimeout(() => {
@@ -298,6 +303,8 @@ export default defineComponent({
                         error: err.description,
                     })
 
+                    if ((err.title = "Aborted")) showHint.aborted = true
+
                     /** slow notification to get attention */
                     setTimeout(() => {
                         notificationsStore.create({
@@ -311,7 +318,7 @@ export default defineComponent({
                     }, 700)
 
                     sendingBet.value = false
-                    showHint.value = false
+                    showHint.confirmationDelay = false
                 })
         }
 
@@ -481,7 +488,11 @@ export default defineComponent({
                 {{ buttonState.text }}
             </Button>
 
-            <div v-if="showHint" :class="$style.hint">
+            <div v-if="showHint.aborted" :class="$style.hint">
+                If you did not cancel the last transaction, then
+                <a>reconnect</a> the wallet
+            </div>
+            <div v-else-if="showHint.confirmationDelay" :class="$style.hint">
                 Confirmation not appearing?
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
@@ -489,10 +500,6 @@ export default defineComponent({
                     >Read about possible solutions</a
                 >
             </div>
-            <!-- <div :class="$style.hint">
-                If you did not cancel the last transaction, then
-                <a>reconnect</a> the wallet
-            </div> -->
         </template>
 
         <template v-else>
