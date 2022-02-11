@@ -34,3 +34,8 @@ export const verifiedMakers = {
     hangzhounet: "tz1U2zsFffCTcTvWddAfHfc2gUvEHepaVT1L",
     mainnet: "tz1h5frRwDbJMGyTPntdwMC8i745q2Z1fzyF",
 }
+
+export const contracts = {
+    hangzhounet: "KT197iHRJaAGw3oGpQj21YYV1vK9Fa5ShoMn",
+    mainnet: "KT1D6XTy8oAHkUWdzuQrzySECCDMnANEchQq",
+}
