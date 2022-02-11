@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://i.imgur.com/KVgm2G0.png" alt="Logo">
 
-  <h2 align="center">Juster Finance</h2>
+  <h3 align="center">Juster Finance</h3>
   <p align="center">
     Decentralized Betting Protocol
     <br />
