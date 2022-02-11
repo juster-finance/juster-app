@@ -44,9 +44,10 @@ const handleSwitch = () => {
             <p>
                 After several months of extensive development, we are happy to
                 announce that <b>Juster</b> is up and running on the
-                <b>Mainnet</b>! The current stable version of the web
-                application is <b>1.0</b>. You can still use the test network
-                for your own purposes.
+                <b>Mainnet</b>! Juster is a decentralized betting protocol on
+                the Tezos blockchain allowing to bet on crypto price dynamics or
+                to become a bookmaker. The current stable version of the web
+                application is <b>1.0</b>.
             </p>
 
             <div
@@ -95,8 +96,8 @@ const handleSwitch = () => {
 
             <p>
                 <b
-                    >All the business logic is implemented in the smart
-                    contract:</b
+                    >All the business logic is implemented in the smart contract
+                    on Tezos:</b
                 >
                 you can place bets, add liquidity, and withdraw profits even if
                 Juster services are down. If anything goes wrong during the
