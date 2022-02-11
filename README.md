@@ -1,5 +1,3 @@
-# Juster
-
 <p align="center">
   <a href="https://app.juster.fi/explore"><img src="https://i.imgur.com/KVgm2G0.png" alt="Logo"></a>
 
