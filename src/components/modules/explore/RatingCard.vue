@@ -1,6 +1,4 @@
 <script setup>
-import { computed, defineProps } from "vue"
-
 /**
  * Utils
  */

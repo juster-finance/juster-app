@@ -58,7 +58,7 @@ import {
     getCurrencyIcon,
     capitalizeFirstLetter,
 } from "@/services/utils/global"
-import { juster, gql, analytics } from "@/services/sdk"
+import { juster, analytics } from "@/services/sdk"
 import { supportedMarkets } from "@/services/config"
 
 /**
