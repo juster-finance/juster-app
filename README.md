@@ -1,7 +1,7 @@
 # Juster
 
 <p align="center">
-  <img src="https://i.imgur.com/KVgm2G0.png" alt="Logo">
+  <a href="https://app.juster.fi/explore"><img src="https://i.imgur.com/KVgm2G0.png" alt="Logo"></a>
 
   <h3 align="center">Juster Finance</h3>
   <p align="center">
