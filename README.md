@@ -29,6 +29,7 @@
     </p>
 </p>
 
+
 <br />
 
 <p align="center">
@@ -38,6 +39,10 @@
     <a href="https://github.com/juster-finance/juster-app/issues"><img src="https://img.shields.io/github/issues-raw/juster-finance/juster-app"/></a>
     <a href="https://github.com/juster-finance/juster-app/pulse"><img src="https://img.shields.io/github/commit-activity/m/juster-finance/juster-app" alt="Commits-per-month"></a>
 </p>
+
+<br/>
+
+<img src="https://i.imgur.com/xhWvft1.png">
 
 <br/>
 
