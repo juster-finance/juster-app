@@ -1,4 +1,7 @@
-import { apollo } from "@/apollo"
+/**
+ * Services
+ */
+import { juster } from "@/services/sdk"
 
 /**
  * GQL: Queries
@@ -7,7 +10,7 @@ import { getBetsByEvent, getBetsByUser } from "@/graphql/queries/bets"
 
 export const fetchBetsByEvent = async ({ eventId }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getBetsByEvent,
             variables: { eventId },
         })
@@ -23,7 +26,7 @@ export const fetchBetsByEvent = async ({ eventId }) => {
 
 export const fetchBetsByUser = async ({ eventId, address }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getBetsByUser,
             variables: { eventId, address },
         })

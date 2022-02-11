@@ -16,7 +16,7 @@ export default defineComponent({
 <template>
     <Page>
         <h1 id="terms-of-use">Terms of Use</h1>
-        <div :class="$style.description">Last Updated: October 25th 2021</div>
+        <div :class="$style.description">Last Updated: February 1th 2022</div>
 
         <div :class="$style.block">
             <p>
@@ -26,15 +26,14 @@ export default defineComponent({
                 “us” and “our”) and you or the company or other legal entity you
                 represent (“you” or “your”), and constitute a binding legal
                 agreement. Please read these Terms carefully, as these Terms
-                govern your use of our Website (<a href="https://app.juster.fi/"
-                    >https://app.juster.fi/</a
-                >) and the Juster Protocol (on-chain software), and expressly
-                cover your rights and obligations, and our disclaimers and
-                limitations of legal liability, relating to such use. By
-                accessing or using our Website or our Protocol, you accept and
-                agree to be bound by and to comply with these Terms. If you do
-                not agree to these Terms, you must not access or use our Website
-                or the Protocol for any purpose.
+                govern your use of our Website (https://app.juster.fi/) and the
+                Juster Protocol (on-chain software), and expressly cover your
+                rights and obligations, and our disclaimers and limitations of
+                legal liability, relating to such use. By accessing or using our
+                Website or our Protocol, you accept and agree to be bound by and
+                to comply with these Terms. If you do not agree to these Terms,
+                you must not access or use our Website or the Protocol for any
+                purpose.
             </p>
         </div>
 
@@ -158,10 +157,15 @@ export default defineComponent({
                 </li>
                 <li>
                     You represent and warrant that you are not under the control
-                    of or a citizen or resident of a state, country, territory
-                    or other jurisdiction that is embargoed by the United States
-                    or where your use of the Website or the Protocol would be
-                    illegal or otherwise violate any applicable law;
+                    of or a citizen or resident of the United States, Canada,
+                    the United Kingdom, Israel, China, Japan, Singapore, Hong
+                    Kong, Russia, Belarus, Crimea and Sevastopol, Cuba, Iran,
+                    Afghanistan, Syria, North Korea, Iraq, Côte d'Ivoire,
+                    Liberia, Sudan, Zimbabwe or any state, country, territory or
+                    other jurisdiction that is embargoed by the United States or
+                    any other country where your use of the Website or the
+                    Protocol would be illegal or otherwise violate any
+                    applicable law;
                 </li>
                 <li>
                     You are at least 18 years old or of other legal age,
@@ -205,11 +209,10 @@ export default defineComponent({
                     communication.
                 </li>
                 <li>
-                    SYou shall not distribute any virus or other harmful
-                    computer code through Juster Website or take any actions
-                    that may impose an unreasonable or disproportionately large
-                    load on Juster Website or any third-party providers’
-                    infrastructure.
+                    You shall not distribute any virus or other harmful computer
+                    code through Juster Website or take any actions that may
+                    impose an unreasonable or disproportionately large load on
+                    Juster Website or any third-party providers’ infrastructure.
                 </li>
             </ul>
         </div>
@@ -454,7 +457,8 @@ export default defineComponent({
     margin-bottom: 16px;
 }
 
-.block p, .block ul {
+.block p,
+.block ul {
     font-size: 14px;
     line-height: 1.6;
     font-weight: 400;

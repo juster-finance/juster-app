@@ -1,12 +1,12 @@
-<script>
-export default {
-    name: "Badge",
-    props: { color: String },
-}
+<script setup>
+const props = defineProps({
+    size: { type: String, default: "small" },
+    color: { type: String, default: "gray" },
+})
 </script>
 
 <template>
-    <div :class="[$style.wrapper, $style[color]]">
+    <div :class="[$style.wrapper, $style[color], $style[size]]">
         <slot />
     </div>
 </template>
@@ -17,17 +17,31 @@ export default {
     align-items: center;
     gap: 6px;
 
-    height: 26px;
     border-radius: 6px;
     border: 1px solid var(--border);
 
-    font-size: 12px;
     font-weight: 600;
     line-height: 1.2;
     white-space: nowrap;
+}
 
+/**
+ * Sizes
+ */
+.wrapper.small {
+    height: 26px;
+    font-size: 12px;
     padding: 0 8px;
 }
+.wrapper.medium {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 13px;
+}
+
+/**
+ * Colors
+ */
 
 .wrapper.green {
     color: var(--green);

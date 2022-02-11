@@ -14,6 +14,7 @@ import {
 /**
  * Services
  */
+import { currentNetwork } from "@/services/sdk"
 import { toClipboard } from "@/services/utils/global"
 
 /**
@@ -61,7 +62,7 @@ export default defineComponent({
             }
         }
 
-        return { handleCopy, accountStore }
+        return { handleCopy, accountStore, currentNetwork }
     },
 
     components: { Button, Dropdown, DropdownItem, DropdownDivider },
@@ -137,7 +138,9 @@ export default defineComponent({
                 </router-link>
 
                 <a
-                    :href="`https://hangzhou2net.tzkt.io/${user.userId}`"
+                    :href="`https://${
+                        currentNetwork == 'mainnet' ? '' : 'hangzhou2net.'
+                    }tzkt.io/${user.userId}`"
                     target="_blank"
                 >
                     <DropdownItem
@@ -166,7 +169,7 @@ export default defineComponent({
 
     border-radius: 8px;
     border: 1px solid var(--border);
-    height: 50px;
+    min-height: 50px;
     padding: 0 10px;
 }
 
@@ -199,6 +202,7 @@ export default defineComponent({
 .avatar img {
     width: 28px;
     height: 28px;
+    border-radius: 50%;
 }
 
 .base {

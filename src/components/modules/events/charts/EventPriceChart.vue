@@ -21,7 +21,7 @@ import { fetchQuoteByRange } from "@/api/quotes"
  * Services
  */
 import { prepareQuotesForD3 } from "@/services/utils/quotes"
-import { gql } from "@/services/tools"
+import { juster } from "@/services/sdk"
 
 /**
  * UI
@@ -431,7 +431,7 @@ export default defineComponent({
             draw()
 
             if (event.value.status !== "FINISHED") {
-                subscription.value = await gql
+                subscription.value = await juster.gql
                     .subscription({
                         quotesWma: [
                             {

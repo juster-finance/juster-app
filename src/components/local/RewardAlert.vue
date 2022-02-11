@@ -24,7 +24,7 @@ const reward = computed(() => {
         0,
     )
 
-    return f(total).split(".")
+    return f(total)
 })
 </script>
 
@@ -34,9 +34,12 @@ const reward = computed(() => {
             <div :class="$style.wrapper">
                 <Icon name="crown" size="14" />
 
-                <div :class="$style.reward">
-                    <span>{{ reward[0] }}</span
-                    >.{{ reward[1] }} XTZ
+                <div v-if="reward % 1 == 0" :class="$style.reward">
+                    <span>{{ reward[0] }}</span> XTZ
+                </div>
+                <div v-else :class="$style.reward">
+                    <span>{{ reward.split(".")[0] }}</span
+                    >.{{ reward.split(".")[1] }} XTZ
                 </div>
             </div>
 

@@ -1,21 +1,55 @@
-<script>
-import { defineComponent, toRefs } from "vue"
+<script setup>
+import { computed, watch } from "vue"
 import { DateTime } from "luxon"
+
+/**
+ * Services
+ */
+import { numberWithSymbol } from "@/services/utils/amounts"
 
 /**
  * Store
  */
 import { useAccountStore } from "@/store/account"
+const accountStore = useAccountStore()
 
-export default defineComponent({
-    name: "DepositCard",
-    props: { deposit: Object },
+const props = defineProps({
+    deposit: { type: Object },
+    event: { type: Object },
+})
 
-    setup() {
-        const accountStore = useAccountStore()
+const aboveEqProfit = computed(() => {
+    let profit =
+        (props.event.poolBelow * props.deposit.shares) /
+            props.event.totalLiquidityShares -
+        props.deposit.amountAboveEq
 
-        return { DateTime, pkh: accountStore.pkh }
-    },
+    if (profit > 0) {
+        profit = profit * (1 - 0.01)
+    }
+
+    return profit
+})
+const belowProfit = computed(() => {
+    let profit =
+        (props.event.poolAboveEq * props.deposit.shares) /
+            props.event.totalLiquidityShares -
+        props.deposit.amountBelow
+
+    if (profit > 0) {
+        profit = profit * (1 - 0.01)
+    }
+
+    return profit
+})
+
+const returnForLiquidity = computed(() => {
+    if (props.event.winnerBets == "ABOVE_EQ")
+        return aboveEqProfit.value + props.deposit.amountAboveEq
+    if (props.event.winnerBets == "BELOW")
+        return belowProfit.value + props.deposit.amountBelow
+
+    return 0
 })
 </script>
 
@@ -36,26 +70,41 @@ export default defineComponent({
 
             <div :class="$style.info">
                 <div :class="$style.title">
-                    {{ pkh == deposit.userId ? "My" : "" }} Liquidity
+                    {{ accountStore.pkh == deposit.userId ? "My" : "" }}
+                    Liquidity
                 </div>
                 <div :class="$style.time">
-                    {{ DateTime.fromISO(deposit.createdTime).toRelative() }}
+                    {{
+                        DateTime.fromISO(deposit.createdTime, {
+                            locale: "en",
+                        }).toRelative()
+                    }}
                 </div>
             </div>
         </div>
 
         <div :class="[$style.param, $style.up]">
             <Icon name="higher" size="12" />{{
-                deposit.amountAboveEq.toFixed(0)
-            }}
-            &nbsp;<span>XTZ</span>
+                numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
+            }}&nbsp;<span>XTZ</span>
         </div>
 
         <div :class="[$style.param, $style.down]">
             <Icon name="higher" size="12" />{{
-                deposit.amountBelow.toFixed(0)
-            }}
-            &nbsp;<span>XTZ</span>
+                numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
+            }}&nbsp;<span>XTZ</span>
+        </div>
+
+        <div v-if="event.status == 'FINISHED'" :class="[$style.param]">
+            {{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
+                >XTZ</span
+            >
+        </div>
+        <div v-else-if="event.status == 'CANCELED'" :class="$style.param">
+            Refund
+        </div>
+        <div v-else :class="$style.param">
+            <span>TBD</span>
         </div>
     </div>
 </template>

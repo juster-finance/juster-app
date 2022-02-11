@@ -1,4 +1,5 @@
 import { defineStore } from "pinia"
+import { cloneDeep } from "lodash"
 
 export const useMarketStore = defineStore({
     id: "market",

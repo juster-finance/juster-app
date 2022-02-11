@@ -10,12 +10,12 @@ import Button from "@/components/ui/Button"
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
 
 /**
  * Services
  */
+import { currentNetwork } from "@/services/sdk"
 import { toClipboard } from "@/services/utils/global"
 
 export default defineComponent({
@@ -59,6 +59,7 @@ export default defineComponent({
             isAddressHovered,
             shortAddress,
             handleCopyAddress,
+            currentNetwork,
         }
     },
 
@@ -116,7 +117,10 @@ export default defineComponent({
                     <div>wallet</div>
                     address
                 </div>
-                <div :class="[$style.label, $style.orange]">
+                <div
+                    v-if="currentNetwork !== 'mainnet'"
+                    :class="[$style.label, $style.orange]"
+                >
                     <Icon name="warning" size="16" /> Notice, Hangzhou Testnet
                     used
                 </div>

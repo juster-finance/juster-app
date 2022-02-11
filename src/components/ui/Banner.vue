@@ -1,6 +1,4 @@
 <script setup>
-import { defineProps } from "vue"
-
 /**
  * UI
  */
@@ -9,17 +7,25 @@ import Spin from "@/components/ui/Spin"
 const props = defineProps({
     type: { type: String, default: "warning" },
     size: { type: String, default: "small" },
+    center: { type: Boolean, default: false },
     loading: Boolean,
 })
 </script>
 
 <template>
-    <div :class="[$style.wrapper, $style[type], $style[size]]">
+    <div
+        :class="[
+            $style.wrapper,
+            $style[type],
+            $style[size],
+            center && $style.center,
+        ]"
+    >
         <Spin v-if="loading" size="14" />
         <Icon
             v-else
             :name="
-                (type == 'warning' && 'help') ||
+                (type == 'warning' && 'warning') ||
                 (type == 'success' && 'checkcircle') ||
                 (type == 'error' && 'close') ||
                 (type == 'info' && 'help')
@@ -45,7 +51,6 @@ const props = defineProps({
 }
 
 .base {
-    width: 100%;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -88,5 +93,9 @@ const props = defineProps({
 
     min-height: 30px;
     border-radius: 6px;
+}
+
+.wrapper.center {
+    justify-content: center;
 }
 </style>

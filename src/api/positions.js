@@ -1,5 +1,9 @@
-import { apollo } from "@/apollo"
 import { cloneDeep } from "lodash"
+
+/**
+ * Services
+ */
+import { juster } from "@/services/sdk"
 
 /**
  * GQL: Queries
@@ -11,7 +15,7 @@ import {
 
 export const fetchAllUserPositions = async ({ address }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getAllUserPositions,
             variables: { address },
         })
@@ -27,7 +31,7 @@ export const fetchAllUserPositions = async ({ address }) => {
 
 export const fetchUserPositionsForWithdraw = async ({ address }) => {
     try {
-        const { data } = await apollo.query({
+        const { data } = await juster.apollo.query({
             query: getUserPositionsForWithdrawal,
             variables: { address },
         })

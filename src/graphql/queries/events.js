@@ -92,6 +92,52 @@ export const getAllEvents = gql`
     }
 `
 
+export const getEventsByStatus = gql`
+    query getEventsByStatus($status: [String]) {
+        event(where: { status: { _in: $status } }) {
+            id
+            status
+            betsCloseTime
+            creatorId
+            currencyPair {
+                symbol
+                id
+            }
+            poolAboveEq
+            poolBelow
+            totalBetsAmount
+            totalLiquidityProvided
+            totalLiquidityShares
+            totalValueLocked
+            liquidityPercent
+            measurePeriod
+            closedOracleTime
+            createdTime
+            startRate
+            closedRate
+            winnerBets
+            targetDynamics
+            bets {
+                id
+                side
+                reward
+                amount
+                createdTime
+                userId
+            }
+            deposits {
+                amountAboveEq
+                amountBelow
+                eventId
+                id
+                userId
+                createdTime
+                shares
+            }
+        }
+    }
+`
+
 export const getEventsByMarket = gql`
     query getEventsByMarket($id: Int, $status: String) {
         event(

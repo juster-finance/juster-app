@@ -8,10 +8,8 @@ import {
     ref,
     reactive,
     computed,
-    inject,
 } from "vue"
-import { DateTime } from "luxon"
-import { gql } from "@/services/tools"
+import { DateTime, Duration } from "luxon"
 
 /**
  * UI
@@ -31,8 +29,7 @@ import Tooltip from "@/components/ui/Tooltip"
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
 import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
 import BetModal from "@/components/local/modals/position/BetModal"
-
-import EventCardActions from "./EventCardActions"
+import EventActions from "@/components/local/EventActions"
 
 /**
  * Services
@@ -42,14 +39,16 @@ import {
     getCurrencyIcon,
     capitalizeFirstLetter,
 } from "@/services/utils/global"
-import { juster } from "@/services/tools"
+import { juster, analytics, currentNetwork } from "@/services/sdk"
 import { abbreviateNumber } from "@/services/utils/amounts"
-import { supportedMarkets } from "@/services/config"
+import { supportedMarkets, verifiedMakers } from "@/services/config"
+import { toReadableDuration } from "@/services/utils/date"
 
 /**
  * Composable
  */
 import { useCountdown } from "@/composable/date"
+import { useMarket } from "@/composable/market"
 
 /**
  * Store
@@ -68,12 +67,12 @@ export default defineComponent({
     setup(props) {
         const { event } = toRefs(props)
 
-        const amplitude = inject("amplitude")
-
         /** Stores */
         const notificationsStore = useNotificationsStore()
         const accountStore = useAccountStore()
         const marketStore = useMarketStore()
+
+        const { updateWithdrawals } = useMarket()
 
         const card = ref(null)
         const openContextMenu = ref(false)
@@ -125,11 +124,8 @@ export default defineComponent({
                 .toJSDate()
                 .getTime(),
         )
-        const {
-            status: finishStatus,
-            time: finishTime,
-            stop: destroyFinishCountdown,
-        } = useCountdown(finishDt)
+        const { time: finishTime, stop: destroyFinishCountdown } =
+            useCountdown(finishDt)
 
         // eslint-disable-next-line vue/return-in-computed-property
         const timeToFinish = computed(() => {
@@ -147,14 +143,14 @@ export default defineComponent({
             }
         })
 
-        const percentage = computed(() => {
-            return event.value?.targetDynamics * 100 - 100
-        })
+        const eventDuration = computed(() =>
+            toReadableDuration({ seconds: event.value.measurePeriod }),
+        )
 
         const timing = computed(() => {
             const eventDt = DateTime.fromISO(
                 event.value.betsCloseTime,
-            ).setLocale("ru")
+            ).setLocale("en")
 
             const endDt = eventDt.plus(event.value.measurePeriod * 1000)
 
@@ -184,10 +180,10 @@ export default defineComponent({
         })
 
         const liquidityLevel = computed(() => {
-            if (event.value.totalLiquidityProvided < 1000) return "Low"
-            if (event.value.totalLiquidityProvided == 1000) return "Medium"
-            if (event.value.totalLiquidityProvided > 1000) return "High"
-            if (event.value.totalLiquidityProvided > 5000) return "Super"
+            if (event.value.totalLiquidityProvided < 500) return "Low"
+            if (event.value.totalLiquidityProvided == 500) return "Medium"
+            if (event.value.totalLiquidityProvided > 500) return "High"
+            if (event.value.totalLiquidityProvided > 1000) return "Super"
         })
 
         const participantsAvatars = computed(() => {
@@ -240,7 +236,7 @@ export default defineComponent({
             )
                 return
 
-            amplitude.logEvent("showBetModal", { where: "event_card" })
+            analytics.log("showBetModal", { where: "event_card" })
 
             showBetModal.value = true
         }
@@ -250,9 +246,9 @@ export default defineComponent({
         const handleWithdraw = (e) => {
             isWithdrawing.value = true
 
-            amplitude.logEvent("clickWithdraw", { where: "event_card" })
+            analytics.log("clickWithdraw", { where: "event_card" })
 
-            juster
+            juster.sdk
                 .withdraw(event.value.id, accountStore.pkh)
                 .then((op) => {
                     /** Pending transaction label */
@@ -262,6 +258,15 @@ export default defineComponent({
                         .then((result) => {
                             accountStore.pendingTransaction.awaiting = false
                             isWithdrawing.value = false
+
+                            /** rm won position from store */
+                            accountStore.positionsForWithdrawal =
+                                accountStore.positionsForWithdrawal.filter(
+                                    (position) =>
+                                        position.event.id != event.value.id,
+                                )
+
+                            updateWithdrawals()
 
                             if (!result.completed) {
                                 // todo: handle it?
@@ -282,11 +287,12 @@ export default defineComponent({
                         },
                     })
 
-                    amplitude.logEvent("onWithdraw", {
+                    analytics.log("onWithdraw", {
                         eventId: event.value.id,
                     })
                 })
                 .catch((err) => {
+                    accountStore.pendingTransaction.awaiting = false
                     isWithdrawing.value = false
                 })
         }
@@ -294,7 +300,7 @@ export default defineComponent({
         const handleParticipants = () => {
             showParticipantsModal.value = true
 
-            amplitude.logEvent("showParticipantsModal", { where: "event_card" })
+            analytics.log("showParticipantsModal", { where: "event_card" })
         }
 
         const copy = (target) => {
@@ -332,17 +338,12 @@ export default defineComponent({
         const contextMenuHandler = (e) => {
             e.preventDefault()
 
-            amplitude.logEvent("showContextMenu")
+            analytics.log("showContextMenu")
 
             contextMenuStyles.top = `${e.clientY}px`
             contextMenuStyles.left = `${e.clientX}px`
 
             openContextMenu.value = !openContextMenu.value
-        }
-
-        const handleSwitch = () => {
-            showBetModal.value = !showBetModal.value
-            showLiquidityModal.value = !showLiquidityModal.value
         }
 
         onMounted(async () => {
@@ -351,7 +352,7 @@ export default defineComponent({
             if (event.value.status === "FINISHED") return
 
             /** Subscription, TODO: refactor */
-            subscription.value = await gql
+            subscription.value = await juster.gql
                 .subscription({
                     event: [
                         {
@@ -433,28 +434,28 @@ export default defineComponent({
             timeToStart,
             startStatus,
             timeToFinish,
-            finishStatus,
             symbol,
             liquidityLevel,
             participantsAvatars,
             userTVL,
             won,
             positionForWithdraw,
-            percentage,
             handleBet,
             handleParticipants,
             isWithdrawing,
             handleWithdraw,
             copy,
-            handleSwitch,
             getCurrencyIcon,
             abbreviateNumber,
             supportedMarkets,
+            verifiedMakers,
+            currentNetwork,
+            eventDuration,
         }
     },
 
     components: {
-        EventCardActions,
+        EventActions,
         Button,
         Badge,
         Tooltip,
@@ -475,14 +476,12 @@ export default defineComponent({
                 :show="showBetModal"
                 :event="event"
                 :preselectedSide="preselectedSide"
-                @switch="handleSwitch"
                 @onBet="showBetModal = false"
                 @onClose="showBetModal = false"
             />
             <LiquidityModal
                 :show="showLiquidityModal"
                 :event="event"
-                @switch="handleSwitch"
                 @onClose="showLiquidityModal = false"
             />
             <ParticipantsModal
@@ -540,7 +539,10 @@ export default defineComponent({
                                 )"
                                 :key="participantAvatar"
                                 :src="`https://services.tzkt.io/v1/avatars/${participantAvatar}`"
-                                :class="$style.user_avatar"
+                                :class="[
+                                    $style.user_avatar,
+                                    $style.participant,
+                                ]"
                             />
                         </div>
 
@@ -553,22 +555,33 @@ export default defineComponent({
 
                     <Tooltip position="bottom" side="right">
                         <div :class="$style.creator">
-                            <img
-                                :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
-                                :class="$style.user_avatar"
-                            />
-                            <Icon name="verified" size="14" />
+                            <template
+                                v-if="
+                                    event.creatorId ==
+                                    verifiedMakers[currentNetwork]
+                                "
+                            >
+                                <Icon name="logo_symbol" size="24" />
+                                <Icon
+                                    name="verified"
+                                    size="16"
+                                    :class="$style.verified_icon"
+                                />
+                            </template>
+
+                            <template v-else>
+                                <img
+                                    :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
+                                    :class="$style.user_avatar"
+                                />
+                            </template>
                         </div>
 
-                        <template v-slot:content>
-                            Creator:
-                            {{
-                                `${event.creatorId.slice(
-                                    0,
-                                    4,
-                                )}....${event.creatorId.slice(32, 36)}`
-                            }}
-                        </template>
+                        <template v-slot:content>{{
+                            event.creatorId == verifiedMakers[currentNetwork]
+                                ? "Recurring event from Juster"
+                                : "Custom event from user"
+                        }}</template>
                     </Tooltip>
                 </div>
             </div>
@@ -605,7 +618,7 @@ export default defineComponent({
                     {{ timing.start.time }}
                     ->
                     {{ timing.end.time }}
-                    <span>({{ event.measurePeriod / 3600 }}h)</span>
+                    <span>({{ eventDuration }})</span>
                 </div>
             </div>
 
@@ -685,14 +698,16 @@ export default defineComponent({
                     <Icon name="hot" size="12" />
                 </Badge>
 
-                <Tooltip position="bottom" side="left">
-                    <Badge color="gray" :class="$style.badge">
-                        <Icon name="infinite" size="12" />
+                <Tooltip
+                    v-if="event.creatorId !== verifiedMakers[currentNetwork]"
+                    position="bottom"
+                    side="left"
+                >
+                    <Badge color="yellow" :class="$style.badge">
+                        <Icon name="bolt" size="12" /> Custom
                     </Badge>
 
-                    <template v-slot:content
-                        >Recurring, created automatically</template
-                    >
+                    <template v-slot:content>Custom event from user</template>
                 </Tooltip>
 
                 <Tooltip position="bottom" side="right">
@@ -715,10 +730,13 @@ export default defineComponent({
                 >
                     <Icon name="time" size="14" />
                     <div>
-                        Starting in
+                        Starting
                         <span>
-                            {{ timeToStart.num == 0 ? "<1" : timeToStart.num }}
-                            {{ timeToStart.suffix }}
+                            {{
+                                DateTime.fromISO(event.betsCloseTime)
+                                    .setLocale("en")
+                                    .toRelative()
+                            }}
                         </span>
                     </div>
                 </div>
@@ -760,7 +778,9 @@ export default defineComponent({
                         Ended
                         <span>
                             {{
-                                DateTime.fromISO(event.betsCloseTime)
+                                DateTime.fromISO(event.betsCloseTime, {
+                                    locale: "en",
+                                })
                                     .plus({ second: event.measurePeriod })
                                     .toRelative()
                             }}
@@ -773,7 +793,7 @@ export default defineComponent({
                     :class="[$style.hint, $style.red]"
                 >
                     <Icon name="flag" size="14" />
-                    <div><span>Start price</span> is not determined</div>
+                    <div><span>Canceled</span> due to measurement delay</div>
                 </div>
 
                 <Tooltip
@@ -851,7 +871,7 @@ export default defineComponent({
                 </Tooltip>
             </div>
 
-            <EventCardActions
+            <EventActions
                 @onBet="handleBet"
                 @onWithdraw="handleWithdraw"
                 :event="event"
@@ -923,24 +943,38 @@ export default defineComponent({
 .users {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
 }
 
 .participants {
     display: flex;
 }
 
-.creator {
-    display: flex;
-    position: relative;
+.participant {
+    margin-left: -12px;
 }
 
-.creator svg {
-    position: absolute;
-    top: -2px;
-    right: -2px;
+.creator {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    fill: var(--yellow);
+    fill: var(--text-secondary);
+
+    width: 30px;
+    height: 30px;
+}
+
+.verified_icon {
+    fill: var(--orange);
+    background: var(--card-bg);
+    border-radius: 50%;
+
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    box-sizing: content-box;
 }
 
 .user_avatar {
@@ -949,8 +983,6 @@ export default defineComponent({
 
     background: rgb(35, 35, 35);
     border-radius: 50px;
-
-    margin-left: -12px;
 
     padding: 2px;
 }

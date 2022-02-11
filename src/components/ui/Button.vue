@@ -16,6 +16,10 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        border: {
+            type: Boolean,
+            default: false,
+        },
         disabled: {
             type: Boolean,
         },
@@ -29,7 +33,7 @@ export default defineComponent({
 
     setup(props, context) {
         const style = useCssModule()
-        const { type, size, block, disabled, icon } = toRefs(props)
+        const { type, size, block, disabled, border, icon } = toRefs(props)
 
         const hasSlot = computed(() => !!context.slots.default)
 
@@ -48,6 +52,7 @@ export default defineComponent({
                 hasCorrectSize && style[size.value],
                 disabled.value && style.disabled,
                 icon.value && style.icon,
+                border.value && style.border,
             ]
         }
 
@@ -173,5 +178,9 @@ export default defineComponent({
 .wrapper.disabled {
     opacity: 0.5;
     pointer-events: none;
+}
+
+.wrapper.border {
+    border: 1px solid var(--border);
 }
 </style>

@@ -6,7 +6,6 @@ import {
     computed,
     toRefs,
     watch,
-    inject,
     nextTick,
 } from "vue"
 import BigNumber from "bignumber.js"
@@ -16,7 +15,8 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { juster } from "@/services/tools"
+import { juster, analytics, currentNetwork } from "@/services/sdk"
+import { verifiedMakers } from "@/services/config"
 
 /**
  * Local
@@ -59,7 +59,6 @@ export default defineComponent({
 
     setup(props, context) {
         const { event, show, preselectedSide } = toRefs(props)
-        const amplitude = inject("amplitude")
 
         const accountStore = useAccountStore()
         const notificationsStore = useNotificationsStore()
@@ -173,7 +172,8 @@ export default defineComponent({
 
                 document.removeEventListener("keydown", onKeydown)
 
-                showHint.value = false
+                showHint.confirmationDelay = false
+                showHint.aborted = false
             } else {
                 side.value = preselectedSide.value
 
@@ -222,7 +222,10 @@ export default defineComponent({
             }
         })
 
-        const showHint = ref(false)
+        const showHint = reactive({
+            confirmationDelay: false,
+            aborted: false,
+        })
 
         const handleBet = () => {
             if (buttonState.value.disabled) return
@@ -234,10 +237,10 @@ export default defineComponent({
             sendingBet.value = true
 
             setTimeout(() => {
-                showHint.value = true
+                showHint.confirmationDelay = true
             }, 5000)
 
-            juster
+            juster.sdk
                 .bet(
                     event.value.id,
                     betType,
@@ -261,7 +264,8 @@ export default defineComponent({
                         })
 
                     sendingBet.value = false
-                    showHint.value = false
+                    showHint.confirmationDelay = false
+                    showHint.aborted = false
 
                     /** slow notification to get attention */
                     setTimeout(() => {
@@ -277,7 +281,7 @@ export default defineComponent({
                     }, 700)
 
                     /** analytics */
-                    amplitude.logEvent("onBet", {
+                    analytics.log("onBet", {
                         eventId: event.value.id,
                         amount: amount.value,
                         fm: fee.value.toNumber(),
@@ -294,10 +298,12 @@ export default defineComponent({
                 })
                 .catch((err) => {
                     /** analytics */
-                    amplitude.logEvent("onError", {
+                    analytics.log("onError", {
                         eventId: event.value.id,
                         error: err.description,
                     })
+
+                    if ((err.title = "Aborted")) showHint.aborted = true
 
                     /** slow notification to get attention */
                     setTimeout(() => {
@@ -312,14 +318,14 @@ export default defineComponent({
                     }, 700)
 
                     sendingBet.value = false
-                    showHint.value = false
+                    showHint.confirmationDelay = false
                 })
         }
 
         /** Login */
         const handleLogin = async () => {
-            await juster.sync()
-            juster.getPkh().then((pkh) => {
+            await juster.sdk.sync()
+            juster.sdk.getPkh().then((pkh) => {
                 accountStore.setPkh(pkh)
             })
 
@@ -346,10 +352,12 @@ export default defineComponent({
             showHint,
             handleLogin,
             buttonState,
+            verifiedMakers,
+            currentNetwork,
         }
     },
 
-    emits: ["switch", "onClose", "onBet"],
+    emits: ["onClose", "onBet"],
     components: {
         Modal,
         Input,
@@ -382,6 +390,15 @@ export default defineComponent({
                 :countdown="countdownText"
                 :class="$style.direction"
             />
+
+            <Banner
+                v-if="event.creatorId !== verifiedMakers[currentNetwork]"
+                type="warning"
+                size="small"
+                :class="$style.banner"
+            >
+                This event is Custom, its behavior may depend on the parameters
+            </Banner>
 
             <div :class="$style.subtitle">The price will</div>
 
@@ -445,7 +462,12 @@ export default defineComponent({
                 :class="$style.slippage_block"
             />
 
-            <Banner type="warning" size="small" :class="$style.banner">
+            <Banner
+                v-if="currentNetwork !== 'mainnet'"
+                type="info"
+                size="small"
+                :class="$style.banner"
+            >
                 Note that the transaction takes place on the Hangzhounet
             </Banner>
 
@@ -466,7 +488,11 @@ export default defineComponent({
                 {{ buttonState.text }}
             </Button>
 
-            <div v-if="showHint" :class="$style.hint">
+            <div v-if="showHint.aborted" :class="$style.hint">
+                If you did not cancel the last transaction, then
+                <a>reconnect</a> the wallet
+            </div>
+            <div v-else-if="showHint.confirmationDelay" :class="$style.hint">
                 Confirmation not appearing?
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
@@ -474,10 +500,6 @@ export default defineComponent({
                     >Read about possible solutions</a
                 >
             </div>
-            <!-- <div :class="$style.hint">
-                If you did not cancel the last transaction, then
-                <a>reconnect</a> the wallet
-            </div> -->
         </template>
 
         <template v-else>

@@ -1,6 +1,4 @@
 <script setup>
-import { computed, defineProps } from "vue"
-
 /**
  * Utils
  */
@@ -109,6 +107,7 @@ const shorten = (address) => {
 .avatar {
     width: 24px;
     height: 24px;
+    border-radius: 50%;
 
     margin-right: 8px;
 }

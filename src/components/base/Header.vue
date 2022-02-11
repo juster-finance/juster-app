@@ -1,12 +1,17 @@
 <script setup>
-import { ref, reactive, computed, inject } from "vue"
+import { ref, reactive, computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { NetworkType } from "@airgap/beacon-sdk"
 
 /**
  * Services
  */
-import { juster } from "@/services/tools"
+import { juster, analytics, currentNetwork } from "@/services/sdk"
+
+/**
+ * Constants
+ */
+import { Networks } from "@/services/constants"
 
 /**
  * UI
@@ -42,9 +47,6 @@ import { useNotificationsStore } from "@/store/notifications"
 import { useMarket } from "@/composable/market"
 
 const { setupUser } = useMarket()
-
-const amplitude = inject("amplitude")
-const identify = new amplitude.Identify()
 
 const notificationsStore = useNotificationsStore()
 const accountStore = useAccountStore()
@@ -83,18 +85,14 @@ const isActive = (url) => {
 }
 
 const login = () => {
-    juster._provider.client.getActiveAccount().then(async (account) => {
+    juster.sdk._provider.client.getActiveAccount().then(async (account) => {
         if (!localStorage["connectingModal"]) {
             showConnectingModal.value = true
 
             address.value = account.address
             network.value = account.network.type
         } else {
-            /** analytics */
-            identify.set("address", account.address)
-            identify.set("network", account.network.type)
-            amplitude.identify(identify)
-            amplitude.logEvent("login", { address: account.address })
+            analytics.log("login", { address: account.address })
 
             accountStore.pkh = account.address
             accountStore.updateBalance()
@@ -110,7 +108,7 @@ const login = () => {
 const address = ref("")
 const network = ref("")
 const handleLogin = async () => {
-    await juster.sync()
+    await juster.sdk.sync()
     login()
 }
 
@@ -122,7 +120,7 @@ const handleCustomLogin = () => {
     showCustomLoginModal.value = true
 }
 const handleSelectCustomNode = async (node) => {
-    await juster._provider.requestPermissions({
+    await juster.sdk._provider.requestPermissions({
         network: {
             type: NetworkType.CUSTOM,
             name: node.value.name,
@@ -138,10 +136,7 @@ const handleAgree = () => {
     localStorage["connectingModal"] = true
 
     /** analytics */
-    identify.set("address", address.value)
-    identify.set("network", network.value)
-    amplitude.identify(identify)
-    amplitude.logEvent("registration", { address: address.value })
+    analytics.log("registration", { address: address.value })
 
     accountStore.pkh = address.value
     address.value = ""
@@ -155,8 +150,8 @@ const handleDisagree = () => {
 
     address.value = ""
 
-    juster._provider.client.clearActiveAccount().then(async () => {
-        await juster._provider.client.getActiveAccount()
+    juster.sdk._provider.client.clearActiveAccount().then(async () => {
+        await juster.sdk._provider.client.getActiveAccount()
         accountStore.setPkh("")
         router.push("/")
     })
@@ -165,20 +160,20 @@ const handleDisagree = () => {
 const handleOpenProfile = () => {
     router.push("/profile")
 
-    amplitude.logEvent("openProfile")
+    analytics.log("openProfile")
 }
 
 const handleOpenWithdrawals = () => {
     router.push("/withdrawals")
 
-    amplitude.logEvent("openWithdrawals")
+    analytics.log("openWithdrawals")
 }
 
 const handleLogout = () => {
-    juster._provider.client.clearActiveAccount().then(async () => {
-        await juster._provider.client.getActiveAccount()
+    juster.sdk._provider.client.clearActiveAccount().then(async () => {
+        await juster.sdk._provider.client.getActiveAccount()
 
-        amplitude.logEvent("logout", { address: accountStore.pkh })
+        analytics.log("logout", { address: accountStore.pkh })
 
         accountStore.setPkh("")
         router.push("/")
@@ -295,7 +290,10 @@ const pkh = computed(() => accountStore.pkh)
             </div>
 
             <div :class="$style.right">
-                <Tooltip v-if="pkh" side="right">
+                <Tooltip
+                    v-if="currentNetwork !== Networks.MAINNET"
+                    side="right"
+                >
                     <div :class="$style.testnet_warning">
                         <Icon
                             name="Warning"
@@ -374,13 +372,16 @@ const pkh = computed(() => accountStore.pkh)
 
                             <DropdownDivider />
 
-                            <router-link to="/releases">
+                            <a
+                                href="https://github.com/juster-finance/juster-app/releases"
+                                target="_blank"
+                            >
                                 <DropdownItem>
                                     <Icon name="merge" size="16" />Releases
                                 </DropdownItem>
-                            </router-link>
+                            </a>
                             <a
-                                href="https://juster.notion.site/Juster-Guide-48af7e1106634cec92597dffdef531b6"
+                                href="https://app.juster.fi/docs"
                                 target="_blank"
                             >
                                 <DropdownItem>
@@ -548,34 +549,34 @@ const pkh = computed(() => accountStore.pkh)
     line-height: 28px;
     font-weight: 600;
     color: var(--text-primary);
-    background: var(--btn-secondary-bg);
+    background: var(--btn-primary-bg);
 
     padding: 0 10px 0 12px;
-    border-radius: 8px 0 0 8px;
-    border-right: 1px solid var(--border);
+    border-radius: 6px 0 0 6px;
+    border-right: 2px solid rgba(0, 0, 0, 0.1);
 
     transition: background 0.2s ease;
 }
 
 .signin:hover {
-    background: var(--btn-secondary-bg-hover);
+    background: var(--btn-primary-bg-hover);
 }
 
 .custom_signin {
     display: flex;
     align-items: center;
     height: 28px;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 6px 6px 0;
     padding: 0 10px;
 
     fill: var(--text-secondary);
-    background: var(--btn-secondary-bg);
+    background: var(--btn-primary-bg);
 
     transition: background 0.2s ease;
 }
 
 .custom_signin:hover {
-    background: var(--btn-secondary-bg-hover);
+    background: var(--btn-primary-bg-hover);
 }
 
 .avatar {

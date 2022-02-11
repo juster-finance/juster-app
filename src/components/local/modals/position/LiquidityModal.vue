@@ -6,7 +6,6 @@ import {
     computed,
     toRefs,
     watch,
-    inject,
     nextTick,
 } from "vue"
 import BigNumber from "bignumber.js"
@@ -15,7 +14,8 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { juster } from "@/services/tools"
+import { juster, currentNetwork, analytics } from "@/services/sdk"
+import { verifiedMakers } from "@/services/config"
 
 /**
  * Local
@@ -54,8 +54,6 @@ export default defineComponent({
 
     setup(props, context) {
         const { event, show } = toRefs(props)
-
-        const amplitude = inject("amplitude")
 
         const accountStore = useAccountStore()
         const notificationsStore = useNotificationsStore()
@@ -116,7 +114,8 @@ export default defineComponent({
 
                 document.removeEventListener("keydown", onKeydown)
 
-                showConfirmationHint.value = false
+                showHint.confirmationDelay = false
+                showHint.aborted = false
             } else {
                 accountStore.updateBalance()
 
@@ -156,7 +155,10 @@ export default defineComponent({
                 return { text: "Provide liquidity", disabled: false }
         })
 
-        const showConfirmationHint = ref(false)
+        const showHint = reactive({
+            confirmationDelay: false,
+            aborted: false,
+        })
 
         const handleProvideLiquidity = () => {
             if (buttonState.value.disabled) return
@@ -164,10 +166,10 @@ export default defineComponent({
             sendingLiquidity.value = true
 
             setTimeout(() => {
-                showConfirmationHint.value = true
+                showHint.confirmationDelay = true
             }, 5000)
 
-            juster
+            juster.sdk
                 .provideLiquidity(
                     event.value.id,
                     new BigNumber(event.value.poolAboveEq),
@@ -192,7 +194,8 @@ export default defineComponent({
                         })
 
                     sendingLiquidity.value = false
-                    showConfirmationHint.value = false
+                    showHint.confirmationDelay = false
+                    showHint.aborted = false
 
                     /** slow notification to get attention */
                     setTimeout(() => {
@@ -208,7 +211,7 @@ export default defineComponent({
                     }, 700)
 
                     /** analytics */
-                    amplitude.logEvent("onLiquidity", {
+                    analytics.log("onLiquidity", {
                         eventId: event.value.id,
                         amount: amount.value,
                         tts:
@@ -220,14 +223,16 @@ export default defineComponent({
                 })
                 .catch((err) => {
                     sendingLiquidity.value = false
-                    showConfirmationHint.value = false
+                    showHint.confirmationDelay = false
+
+                    if (err.title == "Aborted") showHint.aborted = true
                 })
         }
 
         /** Login */
         const handleLogin = async () => {
-            await juster.sync()
-            juster.getPkh().then((pkh) => {
+            await juster.sdk.sync()
+            juster.sdk.getPkh().then((pkh) => {
                 accountStore.setPkh(pkh)
             })
 
@@ -244,14 +249,16 @@ export default defineComponent({
             sendingLiquidity,
             liquidityRatio,
             shares,
-            showConfirmationHint,
+            showHint,
             handleProvideLiquidity,
             handleLogin,
             buttonState,
+            verifiedMakers,
+            currentNetwork,
         }
     },
 
-    emits: ["switch", "onClose"],
+    emits: ["onClose"],
     components: {
         Modal,
         Input,
@@ -284,6 +291,15 @@ export default defineComponent({
                 :countdown="countdownText"
                 :class="$style.direction"
             />
+
+            <Banner
+                v-if="event.creatorId !== verifiedMakers[currentNetwork]"
+                type="warning"
+                size="small"
+                :class="$style.banner"
+            >
+                This event is Custom, its behavior may depend on the parameters
+            </Banner>
 
             <Input
                 ref="amountInput"
@@ -322,7 +338,12 @@ export default defineComponent({
                 </Stat>
             </div>
 
-            <Banner type="warning" size="small" :class="$style.banner">
+            <Banner
+                v-if="currentNetwork !== 'mainnet'"
+                type="info"
+                size="small"
+                :class="$style.banner"
+            >
                 Note that the transaction takes place on the Hangzhounet
             </Banner>
 
@@ -343,7 +364,11 @@ export default defineComponent({
                 {{ buttonState.text }}
             </Button>
 
-            <div v-if="showConfirmationHint" :class="$style.hint">
+            <div v-if="showHint.aborted" :class="$style.hint">
+                If you did not cancel the last transaction, then
+                <a>reconnect</a> the wallet
+            </div>
+            <div v-else-if="showHint.confirmationDelay" :class="$style.hint">
                 Confirmation not appearing?
                 <a
                     href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"

@@ -1,48 +1,67 @@
-<script>
-import { computed, defineComponent, toRefs } from "vue"
+<script setup>
+import { computed } from "vue"
+
+/**
+ * UI
+ */
+import Button from "@/components/ui/Button"
 
 /**
  * Local
  */
 import Pool from "@/components/local/Pool"
 
-export default defineComponent({
-    name: "EventDetailsCard",
-    props: { event: Object },
+/**
+ * Services
+ */
+import { numberWithSymbol } from "@/services/utils/amounts"
 
-    setup(props) {
-        const { event } = toRefs(props)
+const props = defineProps({ event: { type: Object } })
+const emit = defineEmits(["onLiquidity"])
 
-        const risePool = computed(() =>
-            event.value.bets
-                .filter(bet => bet.side == "ABOVE_EQ")
-                .reduce((acc, { amount }) => acc + amount, 0),
-        )
-        const fallPool = computed(() =>
-            event.value.bets
-                .filter(bet => bet.side == "BELOW")
-                .reduce((acc, { amount }) => acc + amount, 0),
-        )
-
-        return { risePool, fallPool }
-    },
-
-    components: { Pool },
-})
+const risePool = computed(() =>
+    props.event.bets
+        .filter((bet) => bet.side == "ABOVE_EQ")
+        .reduce((acc, { amount }) => acc + amount, 0),
+)
+const fallPool = computed(() =>
+    props.event.bets
+        .filter((bet) => bet.side == "BELOW")
+        .reduce((acc, { amount }) => acc + amount, 0),
+)
 </script>
 
 <template>
     <div :class="$style.wrapper">
-        <div :class="$style.title">
-            Liquidity Pool <Icon name="help" size="14" />
-        </div>
+        <div :class="$style.title">Liquidity</div>
 
         <Pool :event="event" />
 
-        <div :class="$style.hint">
-            Users bet <span>{{ risePool }} XTZ</span> for the fact that the
-            price will rise and <span>{{ fallPool }} XTZ</span> for a fall. Make
-            your choice.
+        <Button
+            @click="emit('onLiquidity')"
+            type="secondary"
+            size="small"
+            block
+            :disabled="event.status !== 'NEW'"
+            :class="$style.liquidity_btn"
+            ><Icon name="liquidity" size="12" />Add Liquidity</Button
+        >
+
+        <div :class="$style.params">
+            <div :class="$style.param">
+                <span><Icon name="liquidity" size="12" />Provided</span>
+
+                <span
+                    >{{ numberWithSymbol(event.totalLiquidityProvided, ",") }}
+                    <span>XTZ</span></span
+                >
+            </div>
+
+            <div :class="$style.param">
+                <span><Icon name="bolt" size="12" />Fee Percent</span>
+
+                <span>{{ parseInt(event.liquidityPercent * 100) }}% </span>
+            </div>
         </div>
     </div>
 </template>
@@ -56,28 +75,50 @@ export default defineComponent({
 }
 
 .title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
     font-size: 14px;
     line-height: 1;
     font-weight: 500;
     color: var(--text-primary);
-    fill: var(--opacity-40);
 
     margin-bottom: 20px;
 }
 
-.hint {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--text-tertiary);
-
+.liquidity_btn {
     margin-top: 16px;
 }
 
-.hint span {
+/* Params */
+.params {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    margin-top: 32px;
+}
+
+.param {
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 600;
+}
+
+.param span:nth-child(1) {
+    color: var(--text-tertiary);
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    fill: var(--opacity-40);
+}
+
+.param span:nth-child(2) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
     color: var(--text-secondary);
 }
 </style>

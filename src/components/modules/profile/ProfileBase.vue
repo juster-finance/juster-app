@@ -18,7 +18,7 @@ import { EventCard } from "@/components/local/EventCard"
 /**
  * Services
  */
-import { fetchBalance } from "@/services/tools"
+import { currentNetwork, fetchBalance } from "@/services/sdk"
 import { toClipboard } from "@/services/utils/global"
 import { abbreviateNumber } from "@/services/utils/amounts"
 
@@ -143,6 +143,7 @@ export default defineComponent({
             selectedPageForEvents,
             paginatedEvents,
             abbreviateNumber,
+            currentNetwork,
         }
     },
 
@@ -270,7 +271,11 @@ export default defineComponent({
                 <div :class="$style.additional">
                     <div :class="$style.left">
                         <a
-                            :href="`https://hangzhou2net.tzkt.io/${address}`"
+                            :href="`https://${
+                                currentNetwork == 'mainnet'
+                                    ? ''
+                                    : 'hangzhou2net.'
+                            }tzkt.io/${address}`"
                             target="_blank"
                         >
                             <Button type="secondary" size="small">
@@ -333,7 +338,7 @@ export default defineComponent({
 
             <div :class="$style.error_description">or</div>
 
-            <Button @click="handleBack" type="tertiary" size="small"
+            <Button @click="handleBack" type="secondary" size="small"
                 >Go back</Button
             >
         </div>
@@ -581,6 +586,7 @@ export default defineComponent({
 .error_avatar {
     width: 50px;
     height: 50px;
+    border-radius: 50%;
 
     margin-bottom: 20px;
 }

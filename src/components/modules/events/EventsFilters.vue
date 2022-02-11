@@ -1,13 +1,5 @@
-<script>
-import {
-    defineComponent,
-    reactive,
-    ref,
-    toRefs,
-    watch,
-    inject,
-    computed,
-} from "vue"
+<script setup>
+import { reactive, ref, toRefs, watch, computed } from "vue"
 
 /**
  * Modals
@@ -20,192 +12,147 @@ import FindParticipantModal from "@/components/local/modals/FindParticipantModal
 import Button from "@/components/ui/Button"
 import Checkbox from "@/components/ui/Checkbox"
 import Toggle from "@/components/ui/Toggle"
+import Tooltip from "@/components/ui/Tooltip"
 
 /**
  * Store
  */
 import { useAccountStore } from "@/store/account"
 
-export default defineComponent({
-    name: "EventsFilters",
-    props: {
-        filters: Object,
-        liquidityRange: Object,
-        liquidityFilters: Object,
-        events: Array,
-    },
+/**
+ * Services
+ */
+import { analytics } from "@/services/sdk"
 
-    setup(props, context) {
-        const amplitude = inject("amplitude")
-
-        const selectedTab = ref("Basic")
-
-        const { filters, liquidityRange, liquidityFilters } = toRefs(props)
-
-        const accountStore = useAccountStore()
-
-        /** modals */
-        const showFindParticipantModal = ref(false)
-
-        const values = reactive({
-            min: 0,
-            max: 0,
-        })
-
-        const position = reactive({
-            left: 0,
-            right: 0,
-        })
-
-        const inputs = reactive({
-            min: 0,
-            max: 0,
-        })
-
-        const minInputEl = ref(null)
-        const maxInputEl = ref(null)
-
-        const handleReset = () => {
-            amplitude.logEvent("onResetFilters")
-
-            context.emit("onReset")
-        }
-
-        const advancedFiltersCount = computed(() => {
-            let count = 0
-
-            Object.keys(filters.value.misc).forEach((filterKey) => {
-                if (filters.value.misc[filterKey].active) count += 1
-            })
-
-            if (filters.value.advanced.period) {
-                count += 1
-            }
-
-            if (filters.value.advanced.participants.length) {
-                count += 1
-            }
-
-            return count
-        })
-
-        /** advanced filters (participants) */
-        const manageParticipant = (address, action) => {
-            context.emit("onManageParticipant", { address, action })
-        }
-
-        const handleFindParticipant = (address) => {
-            manageParticipant(address, "add")
-
-            showFindParticipantModal.value = false
-        }
-
-        /** watch for reset */
-        watch(liquidityFilters.value, () => {
-            inputs.min = liquidityFilters.value.min
-            inputs.max = liquidityFilters.value.max
-        })
-
-        watch(liquidityRange.value, () => {
-            if (typeof liquidityRange.value.min == "number") {
-                values.min = liquidityRange.value.min
-                values.max = liquidityRange.value.max
-
-                inputs.min = liquidityRange.value.min
-                inputs.max = liquidityRange.value.max
-            }
-        })
-
-        watch(
-            () => inputs.min,
-            () => {
-                context.emit("onNewMin", inputs.min)
-
-                if (liquidityRange.value.min == inputs.min) {
-                    position.left = 0
-                    return
-                }
-                if (liquidityRange.value.max < inputs.min) {
-                    inputs.min = liquidityRange.value.min
-                    return
-                }
-
-                const left =
-                    ((inputs.min - liquidityRange.value.min) * 100) /
-                    (liquidityRange.value.max - liquidityRange.value.min)
-
-                position.left = left > 0 ? left : 0
-            },
-        )
-
-        watch(
-            () => inputs.max,
-            () => {
-                context.emit("onNewMax", inputs.max)
-
-                if (liquidityRange.value.max == inputs.max) {
-                    position.right = 0
-                    return
-                }
-                if (liquidityRange.value.max < inputs.max) {
-                    inputs.max = liquidityRange.value.max
-                    return
-                }
-
-                const right =
-                    ((liquidityRange.value.max - inputs.max) * 100) /
-                    (liquidityRange.value.max - liquidityRange.value.min)
-
-                position.right = right > 0 ? right : 0
-            },
-        )
-
-        const handleBlur = (target) => {
-            if (target == "min") {
-                if (inputs.min < liquidityRange.value.min) {
-                    inputs.min = liquidityRange.value.min
-                }
-            }
-
-            if (target == "max") {
-                if (inputs.max > liquidityRange.value.max) {
-                    inputs.max = liquidityRange.value.max
-                }
-            }
-
-            if (inputs.min > liquidityRange.value.max) {
-                inputs.min = liquidityRange.value.max
-            }
-
-            if (inputs.max < liquidityRange.value.min) {
-                inputs.max = liquidityRange.value.min
-            }
-        }
-
-        const handleKeydown = (e) => {
-            if (e.key === "-") e.preventDefault()
-        }
-
-        return {
-            showFindParticipantModal,
-            advancedFiltersCount,
-            selectedTab,
-            handleKeydown,
-            handleBlur,
-            values,
-            position,
-            inputs,
-            minInputEl,
-            maxInputEl,
-            handleReset,
-            accountStore,
-            manageParticipant,
-            handleFindParticipant,
-        }
-    },
-
-    components: { Button, Checkbox, Toggle, FindParticipantModal },
+const props = defineProps({
+    filters: { type: Object },
+    liquidityFilters: { type: Object },
+    events: { type: Array },
+    filteredEventsCount: { type: Number },
 })
+const emit = defineEmits([
+    "onReset",
+    "onNewMin",
+    "onManageParticipant",
+    "onNewMax",
+    "onSelect",
+])
+
+const selectedTab = ref("Basic")
+
+const accountStore = useAccountStore()
+
+/** modals */
+const showFindParticipantModal = ref(false)
+
+const position = reactive({
+    left: 0,
+    right: 0,
+})
+
+const inputs = reactive({
+    min: 0,
+    max: 50000,
+})
+
+const minInputEl = ref(null)
+const maxInputEl = ref(null)
+
+const handleReset = () => {
+    analytics.log("onResetFilters")
+
+    inputs.min = 0
+    inputs.max = 50000
+
+    emit("onReset")
+}
+
+const advancedFiltersCount = computed(() => {
+    let count = 0
+
+    Object.keys(props.filters.misc).forEach((filterKey) => {
+        if (props.filters.misc[filterKey].active) count += 1
+    })
+
+    if (props.filters.advanced.period) {
+        count += 1
+    }
+
+    if (props.filters.advanced.participants.length) {
+        count += 1
+    }
+
+    return count
+})
+
+/** advanced filters (participants) */
+const manageParticipant = (address, action) => {
+    emit("onManageParticipant", { address, action })
+}
+
+const handleFindParticipant = (address) => {
+    manageParticipant(address, "add")
+
+    showFindParticipantModal.value = false
+}
+
+watch(
+    () => inputs.min,
+    () => {
+        emit("onNewMin", inputs.min)
+
+        if (inputs.min === 0) {
+            position.left = 0
+            return
+        }
+
+        const left = (inputs.min * 100) / 50000
+
+        position.left = left > 0 ? left : 0
+    },
+)
+
+watch(
+    () => inputs.max,
+    () => {
+        emit("onNewMax", inputs.max)
+
+        if (inputs.max === 50000) {
+            position.right = 0
+            return
+        }
+
+        const right = ((50000 - inputs.max) * 100) / 50000
+
+        position.right = right > 0 ? right : 0
+    },
+)
+
+const handleBlur = (target) => {
+    if (target == "min") {
+        if (inputs.min < 0) {
+            inputs.min = 0
+        }
+    }
+
+    if (target == "max") {
+        if (inputs.max > 50000) {
+            inputs.max = 50000
+        }
+    }
+
+    if (inputs.min > 50000) {
+        inputs.min = 0
+    }
+
+    if (inputs.max < 0) {
+        inputs.max = 50000
+    }
+}
+
+const handleKeydown = (e) => {
+    if (e.key === "-" || e.key === "e") e.preventDefault()
+}
 </script>
 
 <template>
@@ -267,7 +214,15 @@ export default defineComponent({
             </div>
 
             <div :class="$style.block">
-                <div :class="$style.subtitle">Liquidity</div>
+                <div :class="$style.subtitle">
+                    <Tooltip side="left">
+                        Liquidity <Icon name="help" size="12" />
+
+                        <template #content>
+                            Max value of liquidity depend on all events
+                        </template>
+                    </Tooltip>
+                </div>
 
                 <div :class="$style.range_picker">
                     <div :class="$style.range">
@@ -351,11 +306,7 @@ export default defineComponent({
                         v-for="(period, index) in filters.periods"
                         :key="index"
                         @click="$emit('onSelect', 'periods', period)"
-                        :class="[
-                            $style.badge,
-                            $style.yellow,
-                            period.active && $style.active,
-                        ]"
+                        :class="[$style.badge, period.active && $style.active]"
                     >
                         <Icon name="time" size="14" />
                         {{ period.name }}
@@ -374,7 +325,9 @@ export default defineComponent({
                     >
                         <Icon name="plus" size="14" /> Add user
                     </div>
+
                     <div
+                        v-if="accountStore.isLoggined"
                         @click="manageParticipant(accountStore.pkh, 'add')"
                         :class="[$style.badge, $style.active]"
                     >
@@ -421,6 +374,22 @@ export default defineComponent({
             </div>
 
             <div :class="$style.block">
+                <div :class="$style.subtitle">Created by</div>
+
+                <div :class="$style.badges">
+                    <div
+                        v-for="(author, index) in filters.author"
+                        :key="index"
+                        @click="$emit('onSelect', 'author', author)"
+                        :class="[$style.badge, author.active && $style.active]"
+                    >
+                        <Icon :name="author.icon" size="14" />
+                        {{ author.name }}
+                    </div>
+                </div>
+            </div>
+
+            <div :class="$style.block">
                 <div :class="$style.subtitle">Misc</div>
 
                 <div :class="$style.misc">
@@ -439,17 +408,10 @@ export default defineComponent({
                         />
                     </div>
                     <div :class="$style.toggle_filter">
-                        <div :class="$style.left">With Target Dynamics</div>
+                        <div :class="$style.left">Custom Target Dynamics</div>
                         <Toggle
                             v-model="filters.misc.targetDynamics.active"
                             :disabled="filters.misc.targetDynamics.disabled"
-                        />
-                    </div>
-                    <div :class="$style.toggle_filter">
-                        <div :class="$style.left">Custom events</div>
-                        <Toggle
-                            v-model="filters.misc.customEvents.active"
-                            :disabled="filters.misc.customEvents.disabled"
                         />
                     </div>
                 </div>
@@ -459,9 +421,30 @@ export default defineComponent({
         <div :class="$style.divider" />
 
         <div :class="$style.actions">
-            <Button @click="handleReset" type="secondary" size="small"
+            <Button @click="handleReset" type="tertiary" border size="small"
                 >Reset filters</Button
             >
+
+            <div :class="$style.counters">
+                <div :class="$style.counter">
+                    <div :class="$style.counter__left">
+                        <Icon name="collection" size="16" /> Total:
+                    </div>
+
+                    <div :class="$style.counter__value">
+                        {{ events.length }}
+                    </div>
+                </div>
+                <div :class="$style.counter">
+                    <div :class="$style.counter__left">
+                        <Icon name="filter" size="16" /> Filtered:
+                    </div>
+
+                    <div :class="$style.counter__value">
+                        {{ filteredEventsCount }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -474,7 +457,7 @@ export default defineComponent({
     background: var(--card-bg);
     border-radius: 8px;
     border: 1px solid var(--border);
-    padding: 20px 0;
+    padding: 20px 0 12px 0;
     height: fit-content;
 }
 
@@ -546,11 +529,60 @@ export default defineComponent({
     margin-bottom: 32px;
 }
 
+/* Counter: Total & Filtered */
+.counters {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+
+    margin-top: 16px;
+}
+
+.counter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+
+    height: 32px;
+    border-radius: 6px;
+}
+
+.counter svg {
+    fill: var(--text-tertiary);
+}
+
+.counter__left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-tertiary);
+}
+
+.counter__value {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
 .subtitle {
+    display: flex;
+    align-items: center;
+
     font-size: 12px;
     line-height: 1;
     font-weight: 600;
     color: var(--text-tertiary);
+    fill: var(--text-tertiary);
+}
+
+.subtitle svg {
+    margin-left: 4px;
 }
 
 .hint {
@@ -573,8 +605,8 @@ export default defineComponent({
 
 .actions {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    flex-direction: column;
 
     padding: 0 20px;
 }

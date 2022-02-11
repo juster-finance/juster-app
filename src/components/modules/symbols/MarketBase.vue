@@ -5,7 +5,6 @@ import {
     computed,
     watch,
     reactive,
-    inject,
     onMounted,
     onBeforeUnmount,
 } from "vue"
@@ -37,6 +36,11 @@ import Button from "@/components/ui/Button"
 import Pagination from "@/components/ui/Pagination"
 import Breadcrumbs from "@/components/ui/Breadcrumbs"
 
+/**
+ * Services
+ */
+import { analytics } from "@/services/sdk"
+
 export default defineComponent({
     name: "MarketBase",
 
@@ -48,8 +52,6 @@ export default defineComponent({
                 path: "/markets",
             },
         ])
-
-        const amplitude = inject("amplitude")
 
         const currentPage = ref(1)
 
@@ -151,7 +153,7 @@ export default defineComponent({
         )
 
         onMounted(() => {
-            amplitude.logEvent("onPage", { name: "Market" })
+            analytics.log("onPage", { name: "Market" })
         })
 
         onBeforeUnmount(() => {

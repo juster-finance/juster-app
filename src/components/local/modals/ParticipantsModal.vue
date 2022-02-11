@@ -86,15 +86,19 @@ export default defineComponent({
     >
         <div :class="$style.title">Event participants</div>
 
-        <div :class="$style.subtitle">Creator</div>
-        <div :class="$style.users">
-            <UserCard
-                :user="{ userId: event.creatorId, creator: true }"
-                :class="$style.user"
-            />
+        <div :class="$style.block">
+            <div :class="$style.subtitle">Creator</div>
+            <div :class="$style.users">
+                <UserCard
+                    :user="{ userId: event.creatorId, creator: true }"
+                    :class="$style.user"
+                />
+            </div>
         </div>
 
-        <div :class="$style.subtitle">Users who participate</div>
+        <div :class="$style.subtitle">
+            Users who participate <span>{{ users.length }}</span>
+        </div>
         <div v-if="users.length" :class="$style.users">
             <UserCard
                 v-for="user in users"
@@ -129,7 +133,14 @@ export default defineComponent({
     margin-bottom: 24px;
 }
 
+.block {
+    margin-block: 32px;
+}
+
 .subtitle {
+    display: flex;
+    justify-content: space-between;
+
     font-size: 14px;
     font-weight: 600;
     color: var(--text-tertiary);
@@ -141,6 +152,9 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     gap: 8px;
+
+    max-height: 400px;
+    overflow-y: auto;
 
     margin-bottom: 16px;
 }

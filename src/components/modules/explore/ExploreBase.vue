@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, onMounted, onBeforeUnmount, inject, ref } from "vue"
+import { defineComponent, onMounted, onBeforeUnmount, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
@@ -28,12 +28,15 @@ import { fetchTopBettors, fetchTopLiquidityProviders } from "@/api/users"
  */
 import { useMarketStore } from "@/store/market"
 
+/**
+ * Services
+ */
+import { analytics } from "@/services/sdk"
+
 export default defineComponent({
     name: "ExploreBase",
 
     setup() {
-        const amplitude = inject("amplitude")
-
         const router = useRouter()
 
         const marketStore = useMarketStore()
@@ -49,7 +52,7 @@ export default defineComponent({
         }
 
         onMounted(async () => {
-            amplitude.logEvent("onPage", { name: "Explore" })
+            analytics.log("onPage", { name: "Explore" })
 
             const topEvents = await fetchTopEvents({ limit: 3 })
             marketStore.events = cloneDeep(topEvents).sort(

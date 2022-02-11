@@ -4,7 +4,16 @@ export const formatQuote = amount => {
 
 export const numberWithSymbol = (target, symbol) => {
     if (!target) return
-    return target.toString().replace(/\B(?=(\d{3})+(?!\d))/g, symbol)
+
+    let num = parseFloat(target)
+
+    if (num % 1 === 0) {
+        num = num.toFixed(0)
+    } else {
+        num = num.toFixed(2)
+    }
+
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, symbol)
 }
 
 export const calcChange = (a, b) => {

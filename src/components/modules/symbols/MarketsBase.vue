@@ -1,5 +1,5 @@
-<script>
-import { defineComponent, reactive, inject, onMounted } from "vue"
+<script setup>
+import { reactive, onMounted } from "vue"
 import { useMeta } from "vue-meta"
 
 /**
@@ -17,39 +17,29 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs"
  */
 import { useMarketStore } from "@/store/market"
 
-export default defineComponent({
-    name: "MarketsBase",
+/**
+ * Services
+ */
+import { analytics } from "@/services/sdk"
 
-    setup() {
-        const breadcrumbs = reactive([
-            {
-                name: "All Markets",
-                path: "/markets",
-            },
-        ])
-
-        const amplitude = inject("amplitude")
-
-        const marketStore = useMarketStore()
-
-        onMounted(() => {
-            amplitude.logEvent("onPage", { name: "Markets" })
-        })
-
-        /** Meta */
-        useMeta({
-            title: "All Markets",
-            description:
-                "Available markets for events, for providing liquidity and accepting bets from users",
-        })
-
-        return { breadcrumbs, marketStore }
+const breadcrumbs = reactive([
+    {
+        name: "All Markets",
+        path: "/markets",
     },
+])
 
-    components: {
-        Market,
-        Breadcrumbs,
-    },
+const marketStore = useMarketStore()
+
+onMounted(() => {
+    analytics.log("onPage", { name: "Markets" })
+})
+
+/** Meta */
+useMeta({
+    title: "All Markets",
+    description:
+        "Available markets for events, for providing liquidity and accepting bets from users",
 })
 </script>
 

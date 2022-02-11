@@ -41,13 +41,13 @@ export default defineComponent({
             {
                 type: "Basic",
                 title: "Placing bets",
-                color: "yellow",
+                color: "green",
                 link: "/docs/how-to-bet",
             },
             {
                 type: "Advanced",
                 title: "Providing liquidity",
-                color: "green",
+                color: "yellow",
                 link: "/docs/adding-liquidity",
             },
         ]
