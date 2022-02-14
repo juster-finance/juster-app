@@ -248,33 +248,33 @@ export default defineComponent({
                 <div :class="$style.stat">
                     <div :class="$style.stat_name">Last week</div>
                     <div :class="$style.stat_value">
-                        {{ statistics.week.value.toFixed(0) }} XTZ
+                        {{ statistics.week.value.toFixed(0) }} ꜩ
                     </div>
                     <div :class="$style.stat_avg">
                         Avg
-                        <span>{{ statistics.week.avg.toFixed(0) }} XTZ</span>
+                        <span>{{ statistics.week.avg.toFixed(0) }} ꜩ</span>
                         per event
                     </div>
                 </div>
                 <div :class="$style.stat">
                     <div :class="$style.stat_name">Last month</div>
                     <div :class="$style.stat_value">
-                        {{ statistics.month.value.toFixed(0) }} XTZ
+                        {{ statistics.month.value.toFixed(0) }} ꜩ
                     </div>
                     <div :class="$style.stat_avg">
                         Avg
-                        <span>{{ statistics.month.avg.toFixed(0) }} XTZ</span>
+                        <span>{{ statistics.month.avg.toFixed(0) }} ꜩ</span>
                         per event
                     </div>
                 </div>
                 <div :class="$style.stat">
                     <div :class="$style.stat_name">All time</div>
                     <div :class="$style.stat_value">
-                        {{ statistics.all.value.toFixed(0) }} XTZ
+                        {{ statistics.all.value.toFixed(0) }} ꜩ
                     </div>
                     <div :class="$style.stat_avg">
                         Avg
-                        <span>{{ statistics.all.avg.toFixed(0) }} XTZ</span> per
+                        <span>{{ statistics.all.avg.toFixed(0) }} ꜩ</span> per
                         event
                     </div>
                 </div>
@@ -406,7 +406,7 @@ export default defineComponent({
                                     ",",
                                 )
                             }}
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                         </td>
                         <td>
                             <router-link :to="`/events/${withdraw.event.id}`">

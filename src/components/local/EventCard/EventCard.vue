@@ -716,7 +716,7 @@ export default defineComponent({
                             :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
                             :class="$style.my_avatar"
                         />
-                        {{ abbreviateNumber(userTVL) }} XTZ
+                        {{ abbreviateNumber(userTVL) }} ꜩ
                     </Badge>
 
                     <template v-slot:content>My TVL: Bets + Liquidity</template>

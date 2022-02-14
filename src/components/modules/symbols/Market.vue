@@ -123,7 +123,7 @@ export default defineComponent({
                         >{{
                             abbreviateNumber(market.totalValueLocked.toFixed(0))
                         }}
-                        XTZ</span
+                        ꜩ</span
                     >
                 </div>
 
@@ -135,7 +135,7 @@ export default defineComponent({
                         >{{
                             abbreviateNumber(market.totalVolume.toFixed(0))
                         }}
-                        XTZ</span
+                        ꜩ</span
                     >
                 </div>
             </div>

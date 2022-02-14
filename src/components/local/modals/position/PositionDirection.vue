@@ -77,7 +77,7 @@ const timing = computed(() => {
                         @dblclick="amount.value = accountStore.balance / 2"
                         >{{ accountStore.balance }}</span
                     >
-                    XTZ
+                    ꜩ
                 </div>
             </div>
         </div>

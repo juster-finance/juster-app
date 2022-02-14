@@ -358,7 +358,7 @@ const pkh = computed(() => accountStore.pkh)
                                     </div>
                                     <div :class="$style.balance">
                                         {{ accountStore.balance }}
-                                        XTZ
+                                        ꜩ
                                     </div>
                                 </div>
                             </div>

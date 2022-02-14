@@ -250,14 +250,14 @@ const handleKeydown = (e) => {
                                 @blur="handleBlur('min')"
                                 placeholder="0"
                             />
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                         </div>
 
                         <div
                             @click="maxInputEl.focus()"
                             :class="$style.range_input"
                         >
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                             <input
                                 ref="maxInputEl"
                                 v-model="inputs.max"

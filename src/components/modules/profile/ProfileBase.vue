@@ -189,7 +189,7 @@ export default defineComponent({
                 </div>
                 <div :class="$style.status">
                     {{ isMyProfile ? accountStore.balance : balance }}
-                    XTZ
+                    ꜩ
                 </div>
 
                 <div :class="$style.progress">
@@ -218,21 +218,21 @@ export default defineComponent({
                         <div :class="$style.key">Liquidity provided</div>
                         <div :class="$style.value">
                             {{ abbreviateNumber(user.totalLiquidityProvided) }}
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                         </div>
                     </div>
                     <div :class="$style.stat">
                         <div :class="$style.key">Net return</div>
                         <div :class="$style.value">
                             {{ abbreviateNumber(user.totalProviderReward) }}
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                         </div>
                     </div>
                     <div :class="$style.stat">
                         <div :class="$style.key">Fees collected</div>
                         <div :class="$style.value">
                             {{ user.totalFeesCollected.toFixed(0) }}
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                         </div>
                     </div>
                 </div>
@@ -244,14 +244,14 @@ export default defineComponent({
                         <div :class="$style.key">Bets value</div>
                         <div :class="$style.value">
                             {{ user.totalBetsAmount }}
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                         </div>
                     </div>
                     <div v-if="user.totalWithdrawn" :class="$style.stat">
                         <div :class="$style.key">Withdrawn</div>
                         <div :class="$style.value">
                             {{ abbreviateNumber(user.totalWithdrawn) }}
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                         </div>
                     </div>
                     <div :class="$style.stat">

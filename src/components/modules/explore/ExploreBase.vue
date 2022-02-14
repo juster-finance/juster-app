@@ -139,7 +139,7 @@ export default defineComponent({
                 <RatingCard
                     v-if="!isTopProvidersLoading"
                     :users="topProviders"
-                    suffix="XTZ"
+                    suffix="ꜩ"
                     :class="$style.rating_card"
                 />
                 <RatingCardLoading v-else :class="$style.rating_card" />

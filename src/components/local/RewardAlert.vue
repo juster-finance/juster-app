@@ -35,11 +35,11 @@ const reward = computed(() => {
                 <Icon name="crown" size="14" />
 
                 <div v-if="reward % 1 == 0" :class="$style.reward">
-                    <span>{{ reward[0] }}</span> XTZ
+                    <span>{{ reward[0] }}</span> ꜩ
                 </div>
                 <div v-else :class="$style.reward">
                     <span>{{ reward.split(".")[0] }}</span
-                    >.{{ reward.split(".")[1] }} XTZ
+                    >.{{ reward.split(".")[1] }} ꜩ
                 </div>
             </div>
 
