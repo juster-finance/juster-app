@@ -295,13 +295,9 @@ const pkh = computed(() => accountStore.pkh)
                     side="right"
                 >
                     <div :class="$style.testnet_warning">
-                        <Icon
-                            name="hammer"
-                            size="16"
-                            :class="$style.warning_icon"
-                        />
+                        <Icon name="hammer" size="16" />
 
-                        Test Network
+                        <span>Test Network</span>
                     </div>
 
                     <template v-slot:content>
