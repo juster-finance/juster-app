@@ -568,9 +568,13 @@ const { meta } = useMeta({
                         Aggregated data for all your positions for this event
                     </div>
 
-                    <Banner v-if="won" type="success" :class="$style.banner">{{
-                        wonText
-                    }}</Banner>
+                    <Banner
+                        v-if="won"
+                        icon="checkcircle"
+                        color="green"
+                        :class="$style.banner"
+                        >{{ wonText }}</Banner
+                    >
 
                     <EventPersonalStats
                         :event="event"
@@ -644,7 +648,7 @@ const { meta } = useMeta({
                         />
                     </div>
 
-                    <Banner v-else type="info">{{
+                    <Banner v-else icon="help" color="gray">{{
                         filters.bets == "all"
                             ? `Still no bets for this event, maybe yours will be the first?`
                             : `If you have placed a bet, but it is not in this list yet — please wait for the transaction confirmation`
@@ -713,7 +717,7 @@ const { meta } = useMeta({
                         />
                     </div>
 
-                    <Banner v-else type="info">{{
+                    <Banner v-else icon="help" color="gray">{{
                         filters.liquidity == "all"
                             ? `This event has not yet received initial liquidity, please wait for a few minutes`
                             : `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`

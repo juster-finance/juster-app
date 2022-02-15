@@ -384,6 +384,17 @@ export default defineComponent({
         <template v-if="accountStore.isLoggined">
             <div :class="$style.title">Place a bet</div>
 
+            <Banner
+                v-if="currentNetwork !== 'mainnet'"
+                icon="hammer"
+                color="yellow"
+                size="small"
+                center
+                :class="$style.banner"
+            >
+                The transaction takes place on the Hangzhounet
+            </Banner>
+
             <PositionDirection
                 :event="event"
                 :amount="amount"
@@ -393,7 +404,8 @@ export default defineComponent({
 
             <Banner
                 v-if="event.creatorId !== verifiedMakers[currentNetwork]"
-                type="warning"
+                icon="warning"
+                color="yellow"
                 size="small"
                 :class="$style.banner"
             >
@@ -461,15 +473,6 @@ export default defineComponent({
                 v-model="slippage"
                 :class="$style.slippage_block"
             />
-
-            <Banner
-                v-if="currentNetwork !== 'mainnet'"
-                type="info"
-                size="small"
-                :class="$style.banner"
-            >
-                Note that the transaction takes place on the Hangzhounet
-            </Banner>
 
             <Button
                 @click="handleBet"
@@ -657,7 +660,7 @@ export default defineComponent({
 }
 
 .banner {
-    margin-bottom: 16px;
+    margin-bottom: 24px;
 }
 
 .hint {

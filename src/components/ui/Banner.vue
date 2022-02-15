@@ -5,7 +5,8 @@
 import Spin from "@/components/ui/Spin"
 
 const props = defineProps({
-    type: { type: String, default: "warning" },
+    icon: { type: String, default: "warning" },
+    color: { type: String, default: "yellow" },
     size: { type: String, default: "small" },
     center: { type: Boolean, default: false },
     loading: Boolean,
@@ -16,22 +17,13 @@ const props = defineProps({
     <div
         :class="[
             $style.wrapper,
-            $style[type],
+            $style[color],
             $style[size],
             center && $style.center,
         ]"
     >
         <Spin v-if="loading" size="14" />
-        <Icon
-            v-else
-            :name="
-                (type == 'warning' && 'warning') ||
-                (type == 'success' && 'checkcircle') ||
-                (type == 'error' && 'close') ||
-                (type == 'info' && 'help')
-            "
-            size="14"
-        />
+        <Icon v-else :name="icon" size="14" />
 
         <div :class="$style.base"><slot /></div>
     </div>
@@ -64,25 +56,25 @@ const props = defineProps({
     font-weight: 800;
 }
 
-.wrapper.info {
+.wrapper.gray {
     fill: var(--text-secondary);
     color: var(--text-secondary);
     background: var(--opacity-05);
 }
 
-.wrapper.warning {
+.wrapper.yellow {
     fill: var(--yellow);
     color: var(--yellow);
     background: rgba(245, 183, 43, 0.15);
 }
 
-.wrapper.success {
+.wrapper.green {
     fill: var(--green);
     color: var(--green);
     background: rgba(26, 161, 104, 0.15);
 }
 
-.wrapper.error {
+.wrapper.red {
     fill: var(--red);
     color: var(--red);
     background: rgba(224, 92, 67, 0.15);

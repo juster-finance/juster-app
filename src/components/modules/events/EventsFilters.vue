@@ -424,7 +424,7 @@ const handleKeydown = (e) => {
         <div :class="$style.divider" />
 
         <div :class="$style.actions">
-            <Button @click="handleReset" type="tertiary" border size="small"
+            <Button @click="handleReset" type="secondary" size="small"
                 >Reset filters</Button
             >
 

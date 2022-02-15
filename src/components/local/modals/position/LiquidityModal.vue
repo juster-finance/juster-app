@@ -285,21 +285,23 @@ export default defineComponent({
         <template v-if="accountStore.isLoggined">
             <div :class="$style.title">Providing liquidity</div>
 
+            <Banner
+                v-if="currentNetwork !== 'mainnet'"
+                icon="hammer"
+                color="yellow"
+                size="small"
+                center
+                :class="$style.banner"
+            >
+                The transaction takes place on the Hangzhounet
+            </Banner>
+
             <PositionDirection
                 :event="event"
                 :amount="amount"
                 :countdown="countdownText"
                 :class="$style.direction"
             />
-
-            <Banner
-                v-if="event.creatorId !== verifiedMakers[currentNetwork]"
-                type="warning"
-                size="small"
-                :class="$style.banner"
-            >
-                This event is Custom, its behavior may depend on the parameters
-            </Banner>
 
             <Input
                 ref="amountInput"
@@ -339,12 +341,13 @@ export default defineComponent({
             </div>
 
             <Banner
-                v-if="currentNetwork !== 'mainnet'"
-                type="info"
+                v-if="event.creatorId !== verifiedMakers[currentNetwork]"
+                icon="warning"
+                color="red"
                 size="small"
                 :class="$style.banner"
             >
-                Note that the transaction takes place on the Hangzhounet
+                This event is Custom, its behavior may depend on the parameters
             </Banner>
 
             <Button
@@ -457,6 +460,6 @@ export default defineComponent({
 }
 
 .banner {
-    margin-bottom: 16px;
+    margin-bottom: 24px;
 }
 </style>

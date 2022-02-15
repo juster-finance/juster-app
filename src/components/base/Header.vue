@@ -296,18 +296,17 @@ const pkh = computed(() => accountStore.pkh)
                 >
                     <div :class="$style.testnet_warning">
                         <Icon
-                            name="Warning"
+                            name="hammer"
                             size="16"
                             :class="$style.warning_icon"
                         />
+
+                        Test Network
                     </div>
 
                     <template v-slot:content>
-                        Hangzhounet in use.<br />
-                        <span
-                            >Use <b>@tezos_faucet_bot</b> to top up your
-                            balance</span
-                        >
+                        Hangzhounet in use.
+                        <span>Switching the network in the Footer.</span>
                     </template>
                 </Tooltip>
 
@@ -512,22 +511,17 @@ const pkh = computed(() => accountStore.pkh)
     align-items: center;
     gap: 8px;
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--yellow);
     height: 28px;
 
     padding: 0 8px;
     margin-right: 16px;
 
-    font-size: 12px;
-    line-height: 1px;
+    font-size: 13px;
+    line-height: 1.1px;
     font-weight: 600;
-    color: var(--yellow);
-
-    transition: all 0.2s ease;
-}
-
-.testnet_warning svg {
-    fill: var(--yellow);
+    color: var(--text-black);
+    fill: var(--text-black);
 }
 
 .signin_button {

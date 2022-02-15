@@ -514,7 +514,8 @@ export default defineComponent({
     <div :class="$style.wrapper">
         <Banner
             v-if="symbol.isQuotesLoaded && !symbol.quotes.length"
-            type="info"
+            icon="help"
+            color="gray"
             >Quotes for the event are not yet available, please wait for the
             pre-launch period</Banner
         >

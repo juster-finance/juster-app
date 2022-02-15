@@ -318,7 +318,11 @@ export default defineComponent({
                 />
             </div>
             <div v-else :class="$style.empty">
-                <Banner :loading="accountStore.isPositionsLoading" type="info">
+                <Banner
+                    :loading="accountStore.isPositionsLoading"
+                    icon="help"
+                    color="gray"
+                >
                     {{
                         accountStore.isPositionsLoading
                             ? "Fetching your positions"
