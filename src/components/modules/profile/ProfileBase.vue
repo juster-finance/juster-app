@@ -170,6 +170,7 @@ export default defineComponent({
                         <img
                             :src="`https://services.tzkt.io/v1/avatars/${address}`"
                             :class="$style.image"
+                            alt="avatar"
                         />
 
                         <template v-slot:content
@@ -203,10 +204,26 @@ export default defineComponent({
                 </div>
 
                 <div :class="$style.badges">
-                    <img src="@/assets/badge.png" :class="$style.badge" />
-                    <img src="@/assets/badge.png" :class="$style.badge" />
-                    <img src="@/assets/badge.png" :class="$style.badge" />
-                    <img src="@/assets/badge.png" :class="$style.badge" />
+                    <img
+                        src="@/assets/badge.png"
+                        :class="$style.badge"
+                        alt="badge"
+                    />
+                    <img
+                        src="@/assets/badge.png"
+                        :class="$style.badge"
+                        alt="badge"
+                    />
+                    <img
+                        src="@/assets/badge.png"
+                        :class="$style.badge"
+                        alt="badge"
+                    />
+                    <img
+                        src="@/assets/badge.png"
+                        :class="$style.badge"
+                        alt="badge"
+                    />
                 </div>
             </div>
 
@@ -321,6 +338,7 @@ export default defineComponent({
         <img
             :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
             :class="$style.error_avatar"
+            alt="error_avatar"
         />
 
         <div :class="$style.error_title">Your profile is not ready yet</div>

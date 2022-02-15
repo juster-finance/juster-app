@@ -56,6 +56,7 @@ const timing = computed(() => {
                 <img
                     :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
                     :class="$style.image"
+                    alt="avatar"
                 />
             </div>
 

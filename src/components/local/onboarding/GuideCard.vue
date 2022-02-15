@@ -30,7 +30,7 @@ export default defineComponent({
 
 <template>
     <router-link :to="guide.link" :class="$style.wrapper">
-        <img :src="getIcon()" :class="$style[guide.color]" />
+        <img :src="getIcon()" :class="$style[guide.color]" alt="icon" />
 
         <div :class="$style.base">
             <div :class="$style.type">

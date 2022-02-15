@@ -44,6 +44,7 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
                         :src="`https://services.tzkt.io/v1/avatars/${
                             pending ? accountStore.pkh : bet.userId
                         }`"
+                        alt="avatar"
                     />
                 </router-link>
             </div>

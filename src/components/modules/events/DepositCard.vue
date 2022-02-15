@@ -65,6 +65,7 @@ const returnForLiquidity = computed(() => {
                 >
                     <img
                         :src="`https://services.tzkt.io/v1/avatars/${deposit.userId}`"
+                        alt="avatar"
                 /></router-link>
             </div>
 

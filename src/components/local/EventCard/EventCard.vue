@@ -525,8 +525,11 @@ export default defineComponent({
 
             <div :class="$style.header">
                 <div :class="$style.symbol_imgs">
-                    <img :src="getCurrencyIcon(symbol.split('-')[0])" />
-                    <img :src="getCurrencyIcon('USD')" />
+                    <img
+                        :src="getCurrencyIcon(symbol.split('-')[0])"
+                        alt="symbol"
+                    />
+                    <img :src="getCurrencyIcon('USD')" alt="symbol" />
                 </div>
 
                 <div :class="$style.users">
@@ -543,6 +546,7 @@ export default defineComponent({
                                     $style.user_avatar,
                                     $style.participant,
                                 ]"
+                                alt="avatar"
                             />
                         </div>
 
@@ -573,6 +577,7 @@ export default defineComponent({
                                 <img
                                     :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
                                     :class="$style.user_avatar"
+                                    alt="avatar"
                                 />
                             </template>
                         </div>
@@ -590,10 +595,12 @@ export default defineComponent({
                 <img
                     v-if="event.winnerBets == 'ABOVE_EQ'"
                     :src="require('@/assets/icons/higher_won.svg')"
+                    alt="won_side_icon"
                 />
                 <img
                     v-else-if="event.winnerBets == 'BELOW'"
                     :src="require('@/assets/icons/lower_won.svg')"
+                    alt="won_side_icon"
                 />
                 <Icon v-else name="sides" size="16" />
                 {{
@@ -715,6 +722,7 @@ export default defineComponent({
                         <img
                             :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
                             :class="$style.my_avatar"
+                            alt="avatar"
                         />
                         {{ abbreviateNumber(userTVL) }} XTZ
                     </Badge>

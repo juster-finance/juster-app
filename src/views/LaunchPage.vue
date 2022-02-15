@@ -30,7 +30,11 @@ const handleSwitch = () => {
 
 <template>
     <Page :class="$style.wrapper">
-        <img src="@/assets/landing/ga_bg.png" :class="$style.background_grad" />
+        <img
+            src="@/assets/landing/ga_bg.png"
+            alt="bg"
+            :class="$style.background_grad"
+        />
 
         <div :class="$style.header">
             <Icon name="logo_symbol" size="40" />

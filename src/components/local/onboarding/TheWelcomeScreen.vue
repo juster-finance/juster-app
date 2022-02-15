@@ -132,7 +132,7 @@ export default defineComponent({
                 Skip onboarding <Icon name="logout" size="14" />
             </div>
 
-            <img src="@/assets/logo.png" :class="$style.logo" />
+            <img src="@/assets/logo.png" :class="$style.logo" alt="logo" />
 
             <div :class="$style.title">Hi, welcome to Juster ✌️</div>
 

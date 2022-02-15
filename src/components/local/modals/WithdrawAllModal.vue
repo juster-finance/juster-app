@@ -202,10 +202,12 @@ export default defineComponent({
                         <img
                             v-if="position.event.winnerBets == 'ABOVE_EQ'"
                             :src="require('@/assets/icons/higher_won.svg')"
+                            alt="won_side_icon"
                         />
                         <img
                             v-else
                             :src="require('@/assets/icons/lower_won.svg')"
+                            alt="won_side_icon"
                         />
                         <span>Tezos / Dollar</span> price event
                     </div>

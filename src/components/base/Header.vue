@@ -270,7 +270,7 @@ const pkh = computed(() => accountStore.pkh)
 
                 <router-link to="/explore" :class="$style.logo">
                     <Icon name="logo_symbol" size="24" />
-                    <img src="@/assets/icons/logo_text.svg" />
+                    <img src="@/assets/icons/logo_text.svg" alt="logo" />
                 </router-link>
             </div>
 
@@ -333,6 +333,7 @@ const pkh = computed(() => accountStore.pkh)
                                 <img
                                     v-if="pkh"
                                     :src="`https://services.tzkt.io/v1/avatars/${pkh}`"
+                                    alt="avatar"
                                 />
                             </div>
                         </template>

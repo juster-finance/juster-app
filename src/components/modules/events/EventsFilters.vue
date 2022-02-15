@@ -207,6 +207,7 @@ const handleKeydown = (e) => {
                                     (symbol.name == 'BTC-USD' && 'btc')
                                 }.png`)
                             "
+                            alt="symbol"
                         />
                         {{ symbol.name.replace("-USD", "") }}
                     </div>
@@ -334,6 +335,7 @@ const handleKeydown = (e) => {
                         <img
                             :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
                             :class="$style.avatar"
+                            alt="avatar"
                         />
                         Find Me
                     </div>
@@ -349,6 +351,7 @@ const handleKeydown = (e) => {
                         <img
                             :src="`https://services.tzkt.io/v1/avatars/${participant}`"
                             :class="$style.avatar"
+                            alt="avatar"
                         />
                         {{ participant.slice(0, 5) }}..{{
                             participant.slice(
