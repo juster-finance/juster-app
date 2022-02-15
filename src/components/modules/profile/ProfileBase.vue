@@ -330,7 +330,7 @@ export default defineComponent({
         </div>
 
         <div :class="$style.error_buttons">
-            <router-link to="/explore">
+            <router-link to="/">
                 <Button type="secondary" size="small">
                     <Icon name="spark" size="14" />Explore Juster
                 </Button>
