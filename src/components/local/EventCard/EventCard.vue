@@ -635,7 +635,11 @@ export default defineComponent({
                     position="bottom"
                     side="left"
                 >
-                    <Badge color="green" :class="$style.main_badge">
+                    <Badge
+                        size="small"
+                        color="green"
+                        :class="$style.main_badge"
+                    >
                         <Icon name="event_new" size="12" />New
                     </Badge>
 

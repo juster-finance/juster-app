@@ -9,6 +9,7 @@ import { cloneDeep } from "lodash"
  */
 import RatingCard from "./RatingCard"
 import RatingCardLoading from "./RatingCardLoading"
+import MyPositionCard from "./MyPositionCard"
 import MarketCard from "@/components/local/MarketCard"
 import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
@@ -20,13 +21,14 @@ import Button from "@/components/ui/Button"
 /**
  * API
  */
-import { fetchTopEvents } from "@/api/events"
+import { fetchTopEvents, fetchEventsWithUserPosition } from "@/api/events"
 import { fetchTopBettors, fetchTopLiquidityProviders } from "@/api/users"
 
 /**
  * Store
  */
 import { useMarketStore } from "@/store/market"
+import { useAccountStore } from "@/store/account"
 
 /**
  * Services
@@ -40,6 +42,9 @@ export default defineComponent({
         const router = useRouter()
 
         const marketStore = useMarketStore()
+        const accountStore = useAccountStore()
+
+        const myEvents = ref([])
 
         /** Ranking */
         const isTopProvidersLoading = ref(true)
@@ -53,6 +58,11 @@ export default defineComponent({
 
         onMounted(async () => {
             analytics.log("onPage", { name: "Explore" })
+
+            const eventsWithUserPosition = await fetchEventsWithUserPosition({
+                userId: accountStore.pkh,
+            })
+            myEvents.value = eventsWithUserPosition
 
             const topEvents = await fetchTopEvents({ limit: 3 })
             marketStore.events = cloneDeep(topEvents).sort(
@@ -85,6 +95,7 @@ export default defineComponent({
 
         return {
             marketStore,
+            myEvents,
             topProviders,
             topBettors,
             isTopBettorsLoading,
@@ -96,6 +107,7 @@ export default defineComponent({
     components: {
         RatingCard,
         RatingCardLoading,
+        MyPositionCard,
         MarketCard,
         EventCard,
         EventCardLoading,
@@ -112,6 +124,22 @@ export default defineComponent({
                     >{{ content }} • Juster</template
                 >
             </metainfo>
+
+            <!-- My Positions -->
+            <div v-if="marketStore.events.length" :class="$style.block">
+                <h1>My Positions</h1>
+                <div :class="$style.description">
+                    Events in which you have liquidity or bet
+                </div>
+
+                <div :class="$style.my_positions">
+                    <MyPositionCard
+                        v-for="event in myEvents"
+                        :key="event.id"
+                        :event="event"
+                    />
+                </div>
+            </div>
 
             <!-- Top markets -->
             <div v-if="marketStore.isMarketsLoaded" :class="$style.block">
@@ -236,6 +264,14 @@ export default defineComponent({
 }
 
 .rating_card {
+    margin-top: 24px;
+}
+
+.my_positions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(530px, 1fr));
+    grid-gap: 16px;
+
     margin-top: 24px;
 }
 
