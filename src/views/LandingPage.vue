@@ -43,7 +43,7 @@ export default {
             </div>
 
             <div :class="$style.buttons">
-                <router-link to="/explore">
+                <router-link to="/">
                     <Button type="primary" size="medium">
                         <Icon name="spark" size="16" />Launch Juster app
                     </Button>
@@ -340,7 +340,7 @@ export default {
             </p>
 
             <div :class="$style.buttons">
-                <router-link to="/explore"
+                <router-link to="/"
                     ><Button type="primary" size="medium"
                         ><Icon name="spark" size="16" />Explore the
                         Juster</Button

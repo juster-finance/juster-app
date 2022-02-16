@@ -59,7 +59,7 @@ const router = useRouter()
 const links = reactive([
     {
         name: "Explore",
-        url: "/explore",
+        url: "/",
         icon: "bolt",
         isAvailable: true,
     },
@@ -81,7 +81,12 @@ const showMobileMenu = ref(false)
 
 const isActive = (url) => {
     if (!route.name) return
-    return route.path.startsWith(url)
+
+    if (url.length == 1) {
+        return route.path == url
+    } else {
+        return route.path.startsWith(url)
+    }
 }
 
 const login = () => {
@@ -219,10 +224,7 @@ const pkh = computed(() => accountStore.pkh)
                 <div :class="$style.mobile_menu__title">Navigation</div>
 
                 <div :class="$style.mobile_menu__links">
-                    <router-link
-                        to="/explore"
-                        :class="$style.mobile_menu__link"
-                    >
+                    <router-link to="/" :class="$style.mobile_menu__link">
                         <div :class="$style.left">
                             <Icon name="bolt" size="14" />
                             <span>Explore</span>
@@ -268,7 +270,7 @@ const pkh = computed(() => accountStore.pkh)
                     <Icon :name="showMobileMenu ? 'close' : 'menu'" size="16" />
                 </div>
 
-                <router-link to="/explore" :class="$style.logo">
+                <router-link to="/" :class="$style.logo">
                     <Icon name="logo_symbol" size="24" />
                     <img src="@/assets/icons/logo_text.svg" alt="logo" />
                 </router-link>
