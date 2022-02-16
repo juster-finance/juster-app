@@ -309,7 +309,7 @@ export default defineComponent({
                 :limit="10000"
                 label="Amount"
                 placeholder="Liquidity amount"
-                subtext="XTZ"
+                subtext="ꜩ"
                 v-model="amount.value"
                 :error="amount.error"
                 @clearError="amount.error = ''"

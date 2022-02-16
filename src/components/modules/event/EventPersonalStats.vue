@@ -81,7 +81,7 @@ const profit = computed(() => {
 
                 <div :class="$style.amount">
                     {{ abbreviateNumber(dvl + bvl) }}
-                    <span>XTZ</span>
+                    <span>ꜩ</span>
                 </div>
             </div>
 
@@ -96,7 +96,7 @@ const profit = computed(() => {
                 <div :class="$style.name">Returning</div>
 
                 <div :class="$style.amount">
-                    {{ abbreviateNumber(returnOnBets + dvl) }} <span>XTZ</span>
+                    {{ abbreviateNumber(returnOnBets + dvl) }} <span>ꜩ</span>
                 </div>
             </div>
 
@@ -117,7 +117,7 @@ const profit = computed(() => {
                 </div>
 
                 <div :class="$style.amount">
-                    {{ (returnOnBets - bvl).toFixed(2) }} <span>XTZ</span>
+                    {{ (returnOnBets - bvl).toFixed(2) }} <span>ꜩ</span>
                 </div>
             </div>
 
@@ -190,7 +190,8 @@ const profit = computed(() => {
 }
 
 .amount span {
-    font-size: 12px;
+    font-weight: 500;
+    font-size: 16px;
     color: var(--text-tertiary);
 }
 

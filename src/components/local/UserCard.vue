@@ -116,7 +116,7 @@ export default defineComponent({
                                     user.liquidityProvidedAboveEq
                                 ).toFixed(2)
                             }}
-                            XTZ</span
+                            ꜩ</span
                         >
                     </div>
                 </div>

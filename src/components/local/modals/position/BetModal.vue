@@ -449,14 +449,14 @@ export default defineComponent({
                 :limit="10000"
                 label="Amount"
                 placeholder="Bet amount"
-                subtext="XTZ"
+                subtext="ꜩ"
                 v-model="amount.value"
                 :class="$style.amount_input"
             >
                 <template v-slot:rightText>
                     <div :class="$style.potential_reward">
                         Reward:
-                        <span>{{ rewardText }}</span> XTZ
+                        <span>{{ rewardText }}</span> ꜩ
                     </div>
                 </template>
             </Input>

@@ -724,7 +724,7 @@ export default defineComponent({
                             :class="$style.my_avatar"
                             alt="avatar"
                         />
-                        {{ abbreviateNumber(userTVL) }} XTZ
+                        {{ abbreviateNumber(userTVL) }} ꜩ
                     </Badge>
 
                     <template v-slot:content>My TVL: Bets + Liquidity</template>
