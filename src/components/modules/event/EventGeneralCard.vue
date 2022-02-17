@@ -128,10 +128,12 @@ const priceDynamics = computed(() => {
                 <img
                     v-if="event.winnerBets == 'ABOVE_EQ'"
                     :src="require('@/assets/icons/higher_won.svg')"
+                    alt="won_side_icon"
                 />
                 <img
                     v-else-if="event.winnerBets == 'BELOW'"
                     :src="require('@/assets/icons/lower_won.svg')"
+                    alt="won_side_icon"
                 />
                 <Icon v-else name="sides" size="16" />
                 {{
@@ -154,6 +156,7 @@ const priceDynamics = computed(() => {
                             :key="participantAvatar"
                             :src="`https://services.tzkt.io/v1/avatars/${participantAvatar}`"
                             :class="[$style.user_avatar, $style.participant]"
+                            alt="avatar"
                         />
                     </div>
 
@@ -184,6 +187,7 @@ const priceDynamics = computed(() => {
                             <img
                                 :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
                                 :class="$style.user_avatar"
+                                alt="avatar"
                             />
                         </template>
                     </div>
@@ -455,10 +459,12 @@ const priceDynamics = computed(() => {
                     <img
                         v-if="event.winnerBets == 'ABOVE_EQ'"
                         :src="require('@/assets/icons/higher_won.svg')"
+                        alt="won_side_icon"
                     />
                     <img
                         v-else-if="event.winnerBets == 'BELOW'"
                         :src="require('@/assets/icons/lower_won.svg')"
+                        alt="won_side_icon"
                     />
                     <Icon v-else name="sides" size="12" />
                     Price Dynamics</span

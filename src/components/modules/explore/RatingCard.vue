@@ -33,6 +33,7 @@ const shorten = (address) => {
             <img
                 :src="`https://services.tzkt.io/v1/avatars/${user.address}`"
                 :class="$style.avatar"
+                alt="avatar"
             />
 
             <div :class="$style.username">

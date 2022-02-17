@@ -84,6 +84,7 @@ export default defineComponent({
                     <img
                         :src="`https://services.tzkt.io/v1/avatars/${address}`"
                         :class="$style.avatar"
+                        alt="avatar"
                     />
                 </div>
 
@@ -96,7 +97,7 @@ export default defineComponent({
                 </div>
 
                 <div :class="$style.circle">
-                    <img src="@/assets/logo.png" />
+                    <img src="@/assets/logo.png" alt="logo" />
                 </div>
             </div>
 

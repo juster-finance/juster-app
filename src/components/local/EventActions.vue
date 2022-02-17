@@ -121,7 +121,7 @@ const btnType = computed(() => {
         >
             <template v-if="won && !wonPosition"
                 >Successfully withdrawn
-                {{ successfulWithdrawal?.amount.toFixed(2) }} XTZ</template
+                {{ successfulWithdrawal?.amount.toFixed(2) }} ꜩ</template
             >
 
             <template v-else-if="accountStore.pendingTransaction.awaiting">
@@ -130,7 +130,7 @@ const btnType = computed(() => {
 
             <template v-else-if="!isWithdrawing">
                 <Icon name="crown" size="16" />Withdraw
-                {{ f(wonPosition.value) }} XTZ
+                {{ f(wonPosition.value) }} ꜩ
             </template>
 
             <template v-else

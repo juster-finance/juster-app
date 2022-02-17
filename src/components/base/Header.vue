@@ -59,7 +59,7 @@ const router = useRouter()
 const links = reactive([
     {
         name: "Explore",
-        url: "/explore",
+        url: "/",
         icon: "bolt",
         isAvailable: true,
     },
@@ -81,7 +81,12 @@ const showMobileMenu = ref(false)
 
 const isActive = (url) => {
     if (!route.name) return
-    return route.path.startsWith(url)
+
+    if (url.length == 1) {
+        return route.path == url
+    } else {
+        return route.path.startsWith(url)
+    }
 }
 
 const login = () => {
@@ -219,10 +224,7 @@ const pkh = computed(() => accountStore.pkh)
                 <div :class="$style.mobile_menu__title">Navigation</div>
 
                 <div :class="$style.mobile_menu__links">
-                    <router-link
-                        to="/explore"
-                        :class="$style.mobile_menu__link"
-                    >
+                    <router-link to="/" :class="$style.mobile_menu__link">
                         <div :class="$style.left">
                             <Icon name="bolt" size="14" />
                             <span>Explore</span>
@@ -268,9 +270,9 @@ const pkh = computed(() => accountStore.pkh)
                     <Icon :name="showMobileMenu ? 'close' : 'menu'" size="16" />
                 </div>
 
-                <router-link to="/explore" :class="$style.logo">
+                <router-link to="/" :class="$style.logo">
                     <Icon name="logo_symbol" size="24" />
-                    <img src="@/assets/icons/logo_text.svg" />
+                    <img src="@/assets/icons/logo_text.svg" alt="logo" />
                 </router-link>
             </div>
 
@@ -295,19 +297,14 @@ const pkh = computed(() => accountStore.pkh)
                     side="right"
                 >
                     <div :class="$style.testnet_warning">
-                        <Icon
-                            name="Warning"
-                            size="16"
-                            :class="$style.warning_icon"
-                        />
+                        <Icon name="hammer" size="16" />
+
+                        <span>Test Network</span>
                     </div>
 
                     <template v-slot:content>
-                        Hangzhounet in use.<br />
-                        <span
-                            >Use <b>@tezos_faucet_bot</b> to top up your
-                            balance</span
-                        >
+                        Hangzhounet in use.
+                        <span>Switching the network in the Footer.</span>
                     </template>
                 </Tooltip>
 
@@ -333,6 +330,7 @@ const pkh = computed(() => accountStore.pkh)
                                 <img
                                     v-if="pkh"
                                     :src="`https://services.tzkt.io/v1/avatars/${pkh}`"
+                                    alt="avatar"
                                 />
                             </div>
                         </template>
@@ -358,7 +356,7 @@ const pkh = computed(() => accountStore.pkh)
                                     </div>
                                     <div :class="$style.balance">
                                         {{ accountStore.balance }}
-                                        XTZ
+                                        ꜩ
                                     </div>
                                 </div>
                             </div>
@@ -511,22 +509,17 @@ const pkh = computed(() => accountStore.pkh)
     align-items: center;
     gap: 8px;
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--yellow);
     height: 28px;
 
     padding: 0 8px;
     margin-right: 16px;
 
-    font-size: 12px;
-    line-height: 1px;
+    font-size: 13px;
+    line-height: 1.1px;
     font-weight: 600;
-    color: var(--yellow);
-
-    transition: all 0.2s ease;
-}
-
-.testnet_warning svg {
-    fill: var(--yellow);
+    color: var(--text-black);
+    fill: var(--text-black);
 }
 
 .signin_button {

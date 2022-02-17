@@ -21,8 +21,12 @@ const props = defineProps({
     border: 1px solid var(--border);
 
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.1;
     white-space: nowrap;
+}
+
+.wrapper span {
+    opacity: 0.5;
 }
 
 /**

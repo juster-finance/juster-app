@@ -3,8 +3,8 @@ import { useAccountStore } from "@/store/account"
 
 const routes = [
     {
-        path: "/",
-        redirect: "/explore",
+        path: "/explore",
+        redirect: "/",
     },
     {
         path: "/error",
@@ -31,7 +31,7 @@ const routes = [
     },
 
     {
-        path: "/explore",
+        path: "/",
         name: "Explore",
         component: () =>
             import(/* webpackChunkName: "explore" */ "@/views/ExplorePage"),

@@ -237,6 +237,57 @@ export const getTopEvents = gql`
     }
 `
 
+export const getEventsWithUserPosition = gql`
+    query getEventsWithUserPosition($userId: String) {
+        event(
+            where: {
+                bets: { userId: { _eq: $userId } }
+                status: { _in: ["NEW", "STARTED"] }
+            }
+        ) {
+            id
+            status
+            betsCloseTime
+            creatorId
+            currencyPair {
+                symbol
+                id
+            }
+            poolAboveEq
+            poolBelow
+            totalBetsAmount
+            totalLiquidityProvided
+            totalLiquidityShares
+            totalValueLocked
+            liquidityPercent
+            measurePeriod
+            closedOracleTime
+            createdTime
+            startRate
+            closedRate
+            winnerBets
+            targetDynamics
+            bets {
+                id
+                side
+                reward
+                amount
+                createdTime
+                userId
+            }
+            deposits {
+                amountAboveEq
+                amountBelow
+                eventId
+                id
+                userId
+                createdTime
+                shares
+            }
+        }
+    }
+`
+
 export const getEventParticipants = gql`
     query getEventParticipants($id: Int) {
         event(where: { id: { _eq: $id } }) {

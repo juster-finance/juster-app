@@ -501,7 +501,8 @@ const { meta } = useMeta({
 
                     <Banner
                         v-else-if="!filteredEvents.length && isAllEventsLoaded"
-                        type="info"
+                        icon="help"
+                        color="gray"
                         size="small"
                     >
                         No events with the selected filters were found

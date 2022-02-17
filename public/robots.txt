@@ -1,0 +1,9 @@
+Host: app.juster.fi
+Sitemap: https://app.juster.fi/maps/sitemap.xml
+
+User-Agent: *
+
+Disallow: /profile
+Disallow: /profile/
+Disallow: /withdrawals
+Disallow: /operation/

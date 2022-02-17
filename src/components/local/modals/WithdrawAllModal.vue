@@ -63,7 +63,7 @@ export default defineComponent({
             return {
                 text: `Withdraw ${selectedPositions.value
                     .reduce((acc, curr) => acc + curr.value, 0)
-                    .toFixed(0)} XTZ`,
+                    .toFixed(0)} ꜩ`,
                 disabled: false,
             }
         })
@@ -202,10 +202,12 @@ export default defineComponent({
                         <img
                             v-if="position.event.winnerBets == 'ABOVE_EQ'"
                             :src="require('@/assets/icons/higher_won.svg')"
+                            alt="won_side_icon"
                         />
                         <img
                             v-else
                             :src="require('@/assets/icons/lower_won.svg')"
+                            alt="won_side_icon"
                         />
                         <span>Tezos / Dollar</span> price event
                     </div>
@@ -213,7 +215,7 @@ export default defineComponent({
                         Event ID: {{ position.event.id }}, Amount:&nbsp;<span>{{
                             position.value.toFixed(2)
                         }}</span
-                        >&nbsp;XTZ
+                        >&nbsp;ꜩ
                     </div>
                 </div>
             </div>

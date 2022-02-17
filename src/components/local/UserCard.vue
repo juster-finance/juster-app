@@ -75,6 +75,7 @@ export default defineComponent({
             <div :class="$style.avatar">
                 <img
                     :src="`https://services.tzkt.io/v1/avatars/${user.userId}`"
+                    alt="avatar"
                 />
                 <Icon v-if="user.creator" name="verified" size="14" />
             </div>
@@ -115,7 +116,7 @@ export default defineComponent({
                                     user.liquidityProvidedAboveEq
                                 ).toFixed(2)
                             }}
-                            XTZ</span
+                            ꜩ</span
                         >
                     </div>
                 </div>

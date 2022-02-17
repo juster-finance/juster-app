@@ -207,6 +207,7 @@ const handleKeydown = (e) => {
                                     (symbol.name == 'BTC-USD' && 'btc')
                                 }.png`)
                             "
+                            alt="symbol"
                         />
                         {{ symbol.name.replace("-USD", "") }}
                     </div>
@@ -250,14 +251,14 @@ const handleKeydown = (e) => {
                                 @blur="handleBlur('min')"
                                 placeholder="0"
                             />
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                         </div>
 
                         <div
                             @click="maxInputEl.focus()"
                             :class="$style.range_input"
                         >
-                            <span>XTZ</span>
+                            <span>ꜩ</span>
                             <input
                                 ref="maxInputEl"
                                 v-model="inputs.max"
@@ -334,6 +335,7 @@ const handleKeydown = (e) => {
                         <img
                             :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
                             :class="$style.avatar"
+                            alt="avatar"
                         />
                         Find Me
                     </div>
@@ -349,6 +351,7 @@ const handleKeydown = (e) => {
                         <img
                             :src="`https://services.tzkt.io/v1/avatars/${participant}`"
                             :class="$style.avatar"
+                            alt="avatar"
                         />
                         {{ participant.slice(0, 5) }}..{{
                             participant.slice(
@@ -421,7 +424,7 @@ const handleKeydown = (e) => {
         <div :class="$style.divider" />
 
         <div :class="$style.actions">
-            <Button @click="handleReset" type="tertiary" border size="small"
+            <Button @click="handleReset" type="secondary" size="small"
                 >Reset filters</Button
             >
 

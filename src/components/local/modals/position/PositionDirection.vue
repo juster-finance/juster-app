@@ -56,6 +56,7 @@ const timing = computed(() => {
                 <img
                     :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
                     :class="$style.image"
+                    alt="avatar"
                 />
             </div>
 
@@ -77,7 +78,7 @@ const timing = computed(() => {
                         @dblclick="amount.value = accountStore.balance / 2"
                         >{{ accountStore.balance }}</span
                     >
-                    XTZ
+                    ꜩ
                 </div>
             </div>
         </div>

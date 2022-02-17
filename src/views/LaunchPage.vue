@@ -30,7 +30,11 @@ const handleSwitch = () => {
 
 <template>
     <Page :class="$style.wrapper">
-        <img src="@/assets/landing/ga_bg.png" :class="$style.background_grad" />
+        <img
+            src="@/assets/landing/ga_bg.png"
+            alt="bg"
+            :class="$style.background_grad"
+        />
 
         <div :class="$style.header">
             <Icon name="logo_symbol" size="40" />
@@ -54,7 +58,7 @@ const handleSwitch = () => {
                 v-if="juster.sdk._network == 'hangzhounet'"
                 :class="$style.interactive_block"
             >
-                <Banner type="warning" size="small" center
+                <Banner type="warning" color="yellow" size="small" center
                     >You're currently on a testnet ({{
                         juster.sdk._network.slice(0, 1).toUpperCase() +
                         juster.sdk._network.slice(
@@ -78,11 +82,11 @@ const handleSwitch = () => {
                 </div>
             </div>
             <div v-else :class="$style.interactive_block">
-                <Banner type="success" size="small" center
+                <Banner icon="checkcircle" color="green" size="small" center
                     >You are on the main network!</Banner
                 >
 
-                <router-link to="/explore">
+                <router-link to="/">
                     <Button type="secondary" size="medium" block
                         ><Icon name="bolt" size="16" />Explore the
                         Juster</Button
