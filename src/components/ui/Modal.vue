@@ -131,6 +131,8 @@ export default defineComponent({
     background: var(--card-bg);
     box-shadow: rgb(0 0 0 / 20%) 0px 0px 1px, rgb(0 0 0 / 20%) 0px 20px 40px;
     border: 1px solid var(--border);
+
+    margin: 0 20px;
 }
 
 .close_icon {
