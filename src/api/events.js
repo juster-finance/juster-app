@@ -13,6 +13,7 @@ import {
     getEventsByMarket,
     getEventsByStatus,
     getEventParticipants,
+    getEventsWithUserPosition,
 } from "@/graphql/queries/events"
 
 export const fetchAllEvents = async () => {
@@ -105,6 +106,22 @@ export const fetchTopEvents = async ({ limit }) => {
     } catch (error) {
         console.error(
             `Error during fetching top events \n\n ${error.name}: ${error.message}`,
+        )
+        return []
+    }
+}
+
+export const fetchEventsWithUserPosition = async ({ userId }) => {
+    try {
+        const { data } = await juster.apollo.query({
+            query: getEventsWithUserPosition,
+            variables: { userId },
+        })
+
+        return data.event
+    } catch (error) {
+        console.error(
+            `Error during fetching user positions \n\n ${error.name}: ${error.message}`,
         )
         return []
     }

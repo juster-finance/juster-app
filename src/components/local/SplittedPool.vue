@@ -113,48 +113,6 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
-        <!-- <div :class="$style.half">
-            <div :class="$style.head">
-                <div :class="$style.name">
-                    Rise <span>{{ abovePercent }}%</span>
-                </div>
-
-                <div :class="$style.size">
-                    <Icon name="money" size="12" />
-                    {{ aboveAmount.toFixed(0) }}
-                    <span>XTZ</span>
-                </div>
-            </div>
-
-            <div :class="$style.pool">
-                <div
-                    :style="{ width: `${abovePercent}%` }"
-                    :class="[$style.fill, $style.rise]"
-                />
-            </div>
-        </div>
-
-        <div :class="$style.half">
-            <div :class="$style.head">
-                <div :class="$style.name">
-                    Fall <span>{{ belowPercent }}%</span>
-                </div>
-
-                <div :class="$style.size">
-                    <Icon name="money" size="12" />
-                    {{ belowAmount.toFixed(0) }}
-                    <span>XTZ</span>
-                </div>
-            </div>
-
-            <div :class="$style.pool">
-                <div
-                    :style="{ width: `${belowPercent}%` }"
-                    :class="[$style.fill, $style.fall]"
-                />
-            </div>
-        </div> -->
-
         <div :class="$style.head">
             <div :class="$style.left">
                 <div :class="$style.name">
@@ -166,7 +124,7 @@ export default defineComponent({
                 <div :class="$style.size">
                     <Icon name="money" size="12" />
                     {{ aboveAmount.toFixed(0) }}
-                    <span>XTZ</span>
+                    <span>ꜩ</span>
                 </div>
             </div>
 
@@ -174,7 +132,7 @@ export default defineComponent({
                 <div :class="$style.size">
                     <Icon name="money" size="12" />
                     {{ belowAmount.toFixed(0) }}
-                    <span>XTZ</span>
+                    <span>ꜩ</span>
                 </div>
 
                 <div :class="$style.dot" />

@@ -86,7 +86,7 @@ const handleSwitch = () => {
                     >You are on the main network!</Banner
                 >
 
-                <router-link to="/explore">
+                <router-link to="/">
                     <Button type="secondary" size="medium" block
                         ><Icon name="bolt" size="16" />Explore the
                         Juster</Button

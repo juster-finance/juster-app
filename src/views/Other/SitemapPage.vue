@@ -14,16 +14,13 @@ import Page from "@/components/base/Page"
 
             <ul>
                 <li>
-                    <a href="/explore">Explore</a>
+                    <a href="/">Explore</a>
                 </li>
                 <li>
-                    <a href="/explore">Events</a>
+                    <a href="/events">Events</a>
                 </li>
                 <li>
-                    <a href="/explore">Markets</a>
-                </li>
-                <li>
-                    <a href="/explore">Ranking</a>
+                    <a href="/markets">Markets</a>
                 </li>
             </ul>
         </div>
@@ -49,7 +46,7 @@ import Page from "@/components/base/Page"
 
             <ul>
                 <li>
-                    <a href="/explore">White Papper</a>
+                    <a href="/">White Papper</a>
                 </li>
                 <li>
                     <a href="/docs">Documentation</a>

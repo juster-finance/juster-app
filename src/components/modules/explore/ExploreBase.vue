@@ -1,5 +1,11 @@
 <script>
-import { defineComponent, onMounted, onBeforeUnmount, ref } from "vue"
+import {
+    defineComponent,
+    onMounted,
+    onBeforeUnmount,
+    ref,
+    onUnmounted,
+} from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
 import { cloneDeep } from "lodash"
@@ -9,6 +15,7 @@ import { cloneDeep } from "lodash"
  */
 import RatingCard from "./RatingCard"
 import RatingCardLoading from "./RatingCardLoading"
+import MyPositionCard from "./MyPositionCard"
 import MarketCard from "@/components/local/MarketCard"
 import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
@@ -27,11 +34,12 @@ import { fetchTopBettors, fetchTopLiquidityProviders } from "@/api/users"
  * Store
  */
 import { useMarketStore } from "@/store/market"
+import { useAccountStore } from "@/store/account"
 
 /**
  * Services
  */
-import { analytics } from "@/services/sdk"
+import { juster, analytics } from "@/services/sdk"
 
 export default defineComponent({
     name: "ExploreBase",
@@ -40,6 +48,10 @@ export default defineComponent({
         const router = useRouter()
 
         const marketStore = useMarketStore()
+        const accountStore = useAccountStore()
+
+        const subscriptionToMyPositions = ref({})
+        const myEvents = ref([])
 
         /** Ranking */
         const isTopProvidersLoading = ref(true)
@@ -54,6 +66,71 @@ export default defineComponent({
         onMounted(async () => {
             analytics.log("onPage", { name: "Explore" })
 
+            /**
+             * Block: My Positions
+             */
+            subscriptionToMyPositions.value = await juster.gql
+                .subscription({
+                    event: [
+                        {
+                            where: {
+                                bets: { userId: { _eq: accountStore.pkh } },
+                                status: { _in: ["NEW", "STARTED"] },
+                            },
+                        },
+                        {
+                            id: true,
+                            status: true,
+                            betsCloseTime: true,
+                            creatorId: true,
+                            currencyPair: {
+                                symbol: true,
+                                id: true,
+                            },
+                            poolAboveEq: true,
+                            poolBelow: true,
+                            totalBetsAmount: true,
+                            totalLiquidityProvided: true,
+                            totalLiquidityShares: true,
+                            totalValueLocked: true,
+                            liquidityPercent: true,
+                            measurePeriod: true,
+                            closedOracleTime: true,
+                            createdTime: true,
+                            startRate: true,
+                            closedRate: true,
+                            winnerBets: true,
+                            targetDynamics: true,
+                            bets: {
+                                id: true,
+                                side: true,
+                                reward: true,
+                                amount: true,
+                                createdTime: true,
+                                userId: true,
+                            },
+                            deposits: {
+                                amountAboveEq: true,
+                                amountBelow: true,
+                                eventId: true,
+                                id: true,
+                                userId: true,
+                                createdTime: true,
+                                shares: true,
+                            },
+                        },
+                    ],
+                })
+                .subscribe({
+                    next: ({ event }) => {
+                        myEvents.value = event
+                    },
+                    error: console.error,
+                })
+
+            /**
+             * Block: Top Events & Providers
+             */
             const topEvents = await fetchTopEvents({ limit: 3 })
             marketStore.events = cloneDeep(topEvents).sort(
                 (a, b) => b.bets.length - a.bets.length,
@@ -76,6 +153,15 @@ export default defineComponent({
             marketStore.events = []
         })
 
+        onUnmounted(() => {
+            if (
+                subscriptionToMyPositions.value.hasOwnProperty("_state") &&
+                !subscriptionToMyPositions.value?.closed
+            ) {
+                subscriptionToMyPositions.value.unsubscribe()
+            }
+        })
+
         /** Meta */
         useMeta({
             title: "Explore",
@@ -85,6 +171,7 @@ export default defineComponent({
 
         return {
             marketStore,
+            myEvents,
             topProviders,
             topBettors,
             isTopBettorsLoading,
@@ -96,6 +183,7 @@ export default defineComponent({
     components: {
         RatingCard,
         RatingCardLoading,
+        MyPositionCard,
         MarketCard,
         EventCard,
         EventCardLoading,
@@ -112,6 +200,22 @@ export default defineComponent({
                     >{{ content }} • Juster</template
                 >
             </metainfo>
+
+            <!-- My Positions -->
+            <div v-if="myEvents.length" :class="$style.block">
+                <h1>My Positions</h1>
+                <div :class="$style.description">
+                    Events in which you have liquidity or bet
+                </div>
+
+                <div :class="$style.my_positions">
+                    <MyPositionCard
+                        v-for="event in myEvents"
+                        :key="event.id"
+                        :event="event"
+                    />
+                </div>
+            </div>
 
             <!-- Top markets -->
             <div v-if="marketStore.isMarketsLoaded" :class="$style.block">
@@ -139,7 +243,7 @@ export default defineComponent({
                 <RatingCard
                     v-if="!isTopProvidersLoading"
                     :users="topProviders"
-                    suffix="XTZ"
+                    suffix="ꜩ"
                     :class="$style.rating_card"
                 />
                 <RatingCardLoading v-else :class="$style.rating_card" />
@@ -236,6 +340,14 @@ export default defineComponent({
 }
 
 .rating_card {
+    margin-top: 24px;
+}
+
+.my_positions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(530px, 1fr));
+    grid-gap: 16px;
+
     margin-top: 24px;
 }
 

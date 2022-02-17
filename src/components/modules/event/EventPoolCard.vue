@@ -53,7 +53,7 @@ const fallPool = computed(() =>
 
                 <span
                     >{{ numberWithSymbol(event.totalLiquidityProvided, ",") }}
-                    <span>XTZ</span></span
+                    <span>ꜩ</span></span
                 >
             </div>
 

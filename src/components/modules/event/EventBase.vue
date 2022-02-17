@@ -431,11 +431,12 @@ watch(event, async () => {
 /**
  * Get event -> Subscribe (refactor needed) -> Participants
  */
+const subscription = ref({})
 onMounted(async () => {
     await getEvent()
 
     /** Subscribe to event, TODO: refactor */
-    await juster.gql
+    subscription.value = await juster.gql
         .subscription({
             event: [
                 {
@@ -506,6 +507,13 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+    if (
+        subscription.value.hasOwnProperty("_state") &&
+        !subscription.value?.closed
+    ) {
+        subscription.value.unsubscribe()
+    }
+
     destroyStartCountdown()
     destroyFinishCountdown()
 })

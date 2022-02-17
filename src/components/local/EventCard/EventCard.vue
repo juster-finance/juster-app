@@ -635,7 +635,11 @@ export default defineComponent({
                     position="bottom"
                     side="left"
                 >
-                    <Badge color="green" :class="$style.main_badge">
+                    <Badge
+                        size="small"
+                        color="green"
+                        :class="$style.main_badge"
+                    >
                         <Icon name="event_new" size="12" />New
                     </Badge>
 
@@ -724,7 +728,7 @@ export default defineComponent({
                             :class="$style.my_avatar"
                             alt="avatar"
                         />
-                        {{ abbreviateNumber(userTVL) }} XTZ
+                        {{ abbreviateNumber(userTVL) }} ꜩ
                     </Badge>
 
                     <template v-slot:content>My TVL: Bets + Liquidity</template>
