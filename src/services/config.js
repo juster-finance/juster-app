@@ -19,16 +19,40 @@ export const sanity = {
     id: "7iinpn2j",
 }
 
-export const rpcNodes = [
-    {
-        name: "TzKT Hangzhou2net",
-        url: "https://rpc.tzkt.io/hangzhou2net",
-    },
-    {
-        name: "SmartPy Granadanet",
-        url: "https://granadanet.smartpy.io",
-    },
-]
+export const rpcNodes = {
+    mainnet: [
+        {
+            name: "TZKT Mainnet",
+            url: "https://rpc.tzkt.io/mainnet",
+        },
+        {
+            name: "SmartPy Mainnet",
+            url: "https://mainnet.smartpy.io",
+        },
+        {
+            name: "TzBeta Mainnet",
+            url: "https://rpc.tzbeta.net",
+        },
+        {
+            name: "LetzBake!",
+            url: "https://teznode.letzbake.com",
+        },
+        {
+            name: "ATEZA",
+            url: "https://rpc-mainnet.ateza.io",
+        },
+    ],
+    hangzhounet: [
+        {
+            name: "TZKT Testnet",
+            url: "https://rpc.tzkt.io/hangzhou2net",
+        },
+        {
+            name: "SmartPy Testnet",
+            url: "https://hangzhounet.smartpy.io/",
+        },
+    ],
+}
 
 export const verifiedMakers = {
     hangzhounet: "tz1U2zsFffCTcTvWddAfHfc2gUvEHepaVT1L",
