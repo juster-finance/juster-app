@@ -374,13 +374,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <Modal
-        :show="show"
-        width="500"
-        padding="32px 32px 24px 32px"
-        closable
-        @onClose="$emit('onClose')"
-    >
+    <Modal :show="show" width="500" closable @onClose="$emit('onClose')">
         <template v-if="accountStore.isLoggined">
             <div :class="$style.title">Place a bet</div>
 

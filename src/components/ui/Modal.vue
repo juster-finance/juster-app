@@ -24,9 +24,6 @@ export default defineComponent({
         width: {
             type: String,
         },
-        padding: {
-            type: String,
-        },
         closable: {
             type: Boolean,
         },
@@ -41,7 +38,7 @@ export default defineComponent({
         let removeOutside
         const modal = ref(null)
 
-        const { width, padding, show, closeOutside } = toRefs(props)
+        const { width, show, closeOutside } = toRefs(props)
 
         watch(show, () => {
             if (!show.value) {
@@ -67,8 +64,6 @@ export default defineComponent({
             const styles = {
                 width: width.value ? `${width.value}px` : `400px`,
             }
-
-            if (padding.value) styles.padding = padding.value
 
             return styles
         })
@@ -132,6 +127,7 @@ export default defineComponent({
     box-shadow: rgb(0 0 0 / 20%) 0px 0px 1px, rgb(0 0 0 / 20%) 0px 20px 40px;
     border: 1px solid var(--border);
 
+    padding: 32px 32px 24px 32px;
     margin: 0 20px;
 }
 
