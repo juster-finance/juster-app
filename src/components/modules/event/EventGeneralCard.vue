@@ -158,6 +158,15 @@ const priceDynamics = computed(() => {
                             :class="[$style.user_avatar, $style.participant]"
                             alt="avatar"
                         />
+                        <div
+                            v-if="participantsAvatars.length > 3"
+                            :class="[
+                                $style.participant,
+                                $style.more_participants,
+                            ]"
+                        >
+                            +3
+                        </div>
                     </div>
 
                     <template v-slot:content
@@ -571,7 +580,7 @@ const priceDynamics = computed(() => {
 }
 
 .participant {
-    margin-left: -12px;
+    margin-left: -6px;
 }
 
 .creator {
@@ -603,8 +612,27 @@ const priceDynamics = computed(() => {
 
     background: rgb(35, 35, 35);
     border-radius: 50px;
+    outline: 3px solid var(--card-bg);
 
     padding: 2px;
+}
+
+.more_participants {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--text-blue);
+
+    background: rgb(35, 35, 35);
+    border-radius: 50px;
+    outline: 3px solid var(--card-bg);
 }
 
 @keyframes mig {
