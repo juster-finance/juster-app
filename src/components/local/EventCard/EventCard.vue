@@ -810,6 +810,7 @@ export default defineComponent({
 
                 <Tooltip
                     v-if="event.status !== 'FINISHED'"
+                    position="top"
                     side="left"
                     textAlign="left"
                 >
