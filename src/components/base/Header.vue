@@ -420,8 +420,18 @@ const pkh = computed(() => accountStore.pkh)
 
     border-bottom: 1px solid var(--border);
     z-index: 2;
+}
 
-    backdrop-filter: blur(5px);
+@supports (backdrop-filter: blur(5px)) {
+    .wrapper {
+        backdrop-filter: blur(5px);
+    }
+}
+
+@supports not (backdrop-filter: blur(5px)) {
+    .wrapper {
+        background: var(--app-bg);
+    }
 }
 
 .base {
