@@ -332,7 +332,8 @@ const contextMenuHandler = (e) => {
 }
 
 onMounted(async () => {
-    card.value.addEventListener("contextmenu", contextMenuHandler)
+    if (card.value)
+        card.value.addEventListener("contextmenu", contextMenuHandler)
 
     if (props.event.status === "FINISHED") return
 
@@ -484,6 +485,15 @@ onUnmounted(() => {
                                 ]"
                                 alt="avatar"
                             />
+                            <div
+                                v-if="participantsAvatars.length > 3"
+                                :class="[
+                                    $style.participant,
+                                    $style.more_participants,
+                                ]"
+                            >
+                                +3
+                            </div>
                         </div>
 
                         <template v-slot:content
@@ -911,7 +921,7 @@ onUnmounted(() => {
 }
 
 .participant {
-    margin-left: -12px;
+    margin-left: -6px;
 }
 
 .creator {
@@ -943,8 +953,27 @@ onUnmounted(() => {
 
     background: rgb(35, 35, 35);
     border-radius: 50px;
+    outline: 3px solid var(--card-bg);
 
     padding: 2px;
+}
+
+.more_participants {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--text-blue);
+
+    background: rgb(35, 35, 35);
+    border-radius: 50px;
+    outline: 3px solid var(--card-bg);
 }
 
 .title {
