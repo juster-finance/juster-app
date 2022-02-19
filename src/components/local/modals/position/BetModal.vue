@@ -142,7 +142,7 @@ export default defineComponent({
 
             if (amount.value) {
                 if (minReward.value == reward.value) {
-                    return reward.value.toFixed(0)
+                    return reward.value.toFixed(2)
                 } else {
                     return `${minReward.value.toFixed(
                         2,
