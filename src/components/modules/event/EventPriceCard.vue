@@ -29,7 +29,7 @@ const disaggregate = (num) => {
                 <Icon name="go" size="12" />
 
                 <div v-if="event.status == 'NEW'" :class="$style.price">
-                    0.00
+                    TBD
                 </div>
                 <div v-else :class="$style.price">
                     {{ disaggregate(event.startRate * 100)[0] }}.<span>{{
@@ -61,7 +61,7 @@ const disaggregate = (num) => {
                 />
 
                 <div v-if="event.status == 'NEW'" :class="$style.price">
-                    0.00
+                    TBD
                 </div>
                 <div
                     v-else-if="event.status == 'STARTED'"
