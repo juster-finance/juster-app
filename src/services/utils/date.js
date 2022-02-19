@@ -11,14 +11,33 @@ export const countdown = ({ target, now }) => {
     }
 }
 
-export const toReadableDuration = ({ seconds }) => {
+export const toReadableDuration = ({ seconds, asObject }) => {
     const dur = Duration.fromObject({ seconds })
 
-    if (dur.as("hours") < 1) {
-        return `${dur.as("minutes")}m`
-    } else if (dur.as("hours") > 24) {
-        return `${dur.as("days")}d`
+    if (!asObject) {
+        if (dur.as("hours") < 1) {
+            return `${dur.as("minutes")}m`
+        } else if (dur.as("hours") > 24) {
+            return `${dur.as("days")}d`
+        } else {
+            return `${dur.as("hours")}h`
+        }
     } else {
-        return `${dur.as("hours")}h`
+        if (dur.as("hours") < 1) {
+            return {
+                val: dur.as("minutes"),
+                text: "minute",
+            }
+        } else if (dur.as("hours") > 24) {
+            return {
+                val: dur.as("days"),
+                text: "day",
+            }
+        } else {
+            return {
+                val: dur.as("hours"),
+                text: "hour",
+            }
+        }
     }
 }

@@ -18,10 +18,9 @@ const props = defineProps({
     gap: 6px;
 
     border-radius: 6px;
-    border: 1px solid var(--border);
 
     font-weight: 600;
-    line-height: 1.1;
+    line-height: 1.2;
     white-space: nowrap;
 }
 
@@ -50,25 +49,30 @@ const props = defineProps({
 .wrapper.green {
     color: var(--green);
     fill: var(--green);
+    background: rgba(26, 161, 104, 0.15);
 }
 
 .wrapper.yellow {
     color: var(--yellow);
     fill: var(--yellow);
+    background: rgba(245, 183, 43, 0.15);
 }
 
 .wrapper.red {
     color: var(--red);
     fill: var(--red);
+    background: rgba(224, 92, 67, 0.15);
 }
 
 .wrapper.gray {
     color: var(--text-secondary);
     fill: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .wrapper.orange {
     color: var(--orange);
     fill: var(--orange);
+    background: rgba(239, 132, 86, 0.15);
 }
 </style>
