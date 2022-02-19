@@ -602,21 +602,6 @@ const { meta } = useMeta({
                             @click="
                                 handleSelectFilter({
                                     target: 'bets',
-                                    value: 'my',
-                                })
-                            "
-                            :class="[
-                                $style.filter,
-                                filters.bets == 'my' && $style.active,
-                            ]"
-                        >
-                            My bets
-                        </div>
-                        <div :class="$style.dot" />
-                        <div
-                            @click="
-                                handleSelectFilter({
-                                    target: 'bets',
                                     value: 'all',
                                 })
                             "
@@ -626,6 +611,21 @@ const { meta } = useMeta({
                             ]"
                         >
                             All bets
+                        </div>
+                        <div :class="$style.dot" />
+                        <div
+                            @click="
+                                handleSelectFilter({
+                                    target: 'bets',
+                                    value: 'my',
+                                })
+                            "
+                            :class="[
+                                $style.filter,
+                                filters.bets == 'my' && $style.active,
+                            ]"
+                        >
+                            My bets
                         </div>
                     </div>
 
@@ -682,21 +682,6 @@ const { meta } = useMeta({
                             @click="
                                 handleSelectFilter({
                                     target: 'liquidity',
-                                    value: 'my',
-                                })
-                            "
-                            :class="[
-                                $style.filter,
-                                filters.liquidity == 'my' && $style.active,
-                            ]"
-                        >
-                            My liquidity
-                        </div>
-                        <div :class="$style.dot" />
-                        <div
-                            @click="
-                                handleSelectFilter({
-                                    target: 'liquidity',
                                     value: 'all',
                                 })
                             "
@@ -706,6 +691,22 @@ const { meta } = useMeta({
                             ]"
                         >
                             All liquidity
+                        </div>
+                        <div :class="$style.dot" />
+
+                        <div
+                            @click="
+                                handleSelectFilter({
+                                    target: 'liquidity',
+                                    value: 'my',
+                                })
+                            "
+                            :class="[
+                                $style.filter,
+                                filters.liquidity == 'my' && $style.active,
+                            ]"
+                        >
+                            My liquidity
                         </div>
                     </div>
 
@@ -1021,10 +1022,8 @@ const { meta } = useMeta({
     align-items: center;
     gap: 14px;
 
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    border-radius: 6px;
     background: var(--btn-secondary-bg);
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
     height: 32px;
     padding: 0 12px;
 }
