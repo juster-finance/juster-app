@@ -502,8 +502,8 @@ export default defineComponent({
         <template v-else>
             <div :class="$style.title">Place a bet</div>
             <div :class="$style.description">
-                To fully interact with the application, you need to create an
-                account and connect Temple wallet
+                You need to connect your wallet (with Beacon) to place liquidity
+                and make bets
             </div>
 
             <Button @click="handleLogin" size="large" type="primary" block>
