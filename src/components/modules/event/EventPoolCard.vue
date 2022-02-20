@@ -29,6 +29,17 @@ const fallPool = computed(() =>
         .filter((bet) => bet.side == "BELOW")
         .reduce((acc, { amount }) => acc + amount, 0),
 )
+
+const liquidityLevel = computed(() => {
+    if (props.event.totalLiquidityProvided >= 7000)
+        return { text: "Ultra", icon: "liquidity_ultra" }
+    if (props.event.totalLiquidityProvided >= 3000)
+        return { text: "High", icon: "liquidity_high" }
+    if (props.event.totalLiquidityProvided >= 1000)
+        return { text: "Medium", icon: "liquidity_medium" }
+    if (props.event.totalLiquidityProvided < 1000)
+        return { text: "Low", icon: "liquidity_low" }
+})
 </script>
 
 <template>
@@ -48,6 +59,12 @@ const fallPool = computed(() =>
         >
 
         <div :class="$style.params">
+            <div :class="$style.param">
+                <span><Icon :name="liquidityLevel.icon" size="12" />Level</span>
+
+                <span>{{ liquidityLevel.text }}</span>
+            </div>
+
             <div :class="$style.param">
                 <span><Icon name="liquidity" size="12" />Provided</span>
 
