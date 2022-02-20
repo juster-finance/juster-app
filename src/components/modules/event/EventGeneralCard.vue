@@ -385,37 +385,51 @@ const priceDynamics = computed(() => {
 
             <!-- Second Param -->
             <!-- *New/Starting* -->
-            <div
+            <Tooltip
                 v-if="
                     ['In progress', 'Finished'].includes(startStatus) &&
                     event.status == 'NEW'
                 "
-                :class="$style.param"
+                position="top"
+                side="left"
+                :button="{
+                    icon: 'book',
+                    text: 'Learn More',
+                    url: '/docs',
+                }"
             >
-                <span><Icon name="sides" size="12" />Target Dynamics</span>
+                <div :class="$style.param">
+                    <span><Icon name="sides" size="12" />Target Dynamics</span>
 
-                <span>
-                    <Icon
-                        :name="
-                            (event.targetDynamics == 1 && 'checkcircle') ||
-                            ([1.05, 0.95].includes(event.targetDynamics) &&
-                                'warning') ||
-                            'warning'
-                        "
-                        size="12"
-                        :style="{
-                            fill: `var(--${
-                                (event.targetDynamics == 1 && 'green') ||
+                    <span>
+                        <Icon
+                            :name="
+                                (event.targetDynamics == 1 && 'checkcircle') ||
                                 ([1.05, 0.95].includes(event.targetDynamics) &&
-                                    'yellow') ||
-                                'red'
-                            })`,
-                        }"
-                    />
+                                    'warning') ||
+                                'warning'
+                            "
+                            size="12"
+                            :style="{
+                                fill: `var(--${
+                                    (event.targetDynamics == 1 && 'green') ||
+                                    ([1.05, 0.95].includes(
+                                        event.targetDynamics,
+                                    ) &&
+                                        'yellow') ||
+                                    'red'
+                                })`,
+                            }"
+                        />
 
-                    {{ event.targetDynamics * 100 - 100 }}%</span
-                >
-            </div>
+                        {{ event.targetDynamics * 100 - 100 }}%</span
+                    >
+                </div>
+
+                <template #content
+                    >Price change that separates betting pools
+                </template>
+            </Tooltip>
 
             <!-- *Active/Finished* -->
             <div
@@ -723,6 +737,8 @@ const priceDynamics = computed(() => {
 .param {
     display: flex;
     justify-content: space-between;
+
+    width: 100%;
 
     font-size: 14px;
     line-height: 1;
