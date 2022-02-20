@@ -608,7 +608,7 @@ onUnmounted(() => {
                     side="left"
                 >
                     <Badge color="yellow" :class="$style.main_badge">
-                        <Icon name="event_active" size="12" />Running
+                        <Icon name="event_active" size="12" />Active
                     </Badge>
                     <template v-slot:content
                         >Betting is closed. The end of the event is
