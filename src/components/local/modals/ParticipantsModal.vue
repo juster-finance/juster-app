@@ -78,7 +78,7 @@ export default defineComponent({
 
 <template>
     <Modal :show="show" width="500" closable @onClose="$emit('onClose')">
-        <div :class="$style.title">Event participants</div>
+        <div :class="$style.title">Participants</div>
 
         <div :class="$style.block">
             <div :class="$style.subtitle">Creator</div>
