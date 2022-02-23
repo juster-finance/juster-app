@@ -63,13 +63,7 @@ const handleContinue = () => {
 </script>
 
 <template>
-    <Modal
-        :show="show"
-        width="500"
-        padding="32px 32px 24px 32px"
-        closable
-        @onClose="$emit('onClose')"
-    >
+    <Modal :show="show" width="500" closable @onClose="$emit('onClose')">
         <div :class="$style.title">Custom Sign in</div>
         <div :class="$style.description">
             Select an RPC node from the ready-made list based on the selected

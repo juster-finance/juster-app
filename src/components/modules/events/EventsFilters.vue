@@ -455,6 +455,14 @@ const handleKeydown = (e) => {
     height: fit-content;
 }
 
+@media (max-width: 700px) {
+    .wrapper {
+        position: initial;
+
+        width: 100%;
+    }
+}
+
 .switcher {
     display: flex;
 
@@ -470,7 +478,7 @@ const handleKeydown = (e) => {
     justify-content: center;
     gap: 8px;
 
-    width: 130px;
+    width: 100%;
     height: 28px;
     cursor: pointer;
 

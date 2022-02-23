@@ -74,7 +74,6 @@ export default defineComponent({
     <Modal
         :show="show"
         width="500"
-        padding="32px 32px 24px 32px"
         :closeOutside="false"
         @onClose="$emit('onClose')"
     >

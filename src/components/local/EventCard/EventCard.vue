@@ -1,15 +1,13 @@
-<script>
+<script setup>
 import {
-    defineComponent,
     onMounted,
     onBeforeUnmount,
     onUnmounted,
-    toRefs,
     ref,
     reactive,
     computed,
 } from "vue"
-import { DateTime, Duration } from "luxon"
+import { DateTime } from "luxon"
 
 /**
  * UI
@@ -19,7 +17,6 @@ import {
     DropdownItem,
     DropdownDivider,
 } from "@/components/ui/Dropdown"
-import Button from "@/components/ui/Button"
 import Badge from "@/components/ui/Badge"
 import Tooltip from "@/components/ui/Tooltip"
 
@@ -38,6 +35,7 @@ import {
     toClipboard,
     getCurrencyIcon,
     capitalizeFirstLetter,
+    pluralize,
 } from "@/services/utils/global"
 import { juster, analytics, currentNetwork } from "@/services/sdk"
 import { abbreviateNumber } from "@/services/utils/amounts"
@@ -57,415 +55,354 @@ import { useMarketStore } from "@/store/market"
 import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
 
-export default defineComponent({
-    name: "EventCard",
-    props: {
-        event: Object,
-        chart: Boolean,
-    },
+const props = defineProps({ event: { type: Object } })
 
-    setup(props) {
-        const { event } = toRefs(props)
+/** Stores */
+const notificationsStore = useNotificationsStore()
+const accountStore = useAccountStore()
+const marketStore = useMarketStore()
 
-        /** Stores */
-        const notificationsStore = useNotificationsStore()
-        const accountStore = useAccountStore()
-        const marketStore = useMarketStore()
+const { updateWithdrawals } = useMarket()
 
-        const { updateWithdrawals } = useMarket()
+const card = ref(null)
+const openContextMenu = ref(false)
 
-        const card = ref(null)
-        const openContextMenu = ref(false)
+/** Bet modal */
+const showBetModal = ref(false)
+const preselectedSide = ref("Rise")
 
-        /** Bet modal */
-        const showBetModal = ref(false)
-        const preselectedSide = ref("Rise")
+/** Liquidity modal */
+const showLiquidityModal = ref(false)
 
-        /** Liquidity modal */
-        const showLiquidityModal = ref(false)
+/** Participants modal */
+const showParticipantsModal = ref(false)
 
-        /** Participants modal */
-        const showParticipantsModal = ref(false)
+const subscription = ref({})
 
-        const subscription = ref({})
+const symbol = computed(() => props.event.currencyPair.symbol)
 
-        const symbol = computed(() => event.value.currencyPair.symbol)
+/** Countdown setup: Time to start */
+const startDt = computed(() => new Date(props.event?.betsCloseTime).getTime())
+const {
+    status: startStatus,
+    time: startTime,
+    stop: destroyStartCountdown,
+} = useCountdown(startDt)
 
-        /** Countdown setup: Time to start */
-        const startDt = computed(() =>
-            new Date(event.value?.betsCloseTime).getTime(),
-        )
-        const {
-            status: startStatus,
-            time: startTime,
-            stop: destroyStartCountdown,
-        } = useCountdown(startDt)
-
-        // eslint-disable-next-line vue/return-in-computed-property
-        const timeToStart = computed(() => {
-            if (startTime.h > 0) {
-                return {
-                    num: startTime.h,
-                    suffix: startTime.h > 1 ? "hours" : "hour",
-                }
-            }
-            if (startTime.h == 0) {
-                return {
-                    num: startTime.m,
-                    suffix: startTime.m > 1 ? "mins" : "min",
-                }
-            }
-        })
-
-        /** Countdown setup: Time to finish */
-        const finishDt = computed(() =>
-            DateTime.fromISO(event.value.betsCloseTime)
-                .plus({ second: event.value.measurePeriod })
-                .toJSDate()
-                .getTime(),
-        )
-        const { time: finishTime, stop: destroyFinishCountdown } =
-            useCountdown(finishDt)
-
-        // eslint-disable-next-line vue/return-in-computed-property
-        const timeToFinish = computed(() => {
-            if (finishTime.h > 0) {
-                return {
-                    num: finishTime.h,
-                    suffix: finishTime.h > 1 ? "hours" : "hour",
-                }
-            }
-            if (finishTime.h == 0) {
-                return {
-                    num: finishTime.m,
-                    suffix: finishTime.m > 1 ? "mins" : "min",
-                }
-            }
-        })
-
-        const eventDuration = computed(() =>
-            toReadableDuration({ seconds: event.value.measurePeriod }),
-        )
-
-        const timing = computed(() => {
-            const eventDt = DateTime.fromISO(
-                event.value.betsCloseTime,
-            ).setLocale("en")
-
-            const endDt = eventDt.plus(event.value.measurePeriod * 1000)
-
-            return {
-                start: {
-                    time: eventDt.toLocaleString({
-                        hour: "numeric",
-                        minute: "numeric",
-                    }),
-                    day: eventDt.toLocaleString({
-                        day: "numeric",
-                    }),
-                    month: eventDt.toLocaleString({ month: "short" }),
-                },
-                end: {
-                    time: endDt.toLocaleString({
-                        hour: "numeric",
-                        minute: "numeric",
-                    }),
-                    day: endDt.toLocaleString({
-                        day: "numeric",
-                    }),
-                    month: endDt.toLocaleString({ month: "short" }),
-                },
-                showDay: eventDt.ordinal < endDt.ordinal,
-            }
-        })
-
-        const liquidityLevel = computed(() => {
-            if (event.value.totalLiquidityProvided < 500) return "Low"
-            if (event.value.totalLiquidityProvided == 500) return "Medium"
-            if (event.value.totalLiquidityProvided > 500) return "High"
-            if (event.value.totalLiquidityProvided > 1000) return "Super"
-        })
-
-        const participantsAvatars = computed(() => {
-            let avatars = [
-                ...event.value.bets.map((bet) => bet.userId),
-                ...event.value.deposits.map((deposit) => deposit.userId),
-            ]
-
-            /** remove duplicates */
-            avatars = [...new Set(avatars)]
-
-            return avatars
-        })
-
-        const userTVL = computed(() => {
-            let tvl = 0
-
-            tvl += event.value.deposits
-                .filter((deposit) => deposit.userId == accountStore.pkh)
-                .reduce((a, { amountBelow }) => a + amountBelow, 0)
-            tvl += event.value.bets
-                .filter((bet) => bet.userId == accountStore.pkh)
-                .reduce((a, { amount }) => a + amount, 0)
-
-            return tvl
-        })
-
-        /** Win & Withdraw */
-        const won = computed(() => {
-            if (!event.value) return
-
-            return !!event.value.bets
-                .filter((bet) => bet.userId == accountStore.pkh)
-                .filter((bet) => bet.side == event.value.winnerBets).length
-        })
-        const positionForWithdraw = computed(() => {
-            return accountStore.wonPositions.find(
-                (position) => position.event.id == event.value.id,
-            )
-        })
-
-        /** Join to the event & Liquidity */
-        const handleBet = (target) => {
-            preselectedSide.value = capitalizeFirstLetter(target)
-
-            /** disable Bet / Liquidity right after betsCloseTime */
-            if (
-                startStatus.value == "Finished" ||
-                event.value.totalLiquidityProvided == 0
-            )
-                return
-
-            analytics.log("showBetModal", { where: "event_card" })
-
-            showBetModal.value = true
+// eslint-disable-next-line vue/return-in-computed-property
+const timeToStart = computed(() => {
+    if (startTime.h > 0) {
+        return {
+            num: startTime.h,
+            suffix: startTime.h > 1 ? "hours" : "hour",
         }
+    }
+    if (startTime.h == 0) {
+        return {
+            num: startTime.m,
+            suffix: startTime.m > 1 ? "mins" : "min",
+        }
+    }
+})
 
-        /** Withdraw */
-        const isWithdrawing = ref(false)
-        const handleWithdraw = (e) => {
-            isWithdrawing.value = true
+/** Countdown setup: Time to finish */
+const finishDt = computed(() =>
+    DateTime.fromISO(props.event.betsCloseTime)
+        .plus({ second: props.event.measurePeriod })
+        .toJSDate()
+        .getTime(),
+)
+const { time: finishTime, stop: destroyFinishCountdown } =
+    useCountdown(finishDt)
 
-            analytics.log("clickWithdraw", { where: "event_card" })
+// eslint-disable-next-line vue/return-in-computed-property
+const timeToFinish = computed(() => {
+    if (finishTime.h > 0) {
+        return {
+            num: finishTime.h,
+            suffix: finishTime.h > 1 ? "hours" : "hour",
+        }
+    }
+    if (finishTime.h == 0) {
+        return {
+            num: finishTime.m,
+            suffix: finishTime.m > 1 ? "mins" : "min",
+        }
+    }
+})
 
-            juster.sdk
-                .withdraw(event.value.id, accountStore.pkh)
-                .then((op) => {
-                    /** Pending transaction label */
-                    accountStore.pendingTransaction.awaiting = true
+const timing = computed(() => {
+    const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("en")
 
-                    op.confirmation()
-                        .then((result) => {
-                            accountStore.pendingTransaction.awaiting = false
-                            isWithdrawing.value = false
+    const endDt = eventDt.plus(props.event.measurePeriod * 1000)
 
-                            /** rm won position from store */
-                            accountStore.positionsForWithdrawal =
-                                accountStore.positionsForWithdrawal.filter(
-                                    (position) =>
-                                        position.event.id != event.value.id,
-                                )
+    return {
+        start: {
+            time: eventDt.toLocaleString({
+                hour: "numeric",
+                minute: "numeric",
+            }),
+            day: eventDt.toLocaleString({
+                day: "numeric",
+            }),
+            month: eventDt.toLocaleString({ month: "short" }),
+        },
+        end: {
+            time: endDt.toLocaleString({
+                hour: "numeric",
+                minute: "numeric",
+            }),
+            day: endDt.toLocaleString({
+                day: "numeric",
+            }),
+            month: endDt.toLocaleString({ month: "short" }),
+        },
+        showDay: eventDt.ordinal < endDt.ordinal,
+    }
+})
 
-                            updateWithdrawals()
+const liquidityLevel = computed(() => {
+    if (props.event.totalLiquidityProvided >= 7000)
+        return { text: "Ultra", icon: "liquidity_ultra" }
+    if (props.event.totalLiquidityProvided >= 3000)
+        return { text: "High", icon: "liquidity_high" }
+    if (props.event.totalLiquidityProvided >= 1000)
+        return { text: "Medium", icon: "liquidity_medium" }
+    if (props.event.totalLiquidityProvided < 1000)
+        return { text: "Low", icon: "liquidity_low" }
+})
 
-                            if (!result.completed) {
-                                // todo: handle it?
-                            }
-                        })
-                        .catch((err) => {
-                            accountStore.pendingTransaction.awaiting = false
-                            isWithdrawing.value = false
-                        })
+const participantsAvatars = computed(() => {
+    let avatars = [
+        ...props.event.bets.map((bet) => bet.userId),
+        ...props.event.deposits.map((deposit) => deposit.userId),
+    ]
 
-                    notificationsStore.create({
-                        notification: {
-                            type: "success",
-                            title: "Withdrawal request sent",
-                            description:
-                                "Processing takes about 10-30 seconds. Funds will appear in your wallet soon",
-                            autoDestroy: true,
-                        },
-                    })
+    /** remove duplicates */
+    avatars = [...new Set(avatars)]
 
-                    analytics.log("onWithdraw", {
-                        eventId: event.value.id,
-                    })
+    return avatars
+})
+
+const userTVL = computed(() => {
+    let tvl = 0
+
+    tvl += props.event.deposits
+        .filter((deposit) => deposit.userId == accountStore.pkh)
+        .reduce((a, { amountBelow }) => a + amountBelow, 0)
+    tvl += props.event.bets
+        .filter((bet) => bet.userId == accountStore.pkh)
+        .reduce((a, { amount }) => a + amount, 0)
+
+    return tvl
+})
+
+/** Win & Withdraw */
+const won = computed(() => {
+    if (!props.event) return
+
+    return !!props.event.bets
+        .filter((bet) => bet.userId == accountStore.pkh)
+        .filter((bet) => bet.side == props.event.winnerBets).length
+})
+const positionForWithdraw = computed(() => {
+    return accountStore.wonPositions.find(
+        (position) => position.event.id == props.event.id,
+    )
+})
+
+/** Join to the event & Liquidity */
+const handleBet = (target) => {
+    preselectedSide.value = capitalizeFirstLetter(target)
+
+    /** disable Bet / Liquidity right after betsCloseTime */
+    if (
+        startStatus.value == "Finished" ||
+        props.event.totalLiquidityProvided == 0
+    )
+        return
+
+    analytics.log("showBetModal", { where: "event_card" })
+
+    showBetModal.value = true
+}
+
+/** Withdraw */
+const isWithdrawing = ref(false)
+const handleWithdraw = (e) => {
+    isWithdrawing.value = true
+
+    analytics.log("clickWithdraw", { where: "event_card" })
+
+    juster.sdk
+        .withdraw(props.event.id, accountStore.pkh)
+        .then((op) => {
+            /** Pending transaction label */
+            accountStore.pendingTransaction.awaiting = true
+
+            op.confirmation()
+                .then((result) => {
+                    accountStore.pendingTransaction.awaiting = false
+                    isWithdrawing.value = false
+
+                    /** rm won position from store */
+                    accountStore.positionsForWithdrawal =
+                        accountStore.positionsForWithdrawal.filter(
+                            (position) => position.event.id != props.event.id,
+                        )
+
+                    updateWithdrawals()
+
+                    if (!result.completed) {
+                        // todo: handle it?
+                    }
                 })
                 .catch((err) => {
                     accountStore.pendingTransaction.awaiting = false
                     isWithdrawing.value = false
                 })
-        }
 
-        const handleParticipants = () => {
-            showParticipantsModal.value = true
+            notificationsStore.create({
+                notification: {
+                    type: "success",
+                    title: "Withdrawal request sent",
+                    description:
+                        "Processing takes about 10-30 seconds. Funds will appear in your wallet soon",
+                    autoDestroy: true,
+                },
+            })
 
-            analytics.log("showParticipantsModal", { where: "event_card" })
-        }
+            analytics.log("onWithdraw", {
+                eventId: props.event.id,
+            })
+        })
+        .catch((err) => {
+            accountStore.pendingTransaction.awaiting = false
+            isWithdrawing.value = false
+        })
+}
 
-        const copy = (target) => {
-            if (target == "id") {
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "Event ID copied to clipboard",
-                        description: "Use Ctrl+V to paste",
-                        autoDestroy: true,
+const handleParticipants = () => {
+    showParticipantsModal.value = true
+
+    analytics.log("showParticipantsModal", { where: "event_card" })
+}
+
+const copy = (target) => {
+    if (target == "id") {
+        notificationsStore.create({
+            notification: {
+                type: "success",
+                title: "Event ID copied to clipboard",
+                description: "Use Ctrl+V to paste",
+                autoDestroy: true,
+            },
+        })
+
+        toClipboard(props.event.id)
+    }
+    if (target == "url") {
+        notificationsStore.create({
+            notification: {
+                type: "success",
+                title: "Event URL copied to clipboard",
+                description: "Use Ctrl+V to paste",
+                autoDestroy: true,
+            },
+        })
+
+        toClipboard(location)
+    }
+}
+
+/** Context menu */
+const contextMenuStyles = reactive({
+    top: 0,
+    left: 0,
+})
+const contextMenuHandler = (e) => {
+    e.preventDefault()
+
+    analytics.log("showContextMenu")
+
+    contextMenuStyles.top = `${e.clientY}px`
+    contextMenuStyles.left = `${e.clientX}px`
+
+    openContextMenu.value = !openContextMenu.value
+}
+
+onMounted(async () => {
+    if (card.value)
+        card.value.addEventListener("contextmenu", contextMenuHandler)
+
+    if (props.event.status === "FINISHED") return
+
+    /** Subscription, TODO: refactor */
+    subscription.value = await juster.gql
+        .subscription({
+            event: [
+                {
+                    where: { id: { _eq: props.event.id } },
+                },
+                {
+                    id: true,
+                    poolAboveEq: true,
+                    poolBelow: true,
+                    totalLiquidityShares: true,
+                    totalValueLocked: true,
+                    totalLiquidityProvided: true,
+                    createdTime: true,
+                    creatorId: true,
+                    betsCloseTime: true,
+                    liquidityPercent: true,
+                    status: true,
+                    startRate: true,
+                    closedRate: true,
+                    winnerBets: true,
+                    bets: {
+                        id: true,
+                        side: true,
+                        reward: true,
+                        amount: true,
+                        createdTime: true,
+                        userId: true,
                     },
-                })
-
-                toClipboard(event.value.id)
-            }
-            if (target == "url") {
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "Event URL copied to clipboard",
-                        description: "Use Ctrl+V to paste",
-                        autoDestroy: true,
+                    deposits: {
+                        amountAboveEq: true,
+                        amountBelow: true,
+                        eventId: true,
+                        id: true,
+                        userId: true,
+                        createdTime: true,
+                        shares: true,
                     },
-                })
-
-                toClipboard(location)
-            }
-        }
-
-        /** Context menu */
-        const contextMenuStyles = reactive({
-            top: 0,
-            left: 0,
+                },
+            ],
         })
-        const contextMenuHandler = (e) => {
-            e.preventDefault()
+        .subscribe({
+            next: (data) => {
+                const { event: newEvent } = data
 
-            analytics.log("showContextMenu")
-
-            contextMenuStyles.top = `${e.clientY}px`
-            contextMenuStyles.left = `${e.clientX}px`
-
-            openContextMenu.value = !openContextMenu.value
-        }
-
-        onMounted(async () => {
-            card.value.addEventListener("contextmenu", contextMenuHandler)
-
-            if (event.value.status === "FINISHED") return
-
-            /** Subscription, TODO: refactor */
-            subscription.value = await juster.gql
-                .subscription({
-                    event: [
-                        {
-                            where: { id: { _eq: event.value.id } },
-                        },
-                        {
-                            id: true,
-                            poolAboveEq: true,
-                            poolBelow: true,
-                            totalLiquidityShares: true,
-                            totalValueLocked: true,
-                            totalLiquidityProvided: true,
-                            createdTime: true,
-                            creatorId: true,
-                            betsCloseTime: true,
-                            liquidityPercent: true,
-                            status: true,
-                            startRate: true,
-                            closedRate: true,
-                            winnerBets: true,
-                            bets: {
-                                id: true,
-                                side: true,
-                                reward: true,
-                                amount: true,
-                                createdTime: true,
-                                userId: true,
-                            },
-                            deposits: {
-                                amountAboveEq: true,
-                                amountBelow: true,
-                                eventId: true,
-                                id: true,
-                                userId: true,
-                                createdTime: true,
-                                shares: true,
-                            },
-                        },
-                    ],
-                })
-                .subscribe({
-                    next: (data) => {
-                        const { event: newEvent } = data
-
-                        marketStore.updEvent(newEvent[0])
-                    },
-                    error: console.error,
-                })
+                marketStore.updEvent(newEvent[0])
+            },
+            error: console.error,
         })
+})
 
-        onBeforeUnmount(() => {
-            card.value.removeEventListener("contextmenu", contextMenuHandler)
-        })
+onBeforeUnmount(() => {
+    card.value.removeEventListener("contextmenu", contextMenuHandler)
+})
 
-        onUnmounted(() => {
-            if (
-                subscription.value.hasOwnProperty("_state") &&
-                !subscription.value?.closed
-            ) {
-                subscription.value.unsubscribe()
-            }
+onUnmounted(() => {
+    if (
+        subscription.value.hasOwnProperty("_state") &&
+        !subscription.value?.closed
+    ) {
+        subscription.value.unsubscribe()
+    }
 
-            destroyStartCountdown()
-            destroyFinishCountdown()
-        })
-
-        return {
-            DateTime,
-            accountStore,
-            card,
-            openContextMenu,
-            contextMenuStyles,
-            showBetModal,
-            preselectedSide,
-            showLiquidityModal,
-            showParticipantsModal,
-            event,
-            timing,
-            timeToStart,
-            startStatus,
-            timeToFinish,
-            symbol,
-            liquidityLevel,
-            participantsAvatars,
-            userTVL,
-            won,
-            positionForWithdraw,
-            handleBet,
-            handleParticipants,
-            isWithdrawing,
-            handleWithdraw,
-            copy,
-            getCurrencyIcon,
-            abbreviateNumber,
-            supportedMarkets,
-            verifiedMakers,
-            currentNetwork,
-            eventDuration,
-        }
-    },
-
-    components: {
-        EventActions,
-        Button,
-        Badge,
-        Tooltip,
-        Dropdown,
-        DropdownItem,
-        DropdownDivider,
-        ParticipantsModal,
-        LiquidityModal,
-        BetModal,
-    },
+    destroyStartCountdown()
+    destroyFinishCountdown()
 })
 </script>
 
@@ -548,6 +485,15 @@ export default defineComponent({
                                 ]"
                                 alt="avatar"
                             />
+                            <div
+                                v-if="participantsAvatars.length > 3"
+                                :class="[
+                                    $style.participant,
+                                    $style.more_participants,
+                                ]"
+                            >
+                                +3
+                            </div>
                         </div>
 
                         <template v-slot:content
@@ -612,20 +558,13 @@ export default defineComponent({
 
             <div :class="$style.timing">
                 <div :class="$style.days">
-                    {{
-                        `${timing.start.day} ${
-                            timing.showDay ? `- ${timing.end.day}` : ``
-                        } ${timing.start.month}`
-                    }}
+                    {{ `${timing.start.day} ${timing.start.month}` }}
                 </div>
 
                 <div :class="$style.dot" />
 
                 <div :class="$style.hrs">
                     {{ timing.start.time }}
-                    ->
-                    {{ timing.end.time }}
-                    <span>({{ eventDuration }})</span>
                 </div>
             </div>
 
@@ -701,14 +640,41 @@ export default defineComponent({
                     >
                 </Tooltip>
 
+                <!-- Duration Badge -->
+                <Badge color="gray" :class="$style.badge">
+                    <Icon name="time" size="12" />
+                    <div>
+                        {{
+                            toReadableDuration({
+                                seconds: event.measurePeriod,
+                                asObject: true,
+                            }).val
+                        }}
+                        <span>{{
+                            pluralize(
+                                toReadableDuration({
+                                    seconds: event.measurePeriod,
+                                    asObject: true,
+                                }).val,
+                                toReadableDuration({
+                                    seconds: event.measurePeriod,
+                                    asObject: true,
+                                }).text,
+                            )
+                        }}</span>
+                    </div>
+                </Badge>
+
+                <!-- Hot Event Badge -->
                 <Badge
-                    v-if="participantsAvatars.length >= 3"
+                    v-if="participantsAvatars.length >= 6"
                     color="red"
                     :class="$style.badge"
                 >
                     <Icon name="hot" size="12" />
                 </Badge>
 
+                <!-- Custom Badge -->
                 <Tooltip
                     v-if="event.creatorId !== verifiedMakers[currentNetwork]"
                     position="bottom"
@@ -721,6 +687,7 @@ export default defineComponent({
                     <template v-slot:content>Custom event from user</template>
                 </Tooltip>
 
+                <!-- TVL Badge -->
                 <Tooltip position="bottom" side="right">
                     <Badge v-if="userTVL" color="gray" :class="$style.badge">
                         <img
@@ -810,32 +777,23 @@ export default defineComponent({
 
                 <Tooltip
                     v-if="event.status !== 'FINISHED'"
+                    position="top"
                     side="left"
                     textAlign="left"
                 >
                     <div
                         :class="[
                             $style.hint,
-                            liquidityLevel == 'Low' && $style.red,
-                            liquidityLevel == 'Medium' && $style.yellow,
-                            liquidityLevel == 'High' && $style.green,
-                            liquidityLevel == 'Ultra' && $style.red,
+                            liquidityLevel.text == 'Low' && $style.red,
+                            liquidityLevel.text == 'Medium' && $style.yellow,
+                            liquidityLevel.text == 'High' && $style.green,
+                            liquidityLevel.text == 'Ultra' && $style.red,
                         ]"
                     >
-                        <Icon
-                            :name="
-                                (liquidityLevel == 'Low' && 'liquidity_low') ||
-                                (liquidityLevel == 'Medium' &&
-                                    'liquidity_medium') ||
-                                (liquidityLevel == 'High' &&
-                                    'liquidity_high') ||
-                                (liquidityLevel == 'Ultra' && 'liquidity_ultra')
-                            "
-                            size="14"
-                        />
+                        <Icon :name="liquidityLevel.icon" size="14" />
 
                         <div>
-                            <span>{{ liquidityLevel }}</span>
+                            <span>{{ liquidityLevel.text }}</span>
                             liquidity
                         </div>
                     </div>
@@ -963,7 +921,7 @@ export default defineComponent({
 }
 
 .participant {
-    margin-left: -12px;
+    margin-left: -6px;
 }
 
 .creator {
@@ -995,8 +953,27 @@ export default defineComponent({
 
     background: rgb(35, 35, 35);
     border-radius: 50px;
+    outline: 3px solid var(--card-bg);
 
     padding: 2px;
+}
+
+.more_participants {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--text-blue);
+
+    background: rgb(35, 35, 35);
+    border-radius: 50px;
+    outline: 3px solid var(--card-bg);
 }
 
 .title {
@@ -1071,7 +1048,7 @@ export default defineComponent({
 }
 
 .main_badge {
-    margin-right: 12px;
+    margin-right: 8px;
 }
 
 .badge {

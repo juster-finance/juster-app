@@ -1,6 +1,11 @@
 <script>
 import { defineComponent, reactive, onMounted, toRefs, ref } from "vue"
 
+/**
+ * UI
+ */
+import Button from "@/components/ui/Button"
+
 export default defineComponent({
     name: "Tooltip",
     props: {
@@ -10,6 +15,7 @@ export default defineComponent({
         side: { type: String },
         position: { type: String },
         textAlign: { type: String, default: "center" },
+        button: { type: Object },
     },
 
     setup(props) {
@@ -57,6 +63,8 @@ export default defineComponent({
 
         return { styles, trigger, tip }
     },
+
+    components: { Button },
 })
 </script>
 
@@ -70,6 +78,14 @@ export default defineComponent({
             <div :class="[$style.text]" :style="{ textAlign }">
                 <slot name="content" />
             </div>
+
+            <router-link v-if="button" :to="button.url">
+                <Button type="secondary" size="mini" :class="$style.btn" block
+                    ><Icon :name="button.icon" size="12" />{{
+                        button.text
+                    }}</Button
+                >
+            </router-link>
         </div>
     </div>
 </template>
@@ -116,5 +132,9 @@ export default defineComponent({
 .text span {
     font-weight: 500;
     color: var(--text-secondary);
+}
+
+.btn {
+    margin: 8px 0 2px 0;
 }
 </style>

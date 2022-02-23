@@ -11,6 +11,11 @@ import { useAccountStore } from "@/store/account"
  */
 import { abbreviateNumber } from "@/services/utils/amounts"
 
+/**
+ * UI
+ */
+import Tooltip from "@/components/ui/Tooltip"
+
 const props = defineProps({
     event: {
         type: Object,
@@ -70,6 +75,13 @@ const profit = computed(() => {
 
     return reward
 })
+
+const hasHedge = computed(() => {
+    const hasRiseBet = props.userBets.some((bet) => bet.side == "ABOVE_EQ")
+    const hasFallBet = props.userBets.some((bet) => bet.side == "BELOW")
+
+    return hasRiseBet && hasFallBet
+})
 </script>
 
 <template>
@@ -116,12 +128,34 @@ const profit = computed(() => {
                     }}
                 </div>
 
-                <div :class="$style.amount">
+                <div v-if="!hasHedge" :class="$style.amount">
                     {{ (returnOnBets - bvl).toFixed(2) }} <span>ꜩ</span>
                 </div>
+                <div v-else :class="$style.amount">TBD</div>
             </div>
 
+            <Tooltip v-if="hasHedge && event.status !== 'FINISHED'">
+                <div
+                    :class="[
+                        $style.icon,
+                        returnOnBets - bvl > 0 &&
+                            event.status == 'FINISHED' &&
+                            $style.green,
+                        hasHedge && $style.yellow,
+                    ]"
+                >
+                    <Icon name="warning" size="20" />
+                </div>
+
+                <template #content
+                    >Your bets are aimed both ways.<br /><span
+                        >The final profit will be calculated at the end of the
+                        event</span
+                    ></template
+                >
+            </Tooltip>
             <div
+                v-else
                 :class="[
                     $style.icon,
                     returnOnBets - bvl > 0 &&
@@ -210,6 +244,11 @@ const profit = computed(() => {
 .icon.green {
     background: rgba(26, 161, 104, 0.15);
     fill: var(--green);
+}
+
+.icon.yellow {
+    background: rgba(245, 183, 43, 0.15);
+    fill: var(--yellow);
 }
 
 .hint {

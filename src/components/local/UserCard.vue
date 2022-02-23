@@ -1,5 +1,5 @@
-<script>
-import { defineComponent, toRefs } from "vue"
+<script setup>
+import { toRefs } from "vue"
 
 /**
  * UI
@@ -16,6 +16,7 @@ import {
  */
 import { currentNetwork } from "@/services/sdk"
 import { toClipboard } from "@/services/utils/global"
+import { verifiedMakers } from "@/services/config"
 
 /**
  * Store
@@ -23,50 +24,35 @@ import { toClipboard } from "@/services/utils/global"
 import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
 
-export default defineComponent({
-    name: "UserCard",
-    props: {
-        user: Object,
-    },
+const props = defineProps({ user: { type: Object } })
 
-    setup(props) {
-        const { user } = toRefs(props)
+const accountStore = useAccountStore()
+const notificationsStore = useNotificationsStore()
 
-        const accountStore = useAccountStore()
-        const notificationsStore = useNotificationsStore()
-
-        const handleCopy = (target) => {
-            if (target == "address") {
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "User address copied to clipboard",
-                        description: "Use Ctrl+V to paste",
-                        autoDestroy: true,
-                    },
-                })
-                toClipboard(user.value.userId)
-            }
-            if (target == "url") {
-                notificationsStore.create({
-                    notification: {
-                        type: "success",
-                        title: "Profile URL copied to clipboard",
-                        description: "Use Ctrl+V to paste",
-                        autoDestroy: true,
-                    },
-                })
-                toClipboard(
-                    `https://app.juster.fi/profile/${user.value.userId}`,
-                )
-            }
-        }
-
-        return { handleCopy, accountStore, currentNetwork }
-    },
-
-    components: { Button, Dropdown, DropdownItem, DropdownDivider },
-})
+const handleCopy = (target) => {
+    if (target == "address") {
+        notificationsStore.create({
+            notification: {
+                type: "success",
+                title: "User address copied to clipboard",
+                description: "Use Ctrl+V to paste",
+                autoDestroy: true,
+            },
+        })
+        toClipboard(props.user.userId)
+    }
+    if (target == "url") {
+        notificationsStore.create({
+            notification: {
+                type: "success",
+                title: "Profile URL copied to clipboard",
+                description: "Use Ctrl+V to paste",
+                autoDestroy: true,
+            },
+        })
+        toClipboard(`https://app.juster.fi/profile/${props.user.userId}`)
+    }
+}
 </script>
 
 <template>
@@ -74,15 +60,38 @@ export default defineComponent({
         <div :class="$style.left">
             <div :class="$style.avatar">
                 <img
+                    v-if="verifiedMakers[currentNetwork] !== user.userId"
                     :src="`https://services.tzkt.io/v1/avatars/${user.userId}`"
                     alt="avatar"
                 />
-                <Icon v-if="user.creator" name="verified" size="14" />
+                <Icon
+                    v-else
+                    name="logo_symbol"
+                    size="24"
+                    :class="$style.logo_icon"
+                />
+
+                <Icon
+                    v-if="
+                        user.creator ||
+                        verifiedMakers[currentNetwork] == user.userId
+                    "
+                    name="verified"
+                    size="14"
+                    :class="$style.verified_icon"
+                />
             </div>
 
             <div :class="$style.base">
                 <div @click="handleCopy('address')" :class="$style.address">
-                    <template v-if="user.userId !== accountStore.pkh">
+                    <!-- By Juster -->
+                    <template
+                        v-if="verifiedMakers[currentNetwork] == user.userId"
+                    >
+                        Juster
+                    </template>
+                    <!-- User -->
+                    <template v-else-if="user.userId !== accountStore.pkh">
                         {{
                             `${user.userId.slice(0, 8)}..${user.userId.slice(
                                 user.userId.length - 3,
@@ -192,12 +201,20 @@ export default defineComponent({
     background: #121212;
 }
 
-.avatar svg {
+.verified_icon {
     position: absolute;
-    top: -2px;
-    right: -2px;
+    top: 0px;
+    right: 0px;
 
-    fill: var(--yellow);
+    fill: var(--orange);
+    background: var(--card-bg);
+    border-radius: 50%;
+}
+
+.logo_icon {
+    padding: 2px;
+
+    fill: var(--text-secondary);
 }
 
 .avatar img {
