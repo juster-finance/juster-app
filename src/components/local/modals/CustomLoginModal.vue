@@ -1,5 +1,5 @@
-<script>
-import { defineComponent, ref } from "vue"
+<script setup>
+import { ref } from "vue"
 
 /**
  * UI
@@ -16,83 +16,65 @@ import { useNotificationsStore } from "@/store/notifications"
  * Services
  */
 import { rpcNodes } from "@/services/config"
+import { currentNetwork } from "@/services/sdk"
 
-export default defineComponent({
-    name: "CustomLoginModal",
-    props: { show: Boolean },
-    emits: ["onSelectCustomNode"],
+const props = defineProps({ show: { type: Boolean } })
+const emit = defineEmits(["onSelectCustomNode"])
 
-    setup(props, context) {
-        const notificationsStore = useNotificationsStore()
+const notificationsStore = useNotificationsStore()
 
-        const selectedNode = ref({})
-        const handleSelectNode = (node) => {
-            selectedNode.value = node
+const selectedNode = ref({})
+const handleSelectNode = (node) => {
+    selectedNode.value = node
 
-            customRPC.value = ""
+    customRPC.value = ""
+}
+
+const customRPC = ref("")
+const handleCustomRPC = () => {
+    const url = prompt("Enter RPC base URL (Start with `https://`):")
+    const urlRegex =
+        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
+
+    if (!url) return
+
+    if (urlRegex.test(url)) {
+        customRPC.value = url
+
+        selectedNode.value = {
+            name: "Custom RPC Node",
+            url,
         }
+    } else {
+        notificationsStore.create({
+            notification: {
+                type: "warning",
+                title: "Wrong URL format",
+                description: "Please note that the link must start with https",
+                autoDestroy: true,
+            },
+        })
+    }
+}
 
-        const customRPC = ref("")
-        const handleCustomRPC = () => {
-            const url = prompt("Enter RPC base URL (Start with `https://`):")
-            const urlRegex =
-                /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
-
-            if (!url) return
-
-            if (urlRegex.test(url)) {
-                customRPC.value = url
-
-                selectedNode.value = {
-                    name: "Custom RPC Node",
-                    url,
-                }
-            } else {
-                notificationsStore.create({
-                    notification: {
-                        type: "warning",
-                        title: "Wrong URL format",
-                        description:
-                            "Please note that the link must start with https",
-                        autoDestroy: true,
-                    },
-                })
-            }
-        }
-
-        const handleContinue = () => {
-            context.emit("onSelectCustomNode", selectedNode)
-        }
-
-        return {
-            rpcNodes,
-            selectedNode,
-            handleSelectNode,
-            customRPC,
-            handleCustomRPC,
-            handleContinue,
-        }
-    },
-
-    components: {
-        Modal,
-        Button,
-    },
-})
+const handleContinue = () => {
+    emit("onSelectCustomNode", selectedNode)
+}
 </script>
 
 <template>
     <Modal :show="show" width="500" closable @onClose="$emit('onClose')">
-        <div :class="$style.title">Sign in to Juster</div>
+        <div :class="$style.title">Custom Sign in</div>
         <div :class="$style.description">
-            Custom login with a choice of RPC nodes
+            Select an RPC node from the ready-made list based on the selected
+            network ({{ currentNetwork }}) or enter it manually
         </div>
 
         <div :class="$style.subtitle">Select RPC node</div>
 
         <div :class="$style.nodes">
             <div
-                v-for="node in rpcNodes"
+                v-for="node in rpcNodes[currentNetwork]"
                 :key="node.name"
                 @click="handleSelectNode(node)"
                 :class="$style.node"
@@ -129,11 +111,6 @@ export default defineComponent({
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div :class="$style.hint">
-            Sometimes the network may be updated or temporarily unavailable, so
-            there must be an alternative for you
         </div>
 
         <Button
@@ -182,6 +159,8 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     gap: 8px;
+
+    margin-bottom: 32px;
 }
 
 .node {
@@ -235,14 +214,5 @@ export default defineComponent({
 
 .base div:nth-child(2) svg {
     margin-right: 6px;
-}
-
-.hint {
-    font-size: 12px;
-    line-height: 1.6;
-    font-weight: 500;
-    color: var(--text-tertiary);
-
-    margin: 8px 0 32px 0;
 }
 </style>
