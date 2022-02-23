@@ -122,6 +122,15 @@ const priceDynamics = computed(() => {
 
     return { diff, percent }
 })
+
+const endDiff = computed(() =>
+    DateTime.fromISO(props.event.betsCloseTime)
+        .plus({
+            second: props.event.measurePeriod,
+        })
+        .diff(DateTime.fromISO(props.event.betsCloseTime), ["hours"])
+        .toObject(),
+)
 </script>
 
 <template>
@@ -332,11 +341,22 @@ const priceDynamics = computed(() => {
                 "
                 :class="$style.param"
             >
-                <span><Icon name="time" size="12" />Start In</span>
+                <span><Icon name="time" size="12" />Start</span>
 
-                <span v-if="startStatus == 'In progress'">{{
-                    startCountdown
-                }}</span>
+                <span v-if="startStatus == 'In progress'">
+                    <!-- in X days -->
+                    <template v-if="endDiff.hours > 24">
+                        {{
+                            DateTime.fromISO(event.betsCloseTime)
+                                .setLocale("en")
+                                .toRelative()
+                        }}
+                    </template>
+                    <!-- 00:00:00 -->
+                    <template v-else>
+                        {{ finishCountdown }}
+                    </template>
+                </span>
                 <span v-else-if="startStatus == 'Finished'">Soon</span>
             </div>
 
@@ -347,11 +367,23 @@ const priceDynamics = computed(() => {
                 "
                 :class="$style.param"
             >
-                <span><Icon name="time" size="12" />Finish In</span>
+                <span><Icon name="time" size="12" />Finish</span>
 
-                <span v-if="finishStatus == 'In progress'">{{
-                    finishCountdown
-                }}</span>
+                <span v-if="finishStatus == 'In progress'">
+                    <!-- in X days -->
+                    <template v-if="endDiff.hours > 24">
+                        {{
+                            DateTime.fromISO(event.betsCloseTime)
+                                .setLocale("en")
+                                .plus({ second: event.measurePeriod })
+                                .toRelative()
+                        }}
+                    </template>
+                    <!-- 00:00:00 -->
+                    <template v-else>
+                        {{ finishCountdown }}
+                    </template>
+                </span>
                 <span v-else-if="finishStatus == 'Finished'">Soon</span>
             </div>
 

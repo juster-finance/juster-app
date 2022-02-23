@@ -738,12 +738,14 @@ onUnmounted(() => {
                 >
                     <Icon name="time" size="14" />
                     <div>
-                        Ending in
+                        Ending
                         <span>
                             {{
-                                timeToFinish.num == 0 ? "<1" : timeToFinish.num
+                                DateTime.fromISO(event.betsCloseTime)
+                                    .plus({ second: event.measurePeriod })
+                                    .setLocale("en")
+                                    .toRelative()
                             }}
-                            {{ timeToFinish.suffix }}
                         </span>
                     </div>
                 </div>
