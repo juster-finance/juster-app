@@ -155,6 +155,8 @@ const currentPage = ref(1)
 
 let filters = ref(cloneDeep(defaultFilters))
 
+const showFilters = ref(false)
+
 /** reset "currentPage" when changing filters */
 watch(
     filters.value,
@@ -466,6 +468,16 @@ const { meta } = useMeta({
             List of all new, active, and past events with customizable filtering
         </div>
 
+        <Button
+            @click="showFilters = !showFilters"
+            type="secondary"
+            size="small"
+            block
+            :class="$style.show_filters_btn"
+            ><Icon name="filter" size="14" />
+            {{ showFilters ? "Hide" : "Show" }} Filters</Button
+        >
+
         <div :class="$style.container">
             <EventsFilters
                 :filters="filters"
@@ -477,7 +489,7 @@ const { meta } = useMeta({
                 @onSelect="handleSelect"
                 @onReset="handleResetFilters"
                 @onManageParticipant="handleManageParticipant"
-                :class="$style.filters_block"
+                :class="[$style.filters_block, showFilters && $style.show]"
             />
 
             <div :class="$style.events_base">
@@ -536,6 +548,12 @@ const { meta } = useMeta({
     color: var(--text-tertiary);
 
     margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+.show_filters_btn {
+    display: none;
+
     margin-bottom: 24px;
 }
 
@@ -545,7 +563,7 @@ const { meta } = useMeta({
 }
 
 .filters_block {
-    width: 300px;
+    max-width: 300px;
 }
 
 .events_base {
@@ -560,6 +578,25 @@ const { meta } = useMeta({
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-gap: 16px;
+}
+
+@media (max-width: 700px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .show_filters_btn {
+        display: flex;
+    }
+
+    .filters_block {
+        display: none;
+        max-width: initial;
+    }
+
+    .filters_block.show {
+        display: initial;
+    }
 }
 
 @media (max-width: 420px) {
