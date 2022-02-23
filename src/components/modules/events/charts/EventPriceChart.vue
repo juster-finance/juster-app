@@ -8,6 +8,7 @@ import {
     onBeforeUnmount,
     useCssModule,
     computed,
+    nextTick,
 } from "vue"
 import * as d3 from "d3"
 import { DateTime } from "luxon"
@@ -83,7 +84,7 @@ export default defineComponent({
                 .append("g")
                 .attr("transform", `translate(${margin.left},${margin.top})`)
 
-            const data = prepareQuotesForD3({ quotes: symbol.quotes })
+            let data = prepareQuotesForD3({ quotes: symbol.quotes })
 
             const chartEars = {
                 hour: 0,
@@ -98,7 +99,7 @@ export default defineComponent({
 
             /** 6h */
             if (event.value.measurePeriod == 21600) {
-                chartEars.hour = 5
+                chartEars.hour = 6
                 chartEars.minute = 30
             }
 
@@ -106,6 +107,21 @@ export default defineComponent({
             if (event.value.measurePeriod == 86400) {
                 chartEars.hour = 24
                 chartEars.minute = 0
+            }
+
+            /** 7d */
+            if (event.value.measurePeriod == 604800) {
+                chartEars.hour = 24 * 7
+                chartEars.minute = 0
+            }
+
+            /** Simplify the data for 7d */
+            if (event.value.measurePeriod == 604800) {
+                const lastQuote = data[data.length - 1]
+                data = data.filter(
+                    (quote) => DateTime.fromJSDate(quote.date).minute % 60 == 0,
+                )
+                data.push(lastQuote)
             }
 
             let eventPeriod = [
@@ -209,7 +225,14 @@ export default defineComponent({
 
                     tickG.append("text").attr("y", 190).text("Finish")
                 } else {
-                    tickG.append("text").attr("y", 190).text(format(tick))
+                    if (format(tick) == "00:00") {
+                        tickG
+                            .append("text")
+                            .attr("y", 190)
+                            .text(DateTime.fromJSDate(tick).toFormat("LLL dd"))
+                    } else {
+                        tickG.append("text").attr("y", 190).text(format(tick))
+                    }
                 }
             })
 
@@ -253,12 +276,53 @@ export default defineComponent({
                 })
             }
 
+            /** find Start & Finish tick for 7d */
+            if (event.value.measurePeriod == 604800) {
+                scale.x.ticks(280).forEach((tick) => {
+                    const tickG = canvas
+                        .append("g")
+                        .attr("transform", `translate(${scale.x(tick)}, 0)`)
+
+                    tickG
+                        .append("line")
+                        .attr("y2", 170)
+                        .attr("class", classes.time_line_transparent)
+
+                    if (
+                        DateTime.fromISO(event.value.betsCloseTime).ordinal ==
+                            DateTime.fromJSDate(tick).ordinal &&
+                        DateTime.fromISO(event.value.betsCloseTime).hour ==
+                            DateTime.fromJSDate(tick).hour &&
+                        DateTime.fromJSDate(tick).minute == 0
+                    ) {
+                        tickG.attr("class", classes.start)
+
+                        tickG.append("text").attr("y", 190).text("Start")
+                    } else if (
+                        DateTime.fromJSDate(tick).ordinal ==
+                            DateTime.fromISO(event.value.betsCloseTime).plus({
+                                hour: event.value.measurePeriod / 3600,
+                            }).ordinal &&
+                        DateTime.fromJSDate(tick).hour ==
+                            DateTime.fromISO(event.value.betsCloseTime).plus({
+                                hour: event.value.measurePeriod / 3600,
+                            }).hour &&
+                        DateTime.fromJSDate(tick).minute == 0
+                    ) {
+                        tickG.attr("class", classes.start)
+
+                        tickG.append("text").attr("y", 190).text("Finish")
+                    }
+                })
+            }
+
             /** Draw chart Before start */
             const dataBeforeStart = data.filter(
                 (quote) =>
                     DateTime.fromJSDate(quote.date).ts <
                     DateTime.fromISO(event.value.betsCloseTime).ts,
             )
+
             chart
                 .append("path")
                 .datum(dataBeforeStart)
@@ -389,6 +453,41 @@ export default defineComponent({
             circles.remove()
         }
 
+        const getQuotes = async (tsGt, tsLt, ears) => {
+            const rawQuotes = await fetchQuoteByRange({
+                id: event.value.currencyPair.id,
+                tsGt: tsGt.toJSDate(),
+                tsLt: tsLt.toJSDate(),
+            })
+
+            return rawQuotes
+        }
+
+        const fillQuotes = async (tsGt) => {
+            if (!symbol.quotes.length) return
+
+            const lastQuoteDt = DateTime.fromISO(
+                symbol.quotes[symbol.quotes.length - 1].timestamp,
+            )
+
+            if (lastQuoteDt.ts !== tsGt.ts) {
+                const rawQuotes = await getQuotes(tsGt, lastQuoteDt)
+
+                let newQuotes = [...rawQuotes]
+
+                newQuotes.shift()
+
+                symbol.quotes = [...symbol.quotes, ...newQuotes]
+
+                if (
+                    DateTime.fromISO(newQuotes[newQuotes.length - 1].timestamp)
+                        .ts !== tsGt.ts
+                ) {
+                    await fillQuotes(tsGt)
+                }
+            }
+        }
+
         onMounted(async () => {
             const chartEars = {
                 hour: 0,
@@ -403,7 +502,7 @@ export default defineComponent({
 
             /** 6h */
             if (event.value.measurePeriod == 21600) {
-                chartEars.hour = 5
+                chartEars.hour = 6
                 chartEars.minute = 30
             }
 
@@ -413,22 +512,37 @@ export default defineComponent({
                 chartEars.minute = 0
             }
 
-            const quotes = await fetchQuoteByRange({
-                id: event.value.currencyPair.id,
-                tsGt: DateTime.fromISO(event.value.betsCloseTime)
-                    .minus({ hour: chartEars.hour, minute: chartEars.minute })
-                    .toJSDate(),
-                tsLt: DateTime.fromISO(event.value.betsCloseTime)
-                    .plus({
-                        hour: parseInt(event.value.measurePeriod) / 3600,
-                    })
-                    .toJSDate(),
-            })
+            /** 7d */
+            if (event.value.measurePeriod == 604800) {
+                chartEars.hour = 24 * 7
+                chartEars.minute = 0
+            }
+
+            const quotes = await getQuotes(
+                DateTime.fromISO(event.value.betsCloseTime).minus({
+                    hour: chartEars.hour,
+                    minute: chartEars.minute,
+                }),
+                DateTime.fromISO(event.value.betsCloseTime).plus({
+                    hour: parseInt(event.value.measurePeriod) / 3600,
+                }),
+                chartEars,
+            )
 
             symbol.quotes = [...quotes]
+
+            await fillQuotes(
+                DateTime.fromISO(event.value.betsCloseTime).minus({
+                    hour: chartEars.hour,
+                    minute: chartEars.minute,
+                }),
+            )
+
             symbol.isQuotesLoaded = true
 
-            draw()
+            nextTick(() => {
+                draw()
+            })
 
             if (event.value.status !== "FINISHED") {
                 subscription.value = await juster.gql
@@ -512,8 +626,11 @@ export default defineComponent({
 
 <template>
     <div :class="$style.wrapper">
+        <Banner v-if="!symbol.isQuotesLoaded" loading color="gray">
+            Loading quotes..
+        </Banner>
         <Banner
-            v-if="symbol.isQuotesLoaded && !symbol.quotes.length"
+            v-else-if="symbol.isQuotesLoaded && !symbol.quotes.length"
             icon="help"
             color="gray"
             >Quotes for the event are not yet available, please wait for the

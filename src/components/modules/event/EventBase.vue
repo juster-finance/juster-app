@@ -565,10 +565,7 @@ const { meta } = useMeta({
 
         <div v-if="event" :class="$style.container">
             <div :class="$style.base">
-                <EventChart
-                    v-if="event && event.status !== 'CANCELED'"
-                    :event="event"
-                />
+                <EventChart v-if="event" :event="event" />
 
                 <div :class="$style.block">
                     <div :class="$style.title">Personal stats</div>
