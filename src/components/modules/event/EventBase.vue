@@ -780,20 +780,6 @@ const { meta } = useMeta({
                     :class="$style.details_btn"
                     ><Icon name="menu" size="12" />View event details</Button
                 >
-
-                <!-- <div :class="$style.additional_buttons">
-                    <Button type="secondary" size="mini" disabled
-                        ><Icon name="flag" size="16" />Report this event</Button
-                    >
-                    <router-link to="/docs/how-to-bet">
-                        <Button type="secondary" size="mini"
-                            ><Icon name="book" size="16" /><span
-                                >Learn how to
-                            </span>
-                            Make a bet</Button
-                        >
-                    </router-link>
-                </div> -->
             </div>
         </div>
     </div>
@@ -1010,11 +996,6 @@ const { meta } = useMeta({
 
 .details_btn {
     margin-top: 8px;
-}
-
-.additional_buttons {
-    display: flex;
-    justify-content: space-between;
 }
 
 .filters {
