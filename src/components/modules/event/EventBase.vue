@@ -647,7 +647,12 @@ const { meta } = useMeta({
                         v-if="pendingBet || filteredBets.length"
                         :class="$style.bets"
                     >
-                        <BetCard v-if="pendingBet" :bet="pendingBet" pending />
+                        <BetCard
+                            v-if="pendingBet"
+                            :bet="pendingBet"
+                            :event="event"
+                            pending
+                        />
                         <BetCard
                             v-for="bet in paginatedBets"
                             :event="event"
