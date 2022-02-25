@@ -492,7 +492,7 @@ onUnmounted(() => {
                                     $style.more_participants,
                                 ]"
                             >
-                                +3
+                                +{{ participantsAvatars.length - 3 }}
                             </div>
                         </div>
 

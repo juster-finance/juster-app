@@ -128,10 +128,15 @@ const hasHedge = computed(() => {
                     }}
                 </div>
 
-                <div v-if="!hasHedge" :class="$style.amount">
+                <div
+                    v-if="hasHedge && event.status !== 'FINISHED'"
+                    :class="$style.amount"
+                >
+                    TBD
+                </div>
+                <div v-else :class="$style.amount">
                     {{ (returnOnBets - bvl).toFixed(2) }} <span>ꜩ</span>
                 </div>
-                <div v-else :class="$style.amount">TBD</div>
             </div>
 
             <Tooltip v-if="hasHedge && event.status !== 'FINISHED'">
