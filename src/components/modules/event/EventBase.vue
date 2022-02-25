@@ -122,7 +122,7 @@ const getEvent = async () => {
     }
 }
 
-const won = computed(() => {
+const hasWonBet = computed(() => {
     if (!event.value) return
 
     return !!event.value.bets
@@ -574,7 +574,7 @@ const { meta } = useMeta({
                     </div>
 
                     <Banner
-                        v-if="won"
+                        v-if="hasWonBet"
                         icon="checkcircle"
                         color="green"
                         :class="$style.banner"
@@ -752,7 +752,7 @@ const { meta } = useMeta({
                     :startCountdown="startCountdownText"
                     :finishCountdown="finishCountdownText"
                     :price="price"
-                    :won="won"
+                    :isWon="hasWonBet"
                     :positionForWithdraw="positionForWithdraw"
                     :isWithdrawing="isWithdrawing"
                     @openParticipants="handleParticipants"

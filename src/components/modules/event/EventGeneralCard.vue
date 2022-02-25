@@ -42,7 +42,7 @@ const props = defineProps({
     price: {
         type: Object,
     },
-    won: {
+    isWon: {
         type: Boolean,
     },
     positionForWithdraw: {
@@ -517,8 +517,8 @@ const endDiff = computed(() =>
             @onBet="(target) => emit('onBet', target)"
             @onWithdraw="emit('onWithdraw')"
             :event="event"
-            :won="won"
-            :wonPosition="positionForWithdraw"
+            :isWon="isWon"
+            :positionForWithdraw="positionForWithdraw"
             :disabled="
                 event.totalLiquidityProvided == 0 || startStatus == 'Finished'
             "

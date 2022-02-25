@@ -493,33 +493,31 @@ const { meta } = useMeta({
             />
 
             <div :class="$style.events_base">
-                <transition name="fastfade" mode="out-in">
-                    <div v-if="filteredEvents.length" :class="$style.events">
-                        <EventCard
-                            v-for="event in filteredEvents.slice(
-                                (currentPage - 1) * 6,
-                                currentPage * 6,
-                            )"
-                            :key="event.id"
-                            :event="event"
-                        />
-                    </div>
+                <div v-if="filteredEvents.length" :class="$style.events">
+                    <EventCard
+                        v-for="event in filteredEvents.slice(
+                            (currentPage - 1) * 6,
+                            currentPage * 6,
+                        )"
+                        :key="event.id"
+                        :event="event"
+                    />
+                </div>
 
-                    <div v-else-if="!isAllEventsLoaded" :class="$style.events">
-                        <EventCardLoading />
-                        <EventCardLoading />
-                        <EventCardLoading />
-                    </div>
+                <div v-else-if="!isAllEventsLoaded" :class="$style.events">
+                    <EventCardLoading />
+                    <EventCardLoading />
+                    <EventCardLoading />
+                </div>
 
-                    <Banner
-                        v-else-if="!filteredEvents.length && isAllEventsLoaded"
-                        icon="help"
-                        color="gray"
-                        size="small"
-                    >
-                        No events with the selected filters were found
-                    </Banner>
-                </transition>
+                <Banner
+                    v-else-if="!filteredEvents.length && isAllEventsLoaded"
+                    icon="help"
+                    color="gray"
+                    size="small"
+                >
+                    No events with the selected filters were found
+                </Banner>
 
                 <Pagination
                     v-if="filteredEvents.length > 6"

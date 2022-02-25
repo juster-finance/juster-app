@@ -198,7 +198,7 @@ const userTVL = computed(() => {
 })
 
 /** Win & Withdraw */
-const won = computed(() => {
+const hasWonBet = computed(() => {
     if (!props.event) return
 
     return !!props.event.bets
@@ -847,8 +847,8 @@ onUnmounted(() => {
                 @onBet="handleBet"
                 @onWithdraw="handleWithdraw"
                 :event="event"
-                :won="won"
-                :wonPosition="positionForWithdraw"
+                :isWon="hasWonBet"
+                :positionForWithdraw="positionForWithdraw"
                 :disabled="
                     event.totalLiquidityProvided == 0 ||
                     startStatus == 'Finished'

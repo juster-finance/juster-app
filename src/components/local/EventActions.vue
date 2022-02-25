@@ -18,8 +18,8 @@ const accountStore = useAccountStore()
 const props = defineProps({
     primary: Boolean,
     event: Object,
-    won: Boolean,
-    wonPosition: Object,
+    isWon: Boolean,
+    positionForWithdraw: Object,
     disabled: Boolean,
     isWithdrawing: Boolean,
 })
@@ -45,7 +45,7 @@ const btnType = computed(() => {
         return "secondary"
     }
 
-    if (props.won && props.wonPosition) {
+    if (props.isWon && props.positionForWithdraw) {
         return "success"
     } else {
         return "secondary"
@@ -55,7 +55,9 @@ const btnType = computed(() => {
 
 <template>
     <div :class="$style.wrapper">
-        <template v-if="!won && !wonPosition">
+        <template
+            v-if="!isWon && !positionForWithdraw && !successfulWithdrawal"
+        >
             <div
                 @click.prevent="emit('onBet', 'rise')"
                 :class="[
@@ -114,23 +116,24 @@ const btnType = computed(() => {
             size="small"
             :disabled="
                 isWithdrawing ||
-                (won && !wonPosition) ||
+                (isWon && !positionForWithdraw) ||
+                !!successfulWithdrawal.amount ||
                 accountStore.pendingTransaction.awaiting
             "
             block
         >
-            <template v-if="won && !wonPosition"
+            <template v-if="successfulWithdrawal"
                 >Successfully withdrawn
                 {{ successfulWithdrawal?.amount.toFixed(2) }} ꜩ</template
             >
 
             <template v-else-if="accountStore.pendingTransaction.awaiting">
-                Can`t withdraw now
+                Can`t withdraw right now
             </template>
 
             <template v-else-if="!isWithdrawing">
                 <Icon name="crown" size="16" />Withdraw
-                {{ f(wonPosition.value) }} ꜩ
+                {{ f(positionForWithdraw.value) }} ꜩ
             </template>
 
             <template v-else
