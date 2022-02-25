@@ -428,15 +428,16 @@ watch(event, async () => {
     await getEvent()
 })
 
-/**
- * Get event -> Subscribe (refactor needed) -> Participants
- */
-const subscription = ref({})
+const subToEvent = ref({})
+
+const positionsWithLiquidity = ref([])
+const subToDeposits = ref({})
+
 onMounted(async () => {
     await getEvent()
 
     /** Subscribe to event, TODO: refactor */
-    subscription.value = await juster.gql
+    subToEvent.value = await juster.gql
         .subscription({
             event: [
                 {
@@ -499,6 +500,33 @@ onMounted(async () => {
             error: console.error,
         })
 
+    /** Subscribe to deposits */
+    subToDeposits.value = await juster.gql
+        .subscription({
+            position: [
+                {
+                    where: {
+                        eventId: { _eq: event.value.id },
+                        liquidityProvidedBelow: { _neq: 0 },
+                    },
+                },
+                {
+                    id: true,
+                    withdrawn: true,
+                    liquidityProvidedAboveEq: true,
+                    liquidityProvidedBelow: true,
+                    value: true,
+                    userId: true,
+                },
+            ],
+        })
+        .subscribe({
+            next: ({ position }) => {
+                positionsWithLiquidity.value = position
+            },
+            error: console.error,
+        })
+
     /** Participants */
     const eventParticipants = await fetchEventParticipants({
         id: event.value.id,
@@ -508,10 +536,16 @@ onMounted(async () => {
 
 onUnmounted(() => {
     if (
-        subscription.value.hasOwnProperty("_state") &&
-        !subscription.value?.closed
+        subToEvent.value.hasOwnProperty("_state") &&
+        !subToEvent.value?.closed
     ) {
-        subscription.value.unsubscribe()
+        subToEvent.value.unsubscribe()
+    }
+    if (
+        subToDeposits.value.hasOwnProperty("_state") &&
+        !subToDeposits.value?.closed
+    ) {
+        subToDeposits.value.unsubscribe()
     }
 
     destroyStartCountdown()
@@ -724,6 +758,12 @@ const { meta } = useMeta({
                             v-for="deposit in paginatedDeposits"
                             :key="deposit.id"
                             :deposit="deposit"
+                            :position="
+                                positionsWithLiquidity.find(
+                                    (position) =>
+                                        position.userId == deposit.userId,
+                                )
+                            "
                             :event="event"
                         />
                     </div>
