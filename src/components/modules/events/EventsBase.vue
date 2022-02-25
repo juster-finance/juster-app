@@ -85,7 +85,7 @@ const defaultFilters = {
             active: true,
         },
         {
-            name: "Active",
+            name: "Running",
             icon: "event_active",
             color: "yellow",
             active: false,
@@ -245,7 +245,7 @@ const filteredEvents = computed(() => {
             .filter((status) => status.active)
             .map((status) => {
                 if (status.name == "New") return "NEW"
-                if (status.name == "Active") return "STARTED"
+                if (status.name == "Running") return "STARTED"
                 if (status.name == "Finished") return "FINISHED"
                 if (status.name == "Canceled") return "CANCELED"
             })
@@ -465,7 +465,8 @@ const { meta } = useMeta({
 
         <h1>All events</h1>
         <div :class="$style.description">
-            List of all new, active, and past events with customizable filtering
+            List of all new, running, and past events with customizable
+            filtering
         </div>
 
         <Button

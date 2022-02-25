@@ -254,7 +254,7 @@ const endDiff = computed(() =>
                             event.status == 'STARTED'
                         "
                     >
-                        <Icon name="event_active" size="14" /> Active
+                        <Icon name="event_active" size="14" /> Running
                     </template>
                     <template
                         v-else-if="

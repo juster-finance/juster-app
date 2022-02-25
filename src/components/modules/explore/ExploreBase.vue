@@ -222,7 +222,7 @@ export default defineComponent({
             <div :class="$style.block">
                 <div :class="$style.head">
                     <div :class="$style.left">
-                        <h1>Hot events</h1>
+                        <h1>Hot Events</h1>
                         <div :class="$style.description">
                             Events that have not yet begun, but are attracting
                             the interest of participants
