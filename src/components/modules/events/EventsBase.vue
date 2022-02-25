@@ -562,7 +562,7 @@ const { meta } = useMeta({
 }
 
 .filters_block {
-    max-width: 300px;
+    width: 300px;
 }
 
 .events_base {
@@ -590,7 +590,8 @@ const { meta } = useMeta({
 
     .filters_block {
         display: none;
-        max-width: initial;
+
+        width: 100%;
     }
 
     .filters_block.show {
