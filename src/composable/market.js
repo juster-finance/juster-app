@@ -61,6 +61,7 @@ export const useMarket = () => {
                                 _eq: accountStore.pkh,
                             },
                             withdrawn: { _eq: false },
+                            value: { _neq: 0 },
                             event: { status: { _eq: "FINISHED" } },
                         },
                     },

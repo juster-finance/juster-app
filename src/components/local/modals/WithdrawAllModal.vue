@@ -63,7 +63,7 @@ export default defineComponent({
             return {
                 text: `Withdraw ${selectedPositions.value
                     .reduce((acc, curr) => acc + curr.value, 0)
-                    .toFixed(0)} ꜩ`,
+                    .toFixed(2)} ꜩ`,
                 disabled: false,
             }
         })

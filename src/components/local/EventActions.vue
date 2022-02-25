@@ -117,7 +117,7 @@ const btnType = computed(() => {
             :disabled="
                 isWithdrawing ||
                 (isWon && !positionForWithdraw) ||
-                !!successfulWithdrawal.amount ||
+                !!successfulWithdrawal?.amount ||
                 accountStore.pendingTransaction.awaiting
             "
             block
