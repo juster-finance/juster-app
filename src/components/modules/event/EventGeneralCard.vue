@@ -354,7 +354,7 @@ const endDiff = computed(() =>
                     </template>
                     <!-- 00:00:00 -->
                     <template v-else>
-                        {{ finishCountdown }}
+                        {{ startCountdown }}
                     </template>
                 </span>
                 <span v-else-if="startStatus == 'Finished'">Soon</span>

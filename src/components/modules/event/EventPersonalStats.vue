@@ -57,25 +57,6 @@ const returnOnBets = computed(() => {
     return reward
 })
 
-const profit = computed(() => {
-    let reward = 0
-
-    if (props.event.status == "FINISHED") {
-        reward = props.userBets.reduce((acc, { side, reward, amount }) => {
-            return side == props.event.winnerBets
-                ? (acc += reward - amount)
-                : acc
-        }, 0)
-    } else {
-        reward = props.userBets.reduce(
-            (acc, { amount, reward }) => (acc += reward - amount),
-            0,
-        )
-    }
-
-    return reward
-})
-
 const hasHedge = computed(() => {
     const hasRiseBet = props.userBets.some((bet) => bet.side == "ABOVE_EQ")
     const hasFallBet = props.userBets.some((bet) => bet.side == "BELOW")
