@@ -131,7 +131,7 @@ const btnType = computed(() => {
                 Can`t withdraw right now
             </template>
 
-            <template v-else-if="!isWithdrawing">
+            <template v-else-if="!isWithdrawing && positionForWithdraw">
                 <Icon name="crown" size="16" />Withdraw
                 {{ f(positionForWithdraw.value) }} ꜩ
             </template>

@@ -18,7 +18,6 @@ const accountStore = useAccountStore()
 const props = defineProps({
     deposit: { type: Object },
     event: { type: Object },
-    position: { type: Object },
 })
 
 const aboveEqProfit = computed(() => {
@@ -117,10 +116,10 @@ const returnForLiquidity = computed(() => {
         </div>
 
         <div
-            v-if="event.status == 'FINISHED' && position"
+            v-if="event.status == 'FINISHED' && returnForLiquidity"
             :class="[$style.param]"
         >
-            {{ numberWithSymbol(position.value, ",") }}&nbsp;<span>ꜩ</span>
+            {{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>ꜩ</span>
         </div>
         <div v-else-if="event.status == 'CANCELED'" :class="$style.param">
             Refund

@@ -29,6 +29,9 @@ const props = defineProps({
         type: Array,
         default: [],
     },
+    position: {
+        type: Object,
+    },
 })
 
 const accountStore = useAccountStore()
@@ -36,12 +39,12 @@ const accountStore = useAccountStore()
 const bvl = computed(() =>
     props.userBets.reduce((acc, { amount }) => (acc += amount), 0),
 )
-const dvl = computed(() =>
-    props.userDeposits.reduce(
+const dvl = computed(() => {
+    return props.userDeposits.reduce(
         (acc, { amountAboveEq }) => (acc += amountAboveEq),
         0,
-    ),
-)
+    )
+})
 
 const returnOnBets = computed(() => {
     let reward = 0
@@ -55,6 +58,16 @@ const returnOnBets = computed(() => {
     }
 
     return reward
+})
+
+const profit = computed(() => {
+    if (!props.position) return 0
+
+    const profit = props.position.value - (bvl.value + dvl.value)
+
+    if (isNaN(profit)) return 0
+
+    return profit
 })
 
 const hasHedge = computed(() => {
@@ -89,7 +102,8 @@ const hasHedge = computed(() => {
                 <div :class="$style.name">Returning</div>
 
                 <div :class="$style.amount">
-                    {{ abbreviateNumber(returnOnBets + dvl) }} <span>ꜩ</span>
+                    {{ position ? abbreviateNumber(position.value) : 0 }}
+                    <span>ꜩ</span>
                 </div>
             </div>
 
@@ -116,20 +130,12 @@ const hasHedge = computed(() => {
                     TBD
                 </div>
                 <div v-else :class="$style.amount">
-                    {{ (returnOnBets - bvl).toFixed(2) }} <span>ꜩ</span>
+                    {{ profit.toFixed(2) }} <span>ꜩ</span>
                 </div>
             </div>
 
             <Tooltip v-if="hasHedge && event.status !== 'FINISHED'">
-                <div
-                    :class="[
-                        $style.icon,
-                        returnOnBets - bvl > 0 &&
-                            event.status == 'FINISHED' &&
-                            $style.green,
-                        hasHedge && $style.yellow,
-                    ]"
-                >
+                <div :class="[$style.icon, hasHedge && $style.yellow]">
                     <Icon name="warning" size="20" />
                 </div>
 

@@ -430,7 +430,7 @@ watch(event, async () => {
 
 const subToEvent = ref({})
 
-const positionsWithLiquidity = ref([])
+const userPosition = ref([])
 const subToDeposits = ref({})
 
 onMounted(async () => {
@@ -507,7 +507,7 @@ onMounted(async () => {
                 {
                     where: {
                         eventId: { _eq: event.value.id },
-                        liquidityProvidedBelow: { _neq: 0 },
+                        userId: { _eq: accountStore.pkh },
                     },
                 },
                 {
@@ -522,7 +522,7 @@ onMounted(async () => {
         })
         .subscribe({
             next: ({ position }) => {
-                positionsWithLiquidity.value = position
+                userPosition.value = position[0]
             },
             error: console.error,
         })
@@ -617,6 +617,7 @@ const { meta } = useMeta({
 
                     <EventPersonalStats
                         :event="event"
+                        :position="userPosition"
                         :userDeposits="userDeposits"
                         :userBets="userBets"
                     />
@@ -758,12 +759,6 @@ const { meta } = useMeta({
                             v-for="deposit in paginatedDeposits"
                             :key="deposit.id"
                             :deposit="deposit"
-                            :position="
-                                positionsWithLiquidity.find(
-                                    (position) =>
-                                        position.userId == deposit.userId,
-                                )
-                            "
                             :event="event"
                         />
                     </div>
