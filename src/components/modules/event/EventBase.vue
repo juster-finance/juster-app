@@ -601,7 +601,7 @@ const { meta } = useMeta({
             <div :class="$style.base">
                 <EventChart v-if="event" :event="event" />
 
-                <div :class="$style.block">
+                <div v-if="accountStore.pkh" :class="$style.block">
                     <div :class="$style.title">Personal stats</div>
                     <div :class="$style.description">
                         Aggregated data for all your positions for this event
@@ -668,9 +668,10 @@ const { meta } = useMeta({
                         <div :class="$style.column">AMOUNT</div>
                         <div :class="$style.column">
                             {{
-                                event.status !== "CANCELED"
-                                    ? "REWARD"
-                                    : "REFUND"
+                                (event.status == "CANCELED" && "REFUND") ||
+                                (["NEW", "STARTED"].includes(event.status) &&
+                                    "POTENTIAL") ||
+                                (event.status == "FINISHED" && "PROFIT")
                             }}
                         </div>
                     </div>

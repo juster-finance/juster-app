@@ -9,7 +9,7 @@ import { useAccountStore } from "@/store/account"
 /**
  * Services
  */
-import { abbreviateNumber } from "@/services/utils/amounts"
+import { abbreviateNumber, numberWithSymbol } from "@/services/utils/amounts"
 
 /**
  * UI
@@ -60,10 +60,22 @@ const returnOnBets = computed(() => {
     return reward
 })
 
-const profit = computed(() => {
+const potentialProfit = computed(() =>
+    props.userBets.reduce(
+        (acc, { amount, reward }) => (acc += reward - amount),
+        0,
+    ),
+)
+
+const profitOnFinish = computed(() => {
     if (!props.position) return 0
 
-    const profit = props.position.value - (bvl.value + dvl.value)
+    const liquidity = Math.max(
+        props.position.liquidityProvidedAboveEq,
+        props.position.liquidityProvidedBelow,
+    )
+
+    const profit = props.position.value - bvl.value - liquidity
 
     if (isNaN(profit)) return 0
 
@@ -91,9 +103,13 @@ const hasHedge = computed(() => {
                 </div>
             </div>
 
-            <div :class="$style.icon">
-                <Icon name="wallet" size="20" />
-            </div>
+            <Tooltip>
+                <div :class="$style.icon">
+                    <Icon name="wallet" size="20" />
+                </div>
+
+                <template #content> Your Bets + Liquidity </template>
+            </Tooltip>
         </div>
 
         <!-- Returning -->
@@ -101,15 +117,40 @@ const hasHedge = computed(() => {
             <div :class="$style.base">
                 <div :class="$style.name">Returning</div>
 
-                <div :class="$style.amount">
-                    {{ position ? abbreviateNumber(position.value) : 0 }}
+                <div
+                    v-if="
+                        ['NEW', 'STARTED'].includes(event.status) &&
+                        dvl + bvl > 0
+                    "
+                    :class="$style.amount"
+                >
+                    TBD
+                </div>
+                <div
+                    v-else-if="!position || !position.value"
+                    :class="$style.amount"
+                >
+                    0 <span>ꜩ</span>
+                </div>
+                <div v-else :class="$style.amount">
+                    {{
+                        position
+                            ? numberWithSymbol(position.value.toFixed(2), ",")
+                            : 0
+                    }}
                     <span>ꜩ</span>
                 </div>
             </div>
 
-            <div :class="$style.icon">
-                <Icon name="walletadd" size="20" />
-            </div>
+            <Tooltip>
+                <div :class="$style.icon">
+                    <Icon name="walletadd" size="20" />
+                </div>
+
+                <template #content>
+                    The withdrawal amount may be different from this calculation
+                </template>
+            </Tooltip>
         </div>
 
         <!-- Profit -->
@@ -129,9 +170,22 @@ const hasHedge = computed(() => {
                 >
                     TBD
                 </div>
-                <div v-else :class="$style.amount">
-                    {{ profit.toFixed(2) }} <span>ꜩ</span>
+
+                <div
+                    v-else-if="['NEW', 'STARTED'].includes(event.status)"
+                    :class="$style.amount"
+                >
+                    {{ potentialProfit.toFixed(2) }} <span>ꜩ</span>
                 </div>
+
+                <div
+                    v-else-if="event.status == 'FINISHED'"
+                    :class="$style.amount"
+                >
+                    {{ profitOnFinish.toFixed(2) }} <span>ꜩ</span>
+                </div>
+
+                <div v-else :class="$style.amount">0 <span>ꜩ</span></div>
             </div>
 
             <Tooltip v-if="hasHedge && event.status !== 'FINISHED'">

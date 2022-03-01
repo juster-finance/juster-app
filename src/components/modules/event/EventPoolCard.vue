@@ -53,7 +53,9 @@ const liquidityLevel = computed(() => {
             type="secondary"
             size="small"
             block
-            :disabled="event.status !== 'NEW'"
+            :disabled="
+                event.status !== 'NEW' || event.totalLiquidityProvided == 0
+            "
             :class="$style.liquidity_btn"
             ><Icon name="liquidity" size="12" />Add Liquidity</Button
         >

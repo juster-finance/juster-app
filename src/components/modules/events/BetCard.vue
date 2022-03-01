@@ -76,15 +76,12 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
             >
         </div>
 
-        <div v-if="event && event.status == 'NEW'" :class="$style.param">
-            <span>TBD</span>
-        </div>
-        <div v-else-if="event.status == 'CANCELED'" :class="$style.param">
+        <div v-if="event.status == 'CANCELED'" :class="$style.param">
             {{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;<span
                 >ꜩ</span
             >
         </div>
-        <div v-else :class="$style.param">
+        <div v-else-if="event.status == 'FINISHED'" :class="$style.param">
             {{
                 isWon
                     ? `+${numberWithSymbol(
@@ -92,6 +89,14 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
                           ",",
                       )}`
                     : 0
+            }}&nbsp;<span>ꜩ</span>
+        </div>
+        <div
+            v-else-if="['NEW', 'STARTED'].includes(event.status)"
+            :class="$style.param"
+        >
+            {{
+                numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",")
             }}&nbsp;<span>ꜩ</span>
         </div>
     </div>
