@@ -1,10 +1,12 @@
 <script setup>
-import { computed, watch } from "vue"
+import { computed } from "vue"
 import { DateTime } from "luxon"
 
 /**
  * Services
  */
+import { currentNetwork } from "@/services/sdk"
+import { verifiedMakers } from "@/services/config"
 import { numberWithSymbol } from "@/services/utils/amounts"
 
 /**
@@ -57,23 +59,40 @@ const returnForLiquidity = computed(() => {
     <div :class="$style.wrapper">
         <div :class="$style.base">
             <div :class="$style.icon">
-                <Icon name="liquidity" size="16" />
+                <Icon
+                    v-if="verifiedMakers[currentNetwork] !== deposit.userId"
+                    name="liquidity"
+                    size="16"
+                />
+                <Icon
+                    v-else
+                    name="logo_symbol"
+                    size="16"
+                    :class="$style.logo_icon"
+                />
 
                 <router-link
                     :to="`/profile/${deposit.userId}`"
                     :class="$style.user_avatar"
                 >
                     <img
+                        v-if="verifiedMakers[currentNetwork] !== deposit.userId"
                         :src="`https://services.tzkt.io/v1/avatars/${deposit.userId}`"
                         alt="avatar"
-                /></router-link>
+                    />
+                </router-link>
             </div>
 
             <div :class="$style.info">
-                <div :class="$style.title">
+                <div
+                    v-if="verifiedMakers[currentNetwork] !== deposit.userId"
+                    :class="$style.title"
+                >
                     {{ accountStore.pkh == deposit.userId ? "My" : "" }}
                     Liquidity
                 </div>
+                <div v-else :class="$style.title">Initial Liquidity</div>
+
                 <div :class="$style.time">
                     {{
                         DateTime.fromISO(deposit.createdTime, {
@@ -96,7 +115,10 @@ const returnForLiquidity = computed(() => {
             }}&nbsp;<span>ꜩ</span>
         </div>
 
-        <div v-if="event.status == 'FINISHED'" :class="[$style.param]">
+        <div
+            v-if="event.status == 'FINISHED' && returnForLiquidity"
+            :class="[$style.param]"
+        >
             {{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>ꜩ</span>
         </div>
         <div v-else-if="event.status == 'CANCELED'" :class="$style.param">
@@ -156,6 +178,10 @@ const returnForLiquidity = computed(() => {
     height: 20px;
     background: var(--card-bg);
     border-radius: 50%;
+}
+
+.logo_icon {
+    fill: var(--text-primary);
 }
 
 .info {

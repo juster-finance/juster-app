@@ -20,22 +20,22 @@ export default defineComponent({
             if (!userAmount.value || side.value == "Liquidity") {
                 if (!event.value.poolAboveEq && !event.value.poolBelow) return 0
 
-                return Math.floor(
+                return (
                     (event.value.poolAboveEq * 100) /
-                        (event.value.poolAboveEq + event.value.poolBelow),
+                    (event.value.poolAboveEq + event.value.poolBelow)
                 )
             } else {
                 if (side.value == "Rise") {
                     const below = event.value.poolBelow - winDelta.value
                     const above = event.value.poolAboveEq + userAmount.value
 
-                    return Math.floor((above * 100) / (above + below))
+                    return (above * 100) / (above + below)
                 }
                 if (side.value == "Fall") {
                     const below = event.value.poolBelow + userAmount.value
                     const above = event.value.poolAboveEq - winDelta.value
 
-                    return Math.floor((above * 100) / (above + below))
+                    return (above * 100) / (above + below)
                 }
             }
         })
@@ -66,22 +66,22 @@ export default defineComponent({
             if (!userAmount.value || side.value == "Liquidity") {
                 if (!event.value.poolAboveEq && !event.value.poolBelow) return 0
 
-                return Math.ceil(
+                return (
                     (event.value.poolBelow * 100) /
-                        (event.value.poolAboveEq + event.value.poolBelow),
+                    (event.value.poolAboveEq + event.value.poolBelow)
                 )
             } else {
                 if (side.value == "Rise") {
                     const below = event.value.poolBelow - winDelta.value
                     const above = event.value.poolAboveEq + userAmount.value
 
-                    return Math.ceil((below * 100) / (above + below))
+                    return (below * 100) / (above + below)
                 }
                 if (side.value == "Fall") {
                     const below = event.value.poolBelow + userAmount.value
                     const above = event.value.poolAboveEq - winDelta.value
 
-                    return Math.ceil((below * 100) / (above + below))
+                    return (below * 100) / (above + below)
                 }
             }
         })
@@ -116,7 +116,14 @@ export default defineComponent({
         <div :class="$style.head">
             <div :class="$style.left">
                 <div :class="$style.name">
-                    Rise <span>{{ abovePercent }}%</span>
+                    Rise
+                    <span
+                        >{{
+                            abovePercent % 1 == 0
+                                ? abovePercent
+                                : abovePercent.toFixed(2)
+                        }}%</span
+                    >
                 </div>
 
                 <div :class="$style.dot" />
@@ -138,7 +145,14 @@ export default defineComponent({
                 <div :class="$style.dot" />
 
                 <div :class="$style.name">
-                    Fall <span>{{ belowPercent }}%</span>
+                    Fall
+                    <span
+                        >{{
+                            belowPercent % 1 == 0
+                                ? belowPercent
+                                : belowPercent.toFixed(2)
+                        }}%</span
+                    >
                 </div>
             </div>
         </div>

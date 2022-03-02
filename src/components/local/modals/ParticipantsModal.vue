@@ -77,14 +77,8 @@ export default defineComponent({
 </script>
 
 <template>
-    <Modal
-        :show="show"
-        width="500"
-        padding="32px 32px 24px 32px"
-        closable
-        @onClose="$emit('onClose')"
-    >
-        <div :class="$style.title">Event participants</div>
+    <Modal :show="show" width="500" closable @onClose="$emit('onClose')">
+        <div :class="$style.title">Participants</div>
 
         <div :class="$style.block">
             <div :class="$style.subtitle">Creator</div>

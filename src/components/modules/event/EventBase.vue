@@ -122,7 +122,7 @@ const getEvent = async () => {
     }
 }
 
-const won = computed(() => {
+const hasWonBet = computed(() => {
     if (!event.value) return
 
     return !!event.value.bets
@@ -428,15 +428,16 @@ watch(event, async () => {
     await getEvent()
 })
 
-/**
- * Get event -> Subscribe (refactor needed) -> Participants
- */
-const subscription = ref({})
+const subToEvent = ref({})
+
+const userPosition = ref([])
+const subToDeposits = ref({})
+
 onMounted(async () => {
     await getEvent()
 
     /** Subscribe to event, TODO: refactor */
-    subscription.value = await juster.gql
+    subToEvent.value = await juster.gql
         .subscription({
             event: [
                 {
@@ -499,6 +500,33 @@ onMounted(async () => {
             error: console.error,
         })
 
+    /** Subscribe to deposits */
+    subToDeposits.value = await juster.gql
+        .subscription({
+            position: [
+                {
+                    where: {
+                        eventId: { _eq: event.value.id },
+                        userId: { _eq: accountStore.pkh },
+                    },
+                },
+                {
+                    id: true,
+                    withdrawn: true,
+                    liquidityProvidedAboveEq: true,
+                    liquidityProvidedBelow: true,
+                    value: true,
+                    userId: true,
+                },
+            ],
+        })
+        .subscribe({
+            next: ({ position }) => {
+                userPosition.value = position[0]
+            },
+            error: console.error,
+        })
+
     /** Participants */
     const eventParticipants = await fetchEventParticipants({
         id: event.value.id,
@@ -508,10 +536,16 @@ onMounted(async () => {
 
 onUnmounted(() => {
     if (
-        subscription.value.hasOwnProperty("_state") &&
-        !subscription.value?.closed
+        subToEvent.value.hasOwnProperty("_state") &&
+        !subToEvent.value?.closed
     ) {
-        subscription.value.unsubscribe()
+        subToEvent.value.unsubscribe()
+    }
+    if (
+        subToDeposits.value.hasOwnProperty("_state") &&
+        !subToDeposits.value?.closed
+    ) {
+        subToDeposits.value.unsubscribe()
     }
 
     destroyStartCountdown()
@@ -565,19 +599,16 @@ const { meta } = useMeta({
 
         <div v-if="event" :class="$style.container">
             <div :class="$style.base">
-                <EventChart
-                    v-if="event && event.status !== 'CANCELED'"
-                    :event="event"
-                />
+                <EventChart v-if="event" :event="event" />
 
-                <div :class="$style.block">
+                <div v-if="accountStore.pkh" :class="$style.block">
                     <div :class="$style.title">Personal stats</div>
                     <div :class="$style.description">
                         Aggregated data for all your positions for this event
                     </div>
 
                     <Banner
-                        v-if="won"
+                        v-if="hasWonBet"
                         icon="checkcircle"
                         color="green"
                         :class="$style.banner"
@@ -586,6 +617,7 @@ const { meta } = useMeta({
 
                     <EventPersonalStats
                         :event="event"
+                        :position="userPosition"
                         :userDeposits="userDeposits"
                         :userBets="userBets"
                     />
@@ -602,21 +634,6 @@ const { meta } = useMeta({
                             @click="
                                 handleSelectFilter({
                                     target: 'bets',
-                                    value: 'my',
-                                })
-                            "
-                            :class="[
-                                $style.filter,
-                                filters.bets == 'my' && $style.active,
-                            ]"
-                        >
-                            My bets
-                        </div>
-                        <div :class="$style.dot" />
-                        <div
-                            @click="
-                                handleSelectFilter({
-                                    target: 'bets',
                                     value: 'all',
                                 })
                             "
@@ -627,6 +644,21 @@ const { meta } = useMeta({
                         >
                             All bets
                         </div>
+                        <div :class="$style.dot" />
+                        <div
+                            @click="
+                                handleSelectFilter({
+                                    target: 'bets',
+                                    value: 'my',
+                                })
+                            "
+                            :class="[
+                                $style.filter,
+                                filters.bets == 'my' && $style.active,
+                            ]"
+                        >
+                            My bets
+                        </div>
                     </div>
 
                     <!-- todo: new component BetsTable -->
@@ -636,9 +668,10 @@ const { meta } = useMeta({
                         <div :class="$style.column">AMOUNT</div>
                         <div :class="$style.column">
                             {{
-                                event.status !== "CANCELED"
-                                    ? "REWARD"
-                                    : "REFUND"
+                                (event.status == "CANCELED" && "REFUND") ||
+                                (["NEW", "STARTED"].includes(event.status) &&
+                                    "POTENTIAL") ||
+                                (event.status == "FINISHED" && "PROFIT")
                             }}
                         </div>
                     </div>
@@ -647,7 +680,12 @@ const { meta } = useMeta({
                         v-if="pendingBet || filteredBets.length"
                         :class="$style.bets"
                     >
-                        <BetCard v-if="pendingBet" :bet="pendingBet" pending />
+                        <BetCard
+                            v-if="pendingBet"
+                            :bet="pendingBet"
+                            :event="event"
+                            pending
+                        />
                         <BetCard
                             v-for="bet in paginatedBets"
                             :event="event"
@@ -682,21 +720,6 @@ const { meta } = useMeta({
                             @click="
                                 handleSelectFilter({
                                     target: 'liquidity',
-                                    value: 'my',
-                                })
-                            "
-                            :class="[
-                                $style.filter,
-                                filters.liquidity == 'my' && $style.active,
-                            ]"
-                        >
-                            My liquidity
-                        </div>
-                        <div :class="$style.dot" />
-                        <div
-                            @click="
-                                handleSelectFilter({
-                                    target: 'liquidity',
                                     value: 'all',
                                 })
                             "
@@ -706,6 +729,22 @@ const { meta } = useMeta({
                             ]"
                         >
                             All liquidity
+                        </div>
+                        <div :class="$style.dot" />
+
+                        <div
+                            @click="
+                                handleSelectFilter({
+                                    target: 'liquidity',
+                                    value: 'my',
+                                })
+                            "
+                            :class="[
+                                $style.filter,
+                                filters.liquidity == 'my' && $style.active,
+                            ]"
+                        >
+                            My liquidity
                         </div>
                     </div>
 
@@ -749,7 +788,7 @@ const { meta } = useMeta({
                     :startCountdown="startCountdownText"
                     :finishCountdown="finishCountdownText"
                     :price="price"
-                    :won="won"
+                    :isWon="hasWonBet"
                     :positionForWithdraw="positionForWithdraw"
                     :isWithdrawing="isWithdrawing"
                     @openParticipants="handleParticipants"
@@ -774,20 +813,6 @@ const { meta } = useMeta({
                     :class="$style.details_btn"
                     ><Icon name="menu" size="12" />View event details</Button
                 >
-
-                <!-- <div :class="$style.additional_buttons">
-                    <Button type="secondary" size="mini" disabled
-                        ><Icon name="flag" size="16" />Report this event</Button
-                    >
-                    <router-link to="/docs/how-to-bet">
-                        <Button type="secondary" size="mini"
-                            ><Icon name="book" size="16" /><span
-                                >Learn how to
-                            </span>
-                            Make a bet</Button
-                        >
-                    </router-link>
-                </div> -->
             </div>
         </div>
     </div>
@@ -1006,11 +1031,6 @@ const { meta } = useMeta({
     margin-top: 8px;
 }
 
-.additional_buttons {
-    display: flex;
-    justify-content: space-between;
-}
-
 .filters {
     position: absolute;
     top: 0;
@@ -1021,10 +1041,8 @@ const { meta } = useMeta({
     align-items: center;
     gap: 14px;
 
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    border-radius: 6px;
     background: var(--btn-secondary-bg);
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
     height: 32px;
     padding: 0 12px;
 }

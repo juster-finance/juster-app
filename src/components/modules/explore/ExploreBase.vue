@@ -31,6 +31,11 @@ import { fetchTopEvents } from "@/api/events"
 import { fetchTopBettors, fetchTopLiquidityProviders } from "@/api/users"
 
 /**
+ * Subscriptions
+ */
+import { eventSub } from "@/graphql/subscriptions/event"
+
+/**
  * Store
  */
 import { useMarketStore } from "@/store/market"
@@ -50,8 +55,8 @@ export default defineComponent({
         const marketStore = useMarketStore()
         const accountStore = useAccountStore()
 
-        const subscriptionToMyPositions = ref({})
-        const myEvents = ref([])
+        const subToMyPositions = ref({})
+        const myPositions = ref([])
 
         /** Ranking */
         const isTopProvidersLoading = ref(true)
@@ -69,61 +74,25 @@ export default defineComponent({
             /**
              * Block: My Positions
              */
-            subscriptionToMyPositions.value = await juster.gql
+            subToMyPositions.value = await juster.gql
                 .subscription({
-                    event: [
+                    position: [
                         {
                             where: {
-                                bets: { userId: { _eq: accountStore.pkh } },
-                                status: { _in: ["NEW", "STARTED"] },
+                                userId: { _eq: accountStore.pkh },
+                                event: { status: { _in: ["NEW", "STARTED"] } },
                             },
                         },
                         {
                             id: true,
-                            status: true,
-                            betsCloseTime: true,
-                            creatorId: true,
-                            currencyPair: {
-                                symbol: true,
-                                id: true,
-                            },
-                            poolAboveEq: true,
-                            poolBelow: true,
-                            totalBetsAmount: true,
-                            totalLiquidityProvided: true,
-                            totalLiquidityShares: true,
-                            totalValueLocked: true,
-                            liquidityPercent: true,
-                            measurePeriod: true,
-                            closedOracleTime: true,
-                            createdTime: true,
-                            startRate: true,
-                            closedRate: true,
-                            winnerBets: true,
-                            targetDynamics: true,
-                            bets: {
-                                id: true,
-                                side: true,
-                                reward: true,
-                                amount: true,
-                                createdTime: true,
-                                userId: true,
-                            },
-                            deposits: {
-                                amountAboveEq: true,
-                                amountBelow: true,
-                                eventId: true,
-                                id: true,
-                                userId: true,
-                                createdTime: true,
-                                shares: true,
-                            },
+                            value: true,
+                            event: eventSub,
                         },
                     ],
                 })
                 .subscribe({
-                    next: ({ event }) => {
-                        myEvents.value = event
+                    next: ({ position: positions }) => {
+                        myPositions.value = positions
                     },
                     error: console.error,
                 })
@@ -155,10 +124,10 @@ export default defineComponent({
 
         onUnmounted(() => {
             if (
-                subscriptionToMyPositions.value.hasOwnProperty("_state") &&
-                !subscriptionToMyPositions.value?.closed
+                subToMyPositions.value.hasOwnProperty("_state") &&
+                !subToMyPositions.value?.closed
             ) {
-                subscriptionToMyPositions.value.unsubscribe()
+                subToMyPositions.value.unsubscribe()
             }
         })
 
@@ -171,7 +140,7 @@ export default defineComponent({
 
         return {
             marketStore,
-            myEvents,
+            myPositions,
             topProviders,
             topBettors,
             isTopBettorsLoading,
@@ -202,7 +171,7 @@ export default defineComponent({
             </metainfo>
 
             <!-- My Positions -->
-            <div v-if="myEvents.length" :class="$style.block">
+            <div v-if="myPositions.length" :class="$style.block">
                 <h1>My Positions</h1>
                 <div :class="$style.description">
                     Events in which you have liquidity or bet
@@ -210,9 +179,9 @@ export default defineComponent({
 
                 <div :class="$style.my_positions">
                     <MyPositionCard
-                        v-for="event in myEvents"
-                        :key="event.id"
-                        :event="event"
+                        v-for="position in myPositions"
+                        :key="position.id"
+                        :event="position.event"
                     />
                 </div>
             </div>
@@ -253,7 +222,7 @@ export default defineComponent({
             <div :class="$style.block">
                 <div :class="$style.head">
                     <div :class="$style.left">
-                        <h1>Hot events</h1>
+                        <h1>Hot Events</h1>
                         <div :class="$style.description">
                             Events that have not yet begun, but are attracting
                             the interest of participants

@@ -275,13 +275,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <Modal
-        :show="show"
-        width="500"
-        padding="32px 32px 24px 32px"
-        closable
-        @onClose="$emit('onClose')"
-    >
+    <Modal :show="show" width="500" closable @onClose="$emit('onClose')">
         <template v-if="accountStore.isLoggined">
             <div :class="$style.title">Providing liquidity</div>
 
@@ -330,7 +324,7 @@ export default defineComponent({
 
             <div :class="$style.stats">
                 <Stat name="Reward for providing"
-                    >{{ event.liquidityPercent * 100 }}%</Stat
+                    >{{ (event.liquidityPercent * 100).toFixed(0) }}%</Stat
                 >
 
                 <Stat v-if="liquidityRatio" name="Ratio">
@@ -384,8 +378,8 @@ export default defineComponent({
         <template v-else>
             <div :class="$style.title">Place a bet</div>
             <div :class="$style.description">
-                To fully interact with the application, you need to create an
-                account and connect Temple wallet
+                You need to connect your wallet (with Beacon) to place liquidity
+                and make bets
             </div>
 
             <Button @click="handleLogin" size="large" type="primary" block>

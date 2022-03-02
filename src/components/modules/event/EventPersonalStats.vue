@@ -9,7 +9,12 @@ import { useAccountStore } from "@/store/account"
 /**
  * Services
  */
-import { abbreviateNumber } from "@/services/utils/amounts"
+import { abbreviateNumber, numberWithSymbol } from "@/services/utils/amounts"
+
+/**
+ * UI
+ */
+import Tooltip from "@/components/ui/Tooltip"
 
 const props = defineProps({
     event: {
@@ -24,6 +29,9 @@ const props = defineProps({
         type: Array,
         default: [],
     },
+    position: {
+        type: Object,
+    },
 })
 
 const accountStore = useAccountStore()
@@ -31,12 +39,12 @@ const accountStore = useAccountStore()
 const bvl = computed(() =>
     props.userBets.reduce((acc, { amount }) => (acc += amount), 0),
 )
-const dvl = computed(() =>
-    props.userDeposits.reduce(
+const dvl = computed(() => {
+    return props.userDeposits.reduce(
         (acc, { amountAboveEq }) => (acc += amountAboveEq),
         0,
-    ),
-)
+    )
+})
 
 const returnOnBets = computed(() => {
     let reward = 0
@@ -52,23 +60,33 @@ const returnOnBets = computed(() => {
     return reward
 })
 
-const profit = computed(() => {
-    let reward = 0
+const potentialProfit = computed(() =>
+    props.userBets.reduce(
+        (acc, { amount, reward }) => (acc += reward - amount),
+        0,
+    ),
+)
 
-    if (props.event.status == "FINISHED") {
-        reward = props.userBets.reduce((acc, { side, reward, amount }) => {
-            return side == props.event.winnerBets
-                ? (acc += reward - amount)
-                : acc
-        }, 0)
-    } else {
-        reward = props.userBets.reduce(
-            (acc, { amount, reward }) => (acc += reward - amount),
-            0,
-        )
-    }
+const profitOnFinish = computed(() => {
+    if (!props.position) return 0
 
-    return reward
+    const liquidity = Math.max(
+        props.position.liquidityProvidedAboveEq,
+        props.position.liquidityProvidedBelow,
+    )
+
+    const profit = props.position.value - bvl.value - liquidity
+
+    if (isNaN(profit)) return 0
+
+    return profit
+})
+
+const hasHedge = computed(() => {
+    const hasRiseBet = props.userBets.some((bet) => bet.side == "ABOVE_EQ")
+    const hasFallBet = props.userBets.some((bet) => bet.side == "BELOW")
+
+    return hasRiseBet && hasFallBet
 })
 </script>
 
@@ -85,9 +103,13 @@ const profit = computed(() => {
                 </div>
             </div>
 
-            <div :class="$style.icon">
-                <Icon name="wallet" size="20" />
-            </div>
+            <Tooltip>
+                <div :class="$style.icon">
+                    <Icon name="wallet" size="20" />
+                </div>
+
+                <template #content> Your Bets + Liquidity </template>
+            </Tooltip>
         </div>
 
         <!-- Returning -->
@@ -95,14 +117,40 @@ const profit = computed(() => {
             <div :class="$style.base">
                 <div :class="$style.name">Returning</div>
 
-                <div :class="$style.amount">
-                    {{ abbreviateNumber(returnOnBets + dvl) }} <span>ꜩ</span>
+                <div
+                    v-if="
+                        ['NEW', 'STARTED'].includes(event.status) &&
+                        dvl + bvl > 0
+                    "
+                    :class="$style.amount"
+                >
+                    TBD
+                </div>
+                <div
+                    v-else-if="!position || !position.value"
+                    :class="$style.amount"
+                >
+                    0 <span>ꜩ</span>
+                </div>
+                <div v-else :class="$style.amount">
+                    {{
+                        position
+                            ? numberWithSymbol(position.value.toFixed(2), ",")
+                            : 0
+                    }}
+                    <span>ꜩ</span>
                 </div>
             </div>
 
-            <div :class="$style.icon">
-                <Icon name="walletadd" size="20" />
-            </div>
+            <Tooltip>
+                <div :class="$style.icon">
+                    <Icon name="walletadd" size="20" />
+                </div>
+
+                <template #content>
+                    The withdrawal amount may be different from this calculation
+                </template>
+            </Tooltip>
         </div>
 
         <!-- Profit -->
@@ -116,12 +164,44 @@ const profit = computed(() => {
                     }}
                 </div>
 
-                <div :class="$style.amount">
-                    {{ (returnOnBets - bvl).toFixed(2) }} <span>ꜩ</span>
+                <div
+                    v-if="hasHedge && event.status !== 'FINISHED'"
+                    :class="$style.amount"
+                >
+                    TBD
                 </div>
+
+                <div
+                    v-else-if="['NEW', 'STARTED'].includes(event.status)"
+                    :class="$style.amount"
+                >
+                    {{ potentialProfit.toFixed(2) }} <span>ꜩ</span>
+                </div>
+
+                <div
+                    v-else-if="event.status == 'FINISHED'"
+                    :class="$style.amount"
+                >
+                    {{ profitOnFinish.toFixed(2) }} <span>ꜩ</span>
+                </div>
+
+                <div v-else :class="$style.amount">0 <span>ꜩ</span></div>
             </div>
 
+            <Tooltip v-if="hasHedge && event.status !== 'FINISHED'">
+                <div :class="[$style.icon, hasHedge && $style.yellow]">
+                    <Icon name="warning" size="20" />
+                </div>
+
+                <template #content
+                    >Your bets are aimed both ways.<br /><span
+                        >The final profit will be calculated at the end of the
+                        event</span
+                    ></template
+                >
+            </Tooltip>
             <div
+                v-else
                 :class="[
                     $style.icon,
                     returnOnBets - bvl > 0 &&
@@ -210,6 +290,11 @@ const profit = computed(() => {
 .icon.green {
     background: rgba(26, 161, 104, 0.15);
     fill: var(--green);
+}
+
+.icon.yellow {
+    background: rgba(245, 183, 43, 0.15);
+    fill: var(--yellow);
 }
 
 .hint {

@@ -18,6 +18,22 @@ const disaggregate = (num) => {
 
     return [integer, fraction]
 }
+
+const finishTimeText = computed(() => {
+    let text = ``
+
+    if (props.finishTime.d) {
+        text = `${props.finishTime.d}d`
+    }
+    if (props.finishTime.h) {
+        text += ` ${props.finishTime.h}h`
+    }
+    if (props.finishTime.m) {
+        text += ` ${props.finishTime.m}m`
+    }
+
+    return text
+})
 </script>
 
 <template>
@@ -29,7 +45,7 @@ const disaggregate = (num) => {
                 <Icon name="go" size="12" />
 
                 <div v-if="event.status == 'NEW'" :class="$style.price">
-                    0.00
+                    TBD
                 </div>
                 <div v-else :class="$style.price">
                     {{ disaggregate(event.startRate * 100)[0] }}.<span>{{
@@ -61,7 +77,7 @@ const disaggregate = (num) => {
                 />
 
                 <div v-if="event.status == 'NEW'" :class="$style.price">
-                    0.00
+                    TBD
                 </div>
                 <div
                     v-else-if="event.status == 'STARTED'"
@@ -84,9 +100,9 @@ const disaggregate = (num) => {
         <div :class="$style.labels">
             <div :class="$style.label">Start price</div>
 
-            <span v-if="event.status == 'STARTED' && finishTime.m > 0"
-                >{{ finishTime.h }}h {{ finishTime.m }}m</span
-            >
+            <span v-if="event.status == 'STARTED' && finishTime.m > 0">{{
+                finishTimeText
+            }}</span>
             <span v-if="event.status == 'STARTED' && finishTime.m <= 0"
                 >Ending</span
             >

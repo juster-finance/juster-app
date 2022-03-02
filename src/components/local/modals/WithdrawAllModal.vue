@@ -63,7 +63,7 @@ export default defineComponent({
             return {
                 text: `Withdraw ${selectedPositions.value
                     .reduce((acc, curr) => acc + curr.value, 0)
-                    .toFixed(0)} ꜩ`,
+                    .toFixed(2)} ꜩ`,
                 disabled: false,
             }
         })
@@ -159,13 +159,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <Modal
-        :show="show"
-        width="500"
-        padding="32px 32px 24px 32px"
-        closable
-        @onClose="$emit('onClose')"
-    >
+    <Modal :show="show" width="500" closable @onClose="$emit('onClose')">
         <div :class="$style.title">Withdraw all</div>
         <div :class="$style.description">
             Here you can send a batch request to withdraw all your funds

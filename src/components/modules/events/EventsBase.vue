@@ -85,7 +85,7 @@ const defaultFilters = {
             active: true,
         },
         {
-            name: "Active",
+            name: "Running",
             icon: "event_active",
             color: "yellow",
             active: false,
@@ -154,6 +154,8 @@ const isAllEventsLoaded = ref(false)
 const currentPage = ref(1)
 
 let filters = ref(cloneDeep(defaultFilters))
+
+const showFilters = ref(false)
 
 /** reset "currentPage" when changing filters */
 watch(
@@ -243,7 +245,7 @@ const filteredEvents = computed(() => {
             .filter((status) => status.active)
             .map((status) => {
                 if (status.name == "New") return "NEW"
-                if (status.name == "Active") return "STARTED"
+                if (status.name == "Running") return "STARTED"
                 if (status.name == "Finished") return "FINISHED"
                 if (status.name == "Canceled") return "CANCELED"
             })
@@ -463,8 +465,19 @@ const { meta } = useMeta({
 
         <h1>All events</h1>
         <div :class="$style.description">
-            List of all new, active, and past events with customizable filtering
+            List of all new, running, and past events with customizable
+            filtering
         </div>
+
+        <Button
+            @click="showFilters = !showFilters"
+            type="secondary"
+            size="small"
+            block
+            :class="$style.show_filters_btn"
+            ><Icon name="filter" size="14" />
+            {{ showFilters ? "Hide" : "Show" }} Filters</Button
+        >
 
         <div :class="$style.container">
             <EventsFilters
@@ -477,37 +490,35 @@ const { meta } = useMeta({
                 @onSelect="handleSelect"
                 @onReset="handleResetFilters"
                 @onManageParticipant="handleManageParticipant"
-                :class="$style.filters_block"
+                :class="[$style.filters_block, showFilters && $style.show]"
             />
 
             <div :class="$style.events_base">
-                <transition name="fastfade" mode="out-in">
-                    <div v-if="filteredEvents.length" :class="$style.events">
-                        <EventCard
-                            v-for="event in filteredEvents.slice(
-                                (currentPage - 1) * 6,
-                                currentPage * 6,
-                            )"
-                            :key="event.id"
-                            :event="event"
-                        />
-                    </div>
+                <div v-if="filteredEvents.length" :class="$style.events">
+                    <EventCard
+                        v-for="event in filteredEvents.slice(
+                            (currentPage - 1) * 6,
+                            currentPage * 6,
+                        )"
+                        :key="event.id"
+                        :event="event"
+                    />
+                </div>
 
-                    <div v-else-if="!isAllEventsLoaded" :class="$style.events">
-                        <EventCardLoading />
-                        <EventCardLoading />
-                        <EventCardLoading />
-                    </div>
+                <div v-else-if="!isAllEventsLoaded" :class="$style.events">
+                    <EventCardLoading />
+                    <EventCardLoading />
+                    <EventCardLoading />
+                </div>
 
-                    <Banner
-                        v-else-if="!filteredEvents.length && isAllEventsLoaded"
-                        icon="help"
-                        color="gray"
-                        size="small"
-                    >
-                        No events with the selected filters were found
-                    </Banner>
-                </transition>
+                <Banner
+                    v-else-if="!filteredEvents.length && isAllEventsLoaded"
+                    icon="help"
+                    color="gray"
+                    size="small"
+                >
+                    No events with the selected filters were found
+                </Banner>
 
                 <Pagination
                     v-if="filteredEvents.length > 6"
@@ -536,6 +547,12 @@ const { meta } = useMeta({
     color: var(--text-tertiary);
 
     margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+.show_filters_btn {
+    display: none;
+
     margin-bottom: 24px;
 }
 
@@ -560,6 +577,26 @@ const { meta } = useMeta({
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-gap: 16px;
+}
+
+@media (max-width: 700px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .show_filters_btn {
+        display: flex;
+    }
+
+    .filters_block {
+        display: none;
+
+        width: 100%;
+    }
+
+    .filters_block.show {
+        display: initial;
+    }
 }
 
 @media (max-width: 420px) {

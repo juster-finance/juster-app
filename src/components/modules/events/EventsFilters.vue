@@ -12,7 +12,6 @@ import FindParticipantModal from "@/components/local/modals/FindParticipantModal
 import Button from "@/components/ui/Button"
 import Checkbox from "@/components/ui/Checkbox"
 import Toggle from "@/components/ui/Toggle"
-import Tooltip from "@/components/ui/Tooltip"
 
 /**
  * Store
@@ -215,15 +214,7 @@ const handleKeydown = (e) => {
             </div>
 
             <div :class="$style.block">
-                <div :class="$style.subtitle">
-                    <Tooltip side="left">
-                        Liquidity <Icon name="help" size="12" />
-
-                        <template #content>
-                            Max value of liquidity depend on all events
-                        </template>
-                    </Tooltip>
-                </div>
+                <div :class="$style.subtitle">Liquidity</div>
 
                 <div :class="$style.range_picker">
                     <div :class="$style.range">
@@ -464,6 +455,14 @@ const handleKeydown = (e) => {
     height: fit-content;
 }
 
+@media (max-width: 700px) {
+    .wrapper {
+        position: initial;
+
+        width: 100%;
+    }
+}
+
 .switcher {
     display: flex;
 
@@ -479,7 +478,7 @@ const handleKeydown = (e) => {
     justify-content: center;
     gap: 8px;
 
-    width: 130px;
+    width: 100%;
     height: 28px;
     cursor: pointer;
 

@@ -15,6 +15,7 @@ import EventActions from "@/components/local/EventActions"
 /**
  * Services
  */
+import { pluralize } from "@/services/utils/global"
 import { currentNetwork } from "@/services/sdk"
 import { toReadableDuration } from "@/services/utils/date"
 import { supportedMarkets, verifiedMakers } from "@/services/config"
@@ -41,7 +42,7 @@ const props = defineProps({
     price: {
         type: Object,
     },
-    won: {
+    isWon: {
         type: Boolean,
     },
     positionForWithdraw: {
@@ -82,20 +83,22 @@ const timing = computed(() => {
                 hour: "numeric",
                 minute: "numeric",
             }),
-            day: eventDt.toLocaleString({
+            date: eventDt.toLocaleString({
                 day: "numeric",
                 month: "short",
             }),
+            day: eventDt.toFormat("cccc"),
         },
         end: {
             time: endDt.toLocaleString({
                 hour: "numeric",
                 minute: "numeric",
             }),
-            day: endDt.toLocaleString({
+            date: endDt.toLocaleString({
                 day: "numeric",
                 month: "short",
             }),
+            day: endDt.toFormat("cccc"),
         },
         showDay: eventDt.ordinal < endDt.ordinal,
     }
@@ -119,6 +122,15 @@ const priceDynamics = computed(() => {
 
     return { diff, percent }
 })
+
+const endDiff = computed(() =>
+    DateTime.fromISO(props.event.betsCloseTime)
+        .plus({
+            second: props.event.measurePeriod,
+        })
+        .diff(DateTime.fromISO(props.event.betsCloseTime), ["hours"])
+        .toObject(),
+)
 </script>
 
 <template>
@@ -158,6 +170,15 @@ const priceDynamics = computed(() => {
                             :class="[$style.user_avatar, $style.participant]"
                             alt="avatar"
                         />
+                        <div
+                            v-if="participantsAvatars.length > 3"
+                            :class="[
+                                $style.participant,
+                                $style.more_participants,
+                            ]"
+                        >
+                            +{{ participantsAvatars.length - 3 }}
+                        </div>
                     </div>
 
                     <template v-slot:content
@@ -201,154 +222,112 @@ const priceDynamics = computed(() => {
             </div>
         </div>
 
-        <div :class="$style.status">
-            <!-- New -->
-            <template
-                v-if="startStatus == 'In progress' && event.status == 'NEW'"
-            >
-                <Icon
-                    name="event_new"
-                    size="14"
-                    :style="{ fill: `var(--green)` }"
-                />
-
-                <div :class="$style.status__info">
-                    <span>New</span>
-                    <span>Open for betting & providing liquidity</span>
-                </div>
-            </template>
-
-            <!-- Starting -->
-            <template
-                v-else-if="startStatus == 'Finished' && event.status == 'NEW'"
-            >
-                <Icon
-                    name="event_new"
-                    size="14"
-                    :style="{ fill: `var(--yellow)` }"
-                />
-
-                <div :class="$style.status__info">
-                    <span>Starting</span>
-                    <span>The event is starting soon</span>
-                </div>
-            </template>
-
-            <!-- Active -->
-            <template
-                v-else-if="
-                    startStatus == 'Finished' && event.status == 'STARTED'
-                "
-            >
-                <Icon
-                    name="event_active"
-                    size="14"
-                    :style="{ fill: `var(--yellow)` }"
-                />
-
-                <div :class="$style.status__info">
-                    <span>Active</span>
-                    <span>Closed for betting, watching the price</span>
-                </div>
-            </template>
-
-            <!-- Finished -->
-            <template
-                v-else-if="
-                    startStatus == 'Finished' && event.status == 'FINISHED'
-                "
-            >
-                <Icon
-                    name="event_finished"
-                    size="14"
-                    :style="{ fill: `var(--green)` }"
-                />
-
-                <div :class="$style.status__info">
-                    <span>Finished</span>
-                    <span>The event is over, winning side determined</span>
-                </div>
-            </template>
-
-            <!-- Finished -->
-            <template v-else-if="event.status == 'CANCELED'">
-                <Icon
-                    name="stop"
-                    size="14"
-                    :style="{ fill: `var(--text-secondary)` }"
-                />
-
-                <div :class="$style.status__info">
-                    <span>Canceled</span>
-                    <span>Event canceled due to measurement delay</span>
-                </div>
-            </template>
-        </div>
-
-        <div :class="$style.period">
-            <div :class="$style.period__dates">
+        <div :class="$style.card">
+            <div :class="$style.card__header">
                 <div
                     :class="[
-                        $style.period__date,
+                        $style.card__status,
+                        event.status == 'NEW' && $style.green,
+                        event.status == 'STARTED' && $style.yellow,
+                        event.status == 'FINISHED' && $style.gray,
+                        event.status == 'CANCELED' && $style.gray,
+                    ]"
+                >
+                    <template
+                        v-if="
+                            (startStatus == 'In progress') &
+                            (event.status == 'NEW')
+                        "
+                    >
+                        <Icon name="event_new" size="14" /> New
+                    </template>
+                    <template
+                        v-else-if="
+                            startStatus == 'Finished' && event.status == 'NEW'
+                        "
+                    >
+                        <Icon name="event_new" size="14" /> Starting
+                    </template>
+                    <template
+                        v-else-if="
+                            startStatus == 'Finished' &&
+                            event.status == 'STARTED'
+                        "
+                    >
+                        <Icon name="event_active" size="14" /> Running
+                    </template>
+                    <template
+                        v-else-if="
+                            startStatus == 'Finished' &&
+                            event.status == 'FINISHED'
+                        "
+                    >
+                        <Icon name="event_finished" size="14" /> Finished
+                    </template>
+                    <template v-else-if="event.status == 'CANCELED'">
+                        <Icon name="stop" size="14" /> Canceled
+                    </template>
+                </div>
+
+                <div :class="$style.card__duration">
+                    {{
+                        toReadableDuration({
+                            seconds: event.measurePeriod,
+                            asObject: true,
+                        }).val
+                    }}
+                    <span>
+                        {{
+                            pluralize(
+                                toReadableDuration({
+                                    seconds: event.measurePeriod,
+                                    asObject: true,
+                                }).val,
+                                toReadableDuration({
+                                    seconds: event.measurePeriod,
+                                    asObject: true,
+                                }).text,
+                            )
+                        }}
+                    </span>
+                </div>
+            </div>
+
+            <div :class="$style.card__bottom">
+                <div
+                    :class="[
+                        $style.card__side,
+                        $style.left,
                         ['STARTED', 'FINISHED'].includes(event.status) &&
                             $style.opacity,
                     ]"
                 >
-                    <Icon name="calendar" size="14" />
-
-                    <div>
+                    <div :class="$style.card__time">
                         {{ timing.start.time
-                        }}<span>, {{ timing.start.day }}</span>
+                        }}<span>, {{ timing.start.date }}</span>
                     </div>
+                    <div :class="$style.card__day">{{ timing.start.day }}</div>
                 </div>
 
                 <div
                     :class="[
-                        $style.dot,
-                        event.status == 'STARTED' && $style.mig,
-                    ]"
-                />
-                <div
-                    :class="[
-                        $style.dot,
-                        event.status == 'STARTED' && $style.mig,
-                    ]"
-                />
-
-                <span :class="$style.period__duration">{{
-                    eventDuration
-                }}</span>
-
-                <div
-                    :class="[
-                        $style.dot,
-                        event.status == 'STARTED' && $style.mig,
-                    ]"
-                />
-                <div
-                    :class="[
-                        $style.dot,
-                        event.status == 'STARTED' && $style.mig,
-                    ]"
-                />
-
-                <div
-                    :class="[
-                        $style.period__date,
+                        $style.card__side,
+                        $style.right,
                         event.status == 'FINISHED' && $style.opacity,
                     ]"
                 >
-                    <Icon name="calendar" size="14" />
-
-                    <div>
-                        {{ timing.end.time }}<span>, {{ timing.end.day }}</span>
+                    <div :class="$style.card__time">
+                        <span>{{ timing.end.date }}, </span>
+                        {{ timing.end.time }}
                     </div>
+                    <div :class="$style.card__day">{{ timing.end.day }}</div>
                 </div>
-            </div>
 
-            <div :class="$style.period__labels">
-                <span>Start</span>
-                <span>Due to</span>
+                <Icon
+                    name="arrowright"
+                    size="14"
+                    :class="$style.card__arrow_icon"
+                />
             </div>
         </div>
 
@@ -362,11 +341,22 @@ const priceDynamics = computed(() => {
                 "
                 :class="$style.param"
             >
-                <span><Icon name="time" size="12" />Start In</span>
+                <span><Icon name="time" size="12" />Start</span>
 
-                <span v-if="startStatus == 'In progress'">{{
-                    startCountdown
-                }}</span>
+                <span v-if="startStatus == 'In progress'">
+                    <!-- in X days -->
+                    <template v-if="endDiff.hours > 24">
+                        {{
+                            DateTime.fromISO(event.betsCloseTime)
+                                .setLocale("en")
+                                .toRelative()
+                        }}
+                    </template>
+                    <!-- 00:00:00 -->
+                    <template v-else>
+                        {{ startCountdown }}
+                    </template>
+                </span>
                 <span v-else-if="startStatus == 'Finished'">Soon</span>
             </div>
 
@@ -377,11 +367,23 @@ const priceDynamics = computed(() => {
                 "
                 :class="$style.param"
             >
-                <span><Icon name="time" size="12" />Finish In</span>
+                <span><Icon name="time" size="12" />Finish</span>
 
-                <span v-if="finishStatus == 'In progress'">{{
-                    finishCountdown
-                }}</span>
+                <span v-if="finishStatus == 'In progress'">
+                    <!-- in X days -->
+                    <template v-if="endDiff.hours > 24">
+                        {{
+                            DateTime.fromISO(event.betsCloseTime)
+                                .setLocale("en")
+                                .plus({ second: event.measurePeriod })
+                                .toRelative()
+                        }}
+                    </template>
+                    <!-- 00:00:00 -->
+                    <template v-else>
+                        {{ finishCountdown }}
+                    </template>
+                </span>
                 <span v-else-if="finishStatus == 'Finished'">Soon</span>
             </div>
 
@@ -415,37 +417,51 @@ const priceDynamics = computed(() => {
 
             <!-- Second Param -->
             <!-- *New/Starting* -->
-            <div
+            <Tooltip
                 v-if="
                     ['In progress', 'Finished'].includes(startStatus) &&
                     event.status == 'NEW'
                 "
-                :class="$style.param"
+                position="top"
+                side="left"
+                :button="{
+                    icon: 'book',
+                    text: 'Learn More',
+                    url: '/docs',
+                }"
             >
-                <span><Icon name="sides" size="12" />Target Dynamics</span>
+                <div :class="$style.param">
+                    <span><Icon name="sides" size="12" />Target Dynamics</span>
 
-                <span>
-                    <Icon
-                        :name="
-                            (event.targetDynamics == 1 && 'checkcircle') ||
-                            ([1.05, 0.95].includes(event.targetDynamics) &&
-                                'warning') ||
-                            'warning'
-                        "
-                        size="12"
-                        :style="{
-                            fill: `var(--${
-                                (event.targetDynamics == 1 && 'green') ||
+                    <span>
+                        <Icon
+                            :name="
+                                (event.targetDynamics == 1 && 'checkcircle') ||
                                 ([1.05, 0.95].includes(event.targetDynamics) &&
-                                    'yellow') ||
-                                'red'
-                            })`,
-                        }"
-                    />
+                                    'warning') ||
+                                'warning'
+                            "
+                            size="12"
+                            :style="{
+                                fill: `var(--${
+                                    (event.targetDynamics == 1 && 'green') ||
+                                    ([1.05, 0.95].includes(
+                                        event.targetDynamics,
+                                    ) &&
+                                        'yellow') ||
+                                    'red'
+                                })`,
+                            }"
+                        />
 
-                    {{ event.targetDynamics * 100 - 100 }}%</span
-                >
-            </div>
+                        {{ event.targetDynamics * 100 - 100 }}%</span
+                    >
+                </div>
+
+                <template #content
+                    >Price change that separates betting pools
+                </template>
+            </Tooltip>
 
             <!-- *Active/Finished* -->
             <div
@@ -501,8 +517,8 @@ const priceDynamics = computed(() => {
             @onBet="(target) => emit('onBet', target)"
             @onWithdraw="emit('onWithdraw')"
             :event="event"
-            :won="won"
-            :wonPosition="positionForWithdraw"
+            :isWon="isWon"
+            :positionForWithdraw="positionForWithdraw"
             :disabled="
                 event.totalLiquidityProvided == 0 || startStatus == 'Finished'
             "
@@ -571,7 +587,7 @@ const priceDynamics = computed(() => {
 }
 
 .participant {
-    margin-left: -12px;
+    margin-left: -6px;
 }
 
 .creator {
@@ -603,134 +619,142 @@ const priceDynamics = computed(() => {
 
     background: rgb(35, 35, 35);
     border-radius: 50px;
+    outline: 3px solid var(--card-bg);
 
     padding: 2px;
 }
 
-@keyframes mig {
-    0% {
-        background: #2d2d2d;
-    }
-    50% {
-        background: #555555;
-    }
-    100% {
-        background: #2d2d2d;
-    }
-}
+.more_participants {
+    width: 30px;
+    height: 30px;
 
-.dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.dot.mig {
-    animation: mig 2s infinite;
-}
-
-/* Status card */
-.status {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    justify-content: center;
 
-    border-radius: 6px;
-    background: var(--opacity-05);
-    padding: 12px 12px 14px 12px;
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: var(--text-blue);
+
+    background: rgb(35, 35, 35);
+    border-radius: 50px;
+    outline: 3px solid var(--card-bg);
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 
     margin-top: 20px;
 }
 
-.status__info {
+.card__header {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px 6px 2px 2px;
+    padding: 0 14px;
+    height: 42px;
 }
 
-.status__info span:nth-child(1) {
+.card__status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
     font-size: 14px;
     line-height: 1;
+    font-weight: 600;
+}
+
+.card__status.green {
+    color: var(--green);
+    fill: var(--green);
+}
+
+.card__status.yellow {
+    color: var(--yellow);
+    fill: var(--yellow);
+}
+
+.card__status.gray {
+    color: var(--text-secondary);
+    fill: var(--text-secondary);
+}
+
+.card__duration {
+    font-size: 13px;
+    line-height: 1.1;
     font-weight: 600;
     color: var(--text-secondary);
 }
 
-.status__info span:nth-child(2) {
+.card__duration span {
+    color: var(--text-tertiary);
+}
+
+.card__bottom {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 2px 2px 6px 6px;
+    padding: 0 14px;
+    height: 62px;
+}
+
+.card__side {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    transition: opacity 0.2s ease;
+}
+
+.card__side.right {
+    align-items: flex-end;
+}
+
+.card__side.opacity {
+    opacity: 0.5;
+}
+
+.card__side:hover {
+    opacity: 1;
+}
+
+.card__time {
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.card__time span {
+    color: var(--text-tertiary);
+}
+
+.card__day {
     font-size: 13px;
     line-height: 1.1;
     font-weight: 500;
     color: var(--text-tertiary);
 }
 
-/* Period */
-.period {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.card__arrow_icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
 
-    margin-top: 20px;
-}
+    transform: translateY(-50%) translateX(-50%);
 
-.period__dates {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.period__date {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    height: 32px;
-    padding: 0 8px;
-    border-radius: 6px;
-    background: var(--opacity-05);
-
-    transition: opacity 0.2s ease;
-}
-
-.period__date.opacity {
-    opacity: 0.5;
-}
-
-.period__date:hover {
-    opacity: 1;
-}
-
-.period__date svg {
     fill: var(--text-tertiary);
-}
-
-.period__date div {
-    font-size: 13px;
-    line-height: 1.1;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.period__date div span {
-    color: var(--text-tertiary);
-}
-
-.period__duration {
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-tertiary);
-}
-
-.period__labels {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.period__labels span {
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-tertiary);
 }
 
 /* Params */
@@ -745,6 +769,8 @@ const priceDynamics = computed(() => {
 .param {
     display: flex;
     justify-content: space-between;
+
+    width: 100%;
 
     font-size: 14px;
     line-height: 1;

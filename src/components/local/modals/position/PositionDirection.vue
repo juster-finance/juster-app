@@ -19,7 +19,7 @@ const accountStore = useAccountStore()
 const symbol = computed(() => props.event.currencyPair.symbol)
 
 const timing = computed(() => {
-    const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("ru")
+    const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("en")
 
     const endDt = eventDt.plus(props.event.measurePeriod * 1000)
 
@@ -96,11 +96,15 @@ const timing = computed(() => {
                         supportedMarkets[symbol].description
                     }}
                 </div>
+
                 <div :class="$style.subname">
-                    <span>{{ countdown }}</span>
-                    , {{ timing.start.time }}
-                    ->
-                    {{ timing.end.time }}
+                    <span
+                        >{{
+                            DateTime.fromISO(event.betsCloseTime)
+                                .setLocale("en")
+                                .toRelative()
+                        }} </span
+                    >, {{ timing.start.time }}
                 </div>
             </div>
         </div>
