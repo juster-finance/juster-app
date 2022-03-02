@@ -112,8 +112,9 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
     border: 1px solid var(--border);
     background: var(--card-bg);
     padding: 0 16px;
+    cursor: pointer;
 
-    transition: border 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .wrapper:hover {

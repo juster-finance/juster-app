@@ -32,6 +32,7 @@ export const getEventById = gql`
                 amount
                 createdTime
                 userId
+                opgHash
             }
             deposits {
                 amountAboveEq
@@ -41,6 +42,7 @@ export const getEventById = gql`
                 userId
                 createdTime
                 shares
+                opgHash
             }
         }
     }

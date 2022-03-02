@@ -473,6 +473,7 @@ onMounted(async () => {
                         amount: true,
                         createdTime: true,
                         userId: true,
+                        opgHash: true,
                     },
                     deposits: {
                         amountAboveEq: true,
@@ -482,6 +483,7 @@ onMounted(async () => {
                         userId: true,
                         createdTime: true,
                         shares: true,
+                        opgHash: true,
                     },
                 },
             ],
