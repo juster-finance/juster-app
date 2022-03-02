@@ -41,7 +41,7 @@ const handleSwitch = () => {
 
             <h1>Juster is now available on the Mainnet</h1>
 
-            <div :class="$style.when">10 February 2022</div>
+            <div :class="$style.when">17 February 2022</div>
         </div>
 
         <div :class="$style.content">

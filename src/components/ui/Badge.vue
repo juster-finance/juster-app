@@ -20,7 +20,6 @@ const props = defineProps({
     border-radius: 6px;
 
     font-weight: 600;
-    line-height: 1.2;
     white-space: nowrap;
 }
 
@@ -34,12 +33,16 @@ const props = defineProps({
 .wrapper.small {
     height: 26px;
     font-size: 12px;
+    line-height: 1.2;
+
     padding: 0 8px;
 }
 .wrapper.medium {
     height: 30px;
-    padding: 0 10px;
     font-size: 13px;
+    line-height: 1.1;
+
+    padding: 0 10px;
 }
 
 /**
