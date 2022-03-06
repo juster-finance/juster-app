@@ -434,9 +434,9 @@ onUnmounted(() => {
                 :style="{ ...contextMenuStyles }"
             >
                 <template v-slot:dropdown>
-                    <router-link :to="`/events/${event.id}`">
+                    <router-link :to="`/events/${event.id}`" target="_blank">
                         <DropdownItem>
-                            <Icon name="open" size="16" />Open Event page
+                            <Icon name="open" size="16" />Open in new tab
                         </DropdownItem>
                     </router-link>
 
