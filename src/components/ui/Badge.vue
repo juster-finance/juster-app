@@ -33,14 +33,13 @@ const props = defineProps({
 .wrapper.small {
     height: 26px;
     font-size: 12px;
-    line-height: 1.2;
+    line-height: 12px;
 
     padding: 0 8px;
 }
 .wrapper.medium {
     height: 30px;
     font-size: 13px;
-    line-height: 1.1;
 
     padding: 0 10px;
 }
