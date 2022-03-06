@@ -376,7 +376,7 @@ export default defineComponent({
         </template>
 
         <template v-else>
-            <div :class="$style.title">Place a bet</div>
+            <div :class="$style.title">Providing liquidity</div>
             <div :class="$style.description">
                 You need to connect your wallet (with Beacon) to place liquidity
                 and make bets
