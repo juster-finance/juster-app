@@ -11,12 +11,6 @@ import Button from "@/components/ui/Button"
 import Banner from "@/components/ui/Banner"
 
 /**
- * Store
- */
-import { useAccountStore } from "@/store/account"
-const accountStore = useAccountStore()
-
-/**
  * Services
  */
 import { juster, switchNetwork } from "@/services/sdk"
@@ -141,7 +135,7 @@ const handleSwitch = () => {
 					><Icon name="discord" size="16" />Join our Discord
 				</Button></a
 			>
-			<a href="https://twitter.com/TezosBakingBad" target="_blank">
+			<a href="https://twitter.com/Juster_fi" target="_blank">
 				<Button type="secondary" size="small"
 					><Icon name="twitter" size="16" />Read our Twitter</Button
 				>

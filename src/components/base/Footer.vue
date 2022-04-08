@@ -292,7 +292,7 @@ onBeforeUnmount(() => {
 							</Button>
 						</a>
 						<a
-							href="https://twitter.com/TezosBakingBad"
+							href="https://twitter.com/Juster_fi"
 							target="_blank"
 							rel="nofolow noreferrer"
 						>
