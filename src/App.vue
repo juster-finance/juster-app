@@ -111,12 +111,6 @@ html {
 	background: var(--app-bg);
 }
 
-/* 
-@font-face {
-    font-family: "CalSans";
-    src: local("CalSans"), url(./assets/fonts/CalSans.ttf) format("truetype");
-} */
-
 .popup-enter-active,
 .popup-leave-active {
 	transition: all 0.07s ease-out;
