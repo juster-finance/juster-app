@@ -1,6 +1,11 @@
 <script setup>
 import { computed } from "vue"
 
+/**
+ * Services
+ */
+import { numberWithSymbol } from "@/services/utils/amounts"
+
 const props = defineProps({
 	event: { type: Object },
 	price: { type: Object },
@@ -13,7 +18,7 @@ const disaggregate = (num) => {
 	const integer = splittedNum[0]
 	const fraction = splittedNum[1].slice(0, 2)
 
-	return [integer, fraction]
+	return [numberWithSymbol(integer, ","), fraction]
 }
 
 const finishTimeText = computed(() => {
