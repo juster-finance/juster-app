@@ -15,6 +15,7 @@ import EventActions from "@/components/local/EventActions"
 /**
  * Services
  */
+import { numberWithSymbol } from "@/services/utils/amounts"
 import { pluralize } from "@/services/utils/global"
 import { currentNetwork } from "@/services/sdk"
 import { toReadableDuration } from "@/services/utils/date"
@@ -67,10 +68,6 @@ const participantsAvatars = computed(() => {
 
 	return avatars
 })
-
-const eventDuration = computed(() =>
-	toReadableDuration({ seconds: props.event.measurePeriod }),
-)
 
 const timing = computed(() => {
 	const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("en")
@@ -294,7 +291,12 @@ const endDiff = computed(() =>
 				</div>
 			</div>
 
-			<div :class="$style.card__bottom">
+			<div
+				:class="[
+					$style.card__bottom,
+					event.bets.length >= 6 && $style.highdemand_radius,
+				]"
+			>
 				<div
 					:class="[
 						$style.card__side,
@@ -329,6 +331,16 @@ const endDiff = computed(() =>
 					size="14"
 					:class="$style.card__arrow_icon"
 				/>
+			</div>
+
+			<div v-if="event.bets.length >= 6" :class="$style.card__highdemand">
+				<span>High-demand Event</span>
+				<span
+					>{{ event.bets.length }} bets&nbsp;&nbsp;•&nbsp;&nbsp;{{
+						numberWithSymbol(event.totalValueLocked.toFixed(0), ",")
+					}}
+					liquidity</span
+				>
 			</div>
 		</div>
 
@@ -708,6 +720,32 @@ const endDiff = computed(() =>
 	border-radius: 2px 2px 6px 6px;
 	padding: 0 14px;
 	height: 62px;
+}
+
+.card__bottom.highdemand_radius {
+	border-radius: 2px;
+}
+
+.card__highdemand {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	background: rgba(133, 90, 209, 0.15);
+	color: var(--purple);
+	height: 34px;
+	padding: 0 14px;
+	border-radius: 2px 2px 6px 6px;
+}
+
+.card__highdemand span {
+	font-size: 12px;
+	line-height: 1;
+	font-weight: 600;
+}
+
+.card__highdemand span:nth-child(2) {
+	font-weight: 500;
 }
 
 .card__side {
