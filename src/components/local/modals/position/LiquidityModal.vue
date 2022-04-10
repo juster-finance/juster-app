@@ -1,56 +1,47 @@
 <script>
-import {
-	defineComponent,
-	ref,
-	reactive,
-	computed,
-	toRefs,
-	watch,
-	nextTick,
-} from "vue"
-import BigNumber from "bignumber.js"
-import { DateTime } from "luxon"
+import { defineComponent, ref, reactive, computed, toRefs, watch, nextTick } from 'vue'
+import BigNumber from 'bignumber.js'
+import { DateTime } from 'luxon'
 
 /**
  * Services
  */
-import { juster, currentNetwork, analytics } from "@/services/sdk"
-import { verifiedMakers } from "@/services/config"
+import { juster, currentNetwork, analytics } from '@/services/sdk'
+import { verifiedMakers } from '@/services/config'
 
 /**
  * Local
  */
-import SplittedPool from "@/components/local/SplittedPool"
-import SlippageSelector from "@/components/local/SlippageSelector"
+import SplittedPool from '@/components/local/SplittedPool'
+import SlippageSelector from '@/components/local/SlippageSelector'
 
-import PositionDirection from "./PositionDirection"
+import PositionDirection from './PositionDirection'
 
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
-import Input from "@/components/ui/Input"
-import Stat from "@/components/ui/Stat"
-import Button from "@/components/ui/Button"
-import Spin from "@/components/ui/Spin"
-import Tooltip from "@/components/ui/Tooltip"
-import Banner from "@/components/ui/Banner"
+import Modal from '@/components/ui/Modal'
+import Input from '@/components/ui/Input'
+import Stat from '@/components/ui/Stat'
+import Button from '@/components/ui/Button'
+import Spin from '@/components/ui/Spin'
+import Banner from '@/components/ui/Banner'
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useAccountStore } from '@/store/account'
+import { useNotificationsStore } from '@/store/notifications'
 
 /**
  * Composable
  */
-import { useCountdown } from "@/composable/date"
+import { useCountdown } from '@/composable/date'
 
 export default defineComponent({
-	name: "LiquidityModal",
+	name: 'LiquidityModal',
 	props: { show: Boolean, event: Object },
-	emits: ["onClose"],
+	emits: ['onClose'],
 
 	setup(props, context) {
 		const { event, show } = toRefs(props)
@@ -61,17 +52,11 @@ export default defineComponent({
 		const amountInput = ref(null)
 
 		/** Countdown setup */
-		const eventStartTime = computed(() =>
-			new Date(event.value?.betsCloseTime).getTime(),
-		)
-		const {
-			countdownText,
-			status: countdownStatus,
-			stop,
-		} = useCountdown(eventStartTime)
+		const eventStartTime = computed(() => new Date(event.value?.betsCloseTime).getTime())
+		const { countdownText, status: countdownStatus, stop } = useCountdown(eventStartTime)
 
 		/** User inputs */
-		const amount = reactive({ value: 0, error: "" })
+		const amount = reactive({ value: 0, error: '' })
 		const slippage = ref(2.5)
 
 		const sendingLiquidity = ref(false)
@@ -86,20 +71,13 @@ export default defineComponent({
 			}
 		})
 		const shares = computed(() => {
-			const bigPool = Math.max(
-				event.value.poolBelow,
-				event.value.poolAboveEq,
-			)
+			const bigPool = Math.max(event.value.poolBelow, event.value.poolAboveEq)
 
-			return (
-				(event.value.totalLiquidityShares *
-					(!amount.value ? 0 : amount.value)) /
-				bigPool
-			)
+			return (event.value.totalLiquidityShares * (!amount.value ? 0 : amount.value)) / bigPool
 		})
 
 		const onKeydown = (e) => {
-			if (e.code == "Enter") {
+			if (e.code == 'Enter') {
 				e.preventDefault()
 				handleProvideLiquidity()
 			}
@@ -112,47 +90,42 @@ export default defineComponent({
 
 				stop()
 
-				document.removeEventListener("keydown", onKeydown)
+				document.removeEventListener('keydown', onKeydown)
 
 				showHint.confirmationDelay = false
 				showHint.aborted = false
 			} else {
 				accountStore.updateBalance()
 
-				document.addEventListener("keydown", onKeydown)
+				document.addEventListener('keydown', onKeydown)
 
 				/** auto-focus input */
 				nextTick(() => {
-					amountInput.value.$el.querySelector("input").focus()
+					amountInput.value.$el.querySelector('input').focus()
 				})
 			}
 		})
 
 		watch(amount, () => {
-			if (!amount.value) amount.value = ""
+			if (!amount.value) amount.value = ''
 		})
 
 		// eslint-disable-next-line vue/return-in-computed-property
 		const buttonState = computed(() => {
 			if (accountStore.pendingTransaction.awaiting) {
 				return {
-					text: "Previous transaction in process",
+					text: 'Previous transaction in process',
 					disabled: true,
 				}
 			}
 
-			if (countdownStatus.value !== "In progress")
-				return { text: "Acceptance of bets is closed", disabled: true }
-			if (sendingLiquidity.value)
-				return { text: "Awaiting confirmation..", disabled: true }
+			if (countdownStatus.value !== 'In progress') return { text: 'Acceptance of bets is closed', disabled: true }
+			if (sendingLiquidity.value) return { text: 'Awaiting confirmation..', disabled: true }
 
-			if (amount.value > accountStore.balance)
-				return { text: "Insufficient funds", disabled: true }
+			if (amount.value > accountStore.balance) return { text: 'Insufficient funds', disabled: true }
 
-			if (!amount.value)
-				return { text: "Select the liquidity amount", disabled: true }
-			if (amount.value)
-				return { text: "Provide liquidity", disabled: false }
+			if (!amount.value) return { text: 'Select the liquidity amount', disabled: true }
+			if (amount.value) return { text: 'Provide liquidity', disabled: false }
 		})
 
 		const showHint = reactive({
@@ -175,7 +148,7 @@ export default defineComponent({
 					new BigNumber(event.value.poolAboveEq),
 					new BigNumber(event.value.poolBelow),
 					new BigNumber(slippage.value / 100),
-					new BigNumber(amount.value),
+					new BigNumber(amount.value)
 				)
 				.then((op) => {
 					/** Pending transaction label */
@@ -201,31 +174,28 @@ export default defineComponent({
 					setTimeout(() => {
 						notificationsStore.create({
 							notification: {
-								type: "success",
-								title: "Your liquidity has been accepted",
-								description:
-									"We need to process your bet, it will take 15-30 seconds",
+								type: 'success',
+								title: 'Your liquidity has been accepted',
+								description: 'We need to process your bet, it will take 15-30 seconds',
 								autoDestroy: true,
 							},
 						})
 					}, 700)
 
 					/** analytics */
-					analytics.log("onLiquidity", {
+					analytics.log('onLiquidity', {
 						eventId: event.value.id,
 						amount: amount.value,
-						tts:
-							DateTime.fromISO(event.value.betsCloseTime).ts -
-							DateTime.now().ts,
+						tts: DateTime.fromISO(event.value.betsCloseTime).ts - DateTime.now().ts,
 					})
 
-					context.emit("onClose")
+					context.emit('onClose')
 				})
 				.catch((err) => {
 					sendingLiquidity.value = false
 					showHint.confirmationDelay = false
 
-					if (err.title == "Aborted") showHint.aborted = true
+					if (err.title == 'Aborted') showHint.aborted = true
 				})
 		}
 
@@ -236,7 +206,7 @@ export default defineComponent({
 				accountStore.setPkh(pkh)
 			})
 
-			context.emit("onClose")
+			context.emit('onClose')
 		}
 
 		return {
@@ -258,14 +228,13 @@ export default defineComponent({
 		}
 	},
 
-	emits: ["onClose"],
+	emits: ['onClose'],
 	components: {
 		Modal,
 		Input,
 		Stat,
 		Button,
 		Spin,
-		Tooltip,
 		Banner,
 		PositionDirection,
 		SplittedPool,
@@ -290,12 +259,7 @@ export default defineComponent({
 				The transaction takes place on the Ithacanet
 			</Banner>
 
-			<PositionDirection
-				:event="event"
-				:amount="amount"
-				:countdown="countdownText"
-				:class="$style.direction"
-			/>
+			<PositionDirection :event="event" :amount="amount" :countdown="countdownText" :class="$style.direction" />
 
 			<Input
 				ref="amountInput"
@@ -310,22 +274,12 @@ export default defineComponent({
 				:class="$style.amount_input"
 			/>
 
-			<SplittedPool
-				:event="event"
-				:amount="amount.value"
-				side="Liquidity"
-				:class="$style.pool"
-			/>
+			<SplittedPool :event="event" :amount="amount.value" side="Liquidity" :class="$style.pool" />
 
-			<SlippageSelector
-				v-model="slippage"
-				:class="$style.slippage_block"
-			/>
+			<SlippageSelector v-model="slippage" :class="$style.slippage_block" />
 
 			<div :class="$style.stats">
-				<Stat name="Reward for providing"
-					>{{ (event.liquidityPercent * 100).toFixed(0) }}%</Stat
-				>
+				<Stat name="Reward for providing">{{ (event.liquidityPercent * 100).toFixed(0) }}%</Stat>
 
 				<Stat v-if="liquidityRatio" name="Ratio">
 					<Icon name="close" size="14" :class="$style.ratio_icon" />
@@ -335,7 +289,7 @@ export default defineComponent({
 			</div>
 
 			<Banner
-				v-if="event.creatorId !== verifiedMakers[currentNetwork]"
+				v-if="!verifiedMakers[currentNetwork].includes(event.creatorId)"
 				icon="warning"
 				color="red"
 				size="small"
@@ -353,11 +307,7 @@ export default defineComponent({
 				:disabled="buttonState.disabled"
 			>
 				<Spin v-if="sendingLiquidity" size="16" />
-				<Icon
-					v-else
-					:name="!buttonState.disabled ? 'bolt' : 'lock'"
-					size="16"
-				/>
+				<Icon v-else :name="!buttonState.disabled ? 'bolt' : 'lock'" size="16" />
 				{{ buttonState.text }}
 			</Button>
 
@@ -378,8 +328,7 @@ export default defineComponent({
 		<template v-else>
 			<div :class="$style.title">Providing liquidity</div>
 			<div :class="$style.description">
-				You need to connect your wallet (with Beacon) to place liquidity
-				and make bets
+				You need to connect your wallet (with Beacon) to place liquidity and make bets
 			</div>
 
 			<Button @click="handleLogin" size="large" type="primary" block>

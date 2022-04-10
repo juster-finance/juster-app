@@ -1,11 +1,6 @@
 <script setup>
 import { computed } from "vue"
 
-/**
- * Services
- */
-import { numberWithSymbol } from "@/services/utils/amounts"
-
 const props = defineProps({
 	event: { type: Object },
 	price: { type: Object },

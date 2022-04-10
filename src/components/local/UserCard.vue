@@ -1,28 +1,22 @@
 <script setup>
-import { toRefs } from "vue"
-
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import {
-	Dropdown,
-	DropdownItem,
-	DropdownDivider,
-} from "@/components/ui/Dropdown"
+import Button from '@/components/ui/Button'
+import { Dropdown, DropdownItem, DropdownDivider } from '@/components/ui/Dropdown'
 
 /**
  * Services
  */
-import { currentNetwork } from "@/services/sdk"
-import { toClipboard } from "@/services/utils/global"
-import { verifiedMakers } from "@/services/config"
+import { currentNetwork } from '@/services/sdk'
+import { toClipboard } from '@/services/utils/global'
+import { verifiedMakers } from '@/services/config'
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useAccountStore } from '@/store/account'
+import { useNotificationsStore } from '@/store/notifications'
 
 const props = defineProps({ user: { type: Object } })
 
@@ -30,23 +24,23 @@ const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 
 const handleCopy = (target) => {
-	if (target == "address") {
+	if (target == 'address') {
 		notificationsStore.create({
 			notification: {
-				type: "success",
-				title: "User address copied to clipboard",
-				description: "Use Ctrl+V to paste",
+				type: 'success',
+				title: 'User address copied to clipboard',
+				description: 'Use Ctrl+V to paste',
 				autoDestroy: true,
 			},
 		})
 		toClipboard(props.user.userId)
 	}
-	if (target == "url") {
+	if (target == 'url') {
 		notificationsStore.create({
 			notification: {
-				type: "success",
-				title: "Profile URL copied to clipboard",
-				description: "Use Ctrl+V to paste",
+				type: 'success',
+				title: 'Profile URL copied to clipboard',
+				description: 'Use Ctrl+V to paste',
 				autoDestroy: true,
 			},
 		})
@@ -60,22 +54,14 @@ const handleCopy = (target) => {
 		<div :class="$style.left">
 			<div :class="$style.avatar">
 				<img
-					v-if="verifiedMakers[currentNetwork] !== user.userId"
+					v-if="!verifiedMakers[currentNetwork].includes(user.userId)"
 					:src="`https://services.tzkt.io/v1/avatars/${user.userId}`"
 					alt="avatar"
 				/>
-				<Icon
-					v-else
-					name="logo_symbol"
-					size="24"
-					:class="$style.logo_icon"
-				/>
+				<Icon v-else name="logo_symbol" size="24" :class="$style.logo_icon" />
 
 				<Icon
-					v-if="
-						user.creator ||
-						verifiedMakers[currentNetwork] == user.userId
-					"
+					v-if="user.creator || verifiedMakers[currentNetwork].includes(user.userId)"
 					name="verified"
 					size="14"
 					:class="$style.verified_icon"
@@ -85,17 +71,13 @@ const handleCopy = (target) => {
 			<div :class="$style.base">
 				<div @click="handleCopy('address')" :class="$style.address">
 					<!-- By Juster -->
-					<template
-						v-if="verifiedMakers[currentNetwork] == user.userId"
-					>
-						Juster
-					</template>
+					<template v-if="verifiedMakers[currentNetwork].includes(user.userId)"> Juster </template>
 					<!-- User -->
 					<template v-else-if="user.userId !== accountStore.pkh">
 						{{
 							`${user.userId.slice(0, 8)}..${user.userId.slice(
 								user.userId.length - 3,
-								user.userId.length,
+								user.userId.length
 							)}`
 						}}
 					</template>
@@ -105,11 +87,7 @@ const handleCopy = (target) => {
 				</div>
 
 				<div
-					v-if="
-						user.shares &&
-						user.liquidityProvidedAboveEq &&
-						user.liquidityProvidedBelow
-					"
+					v-if="user.shares && user.liquidityProvidedAboveEq && user.liquidityProvidedBelow"
 					:class="$style.params"
 				>
 					<div :class="$style.param">
@@ -118,15 +96,7 @@ const handleCopy = (target) => {
 					<div :class="$style.dot" />
 					<div :class="$style.param">
 						Liquidity:
-						<span
-							>{{
-								(
-									user.liquidityProvidedBelow +
-									user.liquidityProvidedAboveEq
-								).toFixed(2)
-							}}
-							ꜩ</span
-						>
+						<span>{{ (user.liquidityProvidedBelow + user.liquidityProvidedAboveEq).toFixed(2) }} ꜩ</span>
 					</div>
 				</div>
 			</div>
@@ -139,33 +109,22 @@ const handleCopy = (target) => {
 
 			<template v-slot:dropdown>
 				<router-link :to="`/profile/${user.userId}`">
-					<DropdownItem
-						><Icon name="open" size="16" />Open User
-						profile</DropdownItem
-					>
+					<DropdownItem><Icon name="open" size="16" />Open User profile</DropdownItem>
 
 					<DropdownDivider />
 				</router-link>
 
 				<a
-					:href="`https://${
-						currentNetwork == 'mainnet' ? '' : 'ithacanet.'
-					}tzkt.io/${user.userId}`"
+					:href="`https://${currentNetwork == 'mainnet' ? '' : 'ithacanet.'}tzkt.io/${user.userId}`"
 					target="_blank"
 				>
-					<DropdownItem
-						><Icon name="open" size="16" />View on TzKT
-					</DropdownItem>
+					<DropdownItem><Icon name="open" size="16" />View on TzKT </DropdownItem>
 				</a>
 
 				<DropdownDivider />
 
-				<DropdownItem @click="handleCopy('address')"
-					><Icon name="copy" size="16" />Copy address
-				</DropdownItem>
-				<DropdownItem @click="handleCopy('url')"
-					><Icon name="copy" size="16" />Copy URL
-				</DropdownItem>
+				<DropdownItem @click="handleCopy('address')"><Icon name="copy" size="16" />Copy address </DropdownItem>
+				<DropdownItem @click="handleCopy('url')"><Icon name="copy" size="16" />Copy URL </DropdownItem>
 			</template>
 		</Dropdown>
 	</div>
