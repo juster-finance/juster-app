@@ -113,7 +113,7 @@ const handleCopy = (target) => {
 					:class="$style.params"
 				>
 					<div :class="$style.param">
-						Shares: <span>{{ user.shares }}</span>
+						Shares: <span>{{ user.shares.toFixed(2) }}</span>
 					</div>
 					<div :class="$style.dot" />
 					<div :class="$style.param">
