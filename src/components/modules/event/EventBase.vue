@@ -330,6 +330,23 @@ const handleParticipants = () => {
 
 watch(event, async () => {
 	await getEvent()
+
+	/** Manage Favicon */
+	const favicon = document.getElementById("favicon")
+	const isDark = window.matchMedia("(prefers-color-scheme: dark)")
+	const baseFavicon = `/favicon_${isDark.matches ? "dark" : "light"}`
+
+	switch (event.value.status) {
+		case "NEW":
+			favicon.href = `${baseFavicon}__new.svg`
+			break
+		case "STARTED":
+			favicon.href = `${baseFavicon}__running.svg`
+			break
+		case "FINISHED":
+			favicon.href = `${baseFavicon}__finished.svg`
+			break
+	}
 })
 
 const subToEvent = ref({})
@@ -451,6 +468,13 @@ onUnmounted(() => {
 	) {
 		subToDeposits.value.unsubscribe()
 	}
+
+	/** Reset Favicon */
+	const favicon = document.getElementById("favicon")
+	const isDark = window.matchMedia("(prefers-color-scheme: dark)")
+
+	if (isDark.matches) favicon.href = "/favicon_dark.svg"
+	else favicon.href = "/favicon_light.svg"
 
 	destroyStartCountdown()
 	destroyFinishCountdown()

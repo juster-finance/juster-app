@@ -18,7 +18,7 @@ import Notifications from "@/components/local/Notifications"
 /**
  * Services
  */
-import { juster, analytics } from "@/services/sdk"
+import { juster } from "@/services/sdk"
 
 /**
  * Store
@@ -33,6 +33,13 @@ import { useMarket } from "@/composable/market"
 export default defineComponent({
 	setup() {
 		const { setupMarket, setupUser } = useMarket()
+
+		/** Favicon */
+		const favicon = document.getElementById("favicon")
+		const isDark = window.matchMedia("(prefers-color-scheme: dark)")
+
+		if (isDark.matches) favicon.href = "/favicon_dark.svg"
+		else favicon.href = "/favicon_light.svg"
 
 		/**
         /**
