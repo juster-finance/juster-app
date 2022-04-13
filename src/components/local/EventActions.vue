@@ -192,7 +192,7 @@ const btnType = computed(() => {
 
 .left span {
     font-size: 12px;
-    line-height: 1.1;
+    line-height: 14px;
     font-weight: 600;
     color: var(--text-primary);
 }

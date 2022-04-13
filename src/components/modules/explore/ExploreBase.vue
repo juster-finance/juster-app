@@ -302,7 +302,7 @@ export default defineComponent({
 .description {
     font-size: 14px;
     font-weight: 500;
-    line-height: 1.6;
+    line-height: 22px;
     color: var(--text-tertiary);
 
     margin-top: 8px;

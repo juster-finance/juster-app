@@ -15,9 +15,9 @@ import MarketStatus from "./MarketStatus"
 /**
  * Services
  */
+import { numberWithSymbol, calcChange } from "@/services/utils/amounts"
 import { supportedMarkets } from "@/services/config"
 import { prepareQuotesForD3 } from "@/services/utils/quotes"
-import { numberWithSymbol, calcChange } from "@/services/utils/amounts"
 
 /**
  * Store
