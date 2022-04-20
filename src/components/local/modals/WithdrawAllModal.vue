@@ -168,7 +168,7 @@ export default defineComponent({
 	<Modal :show="show" width="500" closable @onClose="$emit('onClose')">
 		<div :class="$style.title">Withdraw all</div>
 		<div :class="$style.description">
-			Here you can send a batch request to withdraw all your funds
+			Send a batch request to withdraw all your funds
 		</div>
 
 		<div :class="$style.subtitle">
@@ -209,13 +209,16 @@ export default defineComponent({
 							:src="require('@/assets/icons/lower_won.svg')"
 							alt="won_side_icon"
 						/>
+
 						<span>{{
 							supportedMarkets[position.event.currencyPair.symbol]
+								.description
 						}}</span>
+
 						price event
 					</div>
 					<div :class="$style.subname">
-						Event ID: {{ position.event.id }}, Amount:&nbsp;<span>{{
+						Event: #{{ position.event.id }}, amount:&nbsp;<span>{{
 							position.value.toFixed(2)
 						}}</span
 						>&nbsp;ꜩ
@@ -225,13 +228,8 @@ export default defineComponent({
 		</div>
 
 		<div :class="$style.hint">
-			Please note that a response about successful withdrawal will come
-			when all operations are completed (this may take some time).
-			<a
-				href="https://juster.notion.site/Withdraw-all-funds-77d8592c238947b497a54f8f3617feb3"
-				target="_blank"
-				>Learn more</a
-			>
+			The answer will come after <span>all operations</span> have been
+			completed successfully
 		</div>
 
 		<Button
@@ -241,9 +239,15 @@ export default defineComponent({
 			:disabled="buttonState.disabled"
 			:loading="awaitingConfirmation"
 			block
-			><Icon v-if="!awaitingConfirmation" name="crown" size="16" />
-			<Spin v-else size="16" />{{ buttonState.text }}</Button
 		>
+			<Icon
+				v-if="!awaitingConfirmation && !buttonState.disabled"
+				name="crown"
+				size="16"
+			/>
+			<Spin v-else-if="awaitingConfirmation" size="16" />
+			{{ buttonState.text }}
+		</Button>
 	</Modal>
 </template>
 
@@ -350,6 +354,10 @@ export default defineComponent({
 	color: var(--text-tertiary);
 
 	margin: 8px 0 32px 0;
+}
+
+.hint span {
+	color: var(--text-secondary);
 }
 
 .hint a {
