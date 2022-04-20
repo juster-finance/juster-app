@@ -1,17 +1,17 @@
 {
     "name": "juster-web",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "private": true,
     "scripts": {
         "serve": "vue-cli-service serve",
-        "build": "vue-cli-service build",
+        "build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
         "lint": "vue-cli-service lint"
     },
     "dependencies": {
         "@apollo/client": "^3.3.21",
         "@juster-finance/gql-client": "^0.0.6",
-        "@juster-finance/sdk": "^0.0.5",
-        "@taquito/taquito": "^10.1.0",
+        "@juster-finance/sdk": "0.0.7",
+        "@taquito/taquito": "12.0.3",
         "@vue/apollo-composable": "4.0.0-alpha.12",
         "amplitude-js": "^8.12.0",
         "axios": "^0.21.4",
@@ -23,12 +23,12 @@
         "lodash": "^4.17.21",
         "luxon": "^2.0.1",
         "markdown-it": "^12.2.0",
-        "pinia": "^2.0.11",
+        "pinia": "^2.0.13",
         "uuid": "^8.3.2",
-        "vue": "^3.2.26",
+        "vue": "^3.2.31",
         "vue-gtag": "^2.0.1",
         "vue-meta": "^3.0.0-alpha.8",
-        "vue-router": "^4.0.0-0"
+        "vue-router": "^4.0.14"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "~4.5.0",
@@ -37,13 +37,20 @@
         "@vue/cli-service": "~4.5.0",
         "@vue/compiler-sfc": "^3.0.0",
         "babel-eslint": "^10.1.0",
-        "eslint": "^6.7.2",
-        "eslint-plugin-vue": "^7.0.0"
+        "eslint": "^7.32.0",
+        "eslint-plugin-vue": "^8.0.3"
     },
     "eslintConfig": {
         "root": true,
         "env": {
-            "node": true
+            "node": true,
+            "vue/setup-compiler-macros": true
+        },
+        "globals": {
+            "defineProps": "readonly",
+            "defineEmits": "readonly",
+            "defineExpose": "readonly",
+            "withDefaults": "readonly"
         },
         "extends": [
             "plugin:vue/vue3-essential",

@@ -27,11 +27,6 @@ export default {
 				] == "object"
 			)
 		},
-		getKeys() {
-			return Object.keys(
-				icons[this.name.charAt(0).toLowerCase() + this.name.slice(1)],
-			)
-		},
 	},
 }
 </script>

@@ -1,6 +1,5 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive } from "vue"
-import { useRouter } from "vue-router"
 import axios from "axios"
 import { DateTime } from "luxon"
 
@@ -9,11 +8,6 @@ import { DateTime } from "luxon"
  */
 import { juster, switchNetwork, currentNetwork } from "@/services/sdk"
 import { capitalizeFirstLetter } from "@/services/utils/global"
-
-/**
- * Constants
- */
-import { Networks } from "@/services/constants"
 
 /**
  * Store
@@ -27,8 +21,6 @@ const marketStore = useMarketStore()
 import Button from "@/components/ui/Button"
 import Tooltip from "@/components/ui/Tooltip"
 import { Dropdown, DropdownItem, DropdownTitle } from "@/components/ui/Dropdown"
-
-const router = useRouter()
 
 /** Watch for DipDup, Quotes, Network */
 let checkInterval = null
@@ -60,11 +52,7 @@ const statusBlock = computed(() => {
 		status.quotes == STATUSES.DELAYED
 	) {
 		return { text: "All systems delayed", color: "red" }
-	} else if (
-		status.dipdup !== STATUSES.GOOD ||
-		status.network !== STATUSES.GOOD ||
-		status.quotes !== STATUSES.GOOD
-	) {
+	} else {
 		return { text: "Some systems delayed", color: "yellow" }
 	}
 })
@@ -73,7 +61,7 @@ const checkDipdup = async () => {
 	const urlToCheck =
 		currentNetwork.value == "mainnet"
 			? "https://juster.dipdup.net/api/rest/dipdupHead?name=https://tzkt-mainnet.dipdup.net"
-			: "https://api.hangzhounet.juster.fi/api/rest/dipdupHead?name=https://api.hangzhou2net.tzkt.io"
+			: "https://api.ithacanet.juster.fi/api/rest/dipdupHead?name=https://api.ithacanet.tzkt.io"
 	const {
 		data: { dipdupHeadByPk },
 	} = await axios.get(urlToCheck)
@@ -93,7 +81,7 @@ const checkDipdup = async () => {
 const checkNetwork = async () => {
 	const { data } = await axios.get(
 		`https://rpc.tzkt.io/${
-			currentNetwork.value == "mainnet" ? "mainnet" : "hangzhou2net"
+			currentNetwork.value == "mainnet" ? "mainnet" : "ithacanet"
 		}/chains/main/blocks/head/header`,
 	)
 
@@ -266,12 +254,12 @@ onBeforeUnmount(() => {
 								<DropdownItem @click="handleSwitch('testnet')"
 									><Icon
 										:name="
-											currentNetwork == 'hangzhounet'
+											currentNetwork == 'ithacanet'
 												? 'checkcircle'
 												: 'network'
 										"
 										size="12"
-									/>Hangzhounet</DropdownItem
+									/>Ithacanet</DropdownItem
 								>
 							</template>
 						</Dropdown>
@@ -292,7 +280,7 @@ onBeforeUnmount(() => {
 							</Button>
 						</a>
 						<a
-							href="https://twitter.com/TezosBakingBad"
+							href="https://twitter.com/Juster_fi"
 							target="_blank"
 							rel="nofolow noreferrer"
 						>

@@ -115,7 +115,7 @@ const shorten = (address) => {
 
 .username {
     font-size: 13px;
-    line-height: 1.1;
+    line-height: 14px;
     font-weight: 600;
     color: var(--text-primary);
 
@@ -127,7 +127,8 @@ const shorten = (address) => {
 }
 
 .amount {
-    font-size: 12px;
+    font-size: 13px;
+    line-height: 14px;
     font-weight: 500;
     color: var(--text-tertiary);
     white-space: nowrap;
