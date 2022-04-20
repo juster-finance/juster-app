@@ -62,7 +62,7 @@ juster.apollo = new ApolloClient({
 /**
  * Switch between Networks
  */
-const switchNetwork = network => {
+const switchNetwork = (network) => {
     if (![Networks.MAINNET, Networks.TESTNET].includes(network)) return
 
     /** todo (Settings): switch temporarily (without saving in LS) */
