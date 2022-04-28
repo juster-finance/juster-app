@@ -21,7 +21,7 @@ import { verifiedMakers } from "@/services/config"
 /**
  * API
  */
-import { fetchAllEvents } from "@/api/events"
+import { fetchEventsByStatus } from "@/api/events"
 
 /**
  * UI
@@ -154,7 +154,7 @@ const marketStore = useMarketStore()
 
 const subscription = ref(null)
 
-const isAllEventsLoaded = ref(false)
+const isNewEventsLoaded = ref(false)
 
 const currentPage = ref(1)
 
@@ -215,11 +215,6 @@ const handleManageParticipant = ({ address, action }) => {
 }
 
 /** Events */
-const availableEvents = computed(() => {
-	return marketStore.events.filter((event) =>
-		["NEW", "STARTED", "FINISHED"].includes(event.status),
-	)
-})
 const filteredEvents = computed(() => {
 	let events = cloneDeep(marketStore.events)
 
@@ -360,11 +355,15 @@ const filteredEvents = computed(() => {
 onMounted(async () => {
 	analytics.log("onPage", { name: "AllEvents" })
 
-	let allNewEvents = await fetchAllEvents()
+	let newEvents = await fetchEventsByStatus({ status: "NEW" })
+	isNewEventsLoaded.value = true
+	marketStore.events = cloneDeep(newEvents)
 
-	isAllEventsLoaded.value = true
+	let runningEvents = await fetchEventsByStatus({ status: "STARTED" })
+	marketStore.events = [...marketStore.events, ...cloneDeep(runningEvents)]
 
-	marketStore.events = cloneDeep(allNewEvents)
+	let finishedEvents = await fetchEventsByStatus({ status: "FINISHED" })
+	marketStore.events = [...marketStore.events, ...cloneDeep(finishedEvents)]
 
 	// Sub to New Events
 	subscription.value = await juster.gql
@@ -424,9 +423,7 @@ useMeta({
 <template>
 	<div :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template #title="{ content }">{{ content }} • Juster</template>
 		</metainfo>
 
 		<Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
@@ -450,9 +447,9 @@ useMeta({
 		<div :class="$style.container">
 			<EventsFilters
 				:filters="filters"
-				:liquidityFilters="liquidityFilters"
+				:liquidity-filters="liquidityFilters"
 				:events="marketStore.events"
-				:filteredEventsCount="filteredEvents.length"
+				:filtered-events-count="filteredEvents.length"
 				@onNewMin="handleNewMin"
 				@onNewMax="handleNewMax"
 				@onSelect="handleSelect"
@@ -473,14 +470,14 @@ useMeta({
 					/>
 				</div>
 
-				<div v-else-if="!isAllEventsLoaded" :class="$style.events">
+				<div v-else-if="!isNewEventsLoaded" :class="$style.events">
 					<EventCardLoading />
 					<EventCardLoading />
 					<EventCardLoading />
 				</div>
 
 				<Banner
-					v-else-if="!filteredEvents.length && isAllEventsLoaded"
+					v-else-if="!filteredEvents.length && isNewEventsLoaded"
 					icon="help"
 					color="gray"
 					size="small"
