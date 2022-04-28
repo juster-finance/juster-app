@@ -4,7 +4,8 @@
 	"private": true,
 	"scripts": {
 		"serve": "vue-cli-service serve",
-		"build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build"
+		"build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
+		"lint": "vue-cli-service lint"
 	},
 	"dependencies": {
 		"@apollo/client": "^3.3.21",
@@ -31,13 +32,16 @@
 	},
 	"devDependencies": {
 		"@vue/cli-plugin-babel": "~4.5.0",
-		"@vue/cli-plugin-eslint": "~4.5.0",
+		"@vue/cli-plugin-eslint": "~4.5.15",
 		"@vue/cli-plugin-router": "~4.5.0",
 		"@vue/cli-service": "~4.5.0",
 		"@vue/compiler-sfc": "^3.0.0",
+		"@vue/eslint-config-prettier": "^6.0.0",
 		"babel-eslint": "^10.1.0",
 		"eslint": "^7.32.0",
-		"eslint-plugin-vue": "^8.0.3"
+		"eslint-plugin-prettier": "^3.3.1",
+		"eslint-plugin-vue": "^8.0.3",
+		"prettier": "^2.2.1"
 	},
 	"browserslist": [
 		"> 1%",
