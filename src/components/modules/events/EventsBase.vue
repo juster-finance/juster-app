@@ -38,6 +38,11 @@ import EventsFilters from "./EventsFilters"
 import { EventCard, EventCardLoading } from "@/components/local/EventCard"
 
 /**
+ * gql
+ */
+import { event as eventModel } from "@/graphql/models"
+
+/**
  * Store
  */
 import { useMarketStore } from "@/store/market"
@@ -361,7 +366,7 @@ onMounted(async () => {
 
 	marketStore.events = cloneDeep(allNewEvents)
 
-	// subscribe to new events
+	// Sub to New Events
 	subscription.value = await juster.gql
 		.subscription({
 			event: [
@@ -371,45 +376,7 @@ onMounted(async () => {
 					},
 				},
 				{
-					id: true,
-					status: true,
-					betsCloseTime: true,
-					creatorId: true,
-					currencyPair: {
-						symbol: true,
-						id: true,
-					},
-					poolAboveEq: true,
-					poolBelow: true,
-					totalBetsAmount: true,
-					totalLiquidityProvided: true,
-					totalLiquidityShares: true,
-					totalValueLocked: true,
-					liquidityPercent: true,
-					measurePeriod: true,
-					closedOracleTime: true,
-					createdTime: true,
-					startRate: true,
-					closedRate: true,
-					winnerBets: true,
-					targetDynamics: true,
-					bets: {
-						id: true,
-						side: true,
-						reward: true,
-						amount: true,
-						createdTime: true,
-						userId: true,
-					},
-					deposits: {
-						amountAboveEq: true,
-						amountBelow: true,
-						eventId: true,
-						id: true,
-						userId: true,
-						createdTime: true,
-						shares: true,
-					},
+					...eventModel,
 				},
 			],
 		})
@@ -440,7 +407,7 @@ onBeforeUnmount(() => {
 onUnmounted(() => {
 	if (
 		subscription.value &&
-		subscription.value.hasOwnProperty("_state") &&
+		Object.prototype.hasOwnProperty.call(subscription.value, "_state") &&
 		!subscription.value?.closed
 	) {
 		subscription.value.unsubscribe()
@@ -448,7 +415,7 @@ onUnmounted(() => {
 })
 
 /** Meta */
-const { meta } = useMeta({
+useMeta({
 	title: `All events`,
 	description: "All available events",
 })

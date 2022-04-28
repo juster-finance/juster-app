@@ -1,12 +1,14 @@
 {
-    "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "~/*": ["./src/*"],
-            "@/*": ["./src/*"],
-            "~~/*": ["./src/*"],
-            "@@/*": ["./src/*"]
-        }
-    },
-    "exclude": ["node_modules", "dist"]
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"~/*": ["./src/*"],
+			"@/*": ["./src/*"],
+			"~~/*": ["./src/*"],
+			"@@/*": ["./src/*"]
+		},
+		"jsx": "preserve",
+		"lib": ["dom"]
+	},
+	"exclude": ["node_modules", "dist"]
 }

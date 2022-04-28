@@ -101,7 +101,7 @@ export default defineComponent({
 
 				/** auto-focus input */
 				nextTick(() => {
-					amountInput.value.$el.querySelector('input').focus()
+					if (accountStore.isLoggined) amountInput.value.$el.querySelector('input').focus()
 				})
 			}
 		})
@@ -248,31 +248,16 @@ export default defineComponent({
 		<template v-if="accountStore.isLoggined">
 			<div :class="$style.title">Providing liquidity</div>
 
-			<Banner
-				v-if="currentNetwork !== 'mainnet'"
-				icon="hammer"
-				color="yellow"
-				size="small"
-				center
-				:class="$style.banner"
-			>
+			<Banner v-if="currentNetwork !== 'mainnet'" icon="hammer" color="yellow" size="small" center
+				:class="$style.banner">
 				The transaction takes place on the Ithacanet
 			</Banner>
 
 			<PositionDirection :event="event" :amount="amount" :countdown="countdownText" :class="$style.direction" />
 
-			<Input
-				ref="amountInput"
-				type="number"
-				:limit="10000"
-				label="Amount"
-				placeholder="Liquidity amount"
-				subtext="ꜩ"
-				v-model="amount.value"
-				:error="amount.error"
-				@clearError="amount.error = ''"
-				:class="$style.amount_input"
-			/>
+			<Input ref="amountInput" type="number" :limit="10000" label="Amount" placeholder="Liquidity amount"
+				subtext="ꜩ" v-model="amount.value" :error="amount.error" @clearError="amount.error = ''"
+				:class="$style.amount_input" />
 
 			<SplittedPool :event="event" :amount="amount.value" side="Liquidity" :class="$style.pool" />
 
@@ -288,24 +273,13 @@ export default defineComponent({
 				</Stat>
 			</div>
 
-			<Banner
-				v-if="!verifiedMakers[currentNetwork].includes(event.creatorId)"
-				icon="warning"
-				color="red"
-				size="small"
-				:class="$style.banner"
-			>
+			<Banner v-if="!verifiedMakers[currentNetwork].includes(event.creatorId)" icon="warning" color="red"
+				size="small" :class="$style.banner">
 				This event is Custom, its behavior may depend on the parameters
 			</Banner>
 
-			<Button
-				@click="handleProvideLiquidity"
-				size="large"
-				:type="buttonState.disabled ? 'secondary' : 'primary'"
-				block
-				:loading="sendingLiquidity"
-				:disabled="buttonState.disabled"
-			>
+			<Button @click="handleProvideLiquidity" size="large" :type="buttonState.disabled ? 'secondary' : 'primary'"
+				block :loading="sendingLiquidity" :disabled="buttonState.disabled">
 				<Spin v-if="sendingLiquidity" size="16" />
 				<Icon v-else :name="!buttonState.disabled ? 'bolt' : 'lock'" size="16" />
 				{{ buttonState.text }}
@@ -317,11 +291,8 @@ export default defineComponent({
 			</div>
 			<div v-else-if="showHint.confirmationDelay" :class="$style.hint">
 				Confirmation not appearing?
-				<a
-					href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
-					target="_blank"
-					>Read about possible solutions</a
-				>
+				<a href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
+					target="_blank">Read about possible solutions</a>
 			</div>
 		</template>
 
@@ -339,8 +310,7 @@ export default defineComponent({
 </template>
 
 <style module>
-.wrapper {
-}
+.wrapper {}
 
 .title {
 	font-size: 20px;

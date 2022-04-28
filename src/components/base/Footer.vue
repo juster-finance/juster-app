@@ -13,7 +13,6 @@ import { capitalizeFirstLetter } from "@/services/utils/global"
  * Store
  */
 import { useMarketStore } from "@/store/market"
-const marketStore = useMarketStore()
 
 /**
  * UI
@@ -21,6 +20,8 @@ const marketStore = useMarketStore()
 import Button from "@/components/ui/Button"
 import Tooltip from "@/components/ui/Tooltip"
 import { Dropdown, DropdownItem, DropdownTitle } from "@/components/ui/Dropdown"
+
+const marketStore = useMarketStore()
 
 /** Watch for DipDup, Quotes, Network */
 let checkInterval = null

@@ -54,6 +54,12 @@ import { juster, analytics } from "@/services/sdk"
 import { useMarketStore } from "@/store/market"
 import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
+
+/**
+ * gql
+ */
+import { event as eventModel } from "@/graphql/models"
+
 const marketStore = useMarketStore()
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
@@ -207,6 +213,8 @@ const wonText = computed(() => {
 		userBets.value.some((bet) => bet.side == event.value.winnerBets)
 	) {
 		return "One or more (not all) of your bets were in the winning direction"
+	} else {
+		return ""
 	}
 })
 
@@ -365,47 +373,7 @@ onMounted(async () => {
 					where: { id: { _eq: event.value.id } },
 				},
 				{
-					id: true,
-					status: true,
-					betsCloseTime: true,
-					creatorId: true,
-					poolAboveEq: true,
-					poolBelow: true,
-					totalBetsAmount: true,
-					totalLiquidityProvided: true,
-					totalLiquidityShares: true,
-					totalValueLocked: true,
-					liquidityPercent: true,
-					measurePeriod: true,
-					closedOracleTime: true,
-					createdTime: true,
-					startRate: true,
-					closedRate: true,
-					winnerBets: true,
-					targetDynamics: true,
-					currencyPair: {
-						id: true,
-						symbol: true,
-					},
-					bets: {
-						id: true,
-						side: true,
-						reward: true,
-						amount: true,
-						createdTime: true,
-						userId: true,
-						opgHash: true,
-					},
-					deposits: {
-						amountAboveEq: true,
-						amountBelow: true,
-						eventId: true,
-						id: true,
-						userId: true,
-						createdTime: true,
-						shares: true,
-						opgHash: true,
-					},
+					...eventModel,
 				},
 			],
 		})
@@ -459,13 +427,13 @@ onMounted(async () => {
 
 onUnmounted(() => {
 	if (
-		subToEvent.value.hasOwnProperty("_state") &&
+		Object.prototype.hasOwnProperty.call(subToEvent.value, "_state") &&
 		!subToEvent.value?.closed
 	) {
 		subToEvent.value.unsubscribe()
 	}
 	if (
-		subToDeposits.value.hasOwnProperty("_state") &&
+		Object.prototype.hasOwnProperty.call(subToDeposits.value, "_state") &&
 		!subToDeposits.value?.closed
 	) {
 		subToDeposits.value.unsubscribe()
@@ -483,7 +451,7 @@ onUnmounted(() => {
 })
 
 /** Meta */
-const { meta } = useMeta({
+useMeta({
 	title: `Event`,
 	description:
 		"Available markets for events, for providing liquidity and accepting bets from users",
@@ -493,9 +461,9 @@ const { meta } = useMeta({
 <template>
 	<div :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template v-slot:title="{ content }">
+				{{ content }} • Juster
+			</template>
 		</metainfo>
 
 		<BetModal
@@ -527,224 +495,238 @@ const { meta } = useMeta({
 
 		<Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-		<div v-if="event" :class="$style.container">
-			<div :class="$style.base">
-				<EventChart v-if="event" :event="event" />
+		<Transition name="slide">
+			<div v-if="event" :class="$style.container">
+				<div :class="$style.base">
+					<EventChart v-if="event" :event="event" />
 
-				<div v-if="accountStore.pkh" :class="$style.block">
-					<div :class="$style.title">Personal stats</div>
-					<div :class="$style.description">
-						Aggregated data for all your positions for this event
+					<div v-if="accountStore.pkh" :class="$style.block">
+						<div :class="$style.title">Personal stats</div>
+						<div :class="$style.description">
+							Aggregated data for all your positions for this
+							event
+						</div>
+
+						<Banner
+							v-if="hasWonBet"
+							icon="checkcircle"
+							color="green"
+							:class="$style.banner"
+							>{{ wonText }}</Banner
+						>
+
+						<EventPersonalStats
+							:event="event"
+							:position="userPosition"
+							:userDeposits="userDeposits"
+							:userBets="userBets"
+						/>
 					</div>
 
-					<Banner
-						v-if="hasWonBet"
-						icon="checkcircle"
-						color="green"
-						:class="$style.banner"
-						>{{ wonText }}</Banner
-					>
+					<div :class="$style.block">
+						<div :class="$style.title">Bets</div>
+						<div :class="$style.description">
+							All the bets placed for this event
+						</div>
 
-					<EventPersonalStats
+						<div :class="$style.filters">
+							<div
+								@click="
+									handleSelectFilter({
+										target: 'bets',
+										value: 'all',
+									})
+								"
+								:class="[
+									$style.filter,
+									filters.bets == 'all' && $style.active,
+								]"
+							>
+								All bets
+							</div>
+							<span>/</span>
+							<div
+								@click="
+									handleSelectFilter({
+										target: 'bets',
+										value: 'my',
+									})
+								"
+								:class="[
+									$style.filter,
+									filters.bets == 'my' && $style.active,
+								]"
+							>
+								My bets
+							</div>
+						</div>
+
+						<!-- todo: new component BetsTable -->
+						<div v-if="filteredBets.length" :class="$style.columns">
+							<div :class="$style.column">TYPE</div>
+							<div :class="$style.column">SIDE</div>
+							<div :class="$style.column">AMOUNT</div>
+							<div :class="$style.column">
+								{{
+									(event.status == "CANCELED" && "REFUND") ||
+									(["NEW", "STARTED"].includes(
+										event.status,
+									) &&
+										"POTENTIAL") ||
+									(event.status == "FINISHED" && "PROFIT")
+								}}
+							</div>
+						</div>
+
+						<div
+							v-if="pendingBet || filteredBets.length"
+							:class="$style.bets"
+						>
+							<BetCard
+								v-if="pendingBet"
+								:bet="pendingBet"
+								:event="event"
+								pending
+							/>
+							<BetCard
+								v-for="bet in paginatedBets"
+								:event="event"
+								:key="bet.id"
+								:bet="bet"
+							/>
+						</div>
+
+						<Banner v-else icon="help" color="gray">{{
+							filters.bets == "all"
+								? `Still no bets for this event, maybe yours will be the first?`
+								: `If you have placed a bet, but it is not in this list yet — please wait for the transaction confirmation`
+						}}</Banner>
+
+						<Pagination
+							v-if="filteredBets.length > 3"
+							v-model="selectedPageForBets"
+							:total="filteredBets.length"
+							:limit="3"
+							:class="$style.pagination"
+						/>
+					</div>
+
+					<div :class="$style.block">
+						<div :class="$style.title">Liquidity</div>
+						<div :class="$style.description">
+							All the liquidity provided for this event
+						</div>
+
+						<div :class="$style.filters">
+							<div
+								@click="
+									handleSelectFilter({
+										target: 'liquidity',
+										value: 'all',
+									})
+								"
+								:class="[
+									$style.filter,
+									filters.liquidity == 'all' && $style.active,
+								]"
+							>
+								All liquidity
+							</div>
+							<span>/</span>
+							<div
+								@click="
+									handleSelectFilter({
+										target: 'liquidity',
+										value: 'my',
+									})
+								"
+								:class="[
+									$style.filter,
+									filters.liquidity == 'my' && $style.active,
+								]"
+							>
+								My liquidity
+							</div>
+						</div>
+
+						<div
+							v-if="filteredDeposits.length"
+							:class="$style.columns"
+						>
+							<div :class="$style.column">TYPE</div>
+							<div :class="$style.column">RISE</div>
+							<div :class="$style.column">FALL</div>
+
+							<div :class="$style.column">RETURN</div>
+						</div>
+						<div
+							v-if="filteredDeposits.length"
+							:class="$style.bets"
+						>
+							<DepositCard
+								v-for="deposit in paginatedDeposits"
+								:key="deposit.id"
+								:deposit="deposit"
+								:event="event"
+							/>
+						</div>
+
+						<Banner v-else icon="help" color="gray">{{
+							filters.liquidity == "all"
+								? `This event has not yet received initial liquidity, please wait for a few minutes`
+								: `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
+						}}</Banner>
+
+						<Pagination
+							v-if="filteredDeposits.length > 3"
+							v-model="selectedPageForDeposits"
+							:total="filteredDeposits.length"
+							:limit="3"
+							:class="$style.pagination"
+						/>
+					</div>
+				</div>
+
+				<div v-if="event" :class="$style.side">
+					<EventGeneralCard
 						:event="event"
-						:position="userPosition"
-						:userDeposits="userDeposits"
-						:userBets="userBets"
+						:startStatus="startStatus"
+						:finishStatus="finishStatus"
+						:startCountdown="startCountdownText"
+						:finishCountdown="finishCountdownText"
+						:price="price"
+						:isWon="hasWonBet"
+						:positionForWithdraw="positionForWithdraw"
+						:isWithdrawing="isWithdrawing"
+						@openParticipants="handleParticipants"
+						@onBet="handleJoin"
+						@onWithdraw="handleWithdraw"
 					/>
-				</div>
 
-				<div :class="$style.block">
-					<div :class="$style.title">Bets</div>
-					<div :class="$style.description">
-						All the bets placed for this event
-					</div>
+					<EventPriceCard
+						v-if="event.status !== 'CANCELED'"
+						:event="event"
+						:price="price"
+						:finishTime="finishTime"
+					/>
 
-					<div :class="$style.filters">
-						<div
-							@click="
-								handleSelectFilter({
-									target: 'bets',
-									value: 'all',
-								})
-							"
-							:class="[
-								$style.filter,
-								filters.bets == 'all' && $style.active,
-							]"
-						>
-							All bets
-						</div>
-						<div :class="$style.dot" />
-						<div
-							@click="
-								handleSelectFilter({
-									target: 'bets',
-									value: 'my',
-								})
-							"
-							:class="[
-								$style.filter,
-								filters.bets == 'my' && $style.active,
-							]"
-						>
-							My bets
-						</div>
-					</div>
+					<EventPoolCard
+						:event="event"
+						@onLiquidity="handleLiquidity"
+					/>
 
-					<!-- todo: new component BetsTable -->
-					<div v-if="filteredBets.length" :class="$style.columns">
-						<div :class="$style.column">TYPE</div>
-						<div :class="$style.column">SIDE</div>
-						<div :class="$style.column">AMOUNT</div>
-						<div :class="$style.column">
-							{{
-								(event.status == "CANCELED" && "REFUND") ||
-								(["NEW", "STARTED"].includes(event.status) &&
-									"POTENTIAL") ||
-								(event.status == "FINISHED" && "PROFIT")
-							}}
-						</div>
-					</div>
-
-					<div
-						v-if="pendingBet || filteredBets.length"
-						:class="$style.bets"
+					<Button
+						@click="showEventDetailsModal = true"
+						type="secondary"
+						size="small"
+						block
+						:class="$style.details_btn"
+						><Icon name="menu" size="12" />View event
+						details</Button
 					>
-						<BetCard
-							v-if="pendingBet"
-							:bet="pendingBet"
-							:event="event"
-							pending
-						/>
-						<BetCard
-							v-for="bet in paginatedBets"
-							:event="event"
-							:key="bet.id"
-							:bet="bet"
-						/>
-					</div>
-
-					<Banner v-else icon="help" color="gray">{{
-						filters.bets == "all"
-							? `Still no bets for this event, maybe yours will be the first?`
-							: `If you have placed a bet, but it is not in this list yet — please wait for the transaction confirmation`
-					}}</Banner>
-
-					<Pagination
-						v-if="filteredBets.length > 3"
-						v-model="selectedPageForBets"
-						:total="filteredBets.length"
-						:limit="3"
-						:class="$style.pagination"
-					/>
-				</div>
-
-				<div :class="$style.block">
-					<div :class="$style.title">Liquidity</div>
-					<div :class="$style.description">
-						All the liquidity provided for this event
-					</div>
-
-					<div :class="$style.filters">
-						<div
-							@click="
-								handleSelectFilter({
-									target: 'liquidity',
-									value: 'all',
-								})
-							"
-							:class="[
-								$style.filter,
-								filters.liquidity == 'all' && $style.active,
-							]"
-						>
-							All liquidity
-						</div>
-						<div :class="$style.dot" />
-
-						<div
-							@click="
-								handleSelectFilter({
-									target: 'liquidity',
-									value: 'my',
-								})
-							"
-							:class="[
-								$style.filter,
-								filters.liquidity == 'my' && $style.active,
-							]"
-						>
-							My liquidity
-						</div>
-					</div>
-
-					<div v-if="filteredDeposits.length" :class="$style.columns">
-						<div :class="$style.column">TYPE</div>
-						<div :class="$style.column">RISE</div>
-						<div :class="$style.column">FALL</div>
-
-						<div :class="$style.column">RETURN</div>
-					</div>
-					<div v-if="filteredDeposits.length" :class="$style.bets">
-						<DepositCard
-							v-for="deposit in paginatedDeposits"
-							:key="deposit.id"
-							:deposit="deposit"
-							:event="event"
-						/>
-					</div>
-
-					<Banner v-else icon="help" color="gray">{{
-						filters.liquidity == "all"
-							? `This event has not yet received initial liquidity, please wait for a few minutes`
-							: `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
-					}}</Banner>
-
-					<Pagination
-						v-if="filteredDeposits.length > 3"
-						v-model="selectedPageForDeposits"
-						:total="filteredDeposits.length"
-						:limit="3"
-						:class="$style.pagination"
-					/>
 				</div>
 			</div>
-
-			<div v-if="event" :class="$style.side">
-				<EventGeneralCard
-					:event="event"
-					:startStatus="startStatus"
-					:finishStatus="finishStatus"
-					:startCountdown="startCountdownText"
-					:finishCountdown="finishCountdownText"
-					:price="price"
-					:isWon="hasWonBet"
-					:positionForWithdraw="positionForWithdraw"
-					:isWithdrawing="isWithdrawing"
-					@openParticipants="handleParticipants"
-					@onBet="handleJoin"
-					@onWithdraw="handleWithdraw"
-				/>
-
-				<EventPriceCard
-					v-if="event.status !== 'CANCELED'"
-					:event="event"
-					:price="price"
-					:finishTime="finishTime"
-				/>
-
-				<EventPoolCard :event="event" @onLiquidity="handleLiquidity" />
-
-				<Button
-					@click="showEventDetailsModal = true"
-					type="secondary"
-					size="small"
-					block
-					:class="$style.details_btn"
-					><Icon name="menu" size="12" />View event details</Button
-				>
-			</div>
-		</div>
+		</Transition>
 	</div>
 </template>
 
@@ -772,6 +754,7 @@ const { meta } = useMeta({
 
 	min-width: 384px;
 	max-width: 384px;
+	height: fit-content;
 }
 
 .banner {
@@ -956,7 +939,7 @@ const { meta } = useMeta({
 	width: max-content;
 	display: flex;
 	align-items: center;
-	gap: 14px;
+	gap: 12px;
 
 	border-radius: 6px;
 	background: var(--btn-secondary-bg);
@@ -964,11 +947,12 @@ const { meta } = useMeta({
 	padding: 0 12px;
 }
 
-.filters .dot {
-	width: 4px;
-	height: 4px;
-	border-radius: 50%;
-	background: var(--opacity-10);
+.filters span {
+	font-size: 14px;
+	font-weight: 700;
+
+	color: var(--text-tertiary);
+	opacity: 0.5;
 }
 
 .filter {
@@ -998,5 +982,16 @@ const { meta } = useMeta({
 
 .pagination {
 	margin-top: 16px;
+}
+
+@media (max-width: 940px) {
+	.container {
+		flex-direction: column-reverse;
+	}
+
+	.side {
+		max-width: initial;
+		min-width: initial;
+	}
 }
 </style>
