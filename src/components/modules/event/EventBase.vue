@@ -461,16 +461,14 @@ useMeta({
 <template>
 	<div :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }">
-				{{ content }} • Juster
-			</template>
+			<template #title="{ content }"> {{ content }} • Juster </template>
 		</metainfo>
 
 		<BetModal
 			v-if="event"
 			:show="showBetModal"
 			:event="event"
-			:preselectedSide="preselectedSide"
+			:preselected-side="preselectedSide"
 			@onBet="handleBet"
 			@onClose="showBetModal = false"
 		/>
@@ -518,8 +516,8 @@ useMeta({
 						<EventPersonalStats
 							:event="event"
 							:position="userPosition"
-							:userDeposits="userDeposits"
-							:userBets="userBets"
+							:user-deposits="userDeposits"
+							:user-bets="userBets"
 						/>
 					</div>
 
@@ -690,14 +688,14 @@ useMeta({
 				<div v-if="event" :class="$style.side">
 					<EventGeneralCard
 						:event="event"
-						:startStatus="startStatus"
-						:finishStatus="finishStatus"
-						:startCountdown="startCountdownText"
-						:finishCountdown="finishCountdownText"
+						:start-status="startStatus"
+						:finish-status="finishStatus"
+						:start-countdown="startCountdownText"
+						:finish-countdown="finishCountdownText"
 						:price="price"
-						:isWon="hasWonBet"
-						:positionForWithdraw="positionForWithdraw"
-						:isWithdrawing="isWithdrawing"
+						:is-won="hasWonBet"
+						:position-for-withdraw="positionForWithdraw"
+						:is-withdrawing="isWithdrawing"
 						@openParticipants="handleParticipants"
 						@onBet="handleJoin"
 						@onWithdraw="handleWithdraw"
@@ -707,7 +705,7 @@ useMeta({
 						v-if="event.status !== 'CANCELED'"
 						:event="event"
 						:price="price"
-						:finishTime="finishTime"
+						:finish-time="finishTime"
 					/>
 
 					<EventPoolCard
