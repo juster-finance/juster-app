@@ -16,14 +16,19 @@ import OperationModal from "@/components/local/modals/OperationModal"
  * Store
  */
 import { useAccountStore } from "@/store/account"
-const accountStore = useAccountStore()
 
 /**
  * Services
  */
-import { abbreviateNumber, numberWithSymbol } from "@/services/utils/amounts"
+import { numberWithSymbol } from "@/services/utils/amounts"
 
-const props = defineProps({ bet: Object, pending: Boolean, event: Object })
+const accountStore = useAccountStore()
+
+const props = defineProps({
+	bet: { type: Object, default: () => {} },
+	event: { type: Object, default: () => {} },
+	pending: Boolean,
+})
 
 const showOperationModal = ref(false)
 
@@ -33,18 +38,15 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 </script>
 
 <template>
-
 	<div @click="showOperationModal = true" :class="$style.wrapper">
-
 		<OperationModal
 			:show="showOperationModal"
+			:data="bet"
 			@onClose="showOperationModal = false"
 		/>
 
 		<div :class="$style.base">
-
 			<div :class="[$style.icon, isWon && $style.won]">
-
 				<Icon
 					v-if="!pending"
 					:name="isWon ? 'checkcircle' : 'bet'"
@@ -57,75 +59,71 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 					:to="`/profile/${pending ? accountStore.pkh : bet.userId}`"
 					:class="$style.user_avatar"
 				>
-
 					<img
-						:src="
-							`https://services.tzkt.io/v1/avatars/${
-								pending ? accountStore.pkh : bet.userId
-							}`
-						"
+						:src="`https://services.tzkt.io/v1/avatars/${
+							pending ? accountStore.pkh : bet.userId
+						}`"
 						alt="avatar"
 					/>
-
 				</router-link>
-
 			</div>
 
 			<div :class="$style.info">
-
 				<div v-if="!pending" :class="$style.title">
-					 {{ accountStore.pkh == bet.userId ? "My" : "" }} Bet
+					{{ accountStore.pkh == bet.userId ? "My" : "" }} Bet
 				</div>
 
 				<div v-else :class="$style.title">Pending Bet</div>
 
 				<div v-if="!pending" :class="$style.time">
-					 {{ DateTime.fromISO(bet.createdTime, { locale: "en", }).toRelative()
+					{{
+						DateTime.fromISO(bet.createdTime, {
+							locale: "en",
+						}).toRelative()
 					}}
 				</div>
 
 				<div v-else :class="$style.time">Just now</div>
-
 			</div>
-
 		</div>
 
 		<div :class="[$style.param, side == 'Up' ? $style.up : $style.down]">
-
 			<Icon name="higher" size="12" />
 			{{ side }}
 		</div>
 
 		<div :class="$style.param">
-			 {{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
+			{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
 			<span>ꜩ</span>
-
 		</div>
 
 		<div v-if="event.status == 'CANCELED'" :class="$style.param">
-			 {{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
+			{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
 			<span>ꜩ</span>
-
 		</div>
 
 		<div v-else-if="event.status == 'FINISHED'" :class="$style.param">
-			 {{ isWon ? `+${numberWithSymbol( (bet.reward - bet.amount).toFixed(2),
-			",", )}` : 0 }}&nbsp;
+			{{
+				isWon
+					? `+${numberWithSymbol(
+							(bet.reward - bet.amount).toFixed(2),
+							",",
+					  )}`
+					: 0
+			}}&nbsp;
 			<span>ꜩ</span>
-
 		</div>
 
 		<div
 			v-else-if="['NEW', 'STARTED'].includes(event.status)"
 			:class="$style.param"
 		>
-			 {{ numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",") }}&nbsp;
+			{{
+				numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",")
+			}}&nbsp;
 			<span>ꜩ</span>
-
 		</div>
-
 	</div>
-
 </template>
 
 <style module>
@@ -236,4 +234,3 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 	color: var(--text-tertiary);
 }
 </style>
-

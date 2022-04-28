@@ -1,6 +1,11 @@
 <script setup>
-import { computed } from "vue"
+import { ref, computed } from "vue"
 import { DateTime } from "luxon"
+
+/**
+ * Modals
+ */
+import OperationModal from "@/components/local/modals/OperationModal"
 
 /**
  * Services
@@ -13,12 +18,15 @@ import { numberWithSymbol } from "@/services/utils/amounts"
  * Store
  */
 import { useAccountStore } from "@/store/account"
+
 const accountStore = useAccountStore()
 
 const props = defineProps({
-	deposit: { type: Object },
-	event: { type: Object },
+	deposit: { type: Object, default: () => {} },
+	event: { type: Object, default: () => {} },
 })
+
+const showOperationModal = ref(false)
 
 const aboveEqProfit = computed(() => {
 	let profit =
@@ -56,7 +64,13 @@ const returnForLiquidity = computed(() => {
 </script>
 
 <template>
-	<div :class="$style.wrapper">
+	<div @click="showOperationModal = true" :class="$style.wrapper">
+		<OperationModal
+			:show="showOperationModal"
+			:data="deposit"
+			@onClose="showOperationModal = false"
+		/>
+
 		<div :class="$style.base">
 			<div :class="$style.icon">
 				<Icon
@@ -148,6 +162,7 @@ const returnForLiquidity = computed(() => {
 	border: 1px solid var(--border);
 	background: var(--card-bg);
 	padding: 0 16px;
+	cursor: pointer;
 
 	transition: border 0.2s ease;
 }

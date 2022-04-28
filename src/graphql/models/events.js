@@ -28,6 +28,8 @@ export const event = {
 		amount: true,
 		createdTime: true,
 		userId: true,
+		eventId: true,
+		opgHash: true,
 	},
 	deposits: {
 		amountAboveEq: true,
@@ -37,5 +39,6 @@ export const event = {
 		userId: true,
 		createdTime: true,
 		shares: true,
+		opgHash: true,
 	},
 }
