@@ -363,7 +363,14 @@ onMounted(async () => {
 	marketStore.events = [...marketStore.events, ...cloneDeep(runningEvents)]
 
 	let finishedEvents = await fetchEventsByStatus({ status: "FINISHED" })
-	marketStore.events = [...marketStore.events, ...cloneDeep(finishedEvents)]
+	marketStore.events = [
+		...marketStore.events,
+		...cloneDeep(finishedEvents).sort(
+			(a, b) =>
+				DateTime.fromISO(b.createdTime).ts -
+				DateTime.fromISO(a.createdTime).ts,
+		),
+	]
 
 	// Sub to New Events
 	subscription.value = await juster.gql
