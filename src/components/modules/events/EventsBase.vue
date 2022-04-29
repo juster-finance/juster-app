@@ -466,31 +466,33 @@ useMeta({
 			/>
 
 			<div :class="$style.events_base">
-				<div v-if="filteredEvents.length" :class="$style.events">
-					<EventCard
-						v-for="event in filteredEvents.slice(
-							(currentPage - 1) * 6,
-							currentPage * 6,
-						)"
-						:key="event.id"
-						:event="event"
-					/>
-				</div>
+				<transition name="fastfade" mode="out-in">
+					<div v-if="filteredEvents.length" :class="$style.events">
+						<EventCard
+							v-for="event in filteredEvents.slice(
+								(currentPage - 1) * 6,
+								currentPage * 6,
+							)"
+							:key="event.id"
+							:event="event"
+						/>
+					</div>
 
-				<div v-else-if="!isNewEventsLoaded" :class="$style.events">
-					<EventCardLoading />
-					<EventCardLoading />
-					<EventCardLoading />
-				</div>
+					<div v-else-if="!isNewEventsLoaded" :class="$style.events">
+						<EventCardLoading />
+						<EventCardLoading />
+						<EventCardLoading />
+					</div>
 
-				<Banner
-					v-else-if="!filteredEvents.length && isNewEventsLoaded"
-					icon="help"
-					color="gray"
-					size="small"
-				>
-					No events with the selected filters were found
-				</Banner>
+					<Banner
+						v-else-if="!filteredEvents.length && isNewEventsLoaded"
+						icon="help"
+						color="gray"
+						size="small"
+					>
+						No events with the selected filters were found
+					</Banner>
+				</transition>
 
 				<Pagination
 					v-if="filteredEvents.length > 6"
