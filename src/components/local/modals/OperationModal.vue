@@ -14,6 +14,7 @@ import Button from "@/components/ui/Button"
 import { shorten } from "@/services/utils/global"
 import { toClipboard } from "@/services/utils/global"
 import { numberWithSymbol } from "@/services/utils/amounts"
+import { currentNetwork } from "@/services/sdk"
 
 /**
  * Store
@@ -72,8 +73,8 @@ const getTypeOfOperation = () => {
 		return "Bid"
 	} else if (props.data.shares !== undefined) {
 		return "Deposit"
-	} else {
-		return "Unknown"
+	} else if (props.data.feeCollectorId !== undefined) {
+		return "Withdraw"
 	}
 }
 </script>
@@ -100,7 +101,9 @@ const getTypeOfOperation = () => {
 					<Icon
 						:name="
 							(getTypeOfOperation() == 'Bid' && 'bet') ||
-							(getTypeOfOperation() == 'Deposit' && 'liquidity')
+							(getTypeOfOperation() == 'Deposit' &&
+								'liquidity') ||
+							(getTypeOfOperation() == 'Withdraw' && 'money')
 						"
 						size="14"
 					/>
@@ -192,7 +195,12 @@ const getTypeOfOperation = () => {
 				</div>
 			</div>
 
-			<a :href="`https://tzkt.io/${data.opgHash}`" target="_blank">
+			<a
+				:href="`https://${
+					currentNetwork == 'mainnet' ? '' : 'ithacanet.'
+				}tzkt.io/${data.opgHash}`"
+				target="_blank"
+			>
 				<Button type="secondary" size="small" block
 					><Icon name="open" size="16" /> View operation on
 					TzKT</Button
