@@ -107,7 +107,7 @@ const getTypeOfOperation = () => {
 						"
 						size="14"
 					/>
-					{{ getTypeOfOperation() }} <span>/ by</span>
+					{{ getTypeOfOperation() }} <span>by</span>
 					{{ shorten(data.userId, 4, 4) }}
 				</router-link>
 
