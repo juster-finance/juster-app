@@ -1,33 +1,29 @@
-<script>
+<script setup>
+import { computed } from "vue"
 import icons from "./icons.json"
 
-export default {
-	name: "Icon",
-	props: {
-		name: { type: String, required: true },
-		size: String,
-		color: String,
-	},
-	computed: {
-		calcSize() {
-			return {
-				minWidth: `${this.size}px`,
-				minHeight: `${this.size}px`,
-			}
-		},
-	},
-	methods: {
-		getPath() {
-			return icons[this.name.charAt(0).toLowerCase() + this.name.slice(1)]
-		},
-		isSplitted() {
-			return (
-				typeof icons[
-					this.name.charAt(0).toLowerCase() + this.name.slice(1)
-				] == "object"
-			)
-		},
-	},
+const props = defineProps({
+	name: { type: String, required: true, default: "warning" },
+	size: { type: String, default: "16" },
+})
+
+const calcSize = computed(() => {
+	return {
+		minWidth: `${props.size}px`,
+		minHeight: `${props.size}px`,
+	}
+})
+
+const getPath = () => {
+	return icons[props.name.charAt(0).toLowerCase() + props.name.slice(1)]
+}
+
+const isSplitted = () => {
+	return (
+		typeof icons[
+			props.name.charAt(0).toLowerCase() + props.name.slice(1)
+		] == "object"
+	)
 }
 </script>
 

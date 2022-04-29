@@ -21,7 +21,7 @@ import { verifiedMakers } from "@/services/config"
 /**
  * API
  */
-import { fetchAllEvents } from "@/api/events"
+import { fetchEventsByStatus } from "@/api/events"
 
 /**
  * UI
@@ -36,6 +36,11 @@ import Button from "@/components/ui/Button"
  */
 import EventsFilters from "./EventsFilters"
 import { EventCard, EventCardLoading } from "@/components/local/EventCard"
+
+/**
+ * gql
+ */
+import { event as eventModel } from "@/graphql/models"
 
 /**
  * Store
@@ -149,7 +154,7 @@ const marketStore = useMarketStore()
 
 const subscription = ref(null)
 
-const isAllEventsLoaded = ref(false)
+const isNewEventsLoaded = ref(false)
 
 const currentPage = ref(1)
 
@@ -210,11 +215,6 @@ const handleManageParticipant = ({ address, action }) => {
 }
 
 /** Events */
-const availableEvents = computed(() => {
-	return marketStore.events.filter((event) =>
-		["NEW", "STARTED", "FINISHED"].includes(event.status),
-	)
-})
 const filteredEvents = computed(() => {
 	let events = cloneDeep(marketStore.events)
 
@@ -355,13 +355,24 @@ const filteredEvents = computed(() => {
 onMounted(async () => {
 	analytics.log("onPage", { name: "AllEvents" })
 
-	let allNewEvents = await fetchAllEvents()
+	let newEvents = await fetchEventsByStatus({ status: "NEW" })
+	isNewEventsLoaded.value = true
+	marketStore.events = cloneDeep(newEvents)
 
-	isAllEventsLoaded.value = true
+	let runningEvents = await fetchEventsByStatus({ status: "STARTED" })
+	marketStore.events = [...marketStore.events, ...cloneDeep(runningEvents)]
 
-	marketStore.events = cloneDeep(allNewEvents)
+	let finishedEvents = await fetchEventsByStatus({ status: "FINISHED" })
+	marketStore.events = [
+		...marketStore.events,
+		...cloneDeep(finishedEvents).sort(
+			(a, b) =>
+				DateTime.fromISO(b.createdTime).ts -
+				DateTime.fromISO(a.createdTime).ts,
+		),
+	]
 
-	// subscribe to new events
+	// Sub to New Events
 	subscription.value = await juster.gql
 		.subscription({
 			event: [
@@ -371,45 +382,7 @@ onMounted(async () => {
 					},
 				},
 				{
-					id: true,
-					status: true,
-					betsCloseTime: true,
-					creatorId: true,
-					currencyPair: {
-						symbol: true,
-						id: true,
-					},
-					poolAboveEq: true,
-					poolBelow: true,
-					totalBetsAmount: true,
-					totalLiquidityProvided: true,
-					totalLiquidityShares: true,
-					totalValueLocked: true,
-					liquidityPercent: true,
-					measurePeriod: true,
-					closedOracleTime: true,
-					createdTime: true,
-					startRate: true,
-					closedRate: true,
-					winnerBets: true,
-					targetDynamics: true,
-					bets: {
-						id: true,
-						side: true,
-						reward: true,
-						amount: true,
-						createdTime: true,
-						userId: true,
-					},
-					deposits: {
-						amountAboveEq: true,
-						amountBelow: true,
-						eventId: true,
-						id: true,
-						userId: true,
-						createdTime: true,
-						shares: true,
-					},
+					...eventModel,
 				},
 			],
 		})
@@ -440,7 +413,7 @@ onBeforeUnmount(() => {
 onUnmounted(() => {
 	if (
 		subscription.value &&
-		subscription.value.hasOwnProperty("_state") &&
+		Object.prototype.hasOwnProperty.call(subscription.value, "_state") &&
 		!subscription.value?.closed
 	) {
 		subscription.value.unsubscribe()
@@ -448,7 +421,7 @@ onUnmounted(() => {
 })
 
 /** Meta */
-const { meta } = useMeta({
+useMeta({
 	title: `All events`,
 	description: "All available events",
 })
@@ -457,9 +430,7 @@ const { meta } = useMeta({
 <template>
 	<div :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template #title="{ content }">{{ content }} • Juster</template>
 		</metainfo>
 
 		<Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
@@ -483,9 +454,9 @@ const { meta } = useMeta({
 		<div :class="$style.container">
 			<EventsFilters
 				:filters="filters"
-				:liquidityFilters="liquidityFilters"
+				:liquidity-filters="liquidityFilters"
 				:events="marketStore.events"
-				:filteredEventsCount="filteredEvents.length"
+				:filtered-events-count="filteredEvents.length"
 				@onNewMin="handleNewMin"
 				@onNewMax="handleNewMax"
 				@onSelect="handleSelect"
@@ -495,31 +466,33 @@ const { meta } = useMeta({
 			/>
 
 			<div :class="$style.events_base">
-				<div v-if="filteredEvents.length" :class="$style.events">
-					<EventCard
-						v-for="event in filteredEvents.slice(
-							(currentPage - 1) * 6,
-							currentPage * 6,
-						)"
-						:key="event.id"
-						:event="event"
-					/>
-				</div>
+				<transition name="fastfade" mode="out-in">
+					<div v-if="filteredEvents.length" :class="$style.events">
+						<EventCard
+							v-for="event in filteredEvents.slice(
+								(currentPage - 1) * 6,
+								currentPage * 6,
+							)"
+							:key="event.id"
+							:event="event"
+						/>
+					</div>
 
-				<div v-else-if="!isAllEventsLoaded" :class="$style.events">
-					<EventCardLoading />
-					<EventCardLoading />
-					<EventCardLoading />
-				</div>
+					<div v-else-if="!isNewEventsLoaded" :class="$style.events">
+						<EventCardLoading />
+						<EventCardLoading />
+						<EventCardLoading />
+					</div>
 
-				<Banner
-					v-else-if="!filteredEvents.length && isAllEventsLoaded"
-					icon="help"
-					color="gray"
-					size="small"
-				>
-					No events with the selected filters were found
-				</Banner>
+					<Banner
+						v-else-if="!filteredEvents.length && isNewEventsLoaded"
+						icon="help"
+						color="gray"
+						size="small"
+					>
+						No events with the selected filters were found
+					</Banner>
+				</transition>
 
 				<Pagination
 					v-if="filteredEvents.length > 6"

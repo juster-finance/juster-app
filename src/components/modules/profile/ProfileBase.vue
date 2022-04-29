@@ -154,9 +154,9 @@ export default defineComponent({
 <template>
 	<div v-if="user && isProfileLoaded" :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template v-slot:title="{ content }">
+				{{ content }} • Juster
+			</template>
 		</metainfo>
 
 		<h2 :class="$style.profile_title">
@@ -173,9 +173,9 @@ export default defineComponent({
 							alt="avatar"
 						/>
 
-						<template v-slot:content
-							>This avatar is supported by TzKT.io</template
-						>
+						<template v-slot:content>
+							This avatar is supported by TzKT.io
+						</template>
 					</Tooltip>
 				</div>
 
@@ -188,9 +188,9 @@ export default defineComponent({
 					}}
 					<Icon name="copy" size="14" />
 				</div>
+
 				<div :class="$style.status">
-					{{ isMyProfile ? accountStore.balance : balance }}
-					ꜩ
+					{{ isMyProfile ? accountStore.balance : balance }} ꜩ
 				</div>
 
 				<div :class="$style.progress">
@@ -209,16 +209,19 @@ export default defineComponent({
 						:class="$style.badge"
 						alt="badge"
 					/>
+
 					<img
 						src="@/assets/badge.png"
 						:class="$style.badge"
 						alt="badge"
 					/>
+
 					<img
 						src="@/assets/badge.png"
 						:class="$style.badge"
 						alt="badge"
 					/>
+
 					<img
 						src="@/assets/badge.png"
 						:class="$style.badge"
@@ -233,20 +236,26 @@ export default defineComponent({
 				<div :class="$style.block">
 					<div :class="$style.stat">
 						<div :class="$style.key">Liquidity provided</div>
+
 						<div :class="$style.value">
 							{{ abbreviateNumber(user.totalLiquidityProvided) }}
+
 							<span>ꜩ</span>
 						</div>
 					</div>
+
 					<div :class="$style.stat">
 						<div :class="$style.key">Net return</div>
+
 						<div :class="$style.value">
 							{{ abbreviateNumber(user.totalProviderReward) }}
 							<span>ꜩ</span>
 						</div>
 					</div>
+
 					<div :class="$style.stat">
 						<div :class="$style.key">Fees collected</div>
+
 						<div :class="$style.value">
 							{{ user.totalFeesCollected.toFixed(0) }}
 							<span>ꜩ</span>
@@ -259,26 +268,33 @@ export default defineComponent({
 				<div :class="$style.block">
 					<div :class="$style.stat">
 						<div :class="$style.key">Bets value</div>
+
 						<div :class="$style.value">
 							{{ user.totalBetsAmount }}
 							<span>ꜩ</span>
 						</div>
 					</div>
+
 					<div v-if="user.totalWithdrawn" :class="$style.stat">
 						<div :class="$style.key">Withdrawn</div>
+
 						<div :class="$style.value">
 							{{ abbreviateNumber(user.totalWithdrawn) }}
 							<span>ꜩ</span>
 						</div>
 					</div>
+
 					<div :class="$style.stat">
 						<div :class="$style.key">Bets</div>
+
 						<div :class="$style.value">
 							{{ user.totalBetsCount }}
 						</div>
 					</div>
+
 					<div :class="$style.stat">
 						<div :class="$style.key">Favorite Market</div>
+
 						<div :class="$style.value">TBD</div>
 					</div>
 				</div>
@@ -294,7 +310,8 @@ export default defineComponent({
 							target="_blank"
 						>
 							<Button type="secondary" size="small">
-								<Icon name="open" size="14" />View on TzKT
+								<Icon name="open" size="14" />
+								View on TzKT
 							</Button>
 						</a>
 					</div>
@@ -308,6 +325,7 @@ export default defineComponent({
 			<div :class="$style.top">
 				<div>
 					<h2>My submissions</h2>
+
 					<div :class="$style.description">
 						List of all current and archived events
 					</div>
@@ -340,6 +358,7 @@ export default defineComponent({
 		/>
 
 		<div :class="$style.error_title">Your profile is not ready yet</div>
+
 		<div :class="$style.error_description">
 			Once you participate in any event, your profile will become
 			available!
@@ -348,15 +367,16 @@ export default defineComponent({
 		<div :class="$style.error_buttons">
 			<router-link to="/">
 				<Button type="secondary" size="small">
-					<Icon name="spark" size="14" />Explore Juster
+					<Icon name="spark" size="14" />
+					Explore Juster
 				</Button>
 			</router-link>
 
 			<div :class="$style.error_description">or</div>
 
-			<Button @click="handleBack" type="secondary" size="small"
-				>Go back</Button
-			>
+			<Button @click="handleBack" type="secondary" size="small">
+				Go back
+			</Button>
 		</div>
 	</div>
 </template>

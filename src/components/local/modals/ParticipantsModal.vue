@@ -16,7 +16,10 @@ import Modal from "@/components/ui/Modal"
  */
 import { fetchEventParticipants } from "@/api/events"
 
-const props = defineProps({ show: Boolean, event: Object })
+const props = defineProps({
+	show: Boolean,
+	event: { type: Object, default: () => {} },
+})
 
 const users = ref([])
 

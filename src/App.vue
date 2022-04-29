@@ -149,6 +149,17 @@ html {
 	opacity: 0;
 }
 
+.slide-enter-active,
+.slice-leave-active {
+	transition: all 0.4s ease;
+}
+
+.slide-enter-from,
+.slice-leave-to {
+	opacity: 0;
+	transform: translateY(-4px);
+}
+
 #app {
 	display: flex;
 	flex-direction: column;
