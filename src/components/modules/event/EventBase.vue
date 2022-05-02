@@ -522,40 +522,44 @@ useMeta({
 					</div>
 
 					<div :class="$style.block">
-						<div :class="$style.title">Bets</div>
-						<div :class="$style.description">
-							All the bets placed for this event
-						</div>
-
-						<div :class="$style.filters">
-							<div
-								@click="
-									handleSelectFilter({
-										target: 'bets',
-										value: 'all',
-									})
-								"
-								:class="[
-									$style.filter,
-									filters.bets == 'all' && $style.active,
-								]"
-							>
-								All bets
+						<div :class="$style.header">
+							<div :class="$style.info">
+								<div :class="$style.title">Bets</div>
+								<div :class="$style.description">
+									All the bets placed for this event
+								</div>
 							</div>
-							<span>/</span>
-							<div
-								@click="
-									handleSelectFilter({
-										target: 'bets',
-										value: 'my',
-									})
-								"
-								:class="[
-									$style.filter,
-									filters.bets == 'my' && $style.active,
-								]"
-							>
-								My bets
+
+							<div :class="$style.filters">
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'bets',
+											value: 'all',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.bets == 'all' && $style.active,
+									]"
+								>
+									All
+								</div>
+								<span>/</span>
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'bets',
+											value: 'my',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.bets == 'my' && $style.active,
+									]"
+								>
+									Only my
+								</div>
 							</div>
 						</div>
 
@@ -610,40 +614,46 @@ useMeta({
 					</div>
 
 					<div :class="$style.block">
-						<div :class="$style.title">Liquidity</div>
-						<div :class="$style.description">
-							All the liquidity provided for this event
-						</div>
-
-						<div :class="$style.filters">
-							<div
-								@click="
-									handleSelectFilter({
-										target: 'liquidity',
-										value: 'all',
-									})
-								"
-								:class="[
-									$style.filter,
-									filters.liquidity == 'all' && $style.active,
-								]"
-							>
-								All liquidity
+						<div :class="$style.header">
+							<div :class="$style.info">
+								<div :class="$style.title">Liquidity</div>
+								<div :class="$style.description">
+									All the liquidity provided for this event
+								</div>
 							</div>
-							<span>/</span>
-							<div
-								@click="
-									handleSelectFilter({
-										target: 'liquidity',
-										value: 'my',
-									})
-								"
-								:class="[
-									$style.filter,
-									filters.liquidity == 'my' && $style.active,
-								]"
-							>
-								My liquidity
+
+							<div :class="$style.filters">
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'liquidity',
+											value: 'all',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.liquidity == 'all' &&
+											$style.active,
+									]"
+								>
+									All
+								</div>
+								<span>/</span>
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'liquidity',
+											value: 'my',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.liquidity == 'my' &&
+											$style.active,
+									]"
+								>
+									Only my
+								</div>
 							</div>
 						</div>
 
@@ -759,93 +769,17 @@ useMeta({
 	margin-bottom: 16px;
 }
 
-.header_badge span {
-	color: var(--text-tertiary);
-}
-
-.event {
-	background: var(--card-bg);
-	border-radius: 8px;
-	border: 1px solid var(--border);
-	padding: 20px 0 20px 0;
-	flex: 1;
-
-	margin-bottom: 8px;
-}
-
 .header {
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
-
-	padding: 0 20px;
 }
 
 .info {
 	display: flex;
 	flex-direction: column;
-}
 
-.name {
-	display: flex;
-	align-items: center;
-
-	margin-bottom: 12px;
-}
-
-.symbol_image {
-	position: relative;
-
-	margin-right: 10px;
-}
-
-.symbol_image svg {
-	position: absolute;
-	top: -4px;
-	right: -4px;
-
-	background: var(--card-bg);
-	border-radius: 50%;
-}
-
-.symbol_image svg.higher {
-	fill: var(--green);
-}
-
-.symbol_image svg.lower {
-	fill: var(--red);
-	transform: rotate(180deg);
-}
-
-.symbol_image img {
-	width: 24px;
-	height: 24px;
-	border-radius: 6px;
-	opacity: 0.7;
-}
-
-.name span {
-	color: var(--text-tertiary);
-
-	margin-left: 6px;
-}
-
-.labels {
-	display: flex;
-	gap: 6px;
-}
-
-.divider {
-	width: 100%;
-	border: 1px solid var(--border);
-
-	margin: 20px 0;
-}
-
-.actions {
-	display: flex;
-	align-items: center;
-	gap: 6px;
+	margin-right: 16px;
 }
 
 .block {
@@ -870,17 +804,6 @@ useMeta({
 	color: var(--text-tertiary);
 
 	margin-bottom: 24px;
-}
-
-.empty {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-
-	font-size: 14px;
-	line-height: 1.6;
-	color: var(--text-tertiary);
-	fill: var(--text-tertiary);
 }
 
 .columns {
@@ -930,9 +853,9 @@ useMeta({
 }
 
 .filters {
-	position: absolute;
+	/* position: absolute;
 	top: 0;
-	right: 0;
+	right: 0; */
 
 	width: max-content;
 	display: flex;
@@ -948,8 +871,8 @@ useMeta({
 .filters span {
 	font-size: 14px;
 	font-weight: 700;
-
 	color: var(--text-tertiary);
+
 	opacity: 0.5;
 }
 
@@ -964,6 +887,7 @@ useMeta({
 	font-weight: 600;
 	color: var(--text-tertiary);
 	fill: var(--text-tertiary);
+	white-space: nowrap;
 
 	transition: all 0.2s ease;
 }
@@ -990,6 +914,12 @@ useMeta({
 	.side {
 		max-width: initial;
 		min-width: initial;
+	}
+}
+
+@media (max-width: 650px) {
+	.columns {
+		display: none;
 	}
 }
 </style>

@@ -125,29 +125,80 @@ const returnForLiquidity = computed(() => {
 			</div>
 		</div>
 
-		<div :class="[$style.param, $style.up]">
-			<Icon name="higher" size="12" />{{
-				numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
-			}}&nbsp;<span>ꜩ</span>
+		<!-- Desktop Template -->
+		<div :class="$style.desktop">
+			<div :class="[$style.param, $style.up]">
+				<Icon name="higher" size="12" />{{
+					numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
+				}}&nbsp;<span>ꜩ</span>
+			</div>
+
+			<div :class="[$style.param, $style.down]">
+				<Icon name="higher" size="12" />{{
+					numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
+				}}&nbsp;<span>ꜩ</span>
+			</div>
+
+			<div
+				v-if="event.status == 'FINISHED' && returnForLiquidity"
+				:class="[$style.param]"
+			>
+				{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
+					>ꜩ</span
+				>
+			</div>
+			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
+				Refund
+			</div>
+			<div v-else :class="$style.param">
+				<span>TBD</span>
+			</div>
 		</div>
 
-		<div :class="[$style.param, $style.down]">
-			<Icon name="higher" size="12" />{{
-				numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
-			}}&nbsp;<span>ꜩ</span>
-		</div>
+		<!-- Mobile Template -->
+		<div :class="$style.mobile">
+			<div :class="[$style.param, $style.up]">
+				<div :class="$style.key">Rise</div>
 
-		<div
-			v-if="event.status == 'FINISHED' && returnForLiquidity"
-			:class="[$style.param]"
-		>
-			{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>ꜩ</span>
-		</div>
-		<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
-			Refund
-		</div>
-		<div v-else :class="$style.param">
-			<span>TBD</span>
+				<div :class="$style.value">
+					<Icon name="higher" size="12" />{{
+						numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
+					}}&nbsp;<span>ꜩ</span>
+				</div>
+			</div>
+
+			<div :class="[$style.param, $style.down]">
+				<div :class="$style.key">Rise</div>
+
+				<div :class="$style.value">
+					<Icon name="higher" size="12" />{{
+						numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
+					}}&nbsp;<span>ꜩ</span>
+				</div>
+			</div>
+
+			<div
+				v-if="event.status == 'FINISHED' && returnForLiquidity"
+				:class="[$style.param]"
+			>
+				<div :class="$style.key">Return</div>
+
+				<div :class="$style.value">
+					{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
+						>ꜩ</span
+					>
+				</div>
+			</div>
+			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
+				<div :class="$style.key">Return</div>
+
+				Refund
+			</div>
+			<div v-else :class="$style.param">
+				<div :class="$style.key">Return</div>
+
+				<span>TBD</span>
+			</div>
 		</div>
 	</div>
 </template>
@@ -257,5 +308,55 @@ const returnForLiquidity = computed(() => {
 
 .param span {
 	color: var(--text-tertiary);
+}
+
+.desktop {
+	display: flex;
+	align-items: center;
+	flex: 3;
+}
+
+.mobile {
+	display: none;
+
+	flex-direction: column;
+	gap: 20px;
+
+	width: 100%;
+}
+
+.key {
+	color: var(--text-tertiary);
+}
+
+.value {
+	display: flex;
+	align-items: center;
+}
+
+@media (max-width: 650px) {
+	.wrapper {
+		align-items: flex-start;
+		flex-direction: column;
+
+		padding: 16px;
+		height: initial;
+	}
+
+	.desktop {
+		display: none;
+	}
+
+	.mobile {
+		display: flex;
+	}
+
+	.base {
+		margin-bottom: 24px;
+	}
+
+	.param {
+		justify-content: space-between;
+	}
 }
 </style>

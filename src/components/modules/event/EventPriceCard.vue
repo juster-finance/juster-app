@@ -250,4 +250,28 @@ const finishTimeText = computed(() => {
 		background: rgba(255, 255, 255, 0.1);
 	}
 }
+
+@media (max-width: 500px) {
+	.dots.anim .dot:nth-child(4) {
+		display: none;
+	}
+	.dots.anim .dot:nth-child(5) {
+		display: none;
+	}
+	.dots.anim .dot:nth-child(6) {
+		display: none;
+	}
+	.dots.anim .dot:nth-child(7) {
+		display: none;
+	}
+	.dots.anim .dot:nth-child(8) {
+		display: none;
+	}
+	.dots.anim .dot:nth-child(9) {
+		display: none;
+	}
+	.dots.anim .dot:nth-child(10) {
+		display: none;
+	}
+}
 </style>

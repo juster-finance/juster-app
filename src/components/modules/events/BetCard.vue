@@ -87,41 +87,110 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 			</div>
 		</div>
 
-		<div :class="[$style.param, side == 'Up' ? $style.up : $style.down]">
-			<Icon name="higher" size="12" />
-			{{ side }}
+		<!-- Desktop Template -->
+		<div :class="$style.desktop">
+			<div
+				:class="[$style.param, side == 'Up' ? $style.up : $style.down]"
+			>
+				<Icon name="higher" size="12" />
+				{{ side }}
+			</div>
+
+			<div :class="$style.param">
+				{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
+				<span>ꜩ</span>
+			</div>
+
+			<div v-if="event.status == 'CANCELED'" :class="$style.param">
+				{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
+				<span>ꜩ</span>
+			</div>
+
+			<div v-else-if="event.status == 'FINISHED'" :class="$style.param">
+				{{
+					isWon
+						? `+${numberWithSymbol(
+								(bet.reward - bet.amount).toFixed(2),
+								",",
+						  )}`
+						: 0
+				}}&nbsp;
+				<span>ꜩ</span>
+			</div>
+
+			<div
+				v-else-if="['NEW', 'STARTED'].includes(event.status)"
+				:class="$style.param"
+			>
+				{{
+					numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",")
+				}}&nbsp;
+				<span>ꜩ</span>
+			</div>
 		</div>
 
-		<div :class="$style.param">
-			{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
-			<span>ꜩ</span>
-		</div>
+		<!-- Mobile Template -->
+		<div :class="$style.mobile">
+			<div
+				:class="[$style.param, side == 'Up' ? $style.up : $style.down]"
+			>
+				<div :class="$style.key">Side</div>
 
-		<div v-if="event.status == 'CANCELED'" :class="$style.param">
-			{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
-			<span>ꜩ</span>
-		</div>
+				<div :class="$style.value">
+					<Icon name="higher" size="12" /> {{ side }}
+				</div>
+			</div>
 
-		<div v-else-if="event.status == 'FINISHED'" :class="$style.param">
-			{{
-				isWon
-					? `+${numberWithSymbol(
+			<div :class="$style.param">
+				<div :class="$style.key">Amount</div>
+
+				<div :class="$style.value">
+					{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
+					<span>ꜩ</span>
+				</div>
+			</div>
+
+			<div v-if="event.status == 'CANCELED'" :class="$style.param">
+				<div :class="$style.key">Amount</div>
+
+				<div :class="$style.value">
+					{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
+					<span>ꜩ</span>
+				</div>
+			</div>
+
+			<div v-else-if="event.status == 'FINISHED'" :class="$style.param">
+				<div :class="$style.key">Amount</div>
+
+				<div :class="$style.value">
+					{{
+						isWon
+							? `+${numberWithSymbol(
+									(bet.reward - bet.amount).toFixed(2),
+									",",
+							  )}`
+							: 0
+					}}&nbsp;
+					<span>ꜩ</span>
+				</div>
+			</div>
+
+			<div
+				v-else-if="['NEW', 'STARTED'].includes(event.status)"
+				:class="$style.param"
+			>
+				<div :class="$style.key">Amount</div>
+
+				<div :class="$style.value">
+					{{
+						numberWithSymbol(
 							(bet.reward - bet.amount).toFixed(2),
 							",",
-					  )}`
-					: 0
-			}}&nbsp;
-			<span>ꜩ</span>
-		</div>
-
-		<div
-			v-else-if="['NEW', 'STARTED'].includes(event.status)"
-			:class="$style.param"
-		>
-			{{
-				numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",")
-			}}&nbsp;
-			<span>ꜩ</span>
+						)
+					}}&nbsp;
+					<span>ꜩ</span>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -232,5 +301,55 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 .param span {
 	color: var(--text-tertiary);
+}
+
+.desktop {
+	display: flex;
+	align-items: center;
+	flex: 3;
+}
+
+.mobile {
+	display: none;
+
+	flex-direction: column;
+	gap: 20px;
+
+	width: 100%;
+}
+
+.key {
+	color: var(--text-tertiary);
+}
+
+.value {
+	display: flex;
+	align-items: center;
+}
+
+@media (max-width: 650px) {
+	.wrapper {
+		align-items: flex-start;
+		flex-direction: column;
+
+		padding: 16px;
+		height: initial;
+	}
+
+	.desktop {
+		display: none;
+	}
+
+	.mobile {
+		display: flex;
+	}
+
+	.base {
+		margin-bottom: 24px;
+	}
+
+	.param {
+		justify-content: space-between;
+	}
 }
 </style>
