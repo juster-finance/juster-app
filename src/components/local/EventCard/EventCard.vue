@@ -6,6 +6,7 @@ import {
 	ref,
 	reactive,
 	computed,
+	nextTick,
 } from "vue"
 import { DateTime } from "luxon"
 
@@ -56,7 +57,7 @@ import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
 
 // eslint-disable-next-line no-undef
-const props = defineProps({ event: { type: Object } })
+const props = defineProps({ event: { type: Object, default: () => {} } })
 
 /** Stores */
 const notificationsStore = useNotificationsStore()
@@ -294,7 +295,9 @@ const contextMenuHandler = (e) => {
 	contextMenuStyles.top = `${e.clientY}px`
 	contextMenuStyles.left = `${e.clientX}px`
 
-	openContextMenu.value = !openContextMenu.value
+	nextTick(() => {
+		openContextMenu.value = !openContextMenu.value
+	})
 }
 
 onMounted(async () => {
@@ -394,12 +397,12 @@ onUnmounted(() => {
 			/>
 
 			<Dropdown
-				:forceOpen="openContextMenu"
+				:force-open="openContextMenu"
 				@onClose="openContextMenu = false"
 				:class="$style.dropdown"
 				:style="{ ...contextMenuStyles }"
 			>
-				<template v-slot:dropdown>
+				<template #dropdown>
 					<router-link :to="`/events/${event.id}`" target="_blank">
 						<DropdownItem>
 							<Icon name="open" size="16" />Open in new tab

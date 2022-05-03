@@ -67,9 +67,6 @@ onMounted(async () => {
 </template>
 
 <style module>
-.wrapper {
-}
-
 .title {
 	font-size: 20px;
 	font-weight: 600;

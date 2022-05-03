@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, reactive, watch, nextTick, toRefs } from "vue"
+import { defineComponent, ref, watch, nextTick, toRefs } from "vue"
 
 /**
  * Composable
@@ -7,121 +7,163 @@ import { defineComponent, ref, reactive, watch, nextTick, toRefs } from "vue"
 import { useOnOutsidePress } from "@/composable/onOutside"
 
 export default defineComponent({
-    name: "Dropdown",
-    props: {
-        forceOpen: Boolean,
-        side: {
-            type: String,
-            default: "bottom",
-        },
-    },
-    emits: ["onClose"],
+	name: "Dropdown",
+	props: {
+		forceOpen: Boolean,
+		side: {
+			type: String,
+			default: "bottom",
+		},
+	},
+	emits: ["onClose"],
 
-    setup(props, context) {
-        const { side, forceOpen } = toRefs(props)
+	setup(props, context) {
+		const { side, forceOpen } = toRefs(props)
 
-        const trigger = ref(null)
-        const dropdown = ref(null)
-        const isOpen = ref(false)
+		const trigger = ref(null)
+		const dropdown = ref(null)
+		const isOpen = ref(false)
 
-        watch(forceOpen, () => {
-            isOpen.value = forceOpen.value
-        })
+		watch(forceOpen, () => {
+			isOpen.value = forceOpen.value
+		})
 
-        const toggleDropdown = (event) => {
-            event.stopPropagation()
+		const toggleDropdown = (event) => {
+			event.stopPropagation()
 
-            isOpen.value = !isOpen.value
-        }
-        const close = (event) => {
-            if (event) event.stopPropagation()
+			isOpen.value = !isOpen.value
+		}
+		const close = (event) => {
+			if (event) event.stopPropagation()
 
-            isOpen.value = false
+			isOpen.value = false
 
-            context.emit("onClose")
-        }
+			context.emit("onClose")
+		}
 
-        const dropdownStyles = reactive({
-            top: `initial`,
-            right: 0,
-            bottom: `initial`,
-        })
+		const dropdownStyles = ref({})
 
-        let removeOutside
-        watch(isOpen, () => {
-            if (!isOpen.value) {
-                removeOutside()
+		let removeOutside
+		const handleOutside = (e) => {
+			if (e.path.find((el) => el.id === "trigger")) {
+				return
+			} else {
+				close()
+			}
+		}
 
-                document.removeEventListener("keydown", onKeydown)
-            } else {
-                document.addEventListener("keydown", onKeydown)
+		watch(isOpen, () => {
+			if (!isOpen.value) {
+				removeOutside()
 
-                const triggerHeight =
-                    trigger.value.getBoundingClientRect().height
+				document.removeEventListener("keydown", onKeydown)
+			} else {
+				document.addEventListener("keydown", onKeydown)
 
-                if (side.value == "bottom") {
-                    dropdownStyles.top = `${triggerHeight + 6}px`
-                }
-                if (side.value == "top") {
-                    dropdownStyles.bottom = `${triggerHeight + 6}px`
-                }
+				const triggerRect = trigger.value.getBoundingClientRect()
 
-                nextTick(() => {
-                    removeOutside = useOnOutsidePress(dropdown, close)
-                })
-            }
-        })
+				dropdownStyles.value.right = `${
+					window.innerWidth - triggerRect.x - triggerRect.width
+				}px`
 
-        const onKeydown = (event) => {
-            if (event.key == "Escape") close()
-        }
+				if (side.value == "bottom") {
+					dropdownStyles.value.top = `${
+						triggerRect.y + triggerRect.height + 6
+					}px`
+				}
+				if (side.value == "top") {
+					dropdownStyles.value.bottom = `${
+						window.innerHeight - triggerRect.y + 6
+					}px`
+				}
 
-        return {
-            trigger,
-            dropdown,
-            isOpen,
-            toggleDropdown,
-            close,
-            dropdownStyles,
-        }
-    },
+				nextTick(() => {
+					removeOutside = useOnOutsidePress(dropdown, handleOutside)
+				})
+			}
+		})
+
+		const onKeydown = (event) => {
+			if (event.key == "Escape") close()
+		}
+
+		return {
+			trigger,
+			dropdown,
+			isOpen,
+			toggleDropdown,
+			close,
+			dropdownStyles,
+		}
+	},
 })
 </script>
 
 <template>
-    <div ref="dropdown" :class="$style.wrapper">
-        <div ref="trigger" @click="toggleDropdown" :class="$style.trigger">
-            <slot name="trigger" />
-        </div>
+	<div :class="$style.wrapper">
+		<div
+			ref="trigger"
+			id="trigger"
+			@click="toggleDropdown"
+			:class="$style.trigger"
+		>
+			<slot name="trigger" />
+		</div>
 
-        <transition name="popup">
-            <div
-                v-if="isOpen"
-                @click="close"
-                :class="$style.dropdown"
-                :style="dropdownStyles"
-            >
-                <slot name="dropdown" />
-            </div>
-        </transition>
-    </div>
+		<teleport to="#dropdown">
+			<transition name="fastfade">
+				<div v-if="isOpen" :class="$style.canvas">
+					<transition name="dropdown" appear>
+						<div
+							ref="dropdown"
+							@click="close"
+							:class="$style.dropdown"
+							:style="{
+								...dropdownStyles,
+							}"
+						>
+							<slot name="dropdown" />
+						</div>
+					</transition>
+				</div>
+			</transition>
+		</teleport>
+	</div>
 </template>
+
+<style>
+.popup-enter-active,
+.popup-leave-active {
+	transition: all 0.07s ease-out;
+}
+
+.popup-enter-from,
+.popup-leave-to {
+	opacity: 0;
+	transform: scale(0.95);
+}
+</style>
 
 <style module>
 .wrapper {
-    position: relative;
+	position: relative;
 }
 
 .trigger {
-    cursor: pointer;
+	cursor: pointer;
+}
+
+.canvas {
+	position: fixed;
+	inset: 0;
+	z-index: 2000;
 }
 
 .dropdown {
-    position: absolute;
+	position: absolute;
 
-    z-index: 1000;
-    padding: 8px 0;
-    border-radius: 8px;
-    background: var(--dropdown-bg);
+	padding: 8px 0;
+	border-radius: 8px;
+	background: var(--dropdown-bg);
 }
 </style>

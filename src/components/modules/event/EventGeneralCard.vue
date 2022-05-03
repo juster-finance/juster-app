@@ -335,7 +335,7 @@ const endDiff = computed(() =>
 			</div>
 
 			<div v-if="event.bets.length >= 6" :class="$style.card__highdemand">
-				<span>High-demand Event</span>
+				<span>High-demand</span>
 				<span
 					>{{ event.bets.length }} bets&nbsp;&nbsp;•&nbsp;&nbsp;{{
 						numberWithSymbol(event.totalValueLocked.toFixed(0), ",")

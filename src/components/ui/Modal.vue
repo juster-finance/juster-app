@@ -64,8 +64,12 @@ const calcModalStyles = computed(() => {
 	return styles
 })
 
-const handleClose = () => {
-	emit("onClose")
+const handleClose = (e) => {
+	if (e && e.path.find((el) => el.id === "dropdown")) {
+		return
+	} else {
+		emit("onClose")
+	}
 }
 
 const onKeydown = (event) => {

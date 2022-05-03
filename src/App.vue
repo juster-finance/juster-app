@@ -31,6 +31,8 @@ import { useAccountStore } from "@/store/account"
 import { useMarket } from "@/composable/market"
 
 export default defineComponent({
+	components: { Header, Notifications, Footer, TheWelcomeScreen },
+
 	setup() {
 		const { setupMarket, setupUser } = useMarket()
 
@@ -81,13 +83,13 @@ export default defineComponent({
 
 		return { showWelcomeScreen }
 	},
-
-	components: { Header, Notifications, Footer, TheWelcomeScreen },
 })
 </script>
 
 <template>
 	<div id="modal" />
+	<div id="dropdown" />
+
 	<Notifications />
 
 	<transition name="popup">
@@ -116,6 +118,24 @@ html {
 	box-sizing: border-box;
 
 	background: var(--app-bg);
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+	animation: fade-in 0.2s;
+	transform-origin: top;
+}
+
+@keyframes fade-in {
+	0% {
+		opacity: 0;
+		transform: scale(0.95) translateY(10px);
+	}
+
+	100% {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
 }
 
 .popup-enter-active,
