@@ -178,10 +178,11 @@ const endDiff = computed(() =>
 						</div>
 					</div>
 
-					<template v-slot:content
-						>Participants ({{
-							participantsAvatars.length
-						}})</template
+					<template #content
+						>Participants
+						<span
+							>({{ participantsAvatars.length }})</span
+						></template
 					>
 				</Tooltip>
 
@@ -211,7 +212,7 @@ const endDiff = computed(() =>
 						</template>
 					</div>
 
-					<template v-slot:content>{{
+					<template #content>{{
 						verifiedMakers[currentNetwork].includes(event.creatorId)
 							? "Recurring event from Juster"
 							: "Custom event from user"

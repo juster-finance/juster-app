@@ -66,9 +66,6 @@ const finishTimeText = computed(() => {
 				<div :class="$style.dot" />
 				<div :class="$style.dot" />
 				<div :class="$style.dot" />
-				<div :class="$style.dot" />
-				<div :class="$style.dot" />
-				<div :class="$style.dot" />
 			</div>
 
 			<div :class="$style.side">

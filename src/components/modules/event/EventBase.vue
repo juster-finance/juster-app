@@ -19,6 +19,7 @@ import Pagination from "@/components/ui/Pagination"
 import EventChart from "./EventChart"
 import EventGeneralCard from "./EventGeneralCard"
 import EventPriceCard from "./EventPriceCard"
+import EventAnalyticsCard from "./EventAnalyticsCard"
 import EventPoolCard from "./EventPoolCard"
 import EventPersonalStats from "./EventPersonalStats"
 
@@ -47,6 +48,7 @@ import { fetchEventById, fetchEventParticipants } from "@/api/events"
 import { numberWithSymbol } from "@/services/utils/amounts"
 import { capitalizeFirstLetter } from "@/services/utils/global"
 import { juster, analytics } from "@/services/sdk"
+import { supportedMarkets } from "@/services/config"
 
 /**
  * Store
@@ -59,6 +61,13 @@ import { useNotificationsStore } from "@/store/notifications"
  * gql
  */
 import { event as eventModel } from "@/graphql/models"
+
+/** Meta */
+const meta = useMeta({
+	title: `Event`,
+	description:
+		"Available markets for events, for providing liquidity and accepting bets from users",
+})
 
 const marketStore = useMarketStore()
 const accountStore = useAccountStore()
@@ -103,6 +112,11 @@ const getEvent = async () => {
 
 	const { id: eventId } = router.currentRoute.value.params
 	event.value = await fetchEventById({ id: eventId })
+
+	/** meta */
+	meta.meta.title = `Price Event - ${
+		supportedMarkets[event.value.currencyPair.symbol].target
+	} (#${event.value.id})`
 
 	if (!event.value) {
 		router.push("/events")
@@ -449,13 +463,6 @@ onUnmounted(() => {
 	destroyStartCountdown()
 	destroyFinishCountdown()
 })
-
-/** Meta */
-useMeta({
-	title: `Event`,
-	description:
-		"Available markets for events, for providing liquidity and accepting bets from users",
-})
 </script>
 
 <template>
@@ -526,7 +533,7 @@ useMeta({
 							<div :class="$style.info">
 								<div :class="$style.title">Bets</div>
 								<div :class="$style.description">
-									All the bets placed for this event
+									All bets from users for this event
 								</div>
 							</div>
 
@@ -618,7 +625,7 @@ useMeta({
 							<div :class="$style.info">
 								<div :class="$style.title">Liquidity</div>
 								<div :class="$style.description">
-									All the liquidity provided for this event
+									Provided liquidity for this event
 								</div>
 							</div>
 
@@ -722,6 +729,8 @@ useMeta({
 						:event="event"
 						@onLiquidity="handleLiquidity"
 					/>
+
+					<EventAnalyticsCard :event="event" />
 
 					<Button
 						@click="showEventDetailsModal = true"
@@ -849,7 +858,7 @@ useMeta({
 }
 
 .details_btn {
-	margin-top: 8px;
+	margin: 8px 0 32px 0;
 }
 
 .filters {
@@ -914,6 +923,10 @@ useMeta({
 	.side {
 		max-width: initial;
 		min-width: initial;
+	}
+
+	.container {
+		gap: 0;
 	}
 }
 
