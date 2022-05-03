@@ -903,7 +903,7 @@ onUnmounted(() => {
 }
 
 .participant {
-	margin-left: -6px;
+	margin-left: -10px;
 }
 
 .creator {
@@ -930,19 +930,19 @@ onUnmounted(() => {
 }
 
 .user_avatar {
-	width: 30px;
-	height: 30px;
+	width: 34px;
+	height: 34px;
 
 	background: rgb(35, 35, 35);
 	border-radius: 50px;
-	outline: 3px solid var(--card-bg);
+	border: 3px solid var(--card-bg);
 
 	padding: 2px;
 }
 
 .more_participants {
-	width: 30px;
-	height: 30px;
+	width: 34px;
+	height: 34px;
 
 	display: flex;
 	align-items: center;
@@ -955,7 +955,7 @@ onUnmounted(() => {
 
 	background: rgb(35, 35, 35);
 	border-radius: 50px;
-	outline: 3px solid var(--card-bg);
+	border: 3px solid var(--card-bg);
 }
 
 .title {

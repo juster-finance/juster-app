@@ -601,7 +601,7 @@ const endDiff = computed(() =>
 }
 
 .participant {
-	margin-left: -6px;
+	margin-left: -10px;
 }
 
 .creator {
@@ -628,19 +628,19 @@ const endDiff = computed(() =>
 }
 
 .user_avatar {
-	width: 30px;
-	height: 30px;
+	width: 34px;
+	height: 34px;
 
 	background: rgb(35, 35, 35);
 	border-radius: 50px;
-	outline: 3px solid var(--card-bg);
+	border: 3px solid var(--card-bg);
 
 	padding: 2px;
 }
 
 .more_participants {
-	width: 30px;
-	height: 30px;
+	width: 34px;
+	height: 34px;
 
 	display: flex;
 	align-items: center;
@@ -653,7 +653,7 @@ const endDiff = computed(() =>
 
 	background: rgb(35, 35, 35);
 	border-radius: 50px;
-	outline: 3px solid var(--card-bg);
+	border: 3px solid var(--card-bg);
 }
 
 .card {
