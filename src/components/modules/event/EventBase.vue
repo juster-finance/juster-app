@@ -12,6 +12,12 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs"
 import Button from "@/components/ui/Button"
 import Banner from "@/components/ui/Banner"
 import Pagination from "@/components/ui/Pagination"
+import {
+	Dropdown,
+	DropdownItem,
+	DropdownTitle,
+	DropdownDivider,
+} from "@/components/ui/Dropdown"
 
 /**
  * Local
@@ -30,6 +36,7 @@ import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
 import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
 import BetModal from "@/components/local/modals/position/BetModal"
 import EventDetailsModal from "@/components/local/modals/EventDetailsModal"
+import NotifyMeModal from "@/components/local/modals/NotifyMeModal"
 
 /**
  * Composable
@@ -46,9 +53,9 @@ import { fetchEventById, fetchEventParticipants } from "@/api/events"
  * Services
  */
 import { numberWithSymbol } from "@/services/utils/amounts"
-import { capitalizeFirstLetter } from "@/services/utils/global"
-import { juster, analytics } from "@/services/sdk"
-import { supportedMarkets } from "@/services/config"
+import { capitalizeFirstLetter, toClipboard } from "@/services/utils/global"
+import { juster, analytics, currentNetwork } from "@/services/sdk"
+import { supportedMarkets, verifiedMakers } from "@/services/config"
 
 /**
  * Store
@@ -91,6 +98,7 @@ const showBetModal = ref(false)
 const showLiquidityModal = ref(false)
 const showParticipantsModal = ref(false)
 const showEventDetailsModal = ref(false)
+const showNotifyMeModal = ref(false)
 
 /**
  * Filters
@@ -350,6 +358,33 @@ const handleParticipants = () => {
 	analytics.log("showParticipantsModal", { where: "event_base" })
 }
 
+const copy = (target) => {
+	if (target == "id") {
+		notificationsStore.create({
+			notification: {
+				type: "success",
+				title: "Event ID copied to clipboard",
+				description: "Use Ctrl+V to paste",
+				autoDestroy: true,
+			},
+		})
+
+		toClipboard(event.value.id)
+	}
+	if (target == "url") {
+		notificationsStore.create({
+			notification: {
+				type: "success",
+				title: "Event URL copied to clipboard",
+				description: "Use Ctrl+V to paste",
+				autoDestroy: true,
+			},
+		})
+
+		toClipboard(location)
+	}
+}
+
 watch(event, async () => {
 	await getEvent()
 
@@ -496,6 +531,10 @@ onUnmounted(() => {
 			:show="showEventDetailsModal"
 			:event="event"
 			@onClose="showEventDetailsModal = false"
+		/>
+		<NotifyMeModal
+			:show="showNotifyMeModal"
+			@onClose="showNotifyMeModal = false"
 		/>
 
 		<Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
@@ -732,15 +771,93 @@ onUnmounted(() => {
 
 					<EventAnalyticsCard :event="event" />
 
-					<Button
-						@click="showEventDetailsModal = true"
-						type="secondary"
-						size="small"
-						block
-						:class="$style.details_btn"
-						><Icon name="menu" size="12" />View event
-						details</Button
-					>
+					<div :class="$style.event_footer">
+						<div :class="$style.metadata">
+							<span
+								>Price Event —
+								{{
+									supportedMarkets[event.currencyPair.symbol]
+										.target
+								}}
+								(#{{ event.id }})
+
+								<Icon
+									v-if="
+										verifiedMakers[currentNetwork].includes(
+											event.creatorId,
+										)
+									"
+									name="verified"
+									size="13"
+							/></span>
+
+							<span
+								v-if="
+									verifiedMakers[currentNetwork].includes(
+										event.creatorId,
+									)
+								"
+								>Recurring • Initial Liquidity Included</span
+							>
+							<span v-else
+								>Custom • Unknown state of Liquidity</span
+							>
+						</div>
+
+						<Dropdown side="top">
+							<template #trigger>
+								<Button type="secondary" size="small"
+									><Icon name="dots" size="12" /> More</Button
+								>
+							</template>
+
+							<template #dropdown>
+								<DropdownItem @click="showNotifyMeModal = true">
+									<Icon name="notifications" size="12" />
+									Notify Me
+								</DropdownItem>
+
+								<DropdownDivider />
+
+								<DropdownTitle>Customization</DropdownTitle>
+								<DropdownItem @click="handleSwitch('mainnet')">
+									<Icon name="collection" size="12" />
+									Presets
+								</DropdownItem>
+
+								<DropdownItem @click="handleSwitch('testnet')">
+									<Icon name="settings" size="12" />
+									View Options
+								</DropdownItem>
+
+								<DropdownItem @click="handleSwitch('testnet')">
+									<Icon name="layers" size="12" />
+									Configure Blocks
+								</DropdownItem>
+
+								<DropdownDivider />
+
+								<DropdownItem @click="copy('id')">
+									<Icon name="copy" size="12" />
+									Copy ID
+								</DropdownItem>
+
+								<DropdownItem @click="copy('url')">
+									<Icon name="copy" size="12" />
+									Copy URL
+								</DropdownItem>
+
+								<DropdownDivider />
+
+								<DropdownItem
+									@click="showEventDetailsModal = true"
+								>
+									<Icon name="menu" size="12" />
+									View all params
+								</DropdownItem>
+							</template>
+						</Dropdown>
+					</div>
 				</div>
 			</div>
 		</Transition>
@@ -913,6 +1030,37 @@ onUnmounted(() => {
 
 .pagination {
 	margin-top: 16px;
+}
+
+.event_footer {
+	display: flex;
+	justify-content: space-between;
+
+	margin-top: 16px;
+}
+
+.metadata {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.metadata span:nth-child(1) {
+	font-size: 13px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-secondary);
+	fill: var(--text-secondary);
+
+	display: flex;
+	gap: 4px;
+}
+
+.metadata span:nth-child(2) {
+	font-size: 12px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-tertiary);
 }
 
 @media (max-width: 940px) {

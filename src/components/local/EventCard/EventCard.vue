@@ -25,6 +25,7 @@ import Tooltip from "@/components/ui/Tooltip"
  * Local
  */
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
+import NotifyMeModal from "@/components/local/modals/NotifyMeModal"
 import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
 import BetModal from "@/components/local/modals/position/BetModal"
 import EventActions from "@/components/local/EventActions"
@@ -73,11 +74,10 @@ const openContextMenu = ref(false)
 const showBetModal = ref(false)
 const preselectedSide = ref("Rise")
 
-/** Liquidity modal */
+/** Modals */
 const showLiquidityModal = ref(false)
-
-/** Participants modal */
 const showParticipantsModal = ref(false)
+const showNotifyMeModal = ref(false)
 
 const subscription = ref({})
 
@@ -395,6 +395,10 @@ onUnmounted(() => {
 				@onClose="showParticipantsModal = false"
 				:event="event"
 			/>
+			<NotifyMeModal
+				:show="showNotifyMeModal"
+				@onClose="showNotifyMeModal = false"
+			/>
 
 			<Dropdown
 				:force-open="openContextMenu"
@@ -411,11 +415,12 @@ onUnmounted(() => {
 
 					<DropdownDivider />
 
+					<DropdownItem @click.prevent="showNotifyMeModal = true">
+						<Icon name="notifications" size="16" />Notify Me
+					</DropdownItem>
+
 					<DropdownItem @click.prevent="handleParticipants">
 						<Icon name="users" size="16" />View participants
-					</DropdownItem>
-					<DropdownItem disabled>
-						<Icon name="notifications" size="16" />Notifiy me
 					</DropdownItem>
 
 					<DropdownDivider />
