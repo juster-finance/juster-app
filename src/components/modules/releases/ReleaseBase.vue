@@ -134,11 +134,10 @@ export default defineComponent({
 }
 
 .title {
-	font-size: 50px;
+	font-size: 42px;
 	line-height: 1;
 	font-weight: 600;
 	color: var(--text-primary);
-	text-align: center;
 
 	margin-top: 40px;
 	margin-bottom: 60px;

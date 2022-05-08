@@ -19,186 +19,130 @@ import { toClipboard } from "@/services/utils/global"
 import { useNotificationsStore } from "@/store/notifications"
 
 export default defineComponent({
-    name: "ReleaseCard",
-    props: { release: Object },
+	name: "ReleaseCard",
+	components: { Button },
 
-    setup(props) {
-        const { release } = toRefs(props)
+	props: { release: Object },
 
-        const notificationsStore = useNotificationsStore()
+	setup(props) {
+		const { release } = toRefs(props)
 
-        const md = ref(null)
-        md.value = new Markdown({ html: true })
+		const notificationsStore = useNotificationsStore()
 
-        const firstParagraphRegex = /\<p>(.*?)\<\/p>/
-        const content = computed(
-            () =>
-                firstParagraphRegex.exec(
-                    md.value.render(release.value.Body),
-                )[0],
-        )
+		const md = ref(null)
+		md.value = new Markdown({ html: true })
 
-        const copyURL = () => {
-            toClipboard(
-                `https://app.juster.fi/releases/${release.value.slug.current}`,
-            )
+		const firstParagraphRegex = /\<p>(.*?)\<\/p>/
+		const content = computed(
+			() =>
+				firstParagraphRegex.exec(
+					md.value.render(release.value.Body),
+				)[0],
+		)
 
-            notificationsStore.create({
-                notification: {
-                    type: "success",
-                    title: "Release URL copied to clipboard",
-                    description: "Use Ctrl+V to paste",
-                    autoDestroy: true,
-                },
-            })
-        }
+		const copyURL = () => {
+			toClipboard(
+				`https://app.juster.fi/releases/${release.value.slug.current}`,
+			)
 
-        const openGithub = () => {
-            window
-                .open("https://github.com/juster-finance/juster-app", "_blank")
-                .focus()
-        }
+			notificationsStore.create({
+				notification: {
+					type: "success",
+					title: "Release URL copied to clipboard",
+					description: "Use Ctrl+V to paste",
+					autoDestroy: true,
+				},
+			})
+		}
 
-        return { content, DateTime, copyURL, openGithub }
-    },
-
-    components: { Button },
+		return { content, DateTime, copyURL }
+	},
 })
 </script>
 
 <template>
-    <router-link
-        :to="`/releases/${release.slug.current}`"
-        :class="$style.wrapper"
-    >
-        <div :class="$style.when">
-            {{
-                DateTime.fromISO(release._updatedAt, {
-                    locale: "en",
-                }).toRelative()
-            }}
-        </div>
+	<router-link
+		:to="`/releases/${release.slug.current}`"
+		:class="$style.wrapper"
+	>
+		<div>
+			<div :class="$style.card">
+				<div :class="$style.when">
+					{{
+						DateTime.fromISO(release._updatedAt, {
+							locale: "en",
+						}).toFormat("dd LLL, kkkk")
+					}}
+				</div>
 
-        <div>
-            <div :class="$style.card">
-                <h2 :class="$style.title">{{ release.title }}</h2>
+				<h2 :class="$style.title">{{ release.title }}</h2>
 
-                <div :class="$style.badges">
-                    <div :class="$style.badge">By <span>Juster</span></div>
+				<div v-html="content" :class="$style.body_preview" />
 
-                    <div :class="$style.dot" />
+				<div :class="$style.buttons">
+					<router-link :to="`/releases/${release.slug.current}`">
+						<Button type="secondary" size="small">
+							<Icon name="document" size="16" />Read more
+						</Button>
+					</router-link>
 
-                    <div :class="$style.badge"><span>Minor</span> Update</div>
-                </div>
-
-                <div v-html="content" :class="$style.body_preview"></div>
-
-                <div :class="$style.buttons">
-                    <router-link :to="`/releases/${release.slug.current}`">
-                        <Button type="secondary" size="small">
-                            <Icon name="document" size="16" />View all changes
-                        </Button>
-                    </router-link>
-
-                    <Button
-                        @click.prevent="openGithub"
-                        type="secondary"
-                        size="small"
-                    >
-                        <Icon name="github" size="16" /> View on Github
-                    </Button>
-
-                    <Button
-                        @click.prevent="copyURL"
-                        type="tertiary"
-                        size="small"
-                    >
-                        <Icon name="back" size="16" /> Share
-                    </Button>
-                </div>
-            </div>
-        </div>
-    </router-link>
+					<Button
+						@click.prevent="copyURL"
+						type="tertiary"
+						size="small"
+					>
+						<Icon name="back" size="16" /> Share
+					</Button>
+				</div>
+			</div>
+		</div>
+	</router-link>
 </template>
 
 <style module>
 .wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.when {
-    font-size: 11px;
-    line-height: 1.1;
-    font-weight: 700;
-    color: var(--text-tertiary);
-
-    text-transform: uppercase;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 }
 
 .card {
-    width: 700px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    padding: 32px;
-    box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.3);
+	width: 100%;
 
-    transition: box-shadow 0.2s ease;
-}
-
-.card:hover {
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+	border-top: 1px solid var(--border);
+	padding-top: 32px;
 }
 
 .title {
-    font-size: 24px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 24px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
 
-    margin-bottom: 16px;
-}
-
-.badges {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    margin-bottom: 16px;
-}
-
-.badge {
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-tertiary);
-}
-
-.badge span {
-    color: var(--text-secondary);
-}
-
-.dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--text-tertiary);
+	margin-bottom: 16px;
 }
 
 .body_preview {
-    font-size: 14px;
-    line-height: 1.6;
-    font-weight: 400;
-    color: var(--text-tertiary);
+	font-size: 16px;
+	line-height: 1.6;
+	font-weight: 400;
+	color: var(--text-secondary);
 
-    margin-bottom: 24px;
+	margin-bottom: 20px;
+}
+
+.when {
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--text-tertiary);
+	text-transform: uppercase;
+
+	margin-bottom: 16px;
 }
 
 .buttons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 </style>

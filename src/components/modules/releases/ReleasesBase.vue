@@ -24,6 +24,10 @@ import { useReleasesStore } from "@/store/releases"
 
 export default defineComponent({
 	name: "ReleasesBase",
+	components: {
+		Button,
+		ReleaseCard,
+	},
 
 	setup() {
 		/** Meta */
@@ -42,24 +46,17 @@ export default defineComponent({
 			releasesStore,
 		}
 	},
-
-	components: {
-		Button,
-		ReleaseCard,
-	},
 })
 </script>
 
 <template>
 	<div :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template #title="{ content }">{{ content }} • Juster</template>
 		</metainfo>
 
 		<div :class="$style.base">
-			<h1 :class="$style.title">Releases.</h1>
+			<h1 :class="$style.title">Releases</h1>
 			<div :class="$style.description">
 				Join our Discord or Twitter to keep up with new updates
 			</div>
@@ -100,13 +97,12 @@ export default defineComponent({
 .base {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 
 	max-width: 700px;
 }
 
 .title {
-	font-size: 50px;
+	font-size: 42px;
 	line-height: 1;
 	font-weight: 600;
 	color: var(--text-primary);
