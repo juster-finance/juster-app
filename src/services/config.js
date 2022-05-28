@@ -53,7 +53,7 @@ export const rpcNodes = {
 export const verifiedMakers = {
 	ithacanet: [
 		"tz1RVJBJDxohFBHLK2hw6JTrKbz6oLSLERU3",
-		"KT1GEfCcvPKhLe1vrpYZtua8eBpUsVjfiDRo",
+		"KT1QdiBR3S71Q2pouuKTLhESjho8NDXkm9BD",
 	],
 	mainnet: ["tz1h5frRwDbJMGyTPntdwMC8i745q2Z1fzyF"],
 }
