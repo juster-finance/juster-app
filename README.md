@@ -144,4 +144,4 @@ The amount that will be available for withdrawal after the Event is closed in ca
 - Hash: `opaHDrmD5Ni4xJVtSYsQgoh3zsFZj879SPUSguNTpyySYy2QZQd`<sub>
       [[tzkt]](https://tzkt.io/opaHDrmD5Ni4xJVtSYsQgoh3zsFZj879SPUSguNTpyySYy2QZQd) /
       [[arronax]](https://arronax.io/tezos/mainnet/operations/query/eyJmaWVsZHMiOlsiYmxvY2tfbGV2ZWwiLCJvcGVyYXRpb25fZ3JvdXBfaGFzaCIsImNvdW50ZXIiLCJjeWNsZSIsImZlZSJdLCJwcmVkaWNhdGVzIjpbeyJmaWVsZCI6Im9wZXJhdGlvbl9ncm91cF9oYXNoIiwib3BlcmF0aW9uIjoiZXEiLCJzZXQiOlsib3BhSERybUQ1Tmk0eEpWdFNZc1Fnb2gzenNGWmo4NzlTUFVTZ3VOVHB5eVNZeTJRWlFkIl0sImludmVyc2UiOmZhbHNlfV0sIm9yZGVyQnkiOlt7ImZpZWxkIjoiYmxvY2tfbGV2ZWwiLCJkaXJlY3Rpb24iOiJkZXNjIn1dLCJhZ2dyZWdhdGlvbiI6W10sImxpbWl0Ijo1MDAwfQ) /
-      [[tzstats]](tzstats.com/opaHDrmD5Ni4xJVtSYsQgoh3zsFZj879SPUSguNTpyySYy2QZQd) /
+      [[tzstats]](tzstats.com/opaHDrmD5Ni4xJVtSYsQgoh3zsFZj879SPUSguNTpyySYy2QZQd) 
