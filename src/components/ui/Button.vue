@@ -29,6 +29,13 @@ export default defineComponent({
 		icon: {
 			type: String,
 		},
+		asLink: {
+			type: Boolean,
+			default: false,
+		},
+		link: {
+			type: String,
+		},
 	},
 
 	setup(props, context) {
@@ -62,10 +69,20 @@ export default defineComponent({
 </script>
 
 <template>
-	<button :class="[...getStyles(), loading && $style.loading]">
+	<button v-if="!asLink" :class="[...getStyles(), loading && $style.loading]">
 		<slot v-if="!icon" />
 		<Icon v-else :name="icon" size="16" />
 	</button>
+
+	<a
+		v-else
+		:href="link"
+		target="_blank"
+		:class="[...getStyles(), loading && $style.loading]"
+	>
+		<slot v-if="!icon" />
+		<Icon v-else :name="icon" size="16" />
+	</a>
 </template>
 
 <style module>
@@ -127,10 +144,12 @@ export default defineComponent({
 }
 
 .wrapper.mini {
+	gap: 8px;
 	height: 26px;
 	padding: 0 10px 0 10px;
-	font-size: 12px;
 	border-radius: 6px;
+
+	font-size: 12px;
 }
 .wrapper.mini.icon {
 	padding: 0 10px;

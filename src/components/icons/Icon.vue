@@ -5,6 +5,7 @@ import icons from "./icons.json"
 const props = defineProps({
 	name: { type: String, required: true, default: "warning" },
 	size: { type: String, default: "16" },
+	fill: { type: Boolean, default: false },
 })
 
 const calcSize = computed(() => {
@@ -14,7 +15,7 @@ const calcSize = computed(() => {
 	}
 })
 
-const getPath = () => {
+const getIcon = () => {
 	return icons[props.name.charAt(0).toLowerCase() + props.name.slice(1)]
 }
 
@@ -35,14 +36,22 @@ const isSplitted = () => {
 		:style="calcSize"
 		role="img"
 	>
-		<path v-if="!isSplitted(name)" :d="getPath(name)" />
+		<path v-if="!isSplitted(name)" :d="getIcon(name)" />
 		<template v-else>
 			<path
-				v-for="path in getPath(name)"
-				:key="path.id"
-				:d="path.path"
+				v-if="!Array.isArray(getIcon(name))"
+				:d="getIcon(name)"
 				:style="{ opacity: path.opacity }"
 			/>
+
+			<template v-else>
+				<path
+					v-for="(icon, i) in getIcon(name)"
+					:key="i"
+					:d="icon.path"
+					:style="{ opacity: fill ? 1 : icon.opacity }"
+				/>
+			</template>
 		</template>
 	</svg>
 </template>
