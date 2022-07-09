@@ -6,6 +6,7 @@ import { ref } from "vue"
  */
 import Modal from "@/components/ui/Modal"
 import Button from "@/components/ui/Button"
+import Banner from "@/components/ui/Banner"
 
 /**
  * Store
@@ -18,7 +19,7 @@ import { useNotificationsStore } from "@/store/notifications"
 import { rpcNodes } from "@/services/config"
 import { currentNetwork } from "@/services/sdk"
 
-const props = defineProps({ show: { type: Boolean } })
+defineProps({ show: { type: Boolean } })
 const emit = defineEmits(["onSelectCustomNode"])
 
 const notificationsStore = useNotificationsStore()
@@ -63,14 +64,15 @@ const handleContinue = () => {
 </script>
 
 <template>
-	<Modal :show="show" width="500" closable @onClose="$emit('onClose')">
-		<div :class="$style.title">Custom Sign in</div>
+	<Modal :show="show" width="650" closable @onClose="$emit('onClose')">
+		<div :class="$style.title">Connection with custom RPC</div>
+
 		<div :class="$style.description">
 			Select an RPC node from the ready-made list based on the selected
-			network ({{ currentNetwork }}) or enter it manually
+			network
 		</div>
 
-		<div :class="$style.subtitle">Select RPC node</div>
+		<div :class="$style.subtitle">Select RPC</div>
 
 		<div :class="$style.nodes">
 			<div
@@ -113,13 +115,19 @@ const handleContinue = () => {
 			</div>
 		</div>
 
+		<Banner color="gray" :class="$style.banner">
+			Selecting and continuing to use a custom RPC can affect the
+			operation of the application.
+		</Banner>
+
 		<Button
 			@click="handleContinue"
 			:type="selectedNode.name ? 'primary' : 'secondary'"
 			size="large"
 			:disabled="!selectedNode.name"
 			block
-			><Icon name="login" size="16" />Continue to Beacon</Button
+		>
+			<Icon name="beacon" size="16" />Continue to Beacon</Button
 		>
 	</Modal>
 </template>
@@ -146,6 +154,10 @@ const handleContinue = () => {
 	margin-bottom: 32px;
 }
 
+.banner {
+	margin-bottom: 32px;
+}
+
 .subtitle {
 	font-size: 14px;
 	line-height: 1;
@@ -156,9 +168,9 @@ const handleContinue = () => {
 }
 
 .nodes {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+	grid-gap: 16px;
 
 	margin-bottom: 32px;
 }
@@ -169,7 +181,16 @@ const handleContinue = () => {
 
 	border-radius: 8px;
 	border: 1px solid var(--border);
+	background: rgba(255, 255, 255, 0.05);
+	cursor: pointer;
+
 	padding: 16px;
+
+	transition: border 0.2s ease;
+}
+
+.node:hover {
+	border: 1px solid var(--border-highlight);
 }
 
 .radio {
@@ -177,7 +198,6 @@ const handleContinue = () => {
 	height: 14px;
 	border-radius: 50%;
 	border: 2px solid var(--opacity-10);
-	background: transparent;
 	transition: all 0.2s ease;
 }
 

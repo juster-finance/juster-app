@@ -120,11 +120,10 @@ const onKeydown = (event) => {
 	overflow: hidden;
 
 	border-radius: 8px;
-	background: var(--card-bg);
+	background: var(--modal-bg);
 	box-shadow: rgb(0 0 0 / 20%) 0px 0px 1px, rgb(0 0 0 / 20%) 0px 20px 40px;
-	border: 1px solid var(--border);
 
-	padding: 32px 32px 24px 32px;
+	padding: 32px;
 	margin: 0 20px;
 }
 

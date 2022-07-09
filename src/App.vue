@@ -200,6 +200,7 @@ html {
 :root {
 	/** Application */
 	--app-bg: #1b1b1b;
+	--modal-bg: #252528;
 
 	/** General */
 	--blue: #457ee8;
