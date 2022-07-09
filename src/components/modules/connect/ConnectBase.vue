@@ -1,0 +1,273 @@
+<script setup>
+import { ref, onMounted } from "vue"
+import { useMeta } from "vue-meta"
+import { NetworkType } from "@airgap/beacon-sdk"
+
+/**
+ * UI
+ */
+import Button from "@/components/ui/Button"
+import Tooltip from "@/components/ui/Tooltip"
+
+/**
+ * Modals
+ */
+import CustomLoginModal from "@/components/local/modals/CustomLoginModal"
+
+/**
+ * Services
+ */
+import { juster, analytics } from "@/services/sdk"
+
+/**
+ * Composable
+ */
+import { useMarket } from "@/composable/market"
+
+/**
+ * API
+ */
+import { fetchAllUsers } from "@/api/users"
+
+/**
+ * Store
+ */
+import { useAccountStore } from "@/store/account"
+import { useNotificationsStore } from "@/store/notifications"
+const accountStore = useAccountStore()
+const notificationsStore = useNotificationsStore()
+
+const { setupUser } = useMarket()
+
+/** Meta */
+useMeta({
+	title: "Connect Wallet",
+	description:
+		"Liquidity provider leaderboard based on perfomance & earnings",
+})
+
+const handleBeacon = async () => {
+	try {
+		await juster.sdk.sync()
+		login()
+	} catch (error) {
+		if (error.title === "Aborted") {
+			notificationsStore.create({
+				notification: {
+					type: "Warning",
+					title: "Wallet connection rejected",
+					description: "??",
+					autoDestroy: true,
+				},
+			})
+		}
+	}
+}
+
+const login = () => {
+	juster.sdk._provider.client.getActiveAccount().then(async (account) => {
+		analytics.log("login", { address: account.address })
+
+		accountStore.pkh = account.address
+		accountStore.updateBalance()
+
+		setupUser()
+	})
+}
+
+/**
+ * Custom RPC Login
+ */
+const showCustomLoginModal = ref(false)
+const handleCustomLogin = () => {
+	showCustomLoginModal.value = true
+}
+const handleSelectCustomNode = async (node) => {
+	await juster.sdk._provider.requestPermissions({
+		network: {
+			type: NetworkType.CUSTOM,
+			name: node.value.name,
+			rpcUrl: node.value.url,
+		},
+	})
+	login()
+}
+
+const allUsersCounter = ref(0)
+
+onMounted(async () => {
+	allUsersCounter.value = await fetchAllUsers()
+})
+</script>
+
+<template>
+	<div :class="$style.wrapper">
+		<metainfo>
+			<template v-slot:title="{ content }"
+				>{{ content }} • Juster</template
+			>
+		</metainfo>
+
+		<CustomLoginModal
+			:show="showCustomLoginModal"
+			@onSelectCustomNode="handleSelectCustomNode"
+			@onClose="showCustomLoginModal = false"
+		/>
+
+		<div :class="$style.base">
+			<div :class="$style.title">Connect Wallet</div>
+
+			<Tooltip position="top">
+				<div :class="$style.description">
+					By continuing, you agree to
+					<router-link to="/terms" target="_blank"
+						>Terms of Use</router-link
+					>
+					and to the age limit of 21*
+				</div>
+
+				<template #content
+					>Please note that the age limit may vary from country to
+					country</template
+				>
+			</Tooltip>
+
+			<div :class="$style.buttons">
+				<Button
+					@click="handleBeacon"
+					type="white"
+					size="large"
+					block
+					:class="$style.connect_btn"
+				>
+					<Icon name="beacon" size="16" />
+					Beacon Wallet
+				</Button>
+				<Button
+					@click="handleCustomLogin"
+					type="secondary"
+					size="large"
+					block
+				>
+					<Icon name="settings" size="16" />Custom Connection</Button
+				>
+			</div>
+
+			<div :class="$style.divider" />
+
+			<div :class="$style.labels">
+				<div :class="$style.label">
+					<Icon name="eye" size="14" />
+					<span
+						><b>View only permissions.</b> We will never do anything
+						without your approval</span
+					>
+				</div>
+				<div :class="$style.label">
+					<Icon name="lock" size="14" />
+					<span>
+						<b>Secure smart contracts.</b> Audited by Baking Bad
+						Security 34 days ago
+					</span>
+				</div>
+				<div :class="$style.label">
+					<Icon name="users" size="14" />
+					<span>
+						Trusted by <b>{{ allUsersCounter.length }}</b> Users
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<style module>
+.wrapper {
+	display: flex;
+	justify-content: center;
+
+	margin-top: 160px;
+}
+
+.base {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+
+	max-width: 350px;
+}
+
+.title {
+	font-size: 22px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
+
+	margin-bottom: 16px;
+}
+
+.description {
+	font-size: 14px;
+	line-height: 1.4;
+	font-weight: 500;
+	color: var(--text-tertiary);
+	text-align: center;
+
+	max-width: 300px;
+
+	margin-bottom: 40px;
+}
+
+.description a {
+	color: var(--text-blue);
+}
+
+.buttons {
+	width: 100%;
+
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.connect_btn svg {
+	fill: var(--blue);
+}
+
+.divider {
+	width: 100%;
+	height: 1px;
+	background: var(--border);
+
+	margin: 40px 0 24px 0;
+}
+
+.labels {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.label {
+	display: flex;
+	gap: 12px;
+}
+
+.label svg {
+	fill: var(--text-tertiary);
+
+	margin-top: 2px;
+}
+
+.label span {
+	font-size: 12px;
+	line-height: 17px;
+	font-weight: 500;
+	color: var(--text-tertiary);
+}
+
+.label span b {
+	color: var(--text-secondary);
+	font-weight: 500;
+}
+</style>

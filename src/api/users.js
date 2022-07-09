@@ -8,6 +8,7 @@ import { juster } from "@/services/sdk"
  */
 import {
 	getUser,
+	getAllUsers,
 	getUserWithdrawals,
 	getTopBettors,
 	getTopLiquidityProviders,
@@ -23,6 +24,20 @@ export const fetchUser = async ({ address }) => {
 	} catch (error) {
 		console.error(
 			`Error during fetching user \n\n ${error.name}: ${error.message}`,
+		)
+		return {}
+	}
+}
+
+export const fetchAllUsers = async () => {
+	try {
+		const { data } = await juster.apollo.query({
+			query: getAllUsers,
+		})
+		return data.user
+	} catch (error) {
+		console.error(
+			`Error during fetching all users \n\n ${error.name}: ${error.message}`,
 		)
 		return {}
 	}

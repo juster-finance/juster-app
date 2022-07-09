@@ -109,7 +109,6 @@ export default defineComponent({
 <style>
 html {
 	font-family: "Inter", sans-serif;
-	word-spacing: 1px;
 	text-rendering: optimizelegibility;
 	-ms-text-size-adjust: 100%;
 	-webkit-text-size-adjust: 100%;
@@ -213,6 +212,9 @@ html {
 	/** Button */
 	--btn-success-bg: #1aa168;
 	--btn-success-bg-hover: #24af75;
+
+	--btn-white-bg: rgba(255, 255, 255, 0.9);
+	--btn-white-bg-hover: rgba(255, 255, 255, 0.8);
 
 	--btn-primary-bg: #276ef1;
 	--btn-primary-bg-hover: #1f60da;

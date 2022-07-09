@@ -1,64 +1,51 @@
-<script>
-import { defineComponent, toRefs, computed, useCssModule } from "vue"
+<script setup>
+import { useCssModule } from "vue"
 
-export default defineComponent({
-	name: "Button",
-	props: {
-		size: {
-			type: String,
-			default: "medium",
-		},
-		type: {
-			type: String,
-			default: "primary",
-		},
-		block: {
-			type: Boolean,
-			default: false,
-		},
-		border: {
-			type: Boolean,
-			default: false,
-		},
-		disabled: {
-			type: Boolean,
-		},
-		loading: {
-			type: Boolean,
-		},
-		icon: {
-			type: String,
-		},
+const props = defineProps({
+	size: {
+		type: String,
+		default: "medium",
 	},
-
-	setup(props, context) {
-		const style = useCssModule()
-		const { type, size, block, disabled, border, icon } = toRefs(props)
-
-		const hasSlot = computed(() => !!context.slots.default)
-
-		const getStyles = () => {
-			const hasCorrectSize = [
-				"large",
-				"medium",
-				"small",
-				"mini",
-			].includes(size.value)
-
-			return [
-				style.wrapper,
-				style[type.value],
-				block.value && style.block,
-				hasCorrectSize && style[size.value],
-				disabled.value && style.disabled,
-				icon.value && style.icon,
-				border.value && style.border,
-			]
-		}
-
-		return { getStyles, hasSlot }
+	type: {
+		type: String,
+		default: "primary",
+	},
+	block: {
+		type: Boolean,
+		default: false,
+	},
+	border: {
+		type: Boolean,
+		default: false,
+	},
+	disabled: {
+		type: Boolean,
+	},
+	loading: {
+		type: Boolean,
+	},
+	icon: {
+		type: String,
 	},
 })
+
+const style = useCssModule()
+
+const getStyles = () => {
+	const hasCorrectSize = ["large", "medium", "small", "mini"].includes(
+		props.size,
+	)
+
+	return [
+		style.wrapper,
+		style[props.type],
+		props.block && style.block,
+		hasCorrectSize && style[props.size],
+		props.disabled && style.disabled,
+		props.icon && style.icon,
+		props.border && style.border,
+	]
+}
 </script>
 
 <template>
@@ -102,6 +89,7 @@ export default defineComponent({
 .wrapper.large {
 	height: 44px;
 	font-size: 14px;
+	line-height: 1;
 }
 .wrapper.large.icon {
 	padding: 0 14px;
@@ -120,7 +108,7 @@ export default defineComponent({
 	height: 32px;
 	padding: 0 12px 0 12px;
 	font-size: 13px;
-	border-radius: 6px;
+	border-radius: 8px;
 }
 .wrapper.small.icon {
 	padding: 0 10px;
@@ -158,9 +146,18 @@ export default defineComponent({
 	background: var(--btn-primary-bg-hover);
 }
 
+.wrapper.white {
+	background: var(--btn-white-bg);
+	fill: var(--text-black);
+	color: var(--text-black);
+}
+.wrapper.white:hover {
+	background: var(--btn-white-bg-hover);
+}
+
 .wrapper.secondary {
 	background: var(--opacity-05);
-	fill: var(--text-tertiary);
+	fill: var(--text-secondary);
 }
 .wrapper.secondary:hover {
 	background: var(--opacity-10);

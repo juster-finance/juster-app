@@ -1,5 +1,13 @@
 import gql from "graphql-tag"
 
+export const getAllUsers = gql`
+	query getAllUsers {
+		user {
+			address
+		}
+	}
+`
+
 export const getUser = gql`
 	query getUser($address: String) {
 		user(where: { address: { _eq: $address } }) {
