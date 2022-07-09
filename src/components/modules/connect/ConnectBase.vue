@@ -133,13 +133,7 @@ onMounted(async () => {
 			</Tooltip>
 
 			<div :class="$style.buttons">
-				<Button
-					@click="handleBeacon"
-					type="white"
-					size="large"
-					block
-					:class="$style.connect_btn"
-				>
+				<Button @click="handleBeacon" type="primary" size="large" block>
 					<Icon name="beacon" size="16" />
 					Beacon Wallet
 				</Button>
@@ -228,10 +222,6 @@ onMounted(async () => {
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
-}
-
-.connect_btn svg {
-	fill: var(--blue);
 }
 
 .divider {
