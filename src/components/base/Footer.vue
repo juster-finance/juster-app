@@ -62,7 +62,7 @@ const checkDipdup = async () => {
 	const urlToCheck =
 		currentNetwork.value == "mainnet"
 			? "https://juster.dipdup.net/api/rest/dipdupHead?name=https://tzkt-mainnet.dipdup.net"
-			: "https://api.ithacanet.juster.fi/api/rest/dipdupHead?name=https://api.ithacanet.tzkt.io"
+			: "https://api.ghostnet.juster.fi/api/rest/dipdupHead?name=https://api.ghostnet.tzkt.io"
 	const {
 		data: { dipdupHeadByPk },
 	} = await axios.get(urlToCheck)
@@ -82,7 +82,7 @@ const checkDipdup = async () => {
 const checkNetwork = async () => {
 	const { data } = await axios.get(
 		`https://rpc.tzkt.io/${
-			currentNetwork.value == "mainnet" ? "mainnet" : "ithacanet"
+			currentNetwork.value == "mainnet" ? "mainnet" : "ghostnet"
 		}/chains/main/blocks/head/header`,
 	)
 
@@ -255,12 +255,12 @@ onBeforeUnmount(() => {
 								<DropdownItem @click="handleSwitch('testnet')"
 									><Icon
 										:name="
-											currentNetwork == 'ithacanet'
+											currentNetwork == 'ghostnet'
 												? 'checkcircle'
 												: 'network'
 										"
 										size="12"
-									/>Ithacanet</DropdownItem
+									/>Ghostnet</DropdownItem
 								>
 							</template>
 						</Dropdown>

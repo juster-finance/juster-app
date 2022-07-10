@@ -382,7 +382,7 @@ export default defineComponent({
 				center
 				:class="$style.banner"
 			>
-				The transaction takes place on the Ithacanet
+				The transaction takes place on the Ghostnet
 			</Banner>
 
 			<PositionDirection

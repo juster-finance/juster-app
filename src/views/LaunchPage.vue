@@ -49,7 +49,7 @@ const handleSwitch = () => {
 			</p>
 
 			<div
-				v-if="juster.sdk._network == 'ithacanet'"
+				v-if="juster.sdk._network == 'ghostnet'"
 				:class="$style.interactive_block"
 			>
 				<Banner type="warning" color="yellow" size="small" center

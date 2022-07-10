@@ -221,16 +221,16 @@ const handleButtons = () => {
 			<div :class="$style.right">
 				<Tooltip
 					v-if="currentNetwork !== Networks.MAINNET"
-					placement="left"
+					placement="bottom-end"
 				>
 					<div :class="$style.testnet_warning">
 						<Icon name="hammer" size="16" />
 
-						<span>Ithaca Network</span>
+						<span>Ghost Network</span>
 					</div>
 
 					<template v-slot:content>
-						Ithaca in use.
+						Ghostnet in use.
 						<span>Switching the network in the footer</span>
 					</template>
 				</Tooltip>

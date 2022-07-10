@@ -156,7 +156,7 @@ onMounted(async () => {
 				>
 					<Icon name="hammer" size="14" />
 					<span>
-						<b>Ithacanet.</b> Use only testing and exploring
+						<b>Ghostnet.</b> Use only testing and exploring
 						opportunities
 					</span>
 				</div>
@@ -274,6 +274,6 @@ onMounted(async () => {
 
 .label span b {
 	color: var(--text-secondary);
-	font-weight: 500;
+	font-weight: 600;
 }
 </style>

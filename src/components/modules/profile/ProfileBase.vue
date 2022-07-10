@@ -305,7 +305,7 @@ export default defineComponent({
 					<div :class="$style.left">
 						<a
 							:href="`https://${
-								currentNetwork == 'mainnet' ? '' : 'ithacanet.'
+								currentNetwork == 'mainnet' ? '' : 'ghostnet.'
 							}tzkt.io/${address}`"
 							target="_blank"
 						>
