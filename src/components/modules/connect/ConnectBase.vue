@@ -17,7 +17,7 @@ import CustomLoginModal from "@/components/local/modals/CustomLoginModal"
 /**
  * Services
  */
-import { juster, analytics } from "@/services/sdk"
+import { juster, analytics, currentNetwork } from "@/services/sdk"
 
 /**
  * Composable
@@ -150,6 +150,16 @@ onMounted(async () => {
 			<div :class="$style.divider" />
 
 			<div :class="$style.labels">
+				<div
+					v-if="currentNetwork !== 'mainnet'"
+					:class="[$style.label, $style.yellow]"
+				>
+					<Icon name="hammer" size="14" />
+					<span>
+						<b>Ithacanet.</b> Use only testing and exploring
+						opportunities
+					</span>
+				</div>
 				<div :class="$style.label">
 					<Icon name="eye" size="14" />
 					<span
@@ -157,7 +167,7 @@ onMounted(async () => {
 						without your approval</span
 					>
 				</div>
-				<div :class="$style.label">
+				<div v-if="currentNetwork === 'mainnet'" :class="$style.label">
 					<Icon name="lock" size="14" />
 					<span>
 						<b>Secure smart contracts.</b> Audited by Baking Bad
@@ -168,6 +178,7 @@ onMounted(async () => {
 					<Icon name="users" size="14" />
 					<span>
 						Trusted by <b>{{ allUsersCounter.length }}</b> Users
+						{{ currentNetwork !== "mainnet" && "(Testnet)" }}
 					</span>
 				</div>
 			</div>
@@ -242,6 +253,10 @@ onMounted(async () => {
 .label {
 	display: flex;
 	gap: 12px;
+}
+
+.label.yellow svg {
+	fill: var(--yellow);
 }
 
 .label svg {
