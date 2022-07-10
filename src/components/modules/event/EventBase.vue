@@ -604,7 +604,7 @@ onUnmounted(() => {
 										filters.bets == 'my' && $style.active,
 									]"
 								>
-									Only my
+									Only me
 								</div>
 							</div>
 						</div>
@@ -698,7 +698,7 @@ onUnmounted(() => {
 											$style.active,
 									]"
 								>
-									Only my
+									Only me
 								</div>
 							</div>
 						</div>

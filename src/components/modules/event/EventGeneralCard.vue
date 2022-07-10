@@ -152,7 +152,7 @@ const endDiff = computed(() =>
 			</div>
 
 			<div :class="$style.users">
-				<Tooltip position="bottom" side="right">
+				<Tooltip placement="bottom-end">
 					<div
 						@click="emit('openParticipants')"
 						:class="$style.participants"
@@ -186,7 +186,7 @@ const endDiff = computed(() =>
 					>
 				</Tooltip>
 
-				<Tooltip position="bottom" side="right">
+				<Tooltip placement="bottom-end">
 					<div :class="$style.creator">
 						<template
 							v-if="
@@ -436,8 +436,7 @@ const endDiff = computed(() =>
 					['In progress', 'Finished'].includes(startStatus) &&
 					event.status == 'NEW'
 				"
-				position="top"
-				side="left"
+				placement="top-start"
 				:button="{
 					icon: 'book',
 					text: 'Learn More',

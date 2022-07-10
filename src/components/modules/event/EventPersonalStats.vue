@@ -103,7 +103,7 @@ const hasHedge = computed(() => {
 				</div>
 			</div>
 
-			<Tooltip>
+			<Tooltip placement="bottom-start">
 				<div :class="$style.icon">
 					<Icon name="wallet" size="20" />
 				</div>
@@ -142,7 +142,7 @@ const hasHedge = computed(() => {
 				</div>
 			</div>
 
-			<Tooltip>
+			<Tooltip placement="bottom-start">
 				<div :class="$style.icon">
 					<Icon name="walletadd" size="20" />
 				</div>
@@ -184,7 +184,10 @@ const hasHedge = computed(() => {
 				<div v-else :class="$style.amount">0 <span>ꜩ</span></div>
 			</div>
 
-			<Tooltip v-if="hasHedge && event.status !== 'FINISHED'">
+			<Tooltip
+				v-if="hasHedge && event.status !== 'FINISHED'"
+				placement="bottom-start"
+			>
 				<div :class="[$style.icon, hasHedge && $style.yellow]">
 					<Icon name="warning" size="20" />
 				</div>

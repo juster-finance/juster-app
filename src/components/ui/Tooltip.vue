@@ -1,71 +1,84 @@
-<script>
-import { defineComponent, reactive, onMounted, toRefs, ref } from "vue"
+<script setup>
+import { reactive, onMounted, ref } from "vue"
 
 /**
  * UI
  */
 import Button from "@/components/ui/Button"
 
-export default defineComponent({
-	name: "Tooltip",
-	props: {
-		width: {
-			type: String,
-		},
-		side: { type: String },
-		position: { type: String },
-		textAlign: { type: String, default: "center" },
-		button: { type: Object },
+const props = defineProps({
+	width: {
+		type: String,
 	},
-
-	setup(props) {
-		const { width, side, position } = toRefs(props)
-
-		const trigger = ref(null)
-		const tip = ref(null)
-
-		const styles = reactive({
-			left: "initial",
-			right: "initial",
-			top: "initial",
-			bottom: "initial",
-		})
-
-		onMounted(() => {
-			const tipRect = tip.value.getBoundingClientRect()
-			const triggerRect = trigger.value.getBoundingClientRect()
-
-			/** todo: refactor -> left / right / top / bottom + auto-positioning */
-			if (position.value == "top") {
-				styles.bottom = `${triggerRect.height + 8}px`
-			} else if (position.value == "bottom" && side.value == "left") {
-				styles.left = 0
-				styles.top = `${triggerRect.height + 8}px`
-			} else if (position.value == "bottom" && side.value == "left") {
-				styles.right = 0
-				styles.top = `${triggerRect.height + 8}px`
-			} else {
-				if (!side.value) {
-					styles.left = `-${
-						tipRect.width / 2 - triggerRect.width / 2
-					}px`
-				} else if (side.value == "left") {
-					styles.left = `0px`
-				} else if (side.value == "right") {
-					styles.right = `0px`
-				}
-
-				if (width.value) styles.width = `${width.value}px`
-
-				styles.top = `${triggerRect.height + 8}px`
-			}
-		})
-
-		return { styles, trigger, tip }
-	},
-
-	components: { Button },
+	placement: { type: String },
+	textAlign: { type: String, default: "center" },
+	button: { type: Object },
 })
+
+const trigger = ref(null)
+const tip = ref(null)
+
+const styles = reactive({
+	left: "initial",
+	right: "initial",
+	top: "initial",
+	bottom: "initial",
+})
+
+onMounted(() => {
+	updateStyles()
+})
+
+const updateStyles = () => {
+	const tipRect = tip.value.getBoundingClientRect()
+	const triggerRect = trigger.value.getBoundingClientRect()
+
+	/** top, top-start, top-end */
+	/** bottom, bottom-start, bottom-end */
+	/** left, left-start, left-end */
+	/** right, right-start, right-end */
+
+	const [position, side] = props.placement.split("-")
+
+	switch (position) {
+		case "top":
+			styles.bottom = `${triggerRect.height + 8}px`
+			break
+
+		case "bottom":
+			styles.top = `${triggerRect.height + 8}px`
+			break
+
+		case "left":
+			styles.right = `${triggerRect.width + 8}px`
+			break
+
+		case "right":
+			styles.left = `${triggerRect.width + 8}px`
+			break
+
+		default:
+			break
+	}
+
+	if (["top", "bottom"].includes(position)) {
+		if (side === "start") {
+			styles.left = 0
+		} else if (side === "end") {
+			styles.right = 0
+		} else {
+			styles.left = `-${tipRect.width / 2 - triggerRect.width / 2}px`
+		}
+	} else if (["left", "right"].includes(position)) {
+		if (side === "start") {
+			styles.top = 0
+		} else if (side === "end") {
+			styles.bottom = 0
+		} else {
+			styles.top = `${triggerRect.height / 2 - tipRect.height / 2}px`
+		}
+	}
+}
 </script>
 
 <template>

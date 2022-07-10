@@ -221,7 +221,7 @@ const handleButtons = () => {
 			<div :class="$style.right">
 				<Tooltip
 					v-if="currentNetwork !== Networks.MAINNET"
-					side="right"
+					placement="left"
 				>
 					<div :class="$style.testnet_warning">
 						<Icon name="hammer" size="16" />

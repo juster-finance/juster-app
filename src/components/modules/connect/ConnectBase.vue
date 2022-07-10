@@ -117,7 +117,7 @@ onMounted(async () => {
 		<div :class="$style.base">
 			<div :class="$style.title">Connect Wallet</div>
 
-			<Tooltip position="top">
+			<Tooltip placement="top">
 				<div :class="$style.description">
 					By continuing, you agree to
 					<router-link to="/terms" target="_blank"
@@ -206,10 +206,9 @@ onMounted(async () => {
 	font-weight: 500;
 	color: var(--text-tertiary);
 	text-align: center;
+	box-sizing: content-box;
 
 	max-width: 300px;
-
-	margin-bottom: 40px;
 }
 
 .description a {
@@ -222,6 +221,8 @@ onMounted(async () => {
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
+
+	margin-top: 40px;
 }
 
 .divider {

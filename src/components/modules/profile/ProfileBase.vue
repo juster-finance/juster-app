@@ -166,7 +166,7 @@ export default defineComponent({
 		<div :class="$style.header">
 			<div :class="$style.profile">
 				<div :class="$style.avatar">
-					<Tooltip>
+					<Tooltip placement="bottom">
 						<img
 							:src="`https://services.tzkt.io/v1/avatars/${address}`"
 							:class="$style.image"

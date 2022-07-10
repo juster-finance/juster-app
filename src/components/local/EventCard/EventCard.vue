@@ -444,7 +444,7 @@ onUnmounted(() => {
 				</div>
 
 				<div :class="$style.users">
-					<Tooltip position="bottom" side="right">
+					<Tooltip placement="bottom-start">
 						<div :class="$style.participants">
 							<img
 								v-for="participantAvatar in participantsAvatars.slice(
@@ -477,7 +477,7 @@ onUnmounted(() => {
 						>
 					</Tooltip>
 
-					<Tooltip position="bottom" side="right">
+					<Tooltip placement="bottom-end">
 						<div :class="$style.creator">
 							<template
 								v-if="
@@ -548,8 +548,7 @@ onUnmounted(() => {
 			<div :class="$style.badges">
 				<Tooltip
 					v-if="startStatus == 'In progress' && event.status == 'NEW'"
-					position="bottom"
-					side="left"
+					placement="bottom-start"
 				>
 					<Badge
 						size="small"
@@ -568,8 +567,7 @@ onUnmounted(() => {
 					v-else-if="
 						startStatus == 'Finished' && event.status == 'NEW'
 					"
-					position="bottom"
-					side="left"
+					placement="bottom-start"
 				>
 					<Badge color="yellow" :class="$style.main_badge">
 						<Icon name="event_new" size="12" />Starting
@@ -581,8 +579,7 @@ onUnmounted(() => {
 				</Tooltip>
 				<Tooltip
 					v-else-if="event.status == 'STARTED'"
-					position="bottom"
-					side="left"
+					placement="bottom-start"
 				>
 					<Badge color="yellow" :class="$style.main_badge">
 						<Icon name="event_active" size="12" />Running
@@ -594,8 +591,7 @@ onUnmounted(() => {
 				</Tooltip>
 				<Tooltip
 					v-else-if="event.status == 'FINISHED'"
-					position="bottom"
-					side="left"
+					placement="bottom-start"
 				>
 					<Badge color="gray" :class="$style.main_badge">
 						<Icon name="event_finished" size="12" />Finished
@@ -606,8 +602,7 @@ onUnmounted(() => {
 				</Tooltip>
 				<Tooltip
 					v-else-if="event.status == 'CANCELED'"
-					position="bottom"
-					side="left"
+					placement="bottom-start"
 				>
 					<Badge color="orange" :class="$style.main_badge">
 						<Icon name="stop" size="12" />Canceled
@@ -643,11 +638,7 @@ onUnmounted(() => {
 				</Badge>
 
 				<!-- Hot Event Badge -->
-				<Tooltip
-					v-if="event.bets.length >= 6"
-					position="bottom"
-					side="right"
-				>
+				<Tooltip v-if="event.bets.length >= 6" placement="bottom-end">
 					<Badge color="purple" :class="$style.badge">
 						<Icon name="bolt" size="12" />
 					</Badge>
@@ -662,8 +653,7 @@ onUnmounted(() => {
 							event.creatorId,
 						)
 					"
-					position="bottom"
-					side="left"
+					placement="bottom-start"
 				>
 					<Badge color="yellow" :class="$style.badge">
 						<Icon name="bolt" size="12" /> Custom
@@ -673,7 +663,7 @@ onUnmounted(() => {
 				</Tooltip>
 
 				<!-- TVL Badge -->
-				<Tooltip position="bottom" side="right">
+				<Tooltip placement="bottom-end">
 					<Badge v-if="userTVL" color="gray" :class="$style.badge">
 						<img
 							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
@@ -764,8 +754,7 @@ onUnmounted(() => {
 
 				<Tooltip
 					v-if="event.status !== 'FINISHED'"
-					position="top"
-					side="left"
+					placement="top-start"
 					textAlign="left"
 				>
 					<div
@@ -793,14 +782,17 @@ onUnmounted(() => {
 					</template>
 				</Tooltip>
 
-				<Tooltip v-if="event.winnerBets == 'BELOW'" side="left">
+				<Tooltip
+					v-if="event.winnerBets == 'BELOW'"
+					placement="bottom-start"
+				>
 					<div :class="[$style.hint, $style.red]">
 						<Icon name="lower" size="14" />
 						<div><span>Fall</span> won</div>
 					</div>
 
 					<template #content
-						><span>Start rate - Closed rate =</span> <br />
+						><span>Difference =</span> <br />
 						{{
 							(
 								event.closedRate * 100 -
@@ -810,14 +802,17 @@ onUnmounted(() => {
 					>
 				</Tooltip>
 
-				<Tooltip v-if="event.winnerBets == 'ABOVE_EQ'" side="left">
+				<Tooltip
+					v-if="event.winnerBets == 'ABOVE_EQ'"
+					placement="bottom-start"
+				>
 					<div :class="[$style.hint, $style.green]">
 						<Icon name="higher" size="14" />
 						<div><span>Rise</span> won</div>
 					</div>
 
 					<template #content
-						><span>Start rate - Closed rate =</span> <br />
+						><span>Difference =</span> <br />
 						{{
 							(
 								event.closedRate * 100 -
