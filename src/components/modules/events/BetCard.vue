@@ -49,7 +49,7 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 			<div :class="[$style.icon, isWon && $style.won]">
 				<Icon
 					v-if="!pending"
-					:name="isWon ? 'checkcircle' : 'bet'"
+					:name="isWon ? 'checkcircle' : 'money'"
 					size="16"
 				/>
 
