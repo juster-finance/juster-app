@@ -119,9 +119,15 @@ onMounted(async () => {
 		/>
 
 		<div :class="$style.base">
-			<div :class="$style.title">Connect Wallet</div>
+			<div :class="$style.title">
+				{{
+					!accountStore.isLoggined
+						? "Connect Wallet"
+						: "Already Connected"
+				}}
+			</div>
 
-			<Tooltip placement="top">
+			<Tooltip v-if="!accountStore.isLoggined" placement="top">
 				<div :class="$style.description">
 					By continuing, you agree to
 					<router-link to="/terms" target="_blank"
@@ -135,8 +141,12 @@ onMounted(async () => {
 					country</template
 				>
 			</Tooltip>
+			<div v-else :class="$style.description">
+				Do you want to use a different wallet? Logout and connect with
+				the desired wallet
+			</div>
 
-			<div :class="$style.buttons">
+			<div v-if="!accountStore.isLoggined" :class="$style.buttons">
 				<Button @click="handleBeacon" type="primary" size="large" block>
 					<Icon name="beacon" size="16" />
 					Beacon Wallet
@@ -148,6 +158,24 @@ onMounted(async () => {
 					block
 				>
 					<Icon name="settings" size="16" />Custom Connection</Button
+				>
+			</div>
+			<div :class="$style.buttons">
+				<Button
+					@click="handleCustomLogin"
+					type="primary"
+					size="large"
+					block
+				>
+					<Icon name="grid" size="16" />Go to my profile</Button
+				>
+				<Button
+					@click="handleCustomLogin"
+					type="secondary"
+					size="large"
+					block
+				>
+					<Icon name="logout" size="16" />Logout</Button
 				>
 			</div>
 
