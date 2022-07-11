@@ -239,7 +239,7 @@ html {
 	--card-bg: #171717;
 
 	/** Dropdown */
-	--dropdown-bg: #252525;
+	--dropdown-bg: rgb(45, 46, 49);
 
 	/** Toggle */
 	--toggle-bg: #393939;

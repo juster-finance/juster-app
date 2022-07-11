@@ -165,5 +165,6 @@ export default defineComponent({
 	padding: 8px 0;
 	border-radius: 8px;
 	background: var(--dropdown-bg);
+	box-shadow: rgb(0 0 0 / 20%) 0px 4px 24px;
 }
 </style>

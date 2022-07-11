@@ -362,9 +362,8 @@ const copy = (target) => {
 	if (target == "id") {
 		notificationsStore.create({
 			notification: {
-				icon: "help",
+				icon: "copy",
 				title: "Event ID copied to clipboard",
-				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
 				badges: [
 					{
@@ -381,14 +380,20 @@ const copy = (target) => {
 	if (target == "url") {
 		notificationsStore.create({
 			notification: {
-				icon: "help",
+				icon: "copy",
 				title: "Event URL copied to clipboard",
-				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
 				badges: [
 					{
 						secondaryText: `app.juster.fi${location.pathname}`,
 						icon: "copy",
+					},
+				],
+
+				actions: [
+					{
+						name: "Open in new tab",
+						callback: () => window.open(location, "_blank"),
 					},
 				],
 			},
@@ -826,7 +831,7 @@ onUnmounted(() => {
 
 							<template #dropdown>
 								<DropdownItem @click="showNotifyMeModal = true">
-									<Icon name="notifications" size="12" />
+									<Icon name="notifications" size="16" />
 									Notify Me
 								</DropdownItem>
 
@@ -834,29 +839,29 @@ onUnmounted(() => {
 
 								<DropdownTitle>Customization</DropdownTitle>
 								<DropdownItem @click="handleSwitch('mainnet')">
-									<Icon name="collection" size="12" />
+									<Icon name="collection" size="16" />
 									Presets
 								</DropdownItem>
 
 								<DropdownItem @click="handleSwitch('testnet')">
-									<Icon name="settings" size="12" />
+									<Icon name="settings" size="16" />
 									View Options
 								</DropdownItem>
 
 								<DropdownItem @click="handleSwitch('testnet')">
-									<Icon name="layers" size="12" />
+									<Icon name="layers" size="16" />
 									Configure Blocks
 								</DropdownItem>
 
 								<DropdownDivider />
 
 								<DropdownItem @click="copy('id')">
-									<Icon name="copy" size="12" />
+									<Icon name="copy" size="16" />
 									Copy ID
 								</DropdownItem>
 
 								<DropdownItem @click="copy('url')">
-									<Icon name="copy" size="12" />
+									<Icon name="copy" size="16" />
 									Copy URL
 								</DropdownItem>
 
@@ -865,7 +870,7 @@ onUnmounted(() => {
 								<DropdownItem
 									@click="showEventDetailsModal = true"
 								>
-									<Icon name="menu" size="12" />
+									<Icon name="menu" size="16" />
 									View all params
 								</DropdownItem>
 							</template>

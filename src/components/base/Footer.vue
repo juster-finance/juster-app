@@ -249,7 +249,7 @@ onBeforeUnmount(() => {
 												? 'checkcircle'
 												: 'network'
 										"
-										size="12"
+										size="16"
 									/>Mainnet</DropdownItem
 								>
 								<DropdownItem @click="handleSwitch('testnet')"
@@ -259,7 +259,7 @@ onBeforeUnmount(() => {
 												? 'checkcircle'
 												: 'network'
 										"
-										size="12"
+										size="16"
 									/>Ghostnet</DropdownItem
 								>
 							</template>

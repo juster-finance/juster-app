@@ -13,7 +13,7 @@ import {
  * Services
  */
 import { currentNetwork } from "@/services/sdk"
-import { toClipboard } from "@/services/utils/global"
+import { toClipboard, shorten } from "@/services/utils/global"
 import { verifiedMakers } from "@/services/config"
 
 /**
@@ -22,7 +22,7 @@ import { verifiedMakers } from "@/services/config"
 import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
 
-const props = defineProps({ user: { type: Object } })
+const props = defineProps({ user: { type: Object, default: () => {} } })
 
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
@@ -31,10 +31,16 @@ const handleCopy = (target) => {
 	if (target == "address") {
 		notificationsStore.create({
 			notification: {
-				icon: "help",
+				icon: "copy",
 				title: "User address copied to clipboard",
-				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
+
+				badges: [
+					{
+						icon: "user",
+						secondaryText: shorten(props.user.userId, 10, 6),
+					},
+				],
 			},
 		})
 		toClipboard(props.user.userId)
@@ -42,10 +48,20 @@ const handleCopy = (target) => {
 	if (target == "url") {
 		notificationsStore.create({
 			notification: {
-				icon: "help",
+				icon: "copy",
 				title: "Profile URL copied to clipboard",
-				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
+
+				actions: [
+					{
+						name: "Open in new tab",
+						callback: () =>
+							window.open(
+								`https://app.juster.fi/profile/${props.user.userId}`,
+								"_blank",
+							),
+					},
+				],
 			},
 		})
 		toClipboard(`https://app.juster.fi/profile/${props.user.userId}`)
@@ -100,8 +116,6 @@ const handleCopy = (target) => {
 						}}
 					</template>
 					<template v-else>You</template>
-
-					<Icon name="copy" size="14" />
 				</div>
 
 				<div
@@ -140,7 +154,7 @@ const handleCopy = (target) => {
 			<template v-slot:dropdown>
 				<router-link :to="`/profile/${user.userId}`">
 					<DropdownItem
-						><Icon name="open" size="16" />Open User
+						><Icon name="open" size="16" />User
 						profile</DropdownItem
 					>
 

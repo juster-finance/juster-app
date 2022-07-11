@@ -76,7 +76,10 @@ notificationsStore.$subscribe(() => {
 							{{ notification.title }}
 						</div>
 
-						<div :class="$style.description">
+						<div
+							v-if="notification.description"
+							:class="$style.description"
+						>
 							{{ notification.description }}
 						</div>
 
@@ -103,6 +106,20 @@ notificationsStore.$subscribe(() => {
 									:class="$style.tertiary"
 									>{{ badge.tertiaryText }}</span
 								>
+							</div>
+						</div>
+
+						<div
+							v-if="notification.actions"
+							:class="$style.actions"
+						>
+							<div
+								v-for="(action, aIndex) in notification.actions"
+								:key="aIndex"
+								@click="action.callback"
+								:class="$style.action"
+							>
+								{{ action.name }}
 							</div>
 						</div>
 					</div>
@@ -220,8 +237,6 @@ notificationsStore.$subscribe(() => {
 	font-weight: 600;
 	line-height: 14px;
 	color: var(--text-primary);
-
-	margin-bottom: 8px;
 }
 
 .description {
@@ -231,6 +246,8 @@ notificationsStore.$subscribe(() => {
 	color: var(--text-tertiary);
 
 	max-width: 250px;
+
+	margin-top: 8px;
 }
 
 .badges {
@@ -264,6 +281,29 @@ notificationsStore.$subscribe(() => {
 
 .badge .tertiary {
 	color: var(--text-tertiary);
+}
+
+.actions {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+
+	margin-top: 12px;
+}
+
+.action {
+	font-size: 13px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-blue);
+
+	cursor: pointer;
+
+	transition: color 0.2s ease;
+}
+
+.action:hover {
+	color: var(--blue);
 }
 
 .close_icon {
