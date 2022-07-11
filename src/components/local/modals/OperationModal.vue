@@ -100,10 +100,10 @@ const getTypeOfOperation = () => {
 				>
 					<Icon
 						:name="
-							(getTypeOfOperation() == 'Bid' && 'bet') ||
+							(getTypeOfOperation() == 'Bid' && 'money') ||
 							(getTypeOfOperation() == 'Deposit' &&
 								'liquidity') ||
-							(getTypeOfOperation() == 'Withdraw' && 'money')
+							(getTypeOfOperation() == 'Withdraw' && 'walletadd')
 						"
 						size="14"
 					/>

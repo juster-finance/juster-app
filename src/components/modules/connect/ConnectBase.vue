@@ -160,7 +160,7 @@ onMounted(async () => {
 					<Icon name="settings" size="16" />Custom Connection</Button
 				>
 			</div>
-			<div :class="$style.buttons">
+			<div v-else :class="$style.buttons">
 				<Button
 					@click="handleCustomLogin"
 					type="primary"
