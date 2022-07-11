@@ -86,7 +86,13 @@ notificationsStore.$subscribe(() => {
 								:key="bIndex"
 								:class="$style.badge"
 							>
-								<Icon :name="badge.icon" size="16" />
+								<Icon
+									:name="badge.icon"
+									size="16"
+									:style="{
+										fill: `var(--${badge.iconColor})`,
+									}"
+								/>
 								<span
 									v-if="badge.secondaryText"
 									:class="$style.secondary"
