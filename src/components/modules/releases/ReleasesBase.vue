@@ -125,6 +125,6 @@ export default defineComponent({
 	align-items: center;
 	gap: 8px;
 
-	margin-bottom: 60px;
+	margin-bottom: 80px;
 }
 </style>

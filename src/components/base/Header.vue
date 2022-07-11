@@ -304,22 +304,17 @@ const handleButtons = () => {
 
 							<DropdownDivider />
 
-							<a
-								href="https://github.com/juster-finance/juster-app/releases"
-								target="_blank"
-							>
+							<!-- Github releases https://github.com/juster-finance/juster-app/releases -->
+							<router-link to="/releases" target="_blank">
 								<DropdownItem>
-									<Icon name="merge" size="16" />Releases
+									<Icon name="spark" size="16" />Releases
 								</DropdownItem>
-							</a>
-							<a
-								href="https://app.juster.fi/docs"
-								target="_blank"
-							>
+							</router-link>
+							<router-link to="/docs" target="_blank">
 								<DropdownItem>
 									<Icon name="book" size="16" />Documentation
 								</DropdownItem>
-							</a>
+							</router-link>
 							<DropdownItem
 								@click="accountStore.showOnboarding = true"
 							>

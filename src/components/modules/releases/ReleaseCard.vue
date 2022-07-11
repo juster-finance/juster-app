@@ -1,63 +1,17 @@
-<script>
-import { defineComponent, ref, toRefs, computed } from "vue"
+<script setup>
+import { ref, computed } from "vue"
 import { DateTime } from "luxon"
 import Markdown from "markdown-it"
 
-/**
- * UI
- */
-import Button from "@/components/ui/Button"
+const props = defineProps({ release: { type: Object } })
 
-/**
- * Services
- */
-import { toClipboard } from "@/services/utils/global"
+const md = ref(null)
+md.value = new Markdown({ html: true })
 
-/**
- * Store
- */
-import { useNotificationsStore } from "@/store/notifications"
-
-export default defineComponent({
-	name: "ReleaseCard",
-	components: { Button },
-
-	props: { release: Object },
-
-	setup(props) {
-		const { release } = toRefs(props)
-
-		const notificationsStore = useNotificationsStore()
-
-		const md = ref(null)
-		md.value = new Markdown({ html: true })
-
-		const firstParagraphRegex = /\<p>(.*?)\<\/p>/
-		const content = computed(
-			() =>
-				firstParagraphRegex.exec(
-					md.value.render(release.value.Body),
-				)[0],
-		)
-
-		const copyURL = () => {
-			toClipboard(
-				`https://app.juster.fi/releases/${release.value.slug.current}`,
-			)
-
-			notificationsStore.create({
-				notification: {
-					icon: "info",
-					title: "Release URL copied to clipboard",
-					description: "Use Ctrl+V to paste",
-					autoDestroy: true,
-				},
-			})
-		}
-
-		return { content, DateTime, copyURL }
-	},
-})
+const firstParagraphRegex = /\<p>(.*?)\<\/p>/
+const content = computed(
+	() => firstParagraphRegex.exec(md.value.render(props.release.Body))[0],
+)
 </script>
 
 <template>
@@ -67,6 +21,8 @@ export default defineComponent({
 	>
 		<div>
 			<div :class="$style.card">
+				<div :class="$style.cover" />
+
 				<div :class="$style.when">
 					{{
 						DateTime.fromISO(release._updatedAt, {
@@ -78,22 +34,6 @@ export default defineComponent({
 				<h2 :class="$style.title">{{ release.title }}</h2>
 
 				<div v-html="content" :class="$style.body_preview" />
-
-				<div :class="$style.buttons">
-					<router-link :to="`/releases/${release.slug.current}`">
-						<Button type="secondary" size="small">
-							<Icon name="document" size="16" />Read more
-						</Button>
-					</router-link>
-
-					<Button
-						@click.prevent="copyURL"
-						type="tertiary"
-						size="small"
-					>
-						<Icon name="back" size="16" /> Share
-					</Button>
-				</div>
 			</div>
 		</div>
 	</router-link>
@@ -108,9 +48,17 @@ export default defineComponent({
 
 .card {
 	width: 100%;
+}
 
-	border-top: 1px solid var(--border);
-	padding-top: 32px;
+.cover {
+	width: 700px;
+	aspect-ratio: 16/9;
+
+	background: rgba(255, 255, 255, 0.03);
+
+	border-radius: 16px;
+
+	margin-bottom: 32px;
 }
 
 .title {
@@ -126,7 +74,7 @@ export default defineComponent({
 	font-size: 16px;
 	line-height: 1.6;
 	font-weight: 400;
-	color: var(--text-secondary);
+	color: var(--text-tertiary);
 
 	margin-bottom: 20px;
 }
@@ -138,11 +86,5 @@ export default defineComponent({
 	text-transform: uppercase;
 
 	margin-bottom: 16px;
-}
-
-.buttons {
-	display: flex;
-	align-items: center;
-	gap: 8px;
 }
 </style>
