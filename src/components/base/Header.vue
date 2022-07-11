@@ -197,7 +197,6 @@ const handleButtons = () => {
 
 				<router-link to="/" :class="$style.logo">
 					<Icon name="logo_symbol" size="24" />
-					<img src="@/assets/icons/logo_text.svg" alt="logo" />
 				</router-link>
 			</div>
 

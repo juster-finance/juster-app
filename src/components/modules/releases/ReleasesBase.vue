@@ -56,7 +56,7 @@ export default defineComponent({
 		</metainfo>
 
 		<div :class="$style.base">
-			<h1 :class="$style.title">Releases</h1>
+			<h1 :class="$style.title">What's New</h1>
 			<div :class="$style.description">
 				Join our Discord or Twitter to keep up with new updates
 			</div>
