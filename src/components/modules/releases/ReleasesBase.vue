@@ -127,4 +127,10 @@ export default defineComponent({
 
 	margin-bottom: 80px;
 }
+
+.releases {
+	display: flex;
+	flex-direction: column;
+	gap: 80px;
+}
 </style>

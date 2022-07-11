@@ -19,22 +19,25 @@ const content = computed(
 		:to="`/releases/${release.slug.current}`"
 		:class="$style.wrapper"
 	>
-		<div>
-			<div :class="$style.card">
-				<div :class="$style.cover" />
-
-				<div :class="$style.when">
+		<div :class="$style.card">
+			<div :class="$style.timeline">
+				<div :class="$style.moment">
 					{{
-						DateTime.fromISO(release._updatedAt, {
+						DateTime.fromISO(release._createdAt, {
 							locale: "en",
-						}).toFormat("dd LLL, kkkk")
+						}).toRelative()
 					}}
+					<div :class="$style.dot" />
 				</div>
 
-				<h2 :class="$style.title">{{ release.title }}</h2>
-
-				<div v-html="content" :class="$style.body_preview" />
+				<div :class="$style.line" />
 			</div>
+
+			<div :class="$style.cover" />
+
+			<h2 :class="$style.title">{{ release.title }}</h2>
+
+			<div v-html="content" :class="$style.body_preview" />
 		</div>
 	</router-link>
 </template>
@@ -48,6 +51,8 @@ const content = computed(
 
 .card {
 	width: 100%;
+
+	position: relative;
 }
 
 .cover {
@@ -79,12 +84,42 @@ const content = computed(
 	margin-bottom: 20px;
 }
 
-.when {
-	font-size: 12px;
-	font-weight: 700;
-	color: var(--text-tertiary);
-	text-transform: uppercase;
+.timeline {
+	position: absolute;
 
-	margin-bottom: 16px;
+	top: 0;
+	right: 760px;
+
+	display: flex;
+	align-items: flex-end;
+	flex-direction: column;
+}
+
+.moment {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+
+	font-size: 13px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-tertiary);
+	white-space: nowrap;
+}
+
+.dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--orange);
+	box-shadow: 0px 0px 15px var(--orange);
+}
+
+.line {
+	width: 1px;
+	height: 500px;
+	background: linear-gradient(var(--border), transparent);
+
+	margin-right: 5px;
 }
 </style>

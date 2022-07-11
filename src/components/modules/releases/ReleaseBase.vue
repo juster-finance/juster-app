@@ -156,6 +156,12 @@ export default defineComponent({
 	cursor: pointer;
 
 	margin-bottom: 24px;
+
+	transition: color 0.2s ease;
+}
+
+.back:hover {
+	color: var(--blue);
 }
 
 .badges {
