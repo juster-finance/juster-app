@@ -99,11 +99,18 @@ const handleLogout = () => {
 
 		notificationsStore.create({
 			notification: {
-				type: "success",
+				icon: "logout",
 				title: "You are signed out",
 				description:
 					"To work with the application, you definitely need an account :)",
 				autoDestroy: true,
+
+				actions: [
+					{
+						name: "Back to Connection page",
+						callback: () => router.push("/connect"),
+					},
+				],
 			},
 		})
 	})

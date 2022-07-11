@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue"
 import { useMeta } from "vue-meta"
 import { NetworkType } from "@airgap/beacon-sdk"
+import { useRouter } from "vue-router"
 
 /**
  * UI
@@ -36,8 +37,9 @@ import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
-
 const { setupUser } = useMarket()
+
+const router = useRouter()
 
 /** Meta */
 useMeta({
@@ -72,6 +74,8 @@ const login = () => {
 		accountStore.updateBalance()
 
 		setupUser()
+
+		router.push("/")
 	})
 }
 
