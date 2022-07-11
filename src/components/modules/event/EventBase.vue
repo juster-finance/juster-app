@@ -362,10 +362,17 @@ const copy = (target) => {
 	if (target == "id") {
 		notificationsStore.create({
 			notification: {
-				type: "success",
+				icon: "help",
 				title: "Event ID copied to clipboard",
 				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
+				badges: [
+					{
+						secondaryText: "ID: ",
+						tertiaryText: event.value.id,
+						icon: "hash",
+					},
+				],
 			},
 		})
 
@@ -374,10 +381,16 @@ const copy = (target) => {
 	if (target == "url") {
 		notificationsStore.create({
 			notification: {
-				type: "success",
+				icon: "help",
 				title: "Event URL copied to clipboard",
 				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
+				badges: [
+					{
+						secondaryText: `app.juster.fi${location.pathname}`,
+						icon: "copy",
+					},
+				],
 			},
 		})
 
@@ -1037,6 +1050,7 @@ onUnmounted(() => {
 	justify-content: space-between;
 
 	margin-top: 16px;
+	margin-bottom: 32px;
 }
 
 .metadata {

@@ -113,7 +113,7 @@ export default defineComponent({
 
 			notificationsStore.create({
 				notification: {
-					type: "success",
+					icon: "info",
 					title: "Copied to clipboard",
 					description: "You have copied the user's address",
 					autoDestroy: true,

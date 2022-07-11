@@ -49,7 +49,7 @@ watch(
 const handleCopy = (target) => {
 	notificationsStore.create({
 		notification: {
-			type: "success",
+			icon: "info",
 			title: "Successfully copied to clipboard",
 			description: "Use Ctrl+V to paste",
 			autoDestroy: true,

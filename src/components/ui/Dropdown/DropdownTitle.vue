@@ -1,21 +1,21 @@
 <template>
-    <div :class="$style.wrapper">
-        <slot />
-    </div>
+	<div :class="$style.wrapper">
+		<slot />
+	</div>
 </template>
 
 <style module>
 .wrapper {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-tertiary);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 24px;
+	color: var(--text-tertiary);
 
-    padding: 0 16px;
-    height: 24px;
+	padding: 0 16px;
 
-    margin-bottom: 4px;
+	margin-bottom: 4px;
 }
 </style>

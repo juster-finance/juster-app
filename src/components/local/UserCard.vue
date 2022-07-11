@@ -31,7 +31,7 @@ const handleCopy = (target) => {
 	if (target == "address") {
 		notificationsStore.create({
 			notification: {
-				type: "success",
+				icon: "help",
 				title: "User address copied to clipboard",
 				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
@@ -42,7 +42,7 @@ const handleCopy = (target) => {
 	if (target == "url") {
 		notificationsStore.create({
 			notification: {
-				type: "success",
+				icon: "help",
 				title: "Profile URL copied to clipboard",
 				description: "Use Ctrl+V to paste",
 				autoDestroy: true,

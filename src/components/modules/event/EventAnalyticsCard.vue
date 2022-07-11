@@ -59,7 +59,7 @@ onMounted(async () => {
 	prevQuote.value = rawQuote[0]
 
 	/** Last Quote (to compare) */
-	if (props.event.status === "STARTED") {
+	if (["STARTED", "FINISHED"].includes(props.event.status)) {
 		startQuote.value.price = props.event.startRate * 100
 	}
 })

@@ -259,7 +259,7 @@ const copy = (target) => {
 	if (target == "id") {
 		notificationsStore.create({
 			notification: {
-				type: "success",
+				icon: "help",
 				title: "Event ID copied to clipboard",
 				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
@@ -271,7 +271,7 @@ const copy = (target) => {
 	if (target == "url") {
 		notificationsStore.create({
 			notification: {
-				type: "success",
+				icon: "help",
 				title: "Event URL copied to clipboard",
 				description: "Use Ctrl+V to paste",
 				autoDestroy: true,

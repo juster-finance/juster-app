@@ -1,5 +1,5 @@
-<script>
-import { defineComponent, ref } from "vue"
+<script setup>
+import { ref } from "vue"
 
 /**
  * Charts
@@ -7,25 +7,17 @@ import { defineComponent, ref } from "vue"
 import EventPriceChart from "@/components/modules/events/charts/EventPriceChart"
 import EventTVLChart from "@/components/modules/events/charts/EventTVLChart"
 
-export default defineComponent({
-	name: "EventChart",
-	components: { EventPriceChart, EventTVLChart },
+/**
+ * UI
+ */
+import Tooltip from "@/components/ui/Tooltip"
 
-	props: { event: { type: Object, default: () => {} } },
+defineProps({ event: { type: Object, default: () => {} } })
 
-	setup() {
-		const isOpen = ref(true)
+const isOpen = ref(true)
 
-		const selectedTab = ref("Price")
-		const tabs = ref(["Price", "TVL"])
-
-		return {
-			isOpen,
-			tabs,
-			selectedTab,
-		}
-	},
-})
+const selectedTab = ref("Price")
+const tabs = ref(["Price", "TVL"])
 </script>
 
 <template>
@@ -57,17 +49,17 @@ export default defineComponent({
 				</div>
 			</div>
 
-			<!-- Chart Status: Pause / Real-time -->
-			<div v-if="event.status == 'FINISHED'" :class="$style.pause">
-				<Icon name="pause" size="16" />
+			<Tooltip placement="bottom-end">
+				<div :class="$style.label">
+					<Icon name="help" size="12" />Details
+				</div>
 
-				Chart is paused
-			</div>
-			<div v-else-if="event.status == 'STARTED'" :class="$style.pause">
-				<Icon name="bolt" size="12" />
-
-				Real-time chart
-			</div>
+				<template #content>
+					Gray Chart <span>- price before start</span><br />
+					Green / Red Chart
+					<span>- price above / below the starting point</span><br />
+				</template>
+			</Tooltip>
 		</div>
 	</div>
 </template>
@@ -129,7 +121,7 @@ export default defineComponent({
 	padding: 0 16px 16px 16px;
 }
 
-.pause {
+.label {
 	display: flex;
 	align-items: center;
 	gap: 6px;
@@ -140,7 +132,7 @@ export default defineComponent({
 	color: var(--text-tertiary);
 }
 
-.pause svg {
+.label svg {
 	fill: var(--text-secondary);
 }
 

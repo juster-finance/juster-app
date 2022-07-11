@@ -10,7 +10,7 @@ const props = defineProps({
 	width: {
 		type: String,
 	},
-	placement: { type: String },
+	placement: { type: String, default: "bottom" },
 	textAlign: { type: String, default: "center" },
 	button: { type: Object },
 })

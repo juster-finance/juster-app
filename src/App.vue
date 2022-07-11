@@ -198,9 +198,9 @@ html {
 }
 
 :root {
-	/** Application */
 	--app-bg: #1b1b1b;
 	--modal-bg: #252528;
+	--notification-bg: #252528;
 
 	/** General */
 	--blue: #457ee8;
@@ -237,9 +237,6 @@ html {
 
 	/** Card */
 	--card-bg: #171717;
-
-	/** Notification */
-	--notification-bg: #27282b;
 
 	/** Dropdown */
 	--dropdown-bg: #252525;
@@ -300,9 +297,6 @@ html {
 
 	/** Card */
 	--card-bg: #ffffff;
-
-	/** Notification */
-	--notification-bg: rgba(255, 255, 255, 0.9);
 
 	/** Settings */
 	--settings-nav-bg: rgba(0, 0, 0, 0.1);

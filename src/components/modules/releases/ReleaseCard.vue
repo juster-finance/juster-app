@@ -47,7 +47,7 @@ export default defineComponent({
 
 			notificationsStore.create({
 				notification: {
-					type: "success",
+					icon: "info",
 					title: "Release URL copied to clipboard",
 					description: "Use Ctrl+V to paste",
 					autoDestroy: true,
