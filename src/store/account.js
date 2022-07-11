@@ -3,6 +3,7 @@ import { defineStore } from "pinia"
 /**
  * Services
  */
+import { juster, analytics } from "@/services/sdk"
 import { fetchBalance } from "@/services/sdk"
 
 export const useAccountStore = defineStore({
@@ -27,6 +28,18 @@ export const useAccountStore = defineStore({
 		}
 	},
 	actions: {
+		logout() {
+			juster.sdk._provider.client.clearActiveAccount().then(async () => {
+				await juster.sdk._provider.client.getActiveAccount()
+
+				analytics.log("logout", { address: this.pkh })
+
+				this.setPkh("")
+
+				this.positionsForWithdrawal = []
+			})
+		},
+
 		setPkh(pkh) {
 			this.pkh = pkh
 		},

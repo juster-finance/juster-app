@@ -97,6 +97,26 @@ const handleSelectCustomNode = async (node) => {
 	login()
 }
 
+const handleLogout = () => {
+	accountStore.logout()
+	router.push("/connect")
+	notificationsStore.create({
+		notification: {
+			icon: "logout",
+			title: "You are signed out",
+			description:
+				"To work with the application, you definitely need an account :)",
+			autoDestroy: true,
+
+			actions: [
+				{
+					name: "Back to Connection page",
+					callback: () => router.push("/connect"),
+				},
+			],
+		},
+	})
+}
 const allUsersCounter = ref(0)
 
 onMounted(async () => {
@@ -161,16 +181,13 @@ onMounted(async () => {
 				>
 			</div>
 			<div v-else :class="$style.buttons">
+				<router-link :to="`/profile/${accountStore.pkh}`">
+					<Button type="primary" size="large" block>
+						<Icon name="grid" size="16" />Go to my profile</Button
+					>
+				</router-link>
 				<Button
-					@click="handleCustomLogin"
-					type="primary"
-					size="large"
-					block
-				>
-					<Icon name="grid" size="16" />Go to my profile</Button
-				>
-				<Button
-					@click="handleCustomLogin"
+					@click="handleLogout"
 					type="secondary"
 					size="large"
 					block

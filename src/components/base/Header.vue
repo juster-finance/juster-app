@@ -87,32 +87,23 @@ const handleOpenWithdrawals = () => {
 }
 
 const handleLogout = () => {
-	juster.sdk._provider.client.clearActiveAccount().then(async () => {
-		await juster.sdk._provider.client.getActiveAccount()
+	accountStore.logout()
+	router.push("/connect")
+	notificationsStore.create({
+		notification: {
+			icon: "logout",
+			title: "You are signed out",
+			description:
+				"To work with the application, you definitely need an account :)",
+			autoDestroy: true,
 
-		analytics.log("logout", { address: accountStore.pkh })
-
-		accountStore.setPkh("")
-		router.push("/")
-
-		accountStore.positionsForWithdrawal = []
-
-		notificationsStore.create({
-			notification: {
-				icon: "logout",
-				title: "You are signed out",
-				description:
-					"To work with the application, you definitely need an account :)",
-				autoDestroy: true,
-
-				actions: [
-					{
-						name: "Back to Connection page",
-						callback: () => router.push("/connect"),
-					},
-				],
-			},
-		})
+			actions: [
+				{
+					name: "Back to Connection page",
+					callback: () => router.push("/connect"),
+				},
+			],
+		},
 	})
 }
 
@@ -284,7 +275,7 @@ const handleButtons = () => {
 								@click="handleOpenProfile"
 								:class="$style.profile"
 							>
-								<Icon name="user" size="16" />
+								<Icon name="usercircle" size="16" />
 
 								<div :class="$style.info">
 									<div :class="$style.address">
