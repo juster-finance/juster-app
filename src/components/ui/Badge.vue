@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps({
+defineProps({
 	size: { type: String, default: "small" },
 	color: { type: String, default: "gray" },
 })
@@ -49,21 +49,21 @@ const props = defineProps({
  */
 
 .wrapper.green {
-	color: var(--green);
+	color: var(--text-secondary);
 	fill: var(--green);
-	background: rgba(26, 161, 104, 0.15);
+	background: rgba(255, 255, 255, 0.05);
 }
 
 .wrapper.yellow {
-	color: var(--yellow);
+	color: var(--text-secondary);
 	fill: var(--yellow);
-	background: rgba(245, 183, 43, 0.15);
+	background: rgba(255, 255, 255, 0.05);
 }
 
 .wrapper.red {
-	color: var(--red);
+	color: var(--text-secondary);
 	fill: var(--red);
-	background: rgba(224, 92, 67, 0.15);
+	background: rgba(255, 255, 255, 0.05);
 }
 
 .wrapper.gray {
@@ -73,14 +73,14 @@ const props = defineProps({
 }
 
 .wrapper.orange {
-	color: var(--orange);
+	color: var(--text-secondary);
 	fill: var(--orange);
-	background: rgba(239, 132, 86, 0.15);
+	background: rgba(255, 255, 255, 0.05);
 }
 
 .wrapper.purple {
-	color: var(--purple);
+	color: var(--text-secondary);
 	fill: var(--purple);
-	background: rgba(133, 90, 209, 0.15);
+	background: rgba(255, 255, 255, 0.05);
 }
 </style>
