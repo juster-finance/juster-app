@@ -209,6 +209,7 @@ html {
 	--green: #1aa168;
 	--yellow: #f5b72b;
 	--purple: #855ad1;
+	--brand: #ee5b46;
 
 	/** Button */
 	--btn-success-bg: #1aa168;
@@ -276,6 +277,7 @@ html {
 	--orange: #ef8456;
 	--green: #1aa168;
 	--yellow: #f5b72b;
+	--brand: #ee5b46;
 
 	/** Button */
 	--btn-primary-bg: #276ef1;

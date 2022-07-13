@@ -238,6 +238,16 @@ export default defineComponent({
 	margin: 60px auto 60px auto;
 }
 
+.body a {
+	color: var(--text-blue);
+
+	transition: color 0.2s ease;
+}
+
+.body a:hover {
+	color: var(--blue);
+}
+
 .buttons {
 	display: flex;
 	align-items: center;

@@ -154,13 +154,54 @@ const routes = [
 		name: "Docs",
 		component: () =>
 			import(/* webpackChunkName: "docs" */ "@/views/DocsPage"),
+		redirect: "/docs/discover",
 		children: [
 			{
-				path: ":slug",
-				name: "Doc",
+				path: "discover",
+				name: "Discover",
 				component: () =>
-					import(/* webpackChunkName: "doc" */ "@/views/DocPage"),
+					import(
+						/* webpackChunkName: "discoverpage" */ "@/components/modules/docs/DiscoverBase"
+					),
 			},
+			{
+				path: "betting",
+				name: "Betting",
+				component: () =>
+					import(
+						/* webpackChunkName: "bettingpage" */ "@/components/modules/docs/BettingBase"
+					),
+			},
+			{
+				path: "liquidity",
+				name: "Liquidity",
+				component: () =>
+					import(
+						/* webpackChunkName: "liquiditypage" */ "@/components/modules/docs/LiquidityBase"
+					),
+			},
+			{
+				path: "withdraw",
+				name: "Withdraw",
+				component: () =>
+					import(
+						/* webpackChunkName: "withdrawpage" */ "@/components/modules/docs/WithdrawBase"
+					),
+			},
+			{
+				path: "roadmap",
+				name: "Roadmap",
+				component: () =>
+					import(
+						/* webpackChunkName: "roadmappage" */ "@/components/modules/docs/RoadmapBase"
+					),
+			},
+			// {
+			// 	path: ":slug",
+			// 	name: "Doc",
+			// 	component: () =>
+			// 		import(/* webpackChunkName: "doc" */ "@/views/DocPage"),
+			// },
 		],
 	},
 

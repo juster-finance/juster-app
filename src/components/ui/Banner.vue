@@ -80,6 +80,14 @@ defineProps({
 	background: rgba(224, 92, 67, 0.15);
 }
 
+.wrapper.medium {
+	min-height: 40px;
+}
+
+.wrapper.medium .base {
+	font-size: 13px;
+}
+
 .wrapper.small {
 	padding: 0 10px;
 
