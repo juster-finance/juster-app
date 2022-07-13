@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, toRefs, watch, computed } from "vue"
+import { reactive, ref, watch, computed } from "vue"
 
 /**
  * Modals
@@ -10,7 +10,6 @@ import FindParticipantModal from "@/components/local/modals/FindParticipantModal
  * UI
  */
 import Button from "@/components/ui/Button"
-import Checkbox from "@/components/ui/Checkbox"
 import Toggle from "@/components/ui/Toggle"
 
 /**
@@ -24,17 +23,17 @@ import { useAccountStore } from "@/store/account"
 import { analytics } from "@/services/sdk"
 
 const props = defineProps({
-    filters: { type: Object },
-    liquidityFilters: { type: Object },
-    events: { type: Array },
-    filteredEventsCount: { type: Number },
+	filters: { type: Object },
+	liquidityFilters: { type: Object },
+	events: { type: Array },
+	filteredEventsCount: { type: Number },
 })
 const emit = defineEmits([
-    "onReset",
-    "onNewMin",
-    "onManageParticipant",
-    "onNewMax",
-    "onSelect",
+	"onReset",
+	"onNewMin",
+	"onManageParticipant",
+	"onNewMax",
+	"onSelect",
 ])
 
 const selectedTab = ref("Basic")
@@ -45,783 +44,788 @@ const accountStore = useAccountStore()
 const showFindParticipantModal = ref(false)
 
 const position = reactive({
-    left: 0,
-    right: 0,
+	left: 0,
+	right: 0,
 })
 
 const inputs = reactive({
-    min: 0,
-    max: 50000,
+	min: 0,
+	max: 50000,
 })
 
 const minInputEl = ref(null)
 const maxInputEl = ref(null)
 
 const handleReset = () => {
-    analytics.log("onResetFilters")
+	analytics.log("onResetFilters")
 
-    inputs.min = 0
-    inputs.max = 50000
+	inputs.min = 0
+	inputs.max = 50000
 
-    emit("onReset")
+	emit("onReset")
 }
 
 const advancedFiltersCount = computed(() => {
-    let count = 0
+	let count = 0
 
-    Object.keys(props.filters.misc).forEach((filterKey) => {
-        if (props.filters.misc[filterKey].active) count += 1
-    })
+	Object.keys(props.filters.misc).forEach((filterKey) => {
+		if (props.filters.misc[filterKey].active) count += 1
+	})
 
-    if (props.filters.advanced.period) {
-        count += 1
-    }
+	if (props.filters.advanced.period) {
+		count += 1
+	}
 
-    if (props.filters.advanced.participants.length) {
-        count += 1
-    }
+	if (props.filters.advanced.participants.length) {
+		count += 1
+	}
 
-    return count
+	return count
 })
 
 /** advanced filters (participants) */
 const manageParticipant = (address, action) => {
-    emit("onManageParticipant", { address, action })
+	emit("onManageParticipant", { address, action })
 }
 
 const handleFindParticipant = (address) => {
-    manageParticipant(address, "add")
+	manageParticipant(address, "add")
 
-    showFindParticipantModal.value = false
+	showFindParticipantModal.value = false
 }
 
 watch(
-    () => inputs.min,
-    () => {
-        emit("onNewMin", inputs.min)
+	() => inputs.min,
+	() => {
+		emit("onNewMin", inputs.min)
 
-        if (inputs.min === 0) {
-            position.left = 0
-            return
-        }
+		if (inputs.min === 0) {
+			position.left = 0
+			return
+		}
 
-        const left = (inputs.min * 100) / 50000
+		const left = (inputs.min * 100) / 50000
 
-        position.left = left > 0 ? left : 0
-    },
+		position.left = left > 0 ? left : 0
+	},
 )
 
 watch(
-    () => inputs.max,
-    () => {
-        emit("onNewMax", inputs.max)
+	() => inputs.max,
+	() => {
+		emit("onNewMax", inputs.max)
 
-        if (inputs.max === 50000) {
-            position.right = 0
-            return
-        }
+		if (inputs.max === 50000) {
+			position.right = 0
+			return
+		}
 
-        const right = ((50000 - inputs.max) * 100) / 50000
+		const right = ((50000 - inputs.max) * 100) / 50000
 
-        position.right = right > 0 ? right : 0
-    },
+		position.right = right > 0 ? right : 0
+	},
 )
 
 const handleBlur = (target) => {
-    if (target == "min") {
-        if (inputs.min < 0) {
-            inputs.min = 0
-        }
-    }
+	if (target == "min") {
+		if (inputs.min < 0) {
+			inputs.min = 0
+		}
+	}
 
-    if (target == "max") {
-        if (inputs.max > 50000) {
-            inputs.max = 50000
-        }
-    }
+	if (target == "max") {
+		if (inputs.max > 50000) {
+			inputs.max = 50000
+		}
+	}
 
-    if (inputs.min > 50000) {
-        inputs.min = 0
-    }
+	if (inputs.min > 50000) {
+		inputs.min = 0
+	}
 
-    if (inputs.max < 0) {
-        inputs.max = 50000
-    }
+	if (inputs.max < 0) {
+		inputs.max = 50000
+	}
 }
 
 const handleKeydown = (e) => {
-    if (e.key === "-" || e.key === "e") e.preventDefault()
+	if (e.key === "-" || e.key === "e") e.preventDefault()
 }
 </script>
 
 <template>
-    <div :class="$style.wrapper">
-        <FindParticipantModal
-            :show="showFindParticipantModal"
-            @onAdd="handleFindParticipant"
-            @onClose="showFindParticipantModal = false"
-        />
+	<div :class="$style.wrapper">
+		<FindParticipantModal
+			:show="showFindParticipantModal"
+			@onAdd="handleFindParticipant"
+			@onClose="showFindParticipantModal = false"
+		/>
 
-        <div :class="$style.title">Filters</div>
+		<div :class="$style.title">Filters</div>
 
-        <div :class="$style.switcher">
-            <div
-                @click="selectedTab = 'Basic'"
-                :class="[$style.tab, selectedTab == 'Basic' && $style.active]"
-            >
-                Basic
-            </div>
-            <div
-                @click="selectedTab = 'Advanced'"
-                :class="[
-                    $style.tab,
-                    selectedTab == 'Advanced' && $style.active,
-                ]"
-            >
-                Advanced
-                <div v-if="advancedFiltersCount" />
-            </div>
-        </div>
+		<div :class="$style.switcher">
+			<div
+				@click="selectedTab = 'Basic'"
+				:class="[$style.tab, selectedTab == 'Basic' && $style.active]"
+			>
+				Basic
+			</div>
+			<div
+				@click="selectedTab = 'Advanced'"
+				:class="[
+					$style.tab,
+					selectedTab == 'Advanced' && $style.active,
+				]"
+			>
+				Advanced
+				<div v-if="advancedFiltersCount" />
+			</div>
+		</div>
 
-        <template v-if="selectedTab == 'Basic'">
-            <div :class="$style.block">
-                <div :class="$style.subtitle">Symbol</div>
+		<template v-if="selectedTab == 'Basic'">
+			<div :class="$style.block">
+				<div :class="$style.subtitle">Symbol</div>
 
-                <div :class="$style.badges">
-                    <div
-                        v-for="(symbol, index) in filters.symbols"
-                        :key="index"
-                        @click="$emit('onSelect', 'symbols', symbol)"
-                        :class="[
-                            $style.badge,
-                            $style.symbol,
-                            symbol.active && $style.active,
-                        ]"
-                    >
-                        <img
-                            :src="
-                                require(`@/assets/symbols/${
-                                    (symbol.name == 'XTZ-USD' && 'tz') ||
-                                    (symbol.name == 'ETH-USD' && 'eth') ||
-                                    (symbol.name == 'BTC-USD' && 'btc')
-                                }.png`)
-                            "
-                            alt="symbol"
-                        />
-                        {{ symbol.name.replace("-USD", "") }}
-                    </div>
-                </div>
-            </div>
+				<div :class="$style.badges">
+					<div
+						v-for="(symbol, index) in filters.symbols"
+						:key="index"
+						@click="$emit('onSelect', 'symbols', symbol)"
+						:class="[
+							$style.badge,
+							$style.symbol,
+							symbol.active && $style.active,
+						]"
+					>
+						<img
+							:src="
+								require(`@/assets/symbols/${
+									(symbol.name == 'XTZ-USD' && 'tz') ||
+									(symbol.name == 'ETH-USD' && 'eth') ||
+									(symbol.name == 'BTC-USD' && 'btc')
+								}.png`)
+							"
+							alt="symbol"
+						/>
+						{{ symbol.name.replace("-USD", "") }}
+					</div>
+				</div>
+			</div>
 
-            <div :class="$style.block">
-                <div :class="$style.subtitle">Liquidity</div>
+			<div :class="$style.block">
+				<div :class="$style.subtitle">Liquidity</div>
 
-                <div :class="$style.range_picker">
-                    <div :class="$style.range">
-                        <div
-                            :class="$style.filled_range"
-                            :style="{
-                                left: `${position.left}%`,
-                                right: `${position.right}%`,
-                            }"
-                        />
-                    </div>
+				<div :class="$style.range_picker">
+					<div :class="$style.range">
+						<div
+							:class="$style.filled_range"
+							:style="{
+								left: `${position.left}%`,
+								right: `${position.right}%`,
+							}"
+						/>
+					</div>
 
-                    <div :class="$style.range_inputs">
-                        <div
-                            @click="minInputEl.focus()"
-                            :class="$style.range_input"
-                        >
-                            <Icon name="download" size="12" />
-                            <input
-                                ref="minInputEl"
-                                v-model="inputs.min"
-                                type="number"
-                                step="200"
-                                @keydown="handleKeydown"
-                                @blur="handleBlur('min')"
-                                placeholder="0"
-                            />
-                            <span>ꜩ</span>
-                        </div>
+					<div :class="$style.range_inputs">
+						<div
+							@click="minInputEl.focus()"
+							:class="$style.range_input"
+						>
+							<Icon name="download" size="12" />
+							<input
+								ref="minInputEl"
+								v-model="inputs.min"
+								type="number"
+								step="200"
+								@keydown="handleKeydown"
+								@blur="handleBlur('min')"
+								placeholder="0"
+							/>
+							<span>ꜩ</span>
+						</div>
 
-                        <div
-                            @click="maxInputEl.focus()"
-                            :class="$style.range_input"
-                        >
-                            <span>ꜩ</span>
-                            <input
-                                ref="maxInputEl"
-                                v-model="inputs.max"
-                                type="number"
-                                step="200"
-                                @keydown="handleKeydown"
-                                @blur="handleBlur('max')"
-                                placeholder="0"
-                                :class="$style.right"
-                            />
-                            <Icon
-                                name="download"
-                                size="12"
-                                :class="$style.reverse"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+						<div
+							@click="maxInputEl.focus()"
+							:class="$style.range_input"
+						>
+							<span>ꜩ</span>
+							<input
+								ref="maxInputEl"
+								v-model="inputs.max"
+								type="number"
+								step="200"
+								@keydown="handleKeydown"
+								@blur="handleBlur('max')"
+								placeholder="0"
+								:class="$style.right"
+							/>
+							<Icon
+								name="download"
+								size="12"
+								:class="$style.reverse"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
 
-            <div :class="$style.block">
-                <div :class="$style.subtitle">Status</div>
+			<div :class="$style.block">
+				<div :class="$style.subtitle">Status</div>
 
-                <div :class="$style.badges">
-                    <div
-                        v-for="(status, index) in filters.statuses"
-                        :key="index"
-                        @click="$emit('onSelect', 'statuses', status)"
-                        :class="[
-                            $style.badge,
-                            $style[status.color],
-                            status.active && $style.active,
-                        ]"
-                    >
-                        <Icon :name="status.icon" size="14" />
-                        {{ status.name }}
-                    </div>
-                </div>
-            </div>
+				<div :class="$style.badges">
+					<div
+						v-for="(status, index) in filters.statuses"
+						:key="index"
+						@click="$emit('onSelect', 'statuses', status)"
+						:class="[
+							$style.badge,
+							$style[status.color],
+							status.active && $style.active,
+						]"
+					>
+						<Icon :name="status.icon" size="14" />
+						{{ status.name }}
+					</div>
+				</div>
+			</div>
 
-            <div :class="$style.block">
-                <div :class="$style.subtitle">Period</div>
+			<div :class="$style.block">
+				<div :class="$style.subtitle">Period</div>
 
-                <div :class="$style.badges">
-                    <div
-                        v-for="(period, index) in filters.periods"
-                        :key="index"
-                        @click="$emit('onSelect', 'periods', period)"
-                        :class="[$style.badge, period.active && $style.active]"
-                    >
-                        <Icon name="time" size="14" />
-                        {{ period.name }}
-                    </div>
-                </div>
-            </div>
-        </template>
-        <template v-else>
-            <div :class="$style.block">
-                <div :class="$style.subtitle">Participants</div>
+				<div :class="$style.badges">
+					<div
+						v-for="(period, index) in filters.periods"
+						:key="index"
+						@click="$emit('onSelect', 'periods', period)"
+						:class="[$style.badge, period.active && $style.active]"
+					>
+						<Icon name="time" size="14" />
+						{{ period.name }}
+					</div>
+				</div>
+			</div>
+		</template>
+		<template v-else>
+			<div :class="$style.block">
+				<div :class="$style.subtitle">Participants</div>
 
-                <div :class="$style.badges">
-                    <div
-                        @click="showFindParticipantModal = true"
-                        :class="[$style.badge, $style.active]"
-                    >
-                        <Icon name="plus" size="14" /> Add user
-                    </div>
+				<div :class="$style.badges">
+					<div
+						@click="showFindParticipantModal = true"
+						:class="[$style.badge, $style.active]"
+					>
+						<Icon name="plus" size="14" /> Add user
+					</div>
 
-                    <div
-                        v-if="accountStore.isLoggined"
-                        @click="manageParticipant(accountStore.pkh, 'add')"
-                        :class="[$style.badge, $style.active]"
-                    >
-                        <img
-                            :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-                            :class="$style.avatar"
-                            alt="avatar"
-                        />
-                        Find Me
-                    </div>
-                </div>
+					<div
+						v-if="accountStore.isLoggined"
+						@click="manageParticipant(accountStore.pkh, 'add')"
+						:class="[$style.badge, $style.active]"
+					>
+						<img
+							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
+							:class="$style.avatar"
+							alt="avatar"
+						/>
+						Find Me
+					</div>
+				</div>
 
-                <div :class="$style.badges">
-                    <div
-                        v-for="participant in filters.advanced.participants"
-                        :key="participant"
-                        @click="manageParticipant(participant, 'remove')"
-                        :class="[$style.badge, $style.active]"
-                    >
-                        <img
-                            :src="`https://services.tzkt.io/v1/avatars/${participant}`"
-                            :class="$style.avatar"
-                            alt="avatar"
-                        />
-                        {{ participant.slice(0, 5) }}..{{
-                            participant.slice(
-                                participant.length - 4,
-                                participant.length,
-                            )
-                        }}
-                    </div>
-                </div>
-            </div>
+				<div :class="$style.badges">
+					<div
+						v-for="participant in filters.advanced.participants"
+						:key="participant"
+						@click="manageParticipant(participant, 'remove')"
+						:class="[$style.badge, $style.active]"
+					>
+						<img
+							:src="`https://services.tzkt.io/v1/avatars/${participant}`"
+							:class="$style.avatar"
+							alt="avatar"
+						/>
+						{{ participant.slice(0, 5) }}..{{
+							participant.slice(
+								participant.length - 4,
+								participant.length,
+							)
+						}}
+					</div>
+				</div>
+			</div>
 
-            <div :class="$style.block">
-                <div :class="$style.subtitle">Period</div>
+			<div :class="$style.block">
+				<div :class="$style.subtitle">Period</div>
 
-                <div :class="$style.period">
-                    <input
-                        v-model="filters.advanced.period"
-                        type="date"
-                        id="filter_day"
-                        name="filter_day"
-                    />
-                </div>
-            </div>
+				<div :class="$style.period">
+					<input
+						v-model="filters.advanced.period"
+						type="date"
+						id="filter_day"
+						name="filter_day"
+					/>
+				</div>
+			</div>
 
-            <div :class="$style.block">
-                <div :class="$style.subtitle">Created by</div>
+			<div :class="$style.block">
+				<div :class="$style.subtitle">Created by</div>
 
-                <div :class="$style.badges">
-                    <div
-                        v-for="(author, index) in filters.author"
-                        :key="index"
-                        @click="$emit('onSelect', 'author', author)"
-                        :class="[$style.badge, author.active && $style.active]"
-                    >
-                        <Icon :name="author.icon" size="14" />
-                        {{ author.name }}
-                    </div>
-                </div>
-            </div>
+				<div :class="$style.badges">
+					<div
+						v-for="(author, index) in filters.author"
+						:key="index"
+						@click="$emit('onSelect', 'author', author)"
+						:class="[$style.badge, author.active && $style.active]"
+					>
+						<Icon
+							:name="author.icon"
+							size="14"
+							:class="
+								author.name === 'Juster' && $style.brand_color
+							"
+						/>
+						{{ author.name }}
+					</div>
+				</div>
+			</div>
 
-            <div :class="$style.block">
-                <div :class="$style.subtitle">Misc</div>
+			<div :class="$style.block">
+				<div :class="$style.subtitle">Misc</div>
 
-                <div :class="$style.misc">
-                    <div :class="$style.toggle_filter">
-                        <div :class="$style.left">Starting Today</div>
-                        <Toggle
-                            v-model="filters.misc.startingToday.active"
-                            :disabled="filters.misc.startingToday.disabled"
-                        />
-                    </div>
-                    <div :class="$style.toggle_filter">
-                        <div :class="$style.left">More than 2 Participant</div>
-                        <Toggle
-                            v-model="filters.misc.moreThan.active"
-                            :disabled="filters.misc.moreThan.disabled"
-                        />
-                    </div>
-                    <div :class="$style.toggle_filter">
-                        <div :class="$style.left">Custom Target Dynamics</div>
-                        <Toggle
-                            v-model="filters.misc.targetDynamics.active"
-                            :disabled="filters.misc.targetDynamics.disabled"
-                        />
-                    </div>
-                </div>
-            </div>
-        </template>
+				<div :class="$style.misc">
+					<div :class="$style.toggle_filter">
+						<div :class="$style.left">Starting Today</div>
+						<Toggle
+							v-model="filters.misc.startingToday.active"
+							:disabled="filters.misc.startingToday.disabled"
+						/>
+					</div>
+					<div :class="$style.toggle_filter">
+						<div :class="$style.left">More than 2 Participant</div>
+						<Toggle
+							v-model="filters.misc.moreThan.active"
+							:disabled="filters.misc.moreThan.disabled"
+						/>
+					</div>
+					<div :class="$style.toggle_filter">
+						<div :class="$style.left">Custom Target Dynamics</div>
+						<Toggle
+							v-model="filters.misc.targetDynamics.active"
+							:disabled="filters.misc.targetDynamics.disabled"
+						/>
+					</div>
+				</div>
+			</div>
+		</template>
 
-        <div :class="$style.divider" />
+		<div :class="$style.divider" />
 
-        <div :class="$style.actions">
-            <Button @click="handleReset" type="secondary" size="small"
-                >Reset filters</Button
-            >
+		<div :class="$style.actions">
+			<Button @click="handleReset" type="secondary" size="small"
+				>Reset filters</Button
+			>
 
-            <div :class="$style.counters">
-                <div :class="$style.counter">
-                    <div :class="$style.counter__left">
-                        <Icon name="collection" size="16" /> Total:
-                    </div>
+			<div :class="$style.counters">
+				<div :class="$style.counter">
+					<div :class="$style.counter__left">
+						<Icon name="collection" size="16" /> Total:
+					</div>
 
-                    <div :class="$style.counter__value">
-                        {{ events.length }}
-                    </div>
-                </div>
-                <div :class="$style.counter">
-                    <div :class="$style.counter__left">
-                        <Icon name="filter" size="16" /> Filtered:
-                    </div>
+					<div :class="$style.counter__value">
+						{{ events.length }}
+					</div>
+				</div>
+				<div :class="$style.counter">
+					<div :class="$style.counter__left">
+						<Icon name="filter" size="16" /> Filtered:
+					</div>
 
-                    <div :class="$style.counter__value">
-                        {{ filteredEventsCount }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+					<div :class="$style.counter__value">
+						{{ filteredEventsCount }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style module>
 .wrapper {
-    position: sticky;
-    top: 100px;
+	position: sticky;
+	top: 100px;
 
-    background: var(--card-bg);
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    padding: 20px 0 12px 0;
-    height: fit-content;
+	background: var(--card-bg);
+	border-radius: 8px;
+	border: 1px solid var(--border);
+	padding: 20px 0 12px 0;
+	height: fit-content;
 }
 
 @media (max-width: 700px) {
-    .wrapper {
-        position: initial;
+	.wrapper {
+		position: initial;
 
-        width: 100%;
-    }
+		width: 100%;
+	}
 }
 
 .switcher {
-    display: flex;
+	display: flex;
 
-    margin: 0 20px 24px 20px;
+	margin: 0 20px 24px 20px;
 
-    border-radius: 6px;
-    outline: 1px solid var(--border);
+	border-radius: 6px;
+	outline: 1px solid var(--border);
 }
 
 .tab {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
 
-    width: 100%;
-    height: 28px;
-    cursor: pointer;
+	width: 100%;
+	height: 28px;
+	cursor: pointer;
 
-    font-size: 13px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 13px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
 
-    opacity: 0.7;
+	opacity: 0.7;
 
-    transition: all 0.2s ease;
+	transition: all 0.2s ease;
 }
 
 .tab div {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--blue);
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--blue);
 }
 
 .tab:nth-child(1) {
-    border-radius: 6px 0 0 6px;
+	border-radius: 6px 0 0 6px;
 }
 
 .tab:nth-child(2) {
-    border-radius: 0 6px 6px 0;
+	border-radius: 0 6px 6px 0;
 }
 
 .tab.active {
-    background: var(--opacity-05);
-    opacity: 1;
+	background: var(--opacity-05);
+	opacity: 1;
 }
 
 .title {
-    font-size: 14px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 14px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
 
-    padding: 0 20px;
-    margin-bottom: 24px;
+	padding: 0 20px;
+	margin-bottom: 24px;
 }
 
 .block {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 
-    padding: 0 20px;
-    margin-bottom: 32px;
+	padding: 0 20px;
+	margin-bottom: 32px;
 }
 
 /* Counter: Total & Filtered */
 .counters {
-    display: flex;
-    justify-content: space-between;
-    gap: 6px;
+	display: flex;
+	justify-content: space-between;
+	gap: 6px;
 
-    margin-top: 16px;
+	margin-top: 16px;
 }
 
 .counter {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
 
-    height: 32px;
-    border-radius: 6px;
+	height: 32px;
+	border-radius: 6px;
 }
 
 .counter svg {
-    fill: var(--text-tertiary);
+	fill: var(--text-tertiary);
 }
 
 .counter__left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 
-    font-size: 13px;
-    line-height: 1.1;
-    font-weight: 600;
-    color: var(--text-tertiary);
+	font-size: 13px;
+	line-height: 1.1;
+	font-weight: 600;
+	color: var(--text-tertiary);
 }
 
 .counter__value {
-    font-size: 13px;
-    line-height: 1.1;
-    font-weight: 600;
-    color: var(--text-secondary);
+	font-size: 13px;
+	line-height: 1.1;
+	font-weight: 600;
+	color: var(--text-secondary);
 }
 
 .subtitle {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-tertiary);
-    fill: var(--text-tertiary);
+	font-size: 12px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-tertiary);
+	fill: var(--text-tertiary);
 }
 
 .subtitle svg {
-    margin-left: 4px;
+	margin-left: 4px;
 }
 
 .hint {
-    font-size: 12px;
-    line-height: 1.6;
-    font-weight: 500;
-    color: var(--text-tertiary);
+	font-size: 12px;
+	line-height: 1.6;
+	font-weight: 500;
+	color: var(--text-tertiary);
 
-    padding: 0 20px;
-    margin-bottom: 12px;
+	padding: 0 20px;
+	margin-bottom: 12px;
 }
 
 .divider {
-    width: 100%;
-    height: 1px;
-    background: var(--border);
+	width: 100%;
+	height: 1px;
+	background: var(--border);
 
-    margin: 20px 0 16px;
+	margin: 20px 0 16px;
 }
 
 .actions {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
 
-    padding: 0 20px;
+	padding: 0 20px;
 }
 
 .symbols {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.symbol_checkbox {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.symbol_checkbox span {
-    color: var(--text-tertiary);
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
 }
 
 .badges {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 .badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 
-    height: 32px;
-    border: 1px solid var(--border);
-    padding: 0 12px;
-    border-radius: 50px;
-    cursor: pointer;
-    opacity: 0.5;
+	height: 32px;
+	border: 2px solid var(--border);
+	padding: 0 12px;
+	border-radius: 50px;
+	cursor: pointer;
+	opacity: 0.5;
 
-    font-size: 14px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
-    fill: var(--text-tertiary);
+	font-size: 14px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
+	fill: var(--text-tertiary);
 
-    transition: all 0.2s ease;
+	transition: all 0.2s ease;
 }
 
 .badge:hover {
-    border: 1px solid var(--border-highlight);
+	border: 2px solid var(--border-highlight);
 }
 
 .badge.active {
-    opacity: 1;
+	opacity: 1;
+	border: 2px solid var(--border-highlight);
 }
 
 .badge.yellow svg {
-    fill: var(--yellow);
+	fill: var(--yellow);
+}
+
+.badge.purple svg {
+	fill: var(--purple);
 }
 
 .badge.green svg {
-    fill: var(--green);
+	fill: var(--green);
 }
 
 .badge.red svg {
-    fill: var(--red);
+	fill: var(--red);
 }
 
 .badge.orange svg {
-    fill: var(--orange);
+	fill: var(--orange);
 }
 
 .badge.gray svg {
-    fill: var(--text-secondary);
+	fill: var(--text-secondary);
+}
+
+.brand_color {
+	fill: var(--brand);
 }
 
 .symbol img {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
 }
 
 .range_picker {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 }
 
 .range {
-    position: relative;
+	position: relative;
 
-    width: 100%;
-    height: 4px;
-    border-radius: 50px;
-    background: var(--opacity-10);
+	width: 100%;
+	height: 4px;
+	border-radius: 50px;
+	background: var(--opacity-10);
 }
 
 .filled_range {
-    position: absolute;
+	position: absolute;
 
-    height: 100%;
-    background: var(--blue);
-    border-radius: 50px;
+	height: 100%;
+	background: var(--blue);
+	border-radius: 50px;
 
-    transition: all 0.2s ease;
+	transition: all 0.2s ease;
 }
 
 .range_inputs {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }
 
 .range_input {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 
-    cursor: text;
+	cursor: text;
 
-    height: 28px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    padding: 0 8px;
+	height: 28px;
+	border-radius: 6px;
+	border: 1px solid var(--border);
+	padding: 0 8px;
 
-    transition: border 0.2s ease;
+	transition: border 0.2s ease;
 }
 
 .range_input svg {
-    fill: var(--text-tertiary);
+	fill: var(--text-tertiary);
 
-    margin: 0 8px 0 0;
+	margin: 0 8px 0 0;
 }
 
 .range_input svg.reverse {
-    fill: var(--text-tertiary);
+	fill: var(--text-tertiary);
 
-    margin: 0 0 0 8px;
+	margin: 0 0 0 8px;
 
-    transform: rotate(180deg);
+	transform: rotate(180deg);
 }
 
 .range_input input {
-    width: 60px;
+	width: 60px;
 
-    font-size: 13px;
-    line-height: 1.1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 13px;
+	line-height: 1.1;
+	font-weight: 600;
+	color: var(--text-primary);
 
-    margin: 0 4px 0 0;
+	margin: 0 4px 0 0;
 }
 
 .range_input input.right {
-    text-align: right;
+	text-align: right;
 
-    margin: 0 0 0 4px;
+	margin: 0 0 0 4px;
 }
 
 .range_input {
-    font-size: 11px;
-    line-height: 1.1;
-    font-weight: 500;
-    color: var(--text-tertiary);
+	font-size: 11px;
+	line-height: 1.1;
+	font-weight: 500;
+	color: var(--text-tertiary);
 }
 
 .range_input input::-webkit-outer-spin-button,
 .range_input input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+	-webkit-appearance: none;
+	margin: 0;
 }
 
 .misc {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
 }
 
 .toggle_filter {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }
 
 .left {
-    font-size: 14px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 14px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
 }
 
 .period {
-    display: flex;
+	display: flex;
 }
 
 .period input {
-    height: 32px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
+	height: 32px;
+	border: 1px solid var(--border);
+	border-radius: 8px;
 
-    font-size: 13px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-primary);
+	font-size: 13px;
+	line-height: 1;
+	font-weight: 500;
+	color: var(--text-primary);
 
-    padding: 0 10px;
+	padding: 0 10px;
 }
 
 .period input::-webkit-calendar-picker-indicator {
-    display: none;
+	display: none;
 }
 
 .avatar {
-    width: 14px;
-    height: 14px;
+	width: 14px;
+	height: 14px;
 }
 </style>

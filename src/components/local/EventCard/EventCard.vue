@@ -550,7 +550,7 @@ onUnmounted(() => {
 				>
 					<Badge
 						size="small"
-						color="green"
+						color="purple"
 						:class="$style.main_badge"
 					>
 						<Icon name="event_new" size="12" />New
@@ -591,7 +591,7 @@ onUnmounted(() => {
 					v-else-if="event.status == 'FINISHED'"
 					placement="bottom-start"
 				>
-					<Badge color="gray" :class="$style.main_badge">
+					<Badge color="green" :class="$style.main_badge">
 						<Icon name="event_finished" size="12" />Finished
 					</Badge>
 					<template #content
@@ -602,7 +602,7 @@ onUnmounted(() => {
 					v-else-if="event.status == 'CANCELED'"
 					placement="bottom-start"
 				>
-					<Badge color="orange" :class="$style.main_badge">
+					<Badge color="gray" :class="$style.main_badge">
 						<Icon name="stop" size="12" />Canceled
 					</Badge>
 					<template #content

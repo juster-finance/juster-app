@@ -226,9 +226,9 @@ const endDiff = computed(() =>
 				<div
 					:class="[
 						$style.card__status,
-						event.status == 'NEW' && $style.green,
+						event.status == 'NEW' && $style.purple,
 						event.status == 'STARTED' && $style.yellow,
-						event.status == 'FINISHED' && $style.gray,
+						event.status == 'FINISHED' && $style.green,
 						event.status == 'CANCELED' && $style.gray,
 					]"
 				>
@@ -697,6 +697,11 @@ const endDiff = computed(() =>
 .card__status.gray {
 	color: var(--text-secondary);
 	fill: var(--text-secondary);
+}
+
+.card__status.purple {
+	color: var(--purple);
+	fill: var(--purple);
 }
 
 .card__duration {

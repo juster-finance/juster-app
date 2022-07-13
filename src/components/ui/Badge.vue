@@ -31,7 +31,7 @@ defineProps({
  * Sizes
  */
 .wrapper.small {
-	height: 26px;
+	height: 28px;
 	font-size: 12px;
 	line-height: 12px;
 
@@ -52,18 +52,21 @@ defineProps({
 	color: var(--text-secondary);
 	fill: var(--green);
 	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(26, 161, 104, 0.2);
 }
 
 .wrapper.yellow {
 	color: var(--text-secondary);
 	fill: var(--yellow);
 	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(245, 183, 43, 0.2);
 }
 
 .wrapper.red {
 	color: var(--text-secondary);
 	fill: var(--red);
 	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(224, 92, 67, 0.2);
 }
 
 .wrapper.gray {
@@ -76,11 +79,13 @@ defineProps({
 	color: var(--text-secondary);
 	fill: var(--orange);
 	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(239, 132, 86, 0.2);
 }
 
 .wrapper.purple {
 	color: var(--text-secondary);
 	fill: var(--purple);
 	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(133, 90, 209, 0.2);
 }
 </style>

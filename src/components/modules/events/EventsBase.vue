@@ -86,7 +86,7 @@ const defaultFilters = {
 		{
 			name: "New",
 			icon: "event_new",
-			color: "green",
+			color: "purple",
 			active: true,
 		},
 		{
@@ -98,13 +98,13 @@ const defaultFilters = {
 		{
 			name: "Finished",
 			icon: "checkcircle",
-			color: "gray",
+			color: "green",
 			active: false,
 		},
 		{
 			name: "Canceled",
 			icon: "stop",
-			color: "orange",
+			color: "gray",
 			active: false,
 		},
 	],
