@@ -197,7 +197,7 @@ const getTypeOfOperation = () => {
 
 			<a
 				:href="`https://${
-					currentNetwork == 'mainnet' ? '' : 'ghostnet.'
+					currentNetwork === 'mainnet' ? '' : 'ghostnet.'
 				}tzkt.io/${data.opgHash}`"
 				target="_blank"
 			>

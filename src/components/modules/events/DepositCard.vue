@@ -82,7 +82,7 @@ const returnForLiquidity = computed(() => {
 				/>
 				<Icon
 					v-else
-					name="logo_symbol"
+					name="server"
 					size="16"
 					:class="$style.logo_icon"
 				/>
@@ -113,7 +113,7 @@ const returnForLiquidity = computed(() => {
 					{{ accountStore.pkh == deposit.userId ? "My" : "" }}
 					Liquidity
 				</div>
-				<div v-else :class="$style.title">Initial Liquidity</div>
+				<div v-else :class="$style.title">Liquidity Pool</div>
 
 				<div :class="$style.time">
 					{{
@@ -255,7 +255,7 @@ const returnForLiquidity = computed(() => {
 }
 
 .logo_icon {
-	fill: var(--text-primary);
+	fill: var(--brand);
 }
 
 .info {

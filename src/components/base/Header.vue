@@ -223,7 +223,7 @@ const handleButtons = () => {
 					<div :class="$style.testnet_warning">
 						<Icon name="hammer" size="16" />
 
-						<span>Ghost Network</span>
+						<span>Test Network</span>
 					</div>
 
 					<template v-slot:content>

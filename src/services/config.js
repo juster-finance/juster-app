@@ -3,7 +3,7 @@ export const dipdup = {
 		graphq: "https://juster.dipdup.net/v1/graphql",
 		ws: "wss://juster.dipdup.net/v1/graphql",
 	},
-	ithacanet: {
+	testnet: {
 		graphq: `https://api.ithacanet.juster.fi/v1/graphql`,
 		ws: "wss://api.ithacanet.juster.fi/v1/graphql",
 	},
@@ -42,16 +42,16 @@ export const rpcNodes = {
 			url: "https://rpc-mainnet.ateza.io",
 		},
 	],
-	ithacanet: [
+	testnet: [
 		{
 			name: "TZKT Testnet",
-			url: "https://rpc.tzkt.io/ithacanet",
+			url: "https://rpc.tzkt.io/ghostnet",
 		},
 	],
 }
 
 export const verifiedMakers = {
-	ithacanet: [
+	testnet: [
 		"tz1RVJBJDxohFBHLK2hw6JTrKbz6oLSLERU3",
 		"KT1T4zTEZQLbFeKoR8sRihozyS4DAnyicYE3",
 	],
@@ -59,6 +59,6 @@ export const verifiedMakers = {
 }
 
 export const contracts = {
-	ithacanet: "KT1Feq9iRBBhpSBdPF1Y7Sd7iJu7uLqqRf1A",
+	testnet: "KT1Feq9iRBBhpSBdPF1Y7Sd7iJu7uLqqRf1A",
 	mainnet: "KT1D6XTy8oAHkUWdzuQrzySECCDMnANEchQq",
 }

@@ -163,7 +163,7 @@ const handleCopy = (target) => {
 
 				<a
 					:href="`https://${
-						currentNetwork == 'mainnet' ? '' : 'ghostnet.'
+						currentNetwork === 'mainnet' ? '' : 'ghostnet.'
 					}tzkt.io/${user.userId}`"
 					target="_blank"
 				>

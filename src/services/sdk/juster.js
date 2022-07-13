@@ -2,10 +2,10 @@ import { computed, reactive } from "vue"
 import { Juster } from "@juster-finance/sdk"
 import { createClient } from "@juster-finance/gql-client"
 import {
-    ApolloClient,
-    InMemoryCache,
-    HttpLink,
-    from,
+	ApolloClient,
+	InMemoryCache,
+	HttpLink,
+	from,
 } from "@apollo/client/core"
 
 import { dipdup } from "@/services/config"
@@ -20,22 +20,24 @@ import { Networks } from "@/services/constants"
  */
 const juster = reactive({ sdk: null, gql: null, apollo: null })
 
-const currentNetwork = computed(() => juster.sdk._network)
+const currentNetwork = computed(() =>
+	juster.sdk._network === "mainnet" ? "mainnet" : "testnet",
+)
 
 /**
  * Storage "activeNetwork"
  */
 if (!localStorage.activeNetwork) {
-    localStorage.activeNetwork = Networks.MAINNET
+	localStorage.activeNetwork = Networks.MAINNET
 }
 
 /**
  * Validate "activeNetwork" (Integrity Repair)
  */
 if (
-    ![Networks.MAINNET, Networks.TESTNET].includes(localStorage.activeNetwork)
+	![Networks.MAINNET, Networks.TESTNET].includes(localStorage.activeNetwork)
 ) {
-    localStorage.activeNetwork = Networks.MAINNET
+	localStorage.activeNetwork = Networks.MAINNET
 }
 
 /**
@@ -47,28 +49,28 @@ juster.sdk = Juster.create(localStorage.activeNetwork)
 
 /** GQL */
 juster.gql = createClient({
-    url: dipdup[currentNetwork.value].graphq,
-    subscription: { url: dipdup[currentNetwork.value].ws },
+	url: dipdup[currentNetwork.value].graphq,
+	subscription: { url: dipdup[currentNetwork.value].ws },
 })
 
 /** Apollo */
 const link = from([new HttpLink({ uri: dipdup[currentNetwork.value].graphq })])
 juster.apollo = new ApolloClient({
-    link,
-    cache: new InMemoryCache(),
-    connectToDevTools: true,
+	link,
+	cache: new InMemoryCache(),
+	connectToDevTools: true,
 })
 
 /**
  * Switch between Networks
  */
 const switchNetwork = (network) => {
-    if (![Networks.MAINNET, Networks.TESTNET].includes(network)) return
+	if (![Networks.MAINNET, Networks.TESTNET].includes(network)) return
 
-    /** todo (Settings): switch temporarily (without saving in LS) */
-    localStorage.activeNetwork = network
+	/** todo (Settings): switch temporarily (without saving in LS) */
+	localStorage.activeNetwork = network
 
-    location.reload()
+	location.reload()
 }
 
 export { juster, currentNetwork, switchNetwork }

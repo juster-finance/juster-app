@@ -139,7 +139,7 @@ const liquidityLevel = computed(() => {
 	else return { text: "Low", icon: "liquidity_low" }
 })
 
-const participantsAvatars = computed(() => {
+const participants = computed(() => {
 	let avatars = [
 		...props.event.bets.map((bet) => bet.userId),
 		...props.event.deposits.map((deposit) => deposit.userId),
@@ -444,15 +444,15 @@ onUnmounted(() => {
 				</div>
 
 				<div :class="$style.users">
-					<Tooltip placement="bottom-start">
+					<Tooltip placement="bottom-end">
 						<div :class="$style.participants">
 							<img
-								v-for="participantAvatar in participantsAvatars.slice(
+								v-for="participantAddress in participants.slice(
 									0,
 									3,
 								)"
-								:key="participantAvatar"
-								:src="`https://services.tzkt.io/v1/avatars/${participantAvatar}`"
+								:key="participantAddress"
+								:src="`https://services.tzkt.io/v1/avatars/${participantAddress}`"
 								:class="[
 									$style.user_avatar,
 									$style.participant,
@@ -460,20 +460,18 @@ onUnmounted(() => {
 								alt="avatar"
 							/>
 							<div
-								v-if="participantsAvatars.length > 3"
+								v-if="participants.length > 3"
 								:class="[
 									$style.participant,
 									$style.more_participants,
 								]"
 							>
-								+{{ participantsAvatars.length - 3 }}
+								+{{ participants.length - 3 }}
 							</div>
 						</div>
 
-						<template v-slot:content
-							>Participants ({{
-								participantsAvatars.length
-							}})</template
+						<template #content
+							>Participants ({{ participants.length }})</template
 						>
 					</Tooltip>
 
@@ -503,7 +501,7 @@ onUnmounted(() => {
 							</template>
 						</div>
 
-						<template v-slot:content>{{
+						<template #content>{{
 							verifiedMakers[currentNetwork].includes(
 								event.creatorId,
 							)
@@ -558,7 +556,7 @@ onUnmounted(() => {
 						<Icon name="event_new" size="12" />New
 					</Badge>
 
-					<template v-slot:content>
+					<template #content>
 						The event is available for betting and providing
 						liquidity
 					</template>
@@ -573,7 +571,7 @@ onUnmounted(() => {
 						<Icon name="event_new" size="12" />Starting
 					</Badge>
 
-					<template v-slot:content
+					<template #content
 						>Betting is closed. The event is starting</template
 					>
 				</Tooltip>
@@ -584,7 +582,7 @@ onUnmounted(() => {
 					<Badge color="yellow" :class="$style.main_badge">
 						<Icon name="event_active" size="12" />Running
 					</Badge>
-					<template v-slot:content
+					<template #content
 						>Betting is closed. The end of the event is
 						pending</template
 					>
@@ -596,7 +594,7 @@ onUnmounted(() => {
 					<Badge color="gray" :class="$style.main_badge">
 						<Icon name="event_finished" size="12" />Finished
 					</Badge>
-					<template v-slot:content
+					<template #content
 						>The event is closed, winning side determined</template
 					>
 				</Tooltip>
@@ -607,7 +605,7 @@ onUnmounted(() => {
 					<Badge color="orange" :class="$style.main_badge">
 						<Icon name="stop" size="12" />Canceled
 					</Badge>
-					<template v-slot:content
+					<template #content
 						>This event has been canceled, funds returned</template
 					>
 				</Tooltip>
@@ -643,7 +641,7 @@ onUnmounted(() => {
 						<Icon name="bolt" size="12" />
 					</Badge>
 
-					<template v-slot:content>High-demand event</template>
+					<template #content>High-demand event</template>
 				</Tooltip>
 
 				<!-- Custom Badge -->
@@ -659,7 +657,7 @@ onUnmounted(() => {
 						<Icon name="bolt" size="12" /> Custom
 					</Badge>
 
-					<template v-slot:content>Custom event from user</template>
+					<template #content>Custom event from user</template>
 				</Tooltip>
 
 				<!-- TVL Badge -->
@@ -673,7 +671,7 @@ onUnmounted(() => {
 						{{ abbreviateNumber(userTVL) }} ꜩ
 					</Badge>
 
-					<template v-slot:content>My TVL: Bets + Liquidity</template>
+					<template #content>My TVL: Bets + Liquidity</template>
 				</Tooltip>
 			</div>
 
@@ -755,7 +753,7 @@ onUnmounted(() => {
 				<Tooltip
 					v-if="event.status !== 'FINISHED'"
 					placement="top-start"
-					textAlign="left"
+					text-align="left"
 				>
 					<div
 						:class="[
@@ -827,13 +825,13 @@ onUnmounted(() => {
 				@onBet="handleBet"
 				@onWithdraw="handleWithdraw"
 				:event="event"
-				:isWon="hasWonBet"
-				:positionForWithdraw="positionForWithdraw"
+				:is-won="hasWonBet"
+				:position-for-withdraw="positionForWithdraw"
 				:disabled="
 					event.totalLiquidityProvided == 0 ||
 					startStatus == 'Finished'
 				"
-				:isWithdrawing="isWithdrawing"
+				:is-withdrawing="isWithdrawing"
 			/>
 		</div>
 	</router-link>

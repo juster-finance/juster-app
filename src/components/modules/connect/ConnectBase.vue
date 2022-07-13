@@ -1,7 +1,10 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { ref, onMounted } from "vue"
 import { useMeta } from "vue-meta"
-import { NetworkType } from "@airgap/beacon-sdk"
+import { NetworkType } from "@airgap/beacon-dapp"
 import { useRouter } from "vue-router"
 
 /**
@@ -58,7 +61,7 @@ const handleBeacon = async () => {
 				notification: {
 					type: "Warning",
 					title: "Wallet connection rejected",
-					description: "??",
+					description: "Try again.",
 					autoDestroy: true,
 				},
 			})
@@ -205,7 +208,7 @@ onMounted(async () => {
 				>
 					<Icon name="hammer" size="14" />
 					<span>
-						<b>Ghostnet.</b> Use only testing and exploring
+						<b>Test Network.</b> Use only testing and exploring
 						opportunities
 					</span>
 				</div>

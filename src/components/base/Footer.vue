@@ -62,7 +62,7 @@ const checkDipdup = async () => {
 	const urlToCheck =
 		currentNetwork.value == "mainnet"
 			? "https://juster.dipdup.net/api/rest/dipdupHead?name=https://tzkt-mainnet.dipdup.net"
-			: "https://api.ghostnet.juster.fi/api/rest/dipdupHead?name=https://api.ghostnet.tzkt.io"
+			: "https://api.ithacanet.juster.fi/api/rest/dipdupHead?name=https://api.ithacanet.tzkt.io"
 	const {
 		data: { dipdupHeadByPk },
 	} = await axios.get(urlToCheck)
@@ -233,7 +233,14 @@ onBeforeUnmount(() => {
 											: $style.yellow,
 									]"
 								>
-									<Icon name="network" size="12" />{{
+									<Icon
+										:name="
+											currentNetwork === 'testnet'
+												? 'hammer'
+												: 'bolt'
+										"
+										size="12"
+									/>{{
 										capitalizeFirstLetter(currentNetwork)
 									}}
 									<Icon name="arrow" size="12" />
@@ -245,23 +252,33 @@ onBeforeUnmount(() => {
 								<DropdownItem @click="handleSwitch('mainnet')"
 									><Icon
 										:name="
-											currentNetwork == 'mainnet'
-												? 'checkcircle'
-												: 'network'
+											currentNetwork === 'mainnet'
+												? 'check'
+												: 'bolt'
 										"
 										size="16"
-									/>Mainnet</DropdownItem
-								>
-								<DropdownItem @click="handleSwitch('testnet')"
-									><Icon
+										:class="
+											currentNetwork === 'mainnet' &&
+											$style.blue_icon
+										"
+									/>
+									Mainnet
+								</DropdownItem>
+								<DropdownItem @click="handleSwitch('testnet')">
+									<Icon
 										:name="
-											currentNetwork == 'ghostnet'
-												? 'checkcircle'
-												: 'network'
+											currentNetwork === 'testnet'
+												? 'check'
+												: 'hammer'
 										"
 										size="16"
-									/>Ghostnet</DropdownItem
-								>
+										:class="
+											currentNetwork === 'testnet' &&
+											$style.blue_icon
+										"
+									/>
+									Testnet
+								</DropdownItem>
 							</template>
 						</Dropdown>
 					</div>
@@ -449,6 +466,10 @@ onBeforeUnmount(() => {
 	line-height: 1;
 	font-weight: 500;
 	color: var(--text-tertiary);
+}
+
+.blue_icon svg {
+	fill: var(--blue);
 }
 
 @media (max-width: 900px) {
