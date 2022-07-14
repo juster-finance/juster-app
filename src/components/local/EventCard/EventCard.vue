@@ -257,10 +257,16 @@ const copy = (target) => {
 	if (target == "id") {
 		notificationsStore.create({
 			notification: {
-				icon: "help",
+				icon: "copy",
 				title: "Event ID copied to clipboard",
-				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
+				badges: [
+					{
+						secondaryText: "ID: ",
+						tertiaryText: props.event.id,
+						icon: "hash",
+					},
+				],
 			},
 		})
 
@@ -269,14 +275,30 @@ const copy = (target) => {
 	if (target == "url") {
 		notificationsStore.create({
 			notification: {
-				icon: "help",
+				icon: "copy",
 				title: "Event URL copied to clipboard",
-				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
+				badges: [
+					{
+						secondaryText: `app.juster.fi/events/${props.event.id}`,
+						icon: "copy",
+					},
+				],
+
+				actions: [
+					{
+						name: "Open in new tab",
+						callback: () =>
+							window.open(
+								`https://app.juster.fi/events/${props.event.id}`,
+								"_blank",
+							),
+					},
+				],
 			},
 		})
 
-		toClipboard(location)
+		toClipboard(`https://app.juster.fi/events/${props.event.id}`)
 	}
 }
 
