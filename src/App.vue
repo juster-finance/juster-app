@@ -128,12 +128,12 @@ html {
 @keyframes fade-in {
 	0% {
 		opacity: 0;
-		transform: scale(0.95) translateY(10px);
+		transform: translateY(10px);
 	}
 
 	100% {
 		opacity: 1;
-		transform: scale(1) translateY(0);
+		transform: translateY(0);
 	}
 }
 
