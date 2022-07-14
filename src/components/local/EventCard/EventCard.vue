@@ -570,7 +570,7 @@ onUnmounted(() => {
 					</Badge>
 
 					<template #content
-						>Betting is closed. The event is starting</template
+						>Submissions is closed. The event is starting</template
 					>
 				</Tooltip>
 				<Tooltip
@@ -581,7 +581,7 @@ onUnmounted(() => {
 						<Icon name="event_active" size="12" />Running
 					</Badge>
 					<template #content
-						>Betting is closed. The end of the event is
+						>Submissions is closed. The end of the event is
 						pending</template
 					>
 				</Tooltip>
