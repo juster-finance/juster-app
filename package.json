@@ -11,7 +11,6 @@
 		"@apollo/client": "^3.3.21",
 		"@juster-finance/gql-client": "^0.0.6",
 		"@juster-finance/sdk": "0.0.8",
-		"@taquito/taquito": "12.0.3",
 		"@vue/apollo-composable": "4.0.0-alpha.12",
 		"amplitude-js": "^8.12.0",
 		"axios": "^0.21.4",
@@ -41,7 +40,8 @@
 		"eslint": "^7.32.0",
 		"eslint-plugin-prettier": "^3.3.1",
 		"eslint-plugin-vue": "^8.0.3",
-		"prettier": "^2.2.1"
+		"prettier": "^2.2.1",
+		"vue-cli-plugin-webpack-bundle-analyzer": "~4.0.0"
 	},
 	"browserslist": [
 		"> 1%",

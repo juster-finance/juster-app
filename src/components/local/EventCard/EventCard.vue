@@ -128,9 +128,7 @@ const timing = computed(() => {
 })
 
 const liquidityLevel = computed(() => {
-	if (props.event.totalLiquidityProvided >= 7000)
-		return { text: "Ultra", icon: "liquidity_ultra" }
-	else if (props.event.totalLiquidityProvided >= 3000)
+	if (props.event.totalLiquidityProvided >= 3000)
 		return { text: "High", icon: "liquidity_high" }
 	else if (props.event.totalLiquidityProvided >= 1000)
 		return { text: "Medium", icon: "liquidity_medium" }
@@ -761,14 +759,13 @@ onUnmounted(() => {
 							liquidityLevel.text == 'Low' && $style.red,
 							liquidityLevel.text == 'Medium' && $style.yellow,
 							liquidityLevel.text == 'High' && $style.green,
-							liquidityLevel.text == 'Ultra' && $style.red,
 						]"
 					>
 						<Icon :name="liquidityLevel.icon" size="14" />
 
 						<div>
 							<span>{{ liquidityLevel.text }}</span>
-							liquidity
+							Liquidity
 						</div>
 					</div>
 

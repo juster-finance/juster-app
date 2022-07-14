@@ -1,5 +1,3 @@
-import { OpKind } from "@taquito/taquito"
-
 /**
  * Services
  */
@@ -19,7 +17,7 @@ export const withdrawAll = async ({ eventIds, address }) => {
 		const transactions = []
 		eventIds.forEach((id) => {
 			transactions.push({
-				kind: OpKind.TRANSACTION,
+				kind: "transaction",
 				...contract.methods.withdraw(id, address).toTransferParams(),
 			})
 		})
