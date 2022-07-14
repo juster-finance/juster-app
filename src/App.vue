@@ -4,7 +4,7 @@ import { defineComponent, onBeforeMount, ref } from "vue"
 /**
  * Base
  */
-import Header from "./components/base/Header"
+import TheHeader from "./components/base/Header/TheHeader"
 import Footer from "@/components/base/Footer"
 
 /** Local */
@@ -31,7 +31,7 @@ import { useAccountStore } from "@/store/account"
 import { useMarket } from "@/composable/market"
 
 export default defineComponent({
-	components: { Header, Notifications, Footer, TheWelcomeScreen },
+	components: { TheHeader, Notifications, Footer, TheWelcomeScreen },
 
 	setup() {
 		const { setupMarket, setupUser } = useMarket()
@@ -100,7 +100,7 @@ export default defineComponent({
 	</transition>
 
 	<div v-if="!showWelcomeScreen" class="app_wrapper">
-		<Header />
+		<TheHeader />
 		<router-view />
 		<Footer class="footer" />
 	</div>
@@ -146,6 +146,20 @@ html {
 .popup-leave-to {
 	opacity: 0;
 	transform: scale(0.95);
+}
+
+.navpopup-enter-active,
+.navpopup-leave-active {
+	will-change: transform, opacity;
+	transition: transform 0.2s ease, opacity 0.2s ease;
+	transform-origin: 50% -50%;
+}
+
+.navpopup-enter-from,
+.navpopup-leave-to {
+	opacity: 0;
+	transform: rotateX(-15deg);
+	transform-origin: 50% -50%;
 }
 
 .fade-enter-active,

@@ -27,6 +27,7 @@ import Button from "@/components/ui/Button"
  * Local
  */
 import ThePendingTransaction from "./ThePendingTransaction"
+import NavigationPopup from "./NavigationPopup"
 import RewardAlert from "@/components/local/RewardAlert"
 
 /**
@@ -41,24 +42,22 @@ const accountStore = useAccountStore()
 const route = useRoute()
 const router = useRouter()
 
+const activeLink = ref("")
 const links = reactive([
 	{
-		name: "Explore",
+		name: "Browse",
 		url: "/",
-		icon: "bolt",
-		isAvailable: true,
+		icon: "star",
 	},
 	{
-		name: "Events",
-		url: "/events",
-		icon: "arrows",
-		isAvailable: true,
+		name: "Resources",
+		url: "/docs",
+		icon: "book",
 	},
 	{
-		name: "Markets",
-		url: "/markets",
-		icon: "collection",
-		isAvailable: true,
+		name: "Community",
+		url: "/blog",
+		icon: "users",
 	},
 ])
 
@@ -151,8 +150,8 @@ const handleButtons = () => {
 				<div :class="$style.mobile_menu__links">
 					<router-link to="/" :class="$style.mobile_menu__link">
 						<div :class="$style.left">
-							<Icon name="bolt" size="14" />
-							<span>Explore</span>
+							<Icon name="compass" size="14" />
+							<span>Browse</span>
 						</div>
 
 						<div :class="$style.mobile_menu__description">
@@ -196,23 +195,25 @@ const handleButtons = () => {
 				</div>
 
 				<router-link to="/" :class="$style.logo">
-					<Icon name="logo_symbol" size="24" />
+					<Icon name="logo_symbol" size="28" />
 				</router-link>
 			</div>
 
-			<div :class="$style.links">
+			<div @mouseleave="activeLink = ''" :class="$style.links">
 				<router-link
 					v-for="link in links"
 					:key="link.name"
 					:to="link.url"
-					:class="[
-						$style.link,
-						isActive(link.url) && $style.active,
-						!link.isAvailable && $style.disabled,
-					]"
+					@mouseenter="activeLink = link.name"
+					:class="[$style.link, isActive(link.url) && $style.active]"
 				>
-					<Icon :name="link.icon" size="12" />{{ link.name }}
+					<Icon :name="link.icon" size="16" fill />{{ link.name }}
 				</router-link>
+
+				<NavigationPopup
+					:active-link="activeLink"
+					@onClick="activeLink = ''"
+				/>
 			</div>
 
 			<div :class="$style.right">
@@ -396,22 +397,22 @@ const handleButtons = () => {
 .links {
 	display: flex;
 	align-items: center;
-	gap: 16px;
+
+	perspective: 2000px;
 }
 
 .link {
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	gap: 8px;
 
-	font-size: 13px;
-	line-height: 1.1;
+	font-size: 14px;
+	line-height: 1;
 	font-weight: 600;
-	color: var(--text-tertiary);
+	color: var(--text-secondary);
 	fill: var(--text-tertiary);
 
-	padding: 0 12px;
-	height: 32px;
+	padding: 20px;
 	border-radius: 6px;
 	cursor: pointer;
 
@@ -419,19 +420,12 @@ const handleButtons = () => {
 }
 
 .link.active {
-	background: var(--opacity-05);
 	color: var(--text-primary);
 	fill: var(--text-primary);
 }
 
-.link.disabled {
-	pointer-events: none;
-	opacity: 0.5;
-}
-
 .link:hover {
 	color: var(--text-primary);
-	background: var(--opacity-05);
 }
 
 .buttons {
