@@ -80,19 +80,9 @@ const handleCopy = (target) => {
 				/>
 				<Icon
 					v-else
-					name="logo_symbol"
-					size="24"
+					:name="user.creator ? 'bolt' : 'server'"
+					size="20"
 					:class="$style.logo_icon"
-				/>
-
-				<Icon
-					v-if="
-						user.creator ||
-						verifiedMakers[currentNetwork].includes(user.userId)
-					"
-					name="verified"
-					size="14"
-					:class="$style.verified_icon"
 				/>
 			</div>
 
@@ -104,7 +94,7 @@ const handleCopy = (target) => {
 							verifiedMakers[currentNetwork].includes(user.userId)
 						"
 					>
-						Juster
+						{{ user.creator ? "Event Maker" : "Liquidity Pool" }}
 					</template>
 					<!-- User -->
 					<template v-else-if="user.userId !== accountStore.pkh">
@@ -118,6 +108,7 @@ const handleCopy = (target) => {
 					<template v-else>You</template>
 				</div>
 
+				<!-- Description -->
 				<div
 					v-if="
 						user.shares &&
@@ -134,24 +125,26 @@ const handleCopy = (target) => {
 						Liquidity:
 						<span
 							>{{
-								(
-									user.liquidityProvidedBelow +
-									user.liquidityProvidedAboveEq
-								).toFixed(2)
+								user.liquidityProvidedBelow.toFixed(2)
 							}}
 							ꜩ</span
 						>
 					</div>
 				</div>
+				<div v-else-if="user.creator" :class="$style.params">
+					<div :class="$style.param">Smart Contract</div>
+					<div :class="$style.dot" />
+					<div :class="$style.param">Recurring Events</div>
+				</div>
 			</div>
 		</div>
 
 		<Dropdown>
-			<template v-slot:trigger>
+			<template #trigger>
 				<Button type="tertiary" size="small" icon="dots" />
 			</template>
 
-			<template v-slot:dropdown>
+			<template #dropdown>
 				<router-link :to="`/profile/${user.userId}`">
 					<DropdownItem
 						><Icon name="open" size="16" />User
@@ -193,7 +186,7 @@ const handleCopy = (target) => {
 
 	border-radius: 8px;
 	background: rgba(255, 255, 255, 0.05);
-	min-height: 50px;
+	min-height: 56px;
 	padding: 0 10px;
 }
 
@@ -211,7 +204,8 @@ const handleCopy = (target) => {
 
 	width: 32px;
 	height: 32px;
-	border-radius: 50%;
+	background: var(--modal-bg);
+	border-radius: 8px;
 }
 
 .verified_icon {
@@ -227,19 +221,19 @@ const handleCopy = (target) => {
 .logo_icon {
 	padding: 2px;
 
-	fill: var(--text-secondary);
+	fill: var(--brand);
 }
 
 .avatar img {
-	width: 28px;
-	height: 28px;
+	width: 20px;
+	height: 20px;
 	border-radius: 50%;
 }
 
 .base {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 6px;
 }
 
 .address {
@@ -277,6 +271,6 @@ const handleCopy = (target) => {
 	width: 4px;
 	height: 4px;
 	border-radius: 50%;
-	background: var(--border);
+	background: var(--text-tertiary);
 }
 </style>

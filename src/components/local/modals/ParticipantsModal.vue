@@ -84,11 +84,11 @@ onMounted(async () => {
 	display: flex;
 	justify-content: space-between;
 
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 600;
 	color: var(--text-tertiary);
 
-	margin-bottom: 12px;
+	margin-bottom: 10px;
 }
 
 .users {
