@@ -432,10 +432,6 @@ const communityLinks = ref([
 	color: var(--text-secondary);
 }
 
-.item:hover .icon_wrapper svg {
-	transform: scale(1.1);
-}
-
 .icon_wrapper {
 	display: flex;
 	background: rgba(255, 255, 255, 0.05);

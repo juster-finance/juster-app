@@ -392,6 +392,12 @@ const handleButtons = () => {
 
 .logo svg {
 	fill: var(--text-primary);
+
+	transition: fill 0.4s ease;
+}
+
+.logo:hover svg {
+	fill: var(--brand);
 }
 
 .links {
@@ -426,6 +432,7 @@ const handleButtons = () => {
 
 .link:hover {
 	color: var(--text-primary);
+	fill: var(--text-primary);
 }
 
 .buttons {
