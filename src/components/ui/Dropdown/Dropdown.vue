@@ -1,102 +1,98 @@
-<script>
-import { defineComponent, ref, watch, nextTick, toRefs } from "vue"
+<script setup>
+import { ref, watch, nextTick } from "vue"
 
 /**
  * Composable
  */
 import { useOnOutsidePress } from "@/composable/onOutside"
 
-export default defineComponent({
-	name: "Dropdown",
-	props: {
-		forceOpen: Boolean,
-		side: {
-			type: String,
-			default: "bottom",
-		},
+const props = defineProps({
+	forceOpen: Boolean,
+	side: {
+		type: String,
+		default: "bottom",
 	},
-	emits: ["onClose"],
-
-	setup(props, context) {
-		const { side, forceOpen } = toRefs(props)
-
-		const trigger = ref(null)
-		const dropdown = ref(null)
-		const isOpen = ref(false)
-
-		watch(forceOpen, () => {
-			isOpen.value = forceOpen.value
-		})
-
-		const toggleDropdown = (event) => {
-			event.stopPropagation()
-
-			isOpen.value = !isOpen.value
-		}
-		const close = (event) => {
-			if (event) event.stopPropagation()
-
-			isOpen.value = false
-
-			context.emit("onClose")
-		}
-
-		const dropdownStyles = ref({})
-
-		let removeOutside
-		const handleOutside = (e) => {
-			if (e.path.find((el) => el.id === "trigger")) {
-				return
-			} else {
-				close()
-			}
-		}
-
-		watch(isOpen, () => {
-			if (!isOpen.value) {
-				removeOutside()
-
-				document.removeEventListener("keydown", onKeydown)
-			} else {
-				document.addEventListener("keydown", onKeydown)
-
-				const triggerRect = trigger.value.getBoundingClientRect()
-
-				dropdownStyles.value.right = `${
-					window.innerWidth - triggerRect.x - triggerRect.width
-				}px`
-
-				if (side.value == "bottom") {
-					dropdownStyles.value.top = `${
-						triggerRect.y + triggerRect.height + 6
-					}px`
-				}
-				if (side.value == "top") {
-					dropdownStyles.value.bottom = `${
-						window.innerHeight - triggerRect.y + 6
-					}px`
-				}
-
-				nextTick(() => {
-					removeOutside = useOnOutsidePress(dropdown, handleOutside)
-				})
-			}
-		})
-
-		const onKeydown = (event) => {
-			if (event.key == "Escape") close()
-		}
-
-		return {
-			trigger,
-			dropdown,
-			isOpen,
-			toggleDropdown,
-			close,
-			dropdownStyles,
-		}
+	width: {
+		type: String,
+		default: null,
 	},
 })
+
+const emit = defineEmits(["onClose"])
+
+const trigger = ref(null)
+const dropdown = ref(null)
+const isOpen = ref(false)
+
+watch(
+	() => props.forceOpen,
+	() => {
+		isOpen.value = props.forceOpen
+	},
+)
+
+const toggleDropdown = (event) => {
+	event.stopPropagation()
+
+	isOpen.value = !isOpen.value
+}
+const close = (event) => {
+	if (event) event.stopPropagation()
+
+	isOpen.value = false
+
+	emit("onClose")
+}
+
+const dropdownStyles = ref({})
+
+let removeOutside
+const handleOutside = (e) => {
+	if (e.path.find((el) => el.id === "trigger")) {
+		return
+	} else {
+		close()
+	}
+}
+
+watch(isOpen, () => {
+	if (!isOpen.value) {
+		removeOutside()
+
+		document.removeEventListener("keydown", onKeydown)
+	} else {
+		document.addEventListener("keydown", onKeydown)
+
+		const triggerRect = trigger.value.getBoundingClientRect()
+
+		if (props.width) {
+			dropdownStyles.value.width = `${props.width}px`
+		}
+
+		dropdownStyles.value.right = `${
+			window.innerWidth - triggerRect.x - triggerRect.width
+		}px`
+
+		if (props.side == "bottom") {
+			dropdownStyles.value.top = `${
+				triggerRect.y + triggerRect.height + 6
+			}px`
+		}
+		if (props.side == "top") {
+			dropdownStyles.value.bottom = `${
+				window.innerHeight - triggerRect.y + 6
+			}px`
+		}
+
+		nextTick(() => {
+			removeOutside = useOnOutsidePress(dropdown, handleOutside)
+		})
+	}
+})
+
+const onKeydown = (event) => {
+	if (event.key == "Escape") close()
+}
 </script>
 
 <template>
@@ -165,6 +161,6 @@ export default defineComponent({
 	padding: 8px 0;
 	border-radius: 8px;
 	background: var(--dropdown-bg);
-	box-shadow: rgb(0 0 0 / 20%) 0px 4px 24px;
+	box-shadow: rgb(0 0 0 / 30%) 0px 20px 40px;
 }
 </style>

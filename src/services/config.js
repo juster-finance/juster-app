@@ -10,9 +10,9 @@ export const dipdup = {
 }
 
 export const supportedMarkets = {
-	"ETH-USD": { target: "Ethereum", description: "Ethereum / USD" },
-	"XTZ-USD": { target: "Tezos", description: "Tezos / USD" },
-	"BTC-USD": { target: "Bitcoin", description: "Bitcoin / USD" },
+	"ETH-USD": { target: "Ethereum", description: "Ethereum / U.S. Dollar" },
+	"XTZ-USD": { target: "Tezos", description: "Tezos / U.S. Dollar" },
+	"BTC-USD": { target: "Bitcoin", description: "Bitcoin / U.S. Dollar" },
 }
 
 export const sanity = {

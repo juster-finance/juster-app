@@ -322,7 +322,7 @@ export default defineComponent({
 			/>
 
 			<div :class="$style.stats">
-				<Stat name="Reward for providing"
+				<Stat name="Payout for providing"
 					>{{ (event.liquidityPercent * 100).toFixed(0) }}%</Stat
 				>
 

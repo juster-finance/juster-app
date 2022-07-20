@@ -301,7 +301,6 @@ const endDiff = computed(() =>
 				<div
 					:class="[
 						$style.card__side,
-						$style.left,
 						['STARTED', 'FINISHED'].includes(event.status) &&
 							$style.opacity,
 					]"
@@ -334,10 +333,14 @@ const endDiff = computed(() =>
 				/>
 			</div>
 
-			<div v-if="event.bets.length >= 6" :class="$style.card__highdemand">
-				<span>High-demand</span>
+			<div v-if="event.bets.length >= 4" :class="$style.card__highdemand">
+				<div :class="$style.left">
+					<Icon name="bolt" size="14" />
+					<span>High-demand</span>
+				</div>
+
 				<span
-					>{{ event.bets.length }} bets&nbsp;&nbsp;•&nbsp;&nbsp;{{
+					>{{ event.bets.length }} stakes&nbsp;&nbsp;•&nbsp;&nbsp;{{
 						numberWithSymbol(event.totalValueLocked.toFixed(0), ",")
 					}}
 					liquidity</span
@@ -442,6 +445,7 @@ const endDiff = computed(() =>
 					text: 'Learn More',
 					url: '/docs',
 				}"
+				is-wide
 			>
 				<div :class="$style.param">
 					<span><Icon name="sides" size="12" />Target Dynamics</span>
@@ -731,13 +735,20 @@ const endDiff = computed(() =>
 	border-radius: 2px;
 }
 
+.left {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
 .card__highdemand {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 
-	background: rgba(133, 90, 209, 0.15);
-	color: var(--purple);
+	background: rgba(239, 132, 86, 0.15);
+	color: var(--orange);
+	fill: var(--orange);
 	height: 34px;
 	padding: 0 14px;
 	border-radius: 2px 2px 6px 6px;
@@ -746,11 +757,11 @@ const endDiff = computed(() =>
 .card__highdemand span {
 	font-size: 12px;
 	line-height: 1;
-	font-weight: 600;
+	font-weight: 500;
 }
 
-.card__highdemand span:nth-child(2) {
-	font-weight: 500;
+.card__highdemand .left span {
+	font-weight: 600;
 }
 
 .card__side {

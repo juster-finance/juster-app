@@ -98,7 +98,7 @@ const finishDt = computed(() =>
 const { stop: destroyFinishCountdown } = useCountdown(finishDt)
 
 const timing = computed(() => {
-	const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("en")
+	const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("ru")
 
 	const endDt = eventDt.plus(props.event.measurePeriod * 1000)
 
@@ -312,8 +312,8 @@ const contextMenuHandler = (e) => {
 
 	analytics.log("showContextMenu")
 
-	contextMenuStyles.top = `${e.clientY}px`
-	contextMenuStyles.left = `${e.clientX}px`
+	contextMenuStyles.top = `${e.layerY}px`
+	contextMenuStyles.left = `${e.layerX}px`
 
 	nextTick(() => {
 		openContextMenu.value = !openContextMenu.value
@@ -533,34 +533,37 @@ onUnmounted(() => {
 			</div>
 
 			<div :class="$style.title">
-				<img
-					v-if="event.winnerBets == 'ABOVE_EQ'"
-					:src="require('@/assets/icons/higher_won.svg')"
-					alt="won_side_icon"
-				/>
-				<img
-					v-else-if="event.winnerBets == 'BELOW'"
-					:src="require('@/assets/icons/lower_won.svg')"
-					alt="won_side_icon"
-				/>
-				<Icon v-else name="sides" size="16" />
 				{{
 					supportedMarkets[symbol] &&
 					supportedMarkets[symbol].description
 				}}
-				<span>price event</span>
 			</div>
 
-			<div :class="$style.timing">
-				<div :class="$style.days">
-					{{ `${timing.start.day} ${timing.start.month}` }}
-				</div>
+			<div :class="$style.description">
+				<span>
+					<img
+						v-if="event.winnerBets == 'ABOVE_EQ'"
+						:src="require('@/assets/icons/higher_won.svg')"
+						alt="won_side_icon"
+					/>
+					<img
+						v-else-if="event.winnerBets == 'BELOW'"
+						:src="require('@/assets/icons/lower_won.svg')"
+						alt="won_side_icon"
+					/>
+					<Icon v-else name="sides" size="12" />
+					Price Event
+				</span>
 
 				<div :class="$style.dot" />
 
-				<div :class="$style.hrs">
-					{{ timing.start.time }}
-				</div>
+				<span v-if="event.status === 'NEW'">Open for stakes</span>
+				<span v-else-if="event.status === 'STARTED'">
+					Watching the price
+				</span>
+				<span v-else-if="event.status === 'FINISHED'">
+					Price determined
+				</span>
 			</div>
 
 			<div :class="$style.badges">
@@ -633,36 +636,16 @@ onUnmounted(() => {
 				<!-- Duration Badge -->
 				<Badge color="gray" :class="$style.badge">
 					<Icon name="time" size="12" />
-					<div>
-						{{
-							toReadableDuration({
-								seconds: event.measurePeriod,
-								asObject: true,
-							}).val
-						}}
-						<span>{{
-							pluralize(
-								toReadableDuration({
-									seconds: event.measurePeriod,
-									asObject: true,
-								}).val,
-								toReadableDuration({
-									seconds: event.measurePeriod,
-									asObject: true,
-								}).text,
-							)
-						}}</span>
-					</div>
+
+					{{ timing.start.time }}
+					<span>{{
+						toReadableDuration({
+							seconds: event.measurePeriod,
+							asObject: true,
+						}).val
+					}}</span>
+					{{ timing.end.time }}
 				</Badge>
-
-				<!-- Hot Event Badge -->
-				<Tooltip v-if="event.bets.length >= 6" placement="bottom-end">
-					<Badge color="purple" :class="$style.badge">
-						<Icon name="bolt" size="12" />
-					</Badge>
-
-					<template #content>High-demand event</template>
-				</Tooltip>
 
 				<!-- Custom Badge -->
 				<Tooltip
@@ -841,6 +824,7 @@ onUnmounted(() => {
 			</div>
 
 			<EventActions
+				v-if="event.status === 'NEW'"
 				@onBet="handleBet"
 				@onWithdraw="handleWithdraw"
 				:event="event"
@@ -851,25 +835,49 @@ onUnmounted(() => {
 					startStatus == 'Finished'
 				"
 				:is-withdrawing="isWithdrawing"
+				:class="$style.bottom_actions"
 			/>
+
+			<div :class="$style.indicators">
+				<Tooltip placement="top-end">
+					<div
+						:class="[
+							$style.highdemand,
+							event.bets.length < 4 && $style.low,
+						]"
+					>
+						<Icon name="bolt" size="12" />
+					</div>
+
+					<template #content>
+						{{
+							event.bets.length >= 4
+								? "High-Demand"
+								: "Low-Demand"
+						}}<br /><span>{{ event.bets.length }} bets</span>
+					</template>
+				</Tooltip>
+			</div>
 		</div>
 	</router-link>
 </template>
 
 <style module>
 .wrapper {
+	position: relative;
 	background: var(--card-bg);
-	border-radius: 10px;
+	border-radius: 8px;
 	border: 1px solid var(--border);
 
-	padding: 20px;
+	padding: 20px 20px 24px 20px;
 	max-width: 617px;
 
 	transition: all 0.2s ease;
 }
 
 .wrapper:hover {
-	border: 1px solid var(--border-highlight);
+	border-radius: 10px 10px 0 0;
+	transform: translateY(-24px);
 }
 
 .dropdown {
@@ -880,6 +888,8 @@ onUnmounted(() => {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+
+	height: 34px;
 
 	margin-bottom: 20px;
 }
@@ -936,7 +946,7 @@ onUnmounted(() => {
 }
 
 .verified_icon {
-	fill: var(--orange);
+	fill: var(--brand);
 	background: var(--card-bg);
 	border-radius: 50%;
 
@@ -1012,25 +1022,28 @@ onUnmounted(() => {
 	margin-left: 4px;
 }
 
-.timing {
+.description {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-secondary);
-
 	margin-bottom: 16px;
 }
 
-.days {
+.description span {
+	display: flex;
+	gap: 4px;
+
+	font-size: 12px;
+	line-height: 1;
+	font-weight: 600;
 	color: var(--text-tertiary);
+	fill: var(--text-tertiary);
 }
 
-.hrs span {
-	color: var(--text-tertiary);
+.description span img {
+	width: 12px;
+	height: 12px;
 }
 
 .dot {
@@ -1048,6 +1061,12 @@ onUnmounted(() => {
 }
 
 .main_badge {
+	background: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.1) 0%,
+		rgba(255, 255, 255, 0) 100%
+	) !important;
+
 	margin-right: 8px;
 }
 
@@ -1059,10 +1078,6 @@ onUnmounted(() => {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
-
-	height: 40px;
-
-	margin-bottom: 24px;
 }
 
 .hint {
@@ -1114,5 +1129,47 @@ onUnmounted(() => {
 .my_avatar {
 	width: 16px;
 	height: 16px;
+}
+
+.bottom_actions {
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	right: 0;
+	bottom: -33px;
+	border-radius: 0 0 8px 8px;
+
+	opacity: 0;
+	transform: translateY(-5px);
+
+	transition: all 200ms ease;
+}
+
+.wrapper:hover .bottom_actions {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.indicators {
+	position: absolute;
+	bottom: 16px;
+	right: 16px;
+}
+
+.highdemand {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 20px;
+	height: 20px;
+	fill: var(--orange);
+	background: rgba(239, 132, 86, 0.15);
+	border-radius: 50%;
+}
+
+.highdemand.low {
+	fill: var(--text-tertiary);
+	background: rgba(255, 255, 255, 0.05);
 }
 </style>

@@ -98,7 +98,7 @@ export default defineComponent({
 	display: flex;
 	flex-direction: column;
 
-	max-width: 700px;
+	width: 700px;
 }
 
 .title {

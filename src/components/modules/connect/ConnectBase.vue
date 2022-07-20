@@ -54,6 +54,7 @@ useMeta({
 const handleBeacon = async () => {
 	try {
 		await juster.sdk.sync()
+
 		login()
 	} catch (error) {
 		if (error.title === "Aborted") {
@@ -102,7 +103,6 @@ const handleSelectCustomNode = async (node) => {
 
 const handleLogout = () => {
 	accountStore.logout()
-	router.push("/connect")
 	notificationsStore.create({
 		notification: {
 			icon: "logout",
@@ -130,9 +130,7 @@ onMounted(async () => {
 <template>
 	<div :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template #title="{ content }">{{ content }} • Juster</template>
 		</metainfo>
 
 		<CustomLoginModal

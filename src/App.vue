@@ -1,6 +1,12 @@
 <script>
 import { defineComponent, onBeforeMount, ref } from "vue"
 
+import "@/styles/variables.css"
+import "@/styles/padding.css"
+import "@/styles/margin.css"
+import "@/styles/flex.css"
+import "@/styles/text.css"
+
 /**
  * Base
  */
@@ -254,7 +260,7 @@ html {
 	--card-bg: #171717;
 
 	/** Dropdown */
-	--dropdown-bg: rgb(45, 46, 49);
+	--dropdown-bg: #252528;
 
 	/** Toggle */
 	--toggle-bg: #393939;

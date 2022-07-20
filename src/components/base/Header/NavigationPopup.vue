@@ -226,7 +226,7 @@ const communityLinks = ref([
 						</div>
 
 						<div :class="$style.guide">
-							<span>Liquidity & rewards</span>
+							<span>Liquidity & Payouts</span>
 							<span>Basic</span>
 						</div>
 					</div>
@@ -310,7 +310,7 @@ const communityLinks = ref([
 						</div>
 
 						<div :class="$style.guide">
-							<span>Liquidity & rewards</span>
+							<span>Liquidity & Payouts</span>
 							<span>Basic</span>
 						</div>
 					</div>

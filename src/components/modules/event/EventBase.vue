@@ -35,6 +35,7 @@ import DepositCard from "@/components/modules/events/DepositCard"
 import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
 import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
 import BetModal from "@/components/local/modals/position/BetModal"
+import ConfirmTransactionModal from "@/components/local/modals/ConfirmTransactionModal"
 import EventDetailsModal from "@/components/local/modals/EventDetailsModal"
 import NotifyMeModal from "@/components/local/modals/NotifyMeModal"
 
@@ -96,6 +97,7 @@ const breadcrumbs = reactive([
  */
 const showBetModal = ref(false)
 const showLiquidityModal = ref(false)
+const showConfirmTransactionModal = ref(false)
 const showParticipantsModal = ref(false)
 const showEventDetailsModal = ref(false)
 const showNotifyMeModal = ref(false)
@@ -297,6 +299,11 @@ const handleLiquidity = () => {
 	showLiquidityModal.value = true
 
 	analytics.log("showLiquidityModal", { where: "event_base" })
+}
+
+const handleContinue = () => {
+	showBetModal.value = false
+	showConfirmTransactionModal.value = true
 }
 
 const isWithdrawing = ref(false)
@@ -530,6 +537,7 @@ onUnmounted(() => {
 			:event="event"
 			:preselected-side="preselectedSide"
 			@onBet="handleBet"
+			@onContinue="handleContinue"
 			@onClose="showBetModal = false"
 		/>
 		<LiquidityModal
@@ -537,6 +545,10 @@ onUnmounted(() => {
 			:show="showLiquidityModal"
 			:event="event"
 			@onClose="showLiquidityModal = false"
+		/>
+		<ConfirmTransactionModal
+			:show="showConfirmTransactionModal"
+			@onClose="showConfirmTransactionModal = false"
 		/>
 		<ParticipantsModal
 			v-if="event"
@@ -588,9 +600,9 @@ onUnmounted(() => {
 					<div :class="$style.block">
 						<div :class="$style.header">
 							<div :class="$style.info">
-								<div :class="$style.title">Bets</div>
+								<div :class="$style.title">Stakes</div>
 								<div :class="$style.description">
-									All bets from users for this event
+									All stakes from users for this event
 								</div>
 							</div>
 
@@ -664,8 +676,8 @@ onUnmounted(() => {
 
 						<Banner v-else icon="help" color="gray">{{
 							filters.bets == "all"
-								? `Still no bets for this event, maybe yours will be the first?`
-								: `If you have placed a bet, but it is not in this list yet — please wait for the transaction confirmation`
+								? `Still no stakes for this event, maybe yours will be the first?`
+								: `If you have placed a stake, but it is not in this list yet — please wait for the transaction confirmation`
 						}}</Banner>
 
 						<Pagination

@@ -49,7 +49,7 @@ const tabs = ref(["Price", "TVL"])
 				</div>
 			</div>
 
-			<Tooltip placement="bottom-end">
+			<Tooltip placement="bottom-end" text-align="right">
 				<div :class="$style.label">
 					<Icon name="help" size="12" />Details
 				</div>

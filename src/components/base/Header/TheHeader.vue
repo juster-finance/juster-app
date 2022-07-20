@@ -1,11 +1,12 @@
 <script setup>
+/** Vendor */
 import { ref, reactive, computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
 /**
  * Services
  */
-import { juster, analytics, currentNetwork } from "@/services/sdk"
+import { currentNetwork } from "@/services/sdk"
 
 /**
  * Constants
@@ -13,15 +14,15 @@ import { juster, analytics, currentNetwork } from "@/services/sdk"
 import { Networks } from "@/services/constants"
 
 /**
- * UI
+ * Components: UI
  */
-import {
-	Dropdown,
-	DropdownItem,
-	DropdownDivider,
-} from "@/components/ui/Dropdown"
 import Tooltip from "@/components/ui/Tooltip"
 import Button from "@/components/ui/Button"
+
+/**
+ * Components: Modules
+ */
+import ProfileMenu from "@/components/modules/profile/ProfileMenu"
 
 /**
  * Local
@@ -34,9 +35,7 @@ import RewardAlert from "@/components/local/RewardAlert"
  * Store
  */
 import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
 
-const notificationsStore = useNotificationsStore()
 const accountStore = useAccountStore()
 
 const route = useRoute()
@@ -73,39 +72,6 @@ const isActive = (url) => {
 	}
 }
 
-const handleOpenProfile = () => {
-	router.push("/profile")
-
-	analytics.log("openProfile")
-}
-
-const handleOpenWithdrawals = () => {
-	router.push("/withdrawals")
-
-	analytics.log("openWithdrawals")
-}
-
-const handleLogout = () => {
-	accountStore.logout()
-	router.push("/connect")
-	notificationsStore.create({
-		notification: {
-			icon: "logout",
-			title: "You are signed out",
-			description:
-				"To work with the application, you definitely need an account :)",
-			autoDestroy: true,
-
-			actions: [
-				{
-					name: "Back to Connection page",
-					callback: () => router.push("/connect"),
-				},
-			],
-		},
-	})
-}
-
 const pkh = computed(() => accountStore.pkh)
 
 /** Back button logic */
@@ -137,7 +103,28 @@ const handleButtons = () => {
 </script>
 
 <template>
-	<header :class="$style.wrapper">
+	<header
+		:class="[
+			$style.wrapper,
+			currentNetwork !== Networks.MAINNET && $style.testnet,
+		]"
+	>
+		<div
+			v-if="currentNetwork !== Networks.MAINNET"
+			:class="$style.testnetwork_warning"
+		>
+			<Tooltip placement="bottom">
+				<div :class="$style.testnetwork_warning__label">
+					Test network
+				</div>
+
+				<template #content
+					>Ghostnet in use.
+					<span>Switching in Advanced Settings.</span></template
+				>
+			</Tooltip>
+		</div>
+
 		<!-- Mobile menu -->
 		<transition name="fade">
 			<div
@@ -217,22 +204,6 @@ const handleButtons = () => {
 			</div>
 
 			<div :class="$style.right">
-				<Tooltip
-					v-if="currentNetwork !== Networks.MAINNET"
-					placement="bottom-end"
-				>
-					<div :class="$style.testnet_warning">
-						<Icon name="hammer" size="16" />
-
-						<span>Test Network</span>
-					</div>
-
-					<template v-slot:content>
-						Ghostnet in use.
-						<span>Switching the network in the footer</span>
-					</template>
-				</Tooltip>
-
 				<RewardAlert :class="$style.reward_alert" />
 
 				<div @click="handleButtons" :class="$style.buttons">
@@ -259,76 +230,14 @@ const handleButtons = () => {
 						</Button>
 					</router-link>
 
-					<Dropdown>
-						<template #trigger>
-							<div :class="$style.avatar">
-								<img
-									v-if="pkh"
-									:src="`https://services.tzkt.io/v1/avatars/${pkh}`"
-									alt="avatar"
-								/>
-							</div>
-						</template>
-
-						<template #dropdown>
-							<div
-								@click="handleOpenProfile"
-								:class="$style.profile"
-							>
-								<Icon name="usercircle" size="16" />
-
-								<div :class="$style.info">
-									<div :class="$style.address">
-										{{
-											`${accountStore.pkh.slice(
-												0,
-												5,
-											)}..${accountStore.pkh.slice(
-												accountStore.pkh.length - 3,
-												accountStore.pkh.length,
-											)}`
-										}}
-									</div>
-									<div :class="$style.balance">
-										{{ accountStore.balance }}
-										ꜩ
-									</div>
-								</div>
-							</div>
-
-							<DropdownItem @click="handleOpenWithdrawals">
-								<div :class="$style.dropdown_icon">
-									<Icon name="money" size="16" />
-								</div>
-								Withdrawals
-							</DropdownItem>
-
-							<DropdownDivider />
-
-							<!-- Github releases https://github.com/juster-finance/juster-app/releases -->
-							<router-link to="/releases" target="_blank">
-								<DropdownItem>
-									<Icon name="spark" size="16" />Releases
-								</DropdownItem>
-							</router-link>
-							<router-link to="/docs" target="_blank">
-								<DropdownItem>
-									<Icon name="book" size="16" />Documentation
-								</DropdownItem>
-							</router-link>
-							<DropdownItem
-								@click="accountStore.showOnboarding = true"
-							>
-								<Icon name="help" size="16" />Onboarding
-							</DropdownItem>
-
-							<DropdownDivider />
-
-							<DropdownItem @click="handleLogout">
-								<Icon name="logout" size="16" />Logout
-							</DropdownItem>
-						</template>
-					</Dropdown>
+					<ProfileMenu v-if="pkh">
+						<div :class="$style.avatar">
+							<img
+								:src="`https://services.tzkt.io/v1/avatars/${pkh}`"
+								alt="avatar"
+							/>
+						</div>
+					</ProfileMenu>
 				</div>
 			</div>
 		</div>
@@ -348,8 +257,36 @@ const handleButtons = () => {
 	align-items: center;
 	justify-content: center;
 
-	border-bottom: 1px solid var(--border);
+	border-bottom: 2px solid var(--border);
 	z-index: 2;
+}
+
+.wrapper.testnet {
+	border-bottom: 2px solid var(--yellow);
+}
+
+.testnetwork_warning {
+	position: absolute;
+	bottom: -20px;
+	left: 50%;
+	transform: translateX(-50%);
+
+	display: flex;
+	align-items: center;
+
+	background: var(--yellow);
+	border-radius: 0 0 6px 6px;
+	height: 20px;
+
+	padding: 0 8px;
+}
+
+.testnetwork_warning__label {
+	font-size: 11px;
+	line-height: 1;
+	font-weight: 700;
+	color: var(--text-black);
+	text-transform: uppercase;
 }
 
 @supports (backdrop-filter: blur(5px)) {
@@ -401,6 +338,10 @@ const handleButtons = () => {
 }
 
 .links {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+
 	display: flex;
 	align-items: center;
 
@@ -444,74 +385,6 @@ const handleButtons = () => {
 	margin-right: 8px;
 }
 
-.testnet_warning {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	border-radius: 6px;
-	background: var(--yellow);
-	height: 28px;
-
-	padding: 0 8px;
-	margin-right: 16px;
-
-	font-size: 13px;
-	line-height: 1.1px;
-	font-weight: 600;
-	color: var(--text-black);
-	fill: var(--text-black);
-}
-
-.signin_button {
-	height: 30px;
-	border-radius: 8px;
-	border: 1px solid var(--border);
-
-	display: flex;
-	align-items: center;
-
-	transition: transform 0.2s ease;
-}
-
-.signin_button:active {
-	transform: translateY(1px);
-}
-
-.signin {
-	font-size: 13px;
-	line-height: 28px;
-	font-weight: 600;
-	color: var(--text-primary);
-	background: var(--btn-primary-bg);
-
-	padding: 0 10px 0 12px;
-	border-radius: 6px 0 0 6px;
-	border-right: 2px solid rgba(0, 0, 0, 0.1);
-
-	transition: background 0.2s ease;
-}
-
-.signin:hover {
-	background: var(--btn-primary-bg-hover);
-}
-
-.custom_signin {
-	display: flex;
-	align-items: center;
-	height: 28px;
-	border-radius: 0 6px 6px 0;
-	padding: 0 10px;
-
-	fill: var(--text-secondary);
-	background: var(--btn-primary-bg);
-
-	transition: background 0.2s ease;
-}
-
-.custom_signin:hover {
-	background: var(--btn-primary-bg-hover);
-}
-
 .avatar {
 	position: relative;
 }
@@ -536,50 +409,6 @@ const handleButtons = () => {
 	transform: translateY(1px);
 }
 
-.dropdown_icon {
-	position: relative;
-}
-
-.profile {
-	display: flex;
-	gap: 8px;
-
-	margin: 0 8px;
-	padding: 8px 16px 8px 8px;
-	background: transparent;
-	border-radius: 6px;
-
-	transition: background 0.2s ease;
-}
-
-.profile svg {
-	fill: var(--opacity-40);
-}
-
-.profile .info {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-}
-
-.info .address {
-	font-size: 13px;
-	line-height: 1.1;
-	font-weight: 600;
-	color: var(--text-primary);
-}
-
-.info .balance {
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-tertiary);
-}
-
-.profile:hover {
-	background: var(--opacity-05);
-}
-
 @media (max-width: 700px) {
 	.base {
 		margin: 0 24px;
@@ -591,13 +420,6 @@ const handleButtons = () => {
 
 	.links {
 		display: none;
-	}
-}
-
-@media (max-width: 450px) {
-	.testnet_warning span {
-		display: none;
-		padding: 0 6px;
 	}
 }
 

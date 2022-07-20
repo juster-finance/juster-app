@@ -7,12 +7,10 @@ import { reactive, onMounted, ref } from "vue"
 import Button from "@/components/ui/Button"
 
 const props = defineProps({
-	width: {
-		type: String,
-	},
 	placement: { type: String, default: "bottom" },
 	textAlign: { type: String, default: "center" },
-	button: { type: Object },
+	isWide: { type: Boolean, default: null },
+	button: { type: Object, default: null },
 })
 
 const trigger = ref(null)
@@ -82,8 +80,12 @@ const updateStyles = () => {
 </script>
 
 <template>
-	<div :class="$style.wrapper">
-		<div ref="trigger" :class="$style.trigger">
+	<div :class="$style.wrapper" :style="{ width: isWide && '100%' }">
+		<div
+			ref="trigger"
+			:class="$style.trigger"
+			:style="{ width: isWide && '100%' }"
+		>
 			<slot />
 		</div>
 
@@ -107,11 +109,11 @@ const updateStyles = () => {
 .wrapper {
 	display: flex;
 	position: relative;
+	width: fit-content;
 }
 
 .trigger {
 	display: flex;
-	width: 100%;
 }
 
 .content {

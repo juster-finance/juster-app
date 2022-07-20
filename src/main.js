@@ -1,3 +1,4 @@
+/* eslint-disable vue/multi-word-component-names */
 import { createApp, h } from "vue"
 import { createMetaManager } from "vue-meta"
 import { createPinia } from "pinia"
@@ -13,7 +14,7 @@ import App from "./App.vue"
 import router from "./router"
 
 const app = createApp({
-    render: () => h(App),
+	render: () => h(App),
 })
 
 /**
@@ -33,6 +34,10 @@ app.provide("amplitude", amplitude.getInstance())
  * Global components
  */
 import Icon from "@/components/icons/Icon"
+import Flex from "@/components/layout/Flex"
+import Text from "@/components/typography/Text"
 app.component("Icon", Icon)
+app.component("Flex", Flex)
+app.component("Text", Text)
 
 app.mount("#app")
