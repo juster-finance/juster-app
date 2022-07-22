@@ -254,7 +254,7 @@ onBeforeUnmount(() => {
 										:name="
 											currentNetwork === 'mainnet'
 												? 'check'
-												: 'bolt'
+												: 'dot'
 										"
 										size="16"
 										:class="
@@ -269,7 +269,7 @@ onBeforeUnmount(() => {
 										:name="
 											currentNetwork === 'testnet'
 												? 'check'
-												: 'hammer'
+												: 'dot'
 										"
 										size="16"
 										:class="
