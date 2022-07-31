@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, reactive, ref } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
-import { cloneDeep } from "lodash"
+import cloneDeep from "lodash.clonedeep"
 
 /**
  * UI

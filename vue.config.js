@@ -1,3 +1,5 @@
+const webpack = require("webpack")
+
 module.exports = {
 	lintOnSave: false,
 	transpileDependencies: ["vue-meta"],
@@ -11,5 +13,19 @@ module.exports = {
 				},
 			],
 		},
+
+		resolve: {
+			fallback: {
+				buffer: require.resolve("buffer"),
+				stream: require.resolve("stream-browserify"),
+				crypto: false,
+				path: false,
+			},
+		},
+		plugins: [
+			new webpack.ProvidePlugin({
+				Buffer: ["buffer", "Buffer"],
+			}),
+		],
 	},
 }

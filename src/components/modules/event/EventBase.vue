@@ -3,7 +3,7 @@ import { ref, reactive, watch, computed, onMounted, onUnmounted } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
 import { useRouter } from "vue-router"
-import { cloneDeep } from "lodash"
+import cloneDeep from "lodash.clonedeep"
 
 /**
  * UI
@@ -64,6 +64,7 @@ import { supportedMarkets, verifiedMakers } from "@/services/config"
 import { useMarketStore } from "@/store/market"
 import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
+import { useApplicationCacheStore } from "@/store/cache"
 
 /**
  * gql
@@ -80,6 +81,7 @@ const meta = useMeta({
 const marketStore = useMarketStore()
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
+const cacheStore = useApplicationCacheStore()
 
 const { updateWithdrawals } = useMarket()
 
@@ -272,9 +274,12 @@ const paginatedBets = computed(() =>
 
 const pendingBet = ref(null)
 
-const preselectedSide = ref("Rise")
+const betModalCache = reactive({
+	side: "Rise",
+	amount: 0,
+})
 const handleJoin = (target) => {
-	preselectedSide.value = capitalizeFirstLetter(target)
+	betModalCache.side = capitalizeFirstLetter(target)
 
 	/** disable Bet / Liquidity right after betsCloseTime */
 	if (
@@ -304,6 +309,18 @@ const handleLiquidity = () => {
 const handleContinue = () => {
 	showBetModal.value = false
 	showConfirmTransactionModal.value = true
+
+	betModalCache.amount = cacheStore.submissions.amount
+}
+const handleCancelTransaction = () => {
+	showConfirmTransactionModal.value = false
+	showBetModal.value = true
+}
+const handleBetModalClose = () => {
+	showBetModal.value = false
+
+	cacheStore.submissions.amount = 0
+	betModalCache.amount = 0
 }
 
 const isWithdrawing = ref(false)
@@ -535,10 +552,10 @@ onUnmounted(() => {
 			v-if="event"
 			:show="showBetModal"
 			:event="event"
-			:preselected-side="preselectedSide"
+			:cache="betModalCache"
 			@onBet="handleBet"
 			@onContinue="handleContinue"
-			@onClose="showBetModal = false"
+			@onClose="handleBetModalClose"
 		/>
 		<LiquidityModal
 			v-if="event"
@@ -548,6 +565,7 @@ onUnmounted(() => {
 		/>
 		<ConfirmTransactionModal
 			:show="showConfirmTransactionModal"
+			@onCancel="handleCancelTransaction"
 			@onClose="showConfirmTransactionModal = false"
 		/>
 		<ParticipantsModal

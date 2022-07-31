@@ -83,6 +83,11 @@ const subscription = ref({})
 
 const symbol = computed(() => props.event.currencyPair.symbol)
 
+const betModalCache = reactive({
+	side: "Rise",
+	amount: 0,
+})
+
 /** Countdown setup: Time to start */
 const startDt = computed(() => new Date(props.event?.betsCloseTime).getTime())
 const { status: startStatus, stop: destroyStartCountdown } =
@@ -177,8 +182,8 @@ const positionForWithdraw = computed(() => {
 })
 
 /** Join to the event & Liquidity */
-const handleBet = (target) => {
-	preselectedSide.value = capitalizeFirstLetter(target)
+const handleJoin = (target) => {
+	betModalCache.side = capitalizeFirstLetter(target)
 
 	/** disable Bet / Liquidity right after betsCloseTime */
 	if (
@@ -401,7 +406,7 @@ onUnmounted(() => {
 			<BetModal
 				:show="showBetModal"
 				:event="event"
-				:preselectedSide="preselectedSide"
+				:cache="betModalCache"
 				@onBet="showBetModal = false"
 				@onClose="showBetModal = false"
 			/>
@@ -761,24 +766,35 @@ onUnmounted(() => {
 					<div
 						:class="[
 							$style.hint,
-							liquidityLevel.text == 'Low' && $style.red,
-							liquidityLevel.text == 'Medium' && $style.yellow,
-							liquidityLevel.text == 'High' && $style.green,
+							event.bets.length >= 3 && $style.green,
+							event.bets.length > 1 && $style.yellow,
+							event.bets.length === 0 && $style.gray,
 						]"
 					>
-						<Icon :name="liquidityLevel.icon" size="14" />
+						<Icon
+							:name="
+								(event.bets.length >= 3 && 'liquidity_high') ||
+								(event.bets.length > 1 && 'liquidity_medium') ||
+								(event.bets.length === 0 && 'liquidity_low')
+							"
+							size="14"
+						/>
 
 						<div>
-							<span>{{ liquidityLevel.text }}</span>
-							Liquidity
+							<span>{{
+								(event.bets.length >= 3 && "High") ||
+								(event.bets.length > 1 && "Medium") ||
+								(event.bets.length === 0 && "Low")
+							}}</span>
+							Demand
 						</div>
 					</div>
 
 					<template #content>
-						<span>Total Value Locked:</span>
-						{{ event.totalValueLocked }} <br />
-						<span>Total Liquidity Provided:</span>
-						{{ event.totalLiquidityProvided }}
+						<span>Stakes:</span>
+						{{ event.bets.length }} <br />
+						<span>Liquidity:</span>
+						{{ event.totalLiquidityProvided }} XTZ
 					</template>
 				</Tooltip>
 
@@ -824,8 +840,7 @@ onUnmounted(() => {
 			</div>
 
 			<EventActions
-				v-if="event.status === 'NEW'"
-				@onBet="handleBet"
+				@onBet="handleJoin"
 				@onWithdraw="handleWithdraw"
 				:event="event"
 				:is-won="hasWonBet"
@@ -837,27 +852,6 @@ onUnmounted(() => {
 				:is-withdrawing="isWithdrawing"
 				:class="$style.bottom_actions"
 			/>
-
-			<div :class="$style.indicators">
-				<Tooltip placement="top-end">
-					<div
-						:class="[
-							$style.highdemand,
-							event.bets.length < 4 && $style.low,
-						]"
-					>
-						<Icon name="bolt" size="12" />
-					</div>
-
-					<template #content>
-						{{
-							event.bets.length >= 4
-								? "High-Demand"
-								: "Low-Demand"
-						}}<br /><span>{{ event.bets.length }} bets</span>
-					</template>
-				</Tooltip>
-			</div>
 		</div>
 	</router-link>
 </template>
@@ -869,15 +863,14 @@ onUnmounted(() => {
 	border-radius: 8px;
 	border: 1px solid var(--border);
 
-	padding: 20px 20px 24px 20px;
+	padding: 20px;
 	max-width: 617px;
 
 	transition: all 0.2s ease;
 }
 
 .wrapper:hover {
-	border-radius: 10px 10px 0 0;
-	transform: translateY(-24px);
+	border: 1px solid var(--border-highlight);
 }
 
 .dropdown {
@@ -1094,6 +1087,10 @@ onUnmounted(() => {
 	fill: var(--red);
 }
 
+.hint.gray svg {
+	fill: var(--text-tertiary);
+}
+
 .hint.yellow svg {
 	fill: var(--yellow);
 }
@@ -1132,44 +1129,6 @@ onUnmounted(() => {
 }
 
 .bottom_actions {
-	position: absolute;
-	z-index: 1;
-	left: 0;
-	right: 0;
-	bottom: -33px;
-	border-radius: 0 0 8px 8px;
-
-	opacity: 0;
-	transform: translateY(-5px);
-
-	transition: all 200ms ease;
-}
-
-.wrapper:hover .bottom_actions {
-	opacity: 1;
-	transform: translateY(0);
-}
-
-.indicators {
-	position: absolute;
-	bottom: 16px;
-	right: 16px;
-}
-
-.highdemand {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	width: 20px;
-	height: 20px;
-	fill: var(--orange);
-	background: rgba(239, 132, 86, 0.15);
-	border-radius: 50%;
-}
-
-.highdemand.low {
-	fill: var(--text-tertiary);
-	background: rgba(255, 255, 255, 0.05);
+	margin-top: 24px;
 }
 </style>

@@ -1,5 +1,5 @@
-<script>
-import { defineComponent, onBeforeMount, ref } from "vue"
+<script setup>
+import { onBeforeMount, ref } from "vue"
 
 import "@/styles/variables.css"
 import "@/styles/padding.css"
@@ -20,6 +20,7 @@ import TheWelcomeScreen from "@/components/local/onboarding/TheWelcomeScreen"
  * UI
  */
 import Notifications from "@/components/local/Notifications"
+import ConfirmationModal from "@/components/local/modals/ConfirmationModal"
 
 /**
  * Services
@@ -30,71 +31,61 @@ import { juster } from "@/services/sdk"
  * Store
  */
 import { useAccountStore } from "@/store/account"
+import { useAppStore } from "@/store/app"
 
 /**
  * Composable
  */
 import { useMarket } from "@/composable/market"
 
-export default defineComponent({
-	components: { TheHeader, Notifications, Footer, TheWelcomeScreen },
+const { setupMarket, setupUser } = useMarket()
 
-	setup() {
-		const { setupMarket, setupUser } = useMarket()
+/** Favicon */
+const favicon = document.getElementById("favicon")
+const isDark = window.matchMedia("(prefers-color-scheme: dark)")
 
-		/** Favicon */
-		const favicon = document.getElementById("favicon")
-		const isDark = window.matchMedia("(prefers-color-scheme: dark)")
+if (isDark.matches) favicon.href = "/favicon_dark.svg"
+else favicon.href = "/favicon_light.svg"
 
-		if (isDark.matches) favicon.href = "/favicon_dark.svg"
-		else favicon.href = "/favicon_light.svg"
+const accountStore = useAccountStore()
+const appStore = useAppStore()
 
-		/**
-        /**
-         * Setup account & user
-         */
-		const accountStore = useAccountStore()
+onBeforeMount(() => {
+	juster.sdk._provider.client.getActiveAccount().then(async (account) => {
+		if (!account) return
 
-		onBeforeMount(() => {
-			juster.sdk._provider.client
-				.getActiveAccount()
-				.then(async (account) => {
-					if (!account) return
+		accountStore.setPkh(account.address)
+		accountStore.updateBalance()
 
-					accountStore.setPkh(account.address)
-					accountStore.updateBalance()
+		setupUser()
+	})
+})
 
-					setupUser()
-				})
-		})
+/**
+ * Setup Market (Markets & Quotes & Subscriptinos)
+ */
+setupMarket()
 
-		/**
-		 * Setup Market (Markets & Quotes & Subscriptinos)
-		 */
-		setupMarket()
+/** Onboarding */
+const showWelcomeScreen = ref(false)
+accountStore.$subscribe((mutation, state) => {
+	/** forced display */
+	if (state.showOnboarding) {
+		showWelcomeScreen.value = true
+	}
 
-		/** Onboarding */
-		const showWelcomeScreen = ref(false)
-		accountStore.$subscribe((mutation, state) => {
-			/** forced display */
-			if (state.showOnboarding) {
-				showWelcomeScreen.value = true
-			}
-
-			if (state.pkh && !localStorage.isOnboardingShown) {
-				localStorage.isOnboardingShown = true
-				showWelcomeScreen.value = true
-			}
-		})
-
-		return { showWelcomeScreen }
-	},
+	if (state.pkh && !localStorage.isOnboardingShown) {
+		localStorage.isOnboardingShown = true
+		showWelcomeScreen.value = true
+	}
 })
 </script>
 
 <template>
 	<div id="modal" />
 	<div id="dropdown" />
+
+	<ConfirmationModal :show="appStore.confirmation.show" />
 
 	<Notifications />
 
@@ -278,10 +269,11 @@ html {
 	--opacity-20: rgba(255, 255, 255, 0.2);
 	--opacity-10: rgba(255, 255, 255, 0.1);
 	--opacity-05: rgba(255, 255, 255, 0.05);
+	--opacity-03: rgba(255, 255, 255, 0.03);
 
 	/** Other */
-	--border: rgb(48, 50, 54);
-	--border-highlight: rgb(57, 59, 63);
+	--border: rgba(255, 255, 255, 0.08);
+	--border-highlight: rgba(255, 255, 255, 0.14);
 	--separator: rgba(255, 255, 255, 0.08);
 
 	--dot: rgba(255, 255, 255, 0.06);

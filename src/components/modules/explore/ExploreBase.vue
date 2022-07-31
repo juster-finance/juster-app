@@ -8,7 +8,7 @@ import {
 } from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
-import { cloneDeep } from "lodash"
+import cloneDeep from "lodash.clonedeep"
 
 /**
  * Local
@@ -198,6 +198,7 @@ export default defineComponent({
 						v-for="market in marketStore.markets"
 						:key="market.id"
 						:market="market"
+						data-cy="market-card"
 					/>
 				</div>
 			</div>
@@ -213,6 +214,7 @@ export default defineComponent({
 					v-if="!isTopProvidersLoading"
 					:users="topProviders"
 					suffix="ꜩ"
+					data-cy="rating-card-liquidity"
 					:class="$style.rating_card"
 				/>
 				<RatingCardLoading v-else :class="$style.rating_card" />
@@ -244,6 +246,7 @@ export default defineComponent({
 							v-for="event in marketStore.events"
 							:key="event.id"
 							:event="event"
+							data-cy="event-card"
 						/>
 					</div>
 
@@ -266,6 +269,7 @@ export default defineComponent({
 					v-if="!isTopBettorsLoading"
 					:users="topBettors"
 					suffix="Bets"
+					data-cy="rating-card-bettors"
 					:class="$style.rating_card"
 				/>
 				<RatingCardLoading v-else :class="$style.rating_card" />

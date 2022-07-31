@@ -381,9 +381,16 @@ export default defineComponent({
 				and make bets
 			</div>
 
-			<Button @click="handleLogin" size="large" type="primary" block>
-				<Icon name="login" size="16" />Sign in to continue
-			</Button>
+			<Flex direction="column" gap="16">
+				<Button @click="handleLogin" size="large" type="primary" block>
+					<Icon name="login" size="16" />Sign in to continue
+				</Button>
+				<router-link to="/connect">
+					<Button size="large" type="secondary" block>
+						<Icon name="login" size="16" />Go to Connect Wallet
+					</Button>
+				</router-link>
+			</Flex>
 		</template>
 	</Modal>
 </template>

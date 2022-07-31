@@ -1,13 +1,5 @@
 <script setup>
-import {
-	defineComponent,
-	ref,
-	reactive,
-	computed,
-	toRefs,
-	watch,
-	nextTick,
-} from "vue"
+import { ref, reactive, computed, watch, nextTick, inject } from "vue"
 import BigNumber from "bignumber.js"
 import { estimateFeeMultiplier } from "@juster-finance/sdk"
 import { DateTime } from "luxon"
@@ -17,6 +9,7 @@ import { DateTime } from "luxon"
  */
 import { juster, analytics, currentNetwork } from "@/services/sdk"
 import { verifiedMakers } from "@/services/config"
+import { flags, updateFlag } from "@/services/flags"
 
 /**
  * Local
@@ -34,12 +27,15 @@ import Modal from "@/components/ui/Modal"
 import Input from "@/components/ui/Input"
 import Button from "@/components/ui/Button"
 import Banner from "@/components/ui/Banner"
+import Block from "@/components/ui/Block"
 
 /**
  * Store
  */
+import { useAppStore } from "@/store/app"
 import { useAccountStore } from "@/store/account"
 import { useNotificationsStore } from "@/store/notifications"
+import { useApplicationCacheStore } from "@/store/cache"
 
 /**
  * Composable
@@ -49,14 +45,14 @@ import { useCountdown } from "@/composable/date"
 const props = defineProps({
 	show: Boolean,
 	event: Object,
-	preselectedSide: { type: String, default: "Rise" },
+	cache: { type: Object, default: null },
 })
 
 const emit = defineEmits(["onClose", "onBet", "onContinue"])
 
-// const { event, show, preselectedSide } = toRefs(props)
-
+const appStore = useAppStore()
 const accountStore = useAccountStore()
+const cacheStore = useApplicationCacheStore()
 const notificationsStore = useNotificationsStore()
 
 const amountInput = ref(null)
@@ -75,6 +71,20 @@ const {
 const side = ref(props.preselectedSide)
 const amount = reactive({ value: 0, error: "" })
 const slippage = ref(2.5)
+
+const handleAmountInput = () => {
+	if (amount.value) {
+		cacheStore.submissions.amount = amount.value
+	}
+}
+
+const handleKeydown = (e) => {
+	sanitizeInput(e)
+}
+
+const sanitizeInput = (e) => {
+	if (["-", "e"].includes(e.key)) e.preventDefault()
+}
 
 const sendingBet = ref(false)
 
@@ -166,11 +176,12 @@ watch(
 
 			showHint.confirmationDelay = false
 		} else {
-			side.value = props.preselectedSide
+			side.value = props.cache.side
+			amount.value = props.cache.amount
 
 			document.addEventListener("keydown", onKeydown)
 
-			accountStore.updateBalance()
+			if (accountStore.isLoggined) accountStore.updateBalance()
 
 			nextTick(() => {
 				if (accountStore.isLoggined)
@@ -312,23 +323,64 @@ const handleLogin = async () => {
 
 	emit("onClose")
 }
+
+const handleCloseTestnetWarning = () => {
+	updateFlag("showTestnetWarningInStakeModal", false)
+
+	notificationsStore.create({
+		notification: {
+			type: "success",
+			title: "Testnet Warning is now hidden",
+			autoDestroy: true,
+
+			actions: [
+				{
+					name: "Undo",
+					icon: "back",
+					callback: () => {
+						updateFlag("showTestnetWarningInStakeModal", true)
+					},
+				},
+			],
+		},
+	})
+}
+
+const handleClose = () => {
+	if (!appStore.confirmation.show && amount.value) {
+		appStore.confirmation.title = "Discard stake?"
+		appStore.confirmation.description =
+			"After closing the selected direction, amount and event is reset"
+		appStore.confirmation.show = true
+		appStore.confirmation.callback = () => {
+			appStore.confirmation.show = false
+			emit("onClose")
+		}
+	} else {
+		emit("onClose")
+	}
+}
 </script>
 
 <template>
-	<Modal :show="show" width="500" closable @onClose="$emit('onClose')">
+	<Modal
+		:show="show"
+		width="500"
+		closable
+		:block-closing="appStore.confirmation.show"
+		@onClose="handleClose"
+	>
 		<template v-if="accountStore.isLoggined">
-			<div :class="$style.title">Place a bet</div>
+			<div :class="$style.title">Stake</div>
 
-			<Banner
-				v-if="currentNetwork !== 'mainnet'"
-				icon="hammer"
-				color="yellow"
-				size="small"
-				center
+			<Block
+				v-if="flags.showTestnetWarningInStakeModal"
+				@onClose="handleCloseTestnetWarning"
 				:class="$style.banner"
 			>
-				The transaction takes place on the Test Network
-			</Banner>
+				<span>This stake is for the test network.</span> Use it to test
+				tools or to understand how to interact with events.
+			</Block>
 
 			<PositionDirection
 				:event="event"
@@ -386,6 +438,8 @@ const handleLogin = async () => {
 				placeholder="Bet amount"
 				subtext="ꜩ"
 				v-model="amount.value"
+				@input="handleAmountInput"
+				@keydown="handleKeydown"
 				:class="$style.amount_input"
 			>
 				<template v-slot:rightText>
@@ -443,9 +497,16 @@ const handleLogin = async () => {
 				and make bets
 			</div>
 
-			<Button @click="handleLogin" size="large" type="primary" block>
-				<Icon name="login" size="16" />Sign in to continue
-			</Button>
+			<Flex direction="column" gap="16">
+				<Button @click="handleLogin" size="large" type="primary" block>
+					<Icon name="beacon" size="16" />Continue to Beacon Wallet
+				</Button>
+				<router-link to="/connect">
+					<Button size="large" type="secondary" block>
+						<Icon name="login" size="16" />Go to Connect Wallet
+					</Button>
+				</router-link>
+			</Flex>
 		</template>
 	</Modal>
 </template>
@@ -499,7 +560,7 @@ const handleLogin = async () => {
 	font-weight: 600;
 	color: var(--text-primary);
 
-	background: var(--btn-secondary-bg);
+	background: var(--opacity-05);
 	border-radius: 8px;
 	width: 100%;
 	height: 40px;
@@ -509,7 +570,7 @@ const handleLogin = async () => {
 }
 
 .tab:hover {
-	background: var(--btn-secondary-bg-hover);
+	background: var(--opacity-03);
 }
 
 .tab_left {

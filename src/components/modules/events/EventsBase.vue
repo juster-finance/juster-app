@@ -10,7 +10,7 @@ import {
 } from "vue"
 import { DateTime } from "luxon"
 import { useMeta } from "vue-meta"
-import { cloneDeep } from "lodash"
+import cloneDeep from "lodash.clonedeep"
 
 /**
  * Services

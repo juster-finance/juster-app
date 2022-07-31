@@ -114,8 +114,10 @@ const getStyles = () => {
 
 .wrapper.medium {
 	height: 36px;
-	padding: 0 12px;
 	font-size: 14px;
+	gap: 8px;
+
+	padding: 0 12px;
 }
 .wrapper.medium.icon {
 	padding: 0 12px;

@@ -6,12 +6,14 @@ const props = defineProps({
 	name: { type: String, required: true, default: "warning" },
 	size: { type: String, default: "16" },
 	fill: { type: Boolean, default: false },
+	color: { type: String, default: null },
 })
 
-const calcSize = computed(() => {
+const styles = computed(() => {
 	return {
 		minWidth: `${props.size}px`,
 		minHeight: `${props.size}px`,
+		fill: props.color,
 	}
 })
 
@@ -33,7 +35,7 @@ const isSplitted = () => {
 		viewBox="0 0 24 24"
 		:width="size"
 		:height="size"
-		:style="calcSize"
+		:style="styles"
 		role="img"
 	>
 		<path v-if="!isSplitted(name)" :d="getIcon(name)" />

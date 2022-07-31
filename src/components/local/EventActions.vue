@@ -73,11 +73,9 @@ const btnType = computed(() => {
 				</div>
 
 				<div :class="$style.ratio">
-					<Icon name="close" size="10" />
-
-					<span v-if="ratio.rise">{{
-						(1 + ratio.rise).toFixed(2)
-					}}</span>
+					<span v-if="ratio.rise">
+						x{{ (1 + ratio.rise).toFixed(2) }}
+					</span>
 					<span v-else>0.00</span>
 				</div>
 			</div>
@@ -93,11 +91,9 @@ const btnType = computed(() => {
 				]"
 			>
 				<div :class="$style.ratio">
-					<Icon name="close" size="10" />
-
-					<span v-if="ratio.fall">{{
-						(1 + ratio.fall).toFixed(2)
-					}}</span>
+					<span v-if="ratio.fall">
+						{{ (1 + ratio.fall).toFixed(2) }}x
+					</span>
 					<span v-else>0.00</span>
 				</div>
 
@@ -221,14 +217,6 @@ const btnType = computed(() => {
 	font-size: 11px;
 	line-height: 1.1;
 	font-weight: 600;
-	color: var(--text-secondary);
-}
-
-.ratio svg {
-	fill: var(--text-tertiary);
-}
-
-.action.primary .ratio {
 	color: var(--text-tertiary);
 }
 

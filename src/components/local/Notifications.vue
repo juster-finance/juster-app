@@ -28,10 +28,16 @@ const notificationsStyles = (index) => {
 }
 
 const getIcon = (type) => {
-	if (type.toLowerCase() == "success") return "Check"
+	if (type.toLowerCase() == "success") return "Checkcircle"
 	if (type.toLowerCase() == "info") return "Help"
 
 	return "Warning"
+}
+
+const handleActionCallback = (callback, notification) => {
+	callback()
+
+	notificationsStore.remove({ id: notification.id })
 }
 
 notificationsStore.$subscribe(() => {
@@ -68,7 +74,10 @@ notificationsStore.$subscribe(() => {
 								: notification.icon
 						"
 						size="16"
-						:class="$style.general_icon"
+						:class="[
+							$style.general_icon,
+							$style[notification.type],
+						]"
 					/>
 
 					<div :class="$style.base">
@@ -113,14 +122,26 @@ notificationsStore.$subscribe(() => {
 							v-if="notification.actions"
 							:class="$style.actions"
 						>
-							<div
+							<Flex
 								v-for="(action, aIndex) in notification.actions"
 								:key="aIndex"
-								@click="action.callback"
+								@click="
+									handleActionCallback(
+										action.callback,
+										notification,
+									)
+								"
+								align="center"
+								gap="6"
 								:class="$style.action"
 							>
+								<Icon
+									v-if="action.icon"
+									:name="action.icon"
+									size="12"
+								/>
 								{{ action.name }}
-							</div>
+							</Flex>
 						</div>
 					</div>
 
@@ -224,6 +245,10 @@ notificationsStore.$subscribe(() => {
 	fill: var(--opacity-40);
 }
 
+.general_icon.success {
+	fill: var(--green);
+}
+
 .general_icon.warning {
 	fill: var(--icon-light);
 }
@@ -293,9 +318,9 @@ notificationsStore.$subscribe(() => {
 
 .action {
 	font-size: 13px;
-	line-height: 1;
 	font-weight: 600;
 	color: var(--text-blue);
+	fill: var(--text-blue);
 
 	cursor: pointer;
 

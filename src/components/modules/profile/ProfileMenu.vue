@@ -43,6 +43,7 @@ const handleOpenReleases = () => {
 }
 
 const handleLogout = () => {
+	/** confirmation.request -> onConfirm -> callback */
 	accountStore.logout()
 	notificationsStore.create({
 		notification: {
@@ -102,7 +103,7 @@ const handleLogout = () => {
 
 						<Flex direction="column" gap="8">
 							<Text size="13" weight="600" color="primary">
-								My Dashboard
+								Dashboard
 							</Text>
 							<Text size="11" weight="600" color="tertiary">
 								Unavailable Now
@@ -120,7 +121,7 @@ const handleLogout = () => {
 
 						<Flex direction="column" gap="8">
 							<Text size="13" weight="600" color="primary">
-								My Assets
+								Assets
 							</Text>
 							<Text size="11" weight="600" color="tertiary">
 								Manage your withdrawals

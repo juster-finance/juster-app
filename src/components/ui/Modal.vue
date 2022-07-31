@@ -24,6 +24,20 @@ const props = defineProps({
 	closable: {
 		type: Boolean,
 	},
+
+	/** Closes only after the action */
+	required: {
+		type: Boolean,
+	},
+	zIndex: {
+		type: String,
+		default: "1001",
+	},
+	blockClosing: {
+		type: Boolean,
+		default: false,
+	},
+
 	closeOutside: {
 		type: Boolean,
 		default: true,
@@ -37,12 +51,17 @@ watch(
 	() => props.show,
 	() => {
 		if (!props.show) {
-			if (removeOutside) removeOutside()
+			if (removeOutside) {
+				removeOutside()
+			}
 		} else {
 			if (!props.closeOutside) return
 
 			nextTick(() => {
-				removeOutside = useOnOutsidePress(modal, handleClose)
+				removeOutside = useOnOutsidePress(modal, () => {
+					if (props.blockClosing) return
+					handleClose()
+				})
 			})
 		}
 	},
@@ -64,10 +83,21 @@ const calcModalStyles = computed(() => {
 	return styles
 })
 
+const showShakeAnimation = ref(false)
 const handleClose = (e) => {
 	if (e && e.path.find((el) => el.id === "dropdown")) {
 		return
 	} else {
+		/** prevent closing */
+		if (props.blockClosing) return
+		if (props.required) {
+			showShakeAnimation.value = true
+			setTimeout(() => {
+				showShakeAnimation.value = false
+			}, 700)
+			return
+		}
+
 		emit("onClose")
 	}
 }
@@ -80,8 +110,16 @@ const onKeydown = (event) => {
 <template>
 	<teleport to="#modal">
 		<transition name="popup">
-			<div v-if="show" :class="$style.wrapper">
-				<div ref="modal" :class="$style.modal" :style="calcModalStyles">
+			<div
+				v-if="show"
+				:class="$style.wrapper"
+				:style="{ zIndex: zIndex }"
+			>
+				<div
+					ref="modal"
+					:class="[$style.modal, showShakeAnimation && $style.shake]"
+					:style="calcModalStyles"
+				>
 					<slot />
 
 					<Icon
@@ -111,8 +149,6 @@ const onKeydown = (event) => {
 
 	backdrop-filter: blur(3px);
 	background: rgba(0, 0, 0, 0.2);
-
-	z-index: 1001;
 }
 
 .modal {
@@ -125,6 +161,36 @@ const onKeydown = (event) => {
 
 	padding: 32px;
 	margin: 0 20px;
+}
+
+.modal.shake {
+	animation: shake 0.4s;
+}
+
+@keyframes shake {
+	0% {
+		transform: translatex(8px) scale(1.03);
+	}
+
+	20% {
+		transform: translatex(-6px) scale(1.02);
+	}
+
+	40% {
+		transform: translatex(4px) scale(1.01);
+	}
+
+	60% {
+		transform: translatex(-2px);
+	}
+
+	80% {
+		transform: translatex(0);
+	}
+
+	100% {
+		transform: translateY(0);
+	}
 }
 
 .close_icon {

@@ -10,6 +10,9 @@ amplitude.getInstance().init("a515d3d1969a8f25c340476842b19836")
 
 import "@/services/sdk"
 
+import { initFlags } from "@/services/flags"
+initFlags()
+
 import App from "./App.vue"
 import router from "./router"
 

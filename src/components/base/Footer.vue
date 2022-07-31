@@ -198,7 +198,11 @@ onBeforeUnmount(() => {
 				<div :class="$style.block">
 					<div :class="$style.left">
 						<Tooltip placement="top-start">
-							<a href="https://status.juster.fi" target="_blank">
+							<a
+								href="https://status.juster.fi"
+								target="_blank"
+								data-cy="systems-status"
+							>
 								<Button
 									type="secondary"
 									size="small"
@@ -232,6 +236,7 @@ onBeforeUnmount(() => {
 											? $style.green
 											: $style.yellow,
 									]"
+									data-cy="network-dropdown"
 								>
 									<Icon
 										:name="
