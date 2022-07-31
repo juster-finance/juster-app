@@ -228,7 +228,7 @@ onMounted(async () => {
 					<Icon name="users" size="14" />
 					<span>
 						Trusted by <b>{{ allUsersCounter.length }}</b> Users
-						{{ currentNetwork !== "mainnet" && "(Testnet)" }}
+						{{ currentNetwork !== "mainnet" ? "(Testnet)" : "" }}
 					</span>
 				</div>
 			</div>
