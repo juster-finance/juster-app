@@ -180,17 +180,10 @@ const handleContinue = () => {
 	gap: 14px;
 
 	border-radius: 8px;
-	border: 1px solid var(--border);
 	background: rgba(255, 255, 255, 0.05);
 	cursor: pointer;
 
 	padding: 16px;
-
-	transition: border 0.2s ease;
-}
-
-.node:hover {
-	border: 1px solid var(--border-highlight);
 }
 
 .radio {
