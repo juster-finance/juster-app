@@ -250,7 +250,7 @@ notificationsStore.$subscribe(() => {
 }
 
 .general_icon.warning {
-	fill: var(--icon-light);
+	fill: var(--text-secondary);
 }
 
 .general_icon.error {

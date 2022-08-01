@@ -1,3 +1,4 @@
 import { Networks } from "./networks"
+import { RpcStatuses } from "./rpc"
 
-export { Networks }
+export { Networks, RpcStatuses }

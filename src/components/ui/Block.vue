@@ -65,6 +65,11 @@ const emit = defineEmits(["onClose"])
 	fill: var(--yellow);
 }
 
+.general_icon.gray {
+	background: rgba(255, 255, 255, 0.08);
+	fill: var(--text-secondary);
+}
+
 .close_icon {
 	fill: var(--text-tertiary);
 	cursor: pointer;

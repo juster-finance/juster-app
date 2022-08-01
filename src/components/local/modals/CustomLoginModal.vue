@@ -1,12 +1,15 @@
 <script setup>
-import { ref } from "vue"
+import { ref, reactive, onMounted } from "vue"
+import { DateTime } from "luxon"
 
 /**
  * UI
  */
 import Modal from "@/components/ui/Modal"
 import Button from "@/components/ui/Button"
-import Banner from "@/components/ui/Banner"
+import Block from "@/components/ui/Block"
+import Spin from "@/components/ui/Spin"
+import Tooltip from "@/components/ui/Tooltip"
 
 /**
  * Store
@@ -18,9 +21,11 @@ import { useNotificationsStore } from "@/store/notifications"
  */
 import { rpcNodes } from "@/services/config"
 import { currentNetwork } from "@/services/sdk"
+import { flags, updateFlag } from "@/services/flags"
+import { RpcStatuses } from "@/services/constants"
 
 defineProps({ show: { type: Boolean } })
-const emit = defineEmits(["onSelectCustomNode"])
+const emit = defineEmits(["onSelectCustomNode", "onClose"])
 
 const notificationsStore = useNotificationsStore()
 
@@ -33,7 +38,7 @@ const handleSelectNode = (node) => {
 
 const customRPC = ref("")
 const handleCustomRPC = () => {
-	const url = prompt("Enter RPC base URL (Start with `https://`):")
+	const url = prompt("Enter RPC base URL:", "https://")
 	const urlRegex =
 		/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
 
@@ -51,15 +56,82 @@ const handleCustomRPC = () => {
 			notification: {
 				type: "warning",
 				title: "Wrong URL format",
-				description: "Please note that the link must start with https",
+				description: "Remember, the link must start with https",
 				autoDestroy: true,
 			},
 		})
 	}
 }
 
+const rpcStates = reactive({})
+const checkRpcNode = async (rpc) => {
+	try {
+		const data = await (
+			await fetch(`${rpc.url}/chains/main/blocks/head/header`)
+		).json()
+
+		if (data.message && !data.level) {
+			rpcStates[rpc.code] = {
+				status: RpcStatuses.UNAVAILABLE,
+				message: data.message,
+			}
+		} else {
+			const isDelayed =
+				DateTime.now()
+					.diff(DateTime.fromISO(data.timestamp), "second")
+					.toObject().seconds > 60
+
+			rpcStates[rpc.code] = {
+				status: RpcStatuses.AVAILABLE,
+				message: !isDelayed ? "Everything is fine" : "Delayed",
+				isDelayed,
+			}
+		}
+	} catch ({ message }) {
+		if (message === "Failed to fetch") {
+			rpcStates[rpc.code] = {
+				status: RpcStatuses.UNAVAILABLE,
+				message,
+			}
+		}
+	}
+}
+
+onMounted(() => {
+	rpcNodes[currentNetwork.value].forEach((node) => {
+		rpcStates[node.code] = {
+			status: RpcStatuses.LOADING,
+			message: "Loading..",
+		}
+
+		checkRpcNode(node)
+	})
+})
+
 const handleContinue = () => {
 	emit("onSelectCustomNode", selectedNode)
+}
+
+const handleCloseCustomRpcInfo = () => {
+	updateFlag("showCustomRpcInfo", false)
+
+	notificationsStore.create({
+		notification: {
+			type: "success",
+			title: "Testnet Warning is now hidden",
+			autoDestroy: true,
+
+			actions: [
+				{
+					name: "Undo",
+					icon: "back",
+					callback: () => {
+						updateFlag("showCustomRpcInfo", true)
+					},
+				},
+			],
+		},
+	})
 }
 </script>
 
@@ -72,29 +144,80 @@ const handleContinue = () => {
 			network
 		</div>
 
+		<Block
+			v-if="flags.showCustomRpcInfo"
+			icon="help"
+			color="gray"
+			@onClose="handleCloseCustomRpcInfo"
+			:class="$style.banner"
+		>
+			<span>Verify that the RPC node is working properly.</span>
+			Selecting and continuing to use a custom RPC can affect the
+			functionality of the app.
+		</Block>
+
 		<div :class="$style.subtitle">Select RPC</div>
 
 		<div :class="$style.nodes">
-			<div
+			<Flex
 				v-for="node in rpcNodes[currentNetwork]"
 				:key="node.name"
 				@click="handleSelectNode(node)"
+				justify="between"
+				align="center"
 				:class="$style.node"
 			>
-				<div
-					:class="[
-						$style.radio,
-						selectedNode.name == node.name && $style.selected,
-					]"
+				<Flex gap="12">
+					<div
+						:class="[
+							$style.radio,
+							selectedNode.name == node.name && $style.selected,
+						]"
+					/>
+
+					<div :class="$style.base">
+						<div>{{ node.name }}</div>
+						<div>{{ node.url }}</div>
+					</div>
+				</Flex>
+
+				<Spin
+					v-if="rpcStates[node.code].status === RpcStatuses.LOADING"
+					size="16"
 				/>
+				<Tooltip v-else placement="bottom">
+					<Icon
+						:name="
+							([
+								RpcStatuses.AVAILABLE,
+								RpcStatuses.DELAYED,
+							].includes(rpcStates[node.code].status) &&
+								'checkcircle') ||
+							(rpcStates[node.code].status ===
+								RpcStatuses.UNAVAILABLE &&
+								'warning')
+						"
+						size="16"
+						:style="{
+							fill:
+								(rpcStates[node.code].isDelayed &&
+									'var(--yellow)') ||
+								(rpcStates[node.code].status ===
+									RpcStatuses.AVAILABLE &&
+									'var(--green)') ||
+								(rpcStates[node.code].status ===
+									RpcStatuses.UNAVAILABLE &&
+									'var(--red)'),
+						}"
+					/>
 
-				<div :class="$style.base">
-					<div>{{ node.name }}</div>
-					<div>{{ node.url }}</div>
-				</div>
-			</div>
+					<template #content>{{
+						rpcStates[node.code].message
+					}}</template>
+				</Tooltip>
+			</Flex>
 
-			<div @click="handleCustomRPC" :class="$style.node">
+			<Flex @click="handleCustomRPC" gap="12" :class="$style.node">
 				<div
 					:class="[
 						$style.radio,
@@ -112,13 +235,8 @@ const handleContinue = () => {
 						}}
 					</div>
 				</div>
-			</div>
+			</Flex>
 		</div>
-
-		<Banner color="gray" :class="$style.banner">
-			Selecting and continuing to use a custom RPC can affect the
-			operation of the application.
-		</Banner>
 
 		<Button
 			@click="handleContinue"
@@ -176,9 +294,6 @@ const handleContinue = () => {
 }
 
 .node {
-	display: flex;
-	gap: 14px;
-
 	border-radius: 8px;
 	background: rgba(255, 255, 255, 0.05);
 	cursor: pointer;
@@ -206,6 +321,8 @@ const handleContinue = () => {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+
+	width: 100%;
 }
 
 .base div:nth-child(1) {
@@ -223,6 +340,8 @@ const handleContinue = () => {
 	font-weight: 500;
 	color: var(--text-tertiary);
 	fill: var(--text-secondary);
+	user-select: text;
+	cursor: text;
 }
 
 .base div:nth-child(2) svg {

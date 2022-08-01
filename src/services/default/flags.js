@@ -1,4 +1,4 @@
 export const defaultFlags = {
 	showTestnetWarningInStakeModal: true,
-	showOnboardingWarning: true,
+	showCustomRpcInfo: true,
 }

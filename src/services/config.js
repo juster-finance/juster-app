@@ -22,28 +22,34 @@ export const sanity = {
 export const rpcNodes = {
 	mainnet: [
 		{
+			code: "tzkt",
 			name: "TZKT Mainnet",
 			url: "https://rpc.tzkt.io/mainnet",
 		},
 		{
+			code: "smartpy",
 			name: "SmartPy Mainnet",
 			url: "https://mainnet.smartpy.io",
 		},
 		{
+			code: "tzbeta",
 			name: "TzBeta Mainnet",
 			url: "https://rpc.tzbeta.net",
 		},
 		{
+			code: "letzbake",
 			name: "LetzBake!",
 			url: "https://teznode.letzbake.com",
 		},
 		{
+			code: "ateza",
 			name: "ATEZA",
 			url: "https://rpc-mainnet.ateza.io",
 		},
 	],
 	testnet: [
 		{
+			code: "tzkttestnet",
 			name: "TZKT Testnet",
 			url: "https://rpc.tzkt.io/ghostnet",
 		},
