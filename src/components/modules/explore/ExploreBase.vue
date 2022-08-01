@@ -1,11 +1,5 @@
-<script>
-import {
-	defineComponent,
-	onMounted,
-	onBeforeUnmount,
-	ref,
-	onUnmounted,
-} from "vue"
+<script setup>
+import { ref, onMounted, onBeforeUnmount, onUnmounted, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
 import cloneDeep from "lodash.clonedeep"
@@ -46,118 +40,114 @@ import { useAccountStore } from "@/store/account"
  */
 import { juster, analytics } from "@/services/sdk"
 
-export default defineComponent({
-	name: "ExploreBase",
+const router = useRouter()
 
-	setup() {
-		const router = useRouter()
+const marketStore = useMarketStore()
+const accountStore = useAccountStore()
 
-		const marketStore = useMarketStore()
-		const accountStore = useAccountStore()
+const subToMyPositions = ref({})
+const myPositions = ref([])
 
-		const subToMyPositions = ref({})
-		const myPositions = ref([])
+/** Ranking */
+const isTopProvidersLoading = ref(true)
+const isTopBettorsLoading = ref(true)
+const topProviders = ref([])
+const topBettors = ref([])
 
-		/** Ranking */
-		const isTopProvidersLoading = ref(true)
-		const isTopBettorsLoading = ref(true)
-		const topProviders = ref([])
-		const topBettors = ref([])
+const handleViewTopEvents = () => {
+	router.push("/events/top")
+}
 
-		const handleViewTopEvents = () => {
-			router.push("/events/top")
-		}
-
-		onMounted(async () => {
-			analytics.log("onPage", { name: "Explore" })
-
-			/**
-			 * Block: My Positions
-			 */
-			subToMyPositions.value = await juster.gql
-				.subscription({
-					position: [
-						{
-							where: {
-								userId: { _eq: accountStore.pkh },
-								event: { status: { _in: ["NEW", "STARTED"] } },
-							},
-						},
-						{
-							id: true,
-							value: true,
-							event: eventModel,
-						},
-					],
-				})
-				.subscribe({
-					next: ({ position: positions }) => {
-						myPositions.value = positions
+const init = async () => {
+	/**
+	 * Block: My Positions
+	 */
+	subToMyPositions.value = await juster.gql
+		.subscription({
+			position: [
+				{
+					where: {
+						userId: { _eq: accountStore.pkh },
+						event: { status: { _in: ["NEW", "STARTED"] } },
 					},
-					error: console.error,
-				})
-
-			/**
-			 * Block: Top Events & Providers
-			 */
-			const topEvents = await fetchTopEvents({ limit: 3 })
-			marketStore.events = cloneDeep(topEvents).sort(
-				(a, b) => b.bets.length - a.bets.length,
-			)
-
-			const rawTopProviders = await fetchTopLiquidityProviders()
-			const rawTopBettors = await fetchTopBettors()
-
-			topProviders.value = rawTopProviders.map((el) => {
-				return { address: el.address, value: el.totalProviderReward }
-			})
-			isTopProvidersLoading.value = false
-
-			topBettors.value = rawTopBettors.map((el) => {
-				return { address: el.address, value: el.totalBetsCount }
-			})
-			isTopBettorsLoading.value = false
+				},
+				{
+					id: true,
+					value: true,
+					event: eventModel,
+				},
+			],
 		})
-		onBeforeUnmount(() => {
-			marketStore.events = []
+		.subscribe({
+			next: ({ position: positions }) => {
+				myPositions.value = positions
+			},
+			error: console.error,
 		})
 
-		onUnmounted(() => {
-			if (
-				subToMyPositions.value.hasOwnProperty("_state") &&
-				!subToMyPositions.value?.closed
-			) {
-				subToMyPositions.value.unsubscribe()
-			}
-		})
+	/**
+	 * Block: Top Events & Providers
+	 */
+	const topEvents = await fetchTopEvents({ limit: 3 })
+	marketStore.events = cloneDeep(topEvents).sort(
+		(a, b) => b.bets.length - a.bets.length,
+	)
 
-		/** Meta */
-		useMeta({
-			title: "Explore",
-			description:
-				"Juster is an on-chain smart contract platform allowing users to take part in an automated betting market by creating events, providing liquidity to them, and making bets.",
-		})
+	const rawTopProviders = await fetchTopLiquidityProviders()
+	const rawTopBettors = await fetchTopBettors()
 
-		return {
-			marketStore,
-			myPositions,
-			topProviders,
-			topBettors,
-			isTopBettorsLoading,
-			isTopProvidersLoading,
-			handleViewTopEvents,
-		}
+	topProviders.value = rawTopProviders.map((el) => {
+		return { address: el.address, value: el.totalProviderReward }
+	})
+	isTopProvidersLoading.value = false
+
+	topBettors.value = rawTopBettors.map((el) => {
+		return { address: el.address, value: el.totalBetsCount }
+	})
+	isTopBettorsLoading.value = false
+}
+
+watch(
+	() => juster.sdk._network,
+	() => {
+		subToMyPositions.value.unsubscribe()
+		myPositions.value = []
+		marketStore.events = []
+		topProviders.value = []
+		isTopProvidersLoading.value = true
+		topBettors.value = []
+		isTopBettorsLoading.value = true
+
+		init()
 	},
+)
 
-	components: {
-		RatingCard,
-		RatingCardLoading,
-		MyPositionCard,
-		MarketCard,
-		EventCard,
-		EventCardLoading,
-		Button,
-	},
+onMounted(async () => {
+	analytics.log("onPage", { name: "Explore" })
+
+	init()
+})
+onBeforeUnmount(() => {
+	marketStore.events = []
+})
+
+onUnmounted(() => {
+	if (
+		Object.prototype.hasOwnProperty.call(
+			subToMyPositions.value,
+			"_state",
+		) &&
+		!subToMyPositions.value?.closed
+	) {
+		subToMyPositions.value.unsubscribe()
+	}
+})
+
+/** Meta */
+useMeta({
+	title: "Explore",
+	description:
+		"Juster is an on-chain smart contract platform allowing users to take part in an automated betting market by creating events, providing liquidity to them, and making bets.",
 })
 </script>
 
@@ -165,9 +155,7 @@ export default defineComponent({
 	<transition name="fade">
 		<div :class="$style.wrapper">
 			<metainfo>
-				<template v-slot:title="{ content }"
-					>{{ content }} • Juster</template
-				>
+				<template #title="{ content }">{{ content }} • Juster</template>
 			</metainfo>
 
 			<!-- My Positions -->

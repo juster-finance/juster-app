@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive } from "vue"
+import { useRouter } from "vue-router"
 import axios from "axios"
 import { DateTime } from "luxon"
 
@@ -22,6 +23,8 @@ import Tooltip from "@/components/ui/Tooltip"
 import { Dropdown, DropdownItem, DropdownTitle } from "@/components/ui/Dropdown"
 
 const marketStore = useMarketStore()
+
+const router = useRouter()
 
 /** Watch for DipDup, Quotes, Network */
 let checkInterval = null
@@ -117,7 +120,7 @@ const checkQuotes = () => {
 
 const handleSwitch = (network) => {
 	juster.sdk._provider.client.clearActiveAccount().then(async () => {
-		switchNetwork(network)
+		switchNetwork(network, router)
 	})
 }
 

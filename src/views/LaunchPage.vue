@@ -1,4 +1,7 @@
 <script setup>
+/** Vendor */
+import { useRouter } from "vue-router"
+
 /**
  * Base
  */
@@ -15,9 +18,11 @@ import Banner from "@/components/ui/Banner"
  */
 import { juster, switchNetwork } from "@/services/sdk"
 
+const router = useRouter()
+
 const handleSwitch = () => {
 	juster.sdk._provider.client.clearActiveAccount().then(async () => {
-		switchNetwork("mainnet")
+		switchNetwork("mainnet", router)
 	})
 }
 </script>

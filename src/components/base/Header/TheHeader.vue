@@ -6,7 +6,7 @@ import { useRoute, useRouter } from "vue-router"
 /**
  * Services
  */
-import { currentNetwork } from "@/services/sdk"
+import { juster, switchNetwork, currentNetwork } from "@/services/sdk"
 
 /**
  * Constants
@@ -100,6 +100,12 @@ const handleButtons = () => {
 		bringMeBack.path = "/"
 	}
 }
+
+const handleNetworkDblClick = () => {
+	juster.sdk._provider.client.clearActiveAccount().then(async () => {
+		switchNetwork("mainnet", router)
+	})
+}
 </script>
 
 <template>
@@ -114,13 +120,16 @@ const handleButtons = () => {
 			:class="$style.testnetwork_warning"
 		>
 			<Tooltip placement="bottom">
-				<div :class="$style.testnetwork_warning__label">
+				<div
+					@dblclick="handleNetworkDblClick"
+					:class="$style.testnetwork_warning__label"
+				>
 					Test network
 				</div>
 
 				<template #content
 					>Ghostnet in use.
-					<span>Switching in Advanced Settings.</span></template
+					<span>Double-click to switch to Mainnet.</span></template
 				>
 			</Tooltip>
 		</div>

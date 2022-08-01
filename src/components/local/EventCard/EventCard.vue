@@ -389,7 +389,7 @@ onBeforeUnmount(() => {
 
 onUnmounted(() => {
 	if (
-		subscription.value.hasOwnProperty("_state") &&
+		Object.prototype.hasOwnProperty.call(subscription.value, "_state") &&
 		!subscription.value?.closed
 	) {
 		subscription.value.unsubscribe()
@@ -767,14 +767,15 @@ onUnmounted(() => {
 						:class="[
 							$style.hint,
 							event.bets.length >= 3 && $style.green,
-							event.bets.length > 1 && $style.yellow,
+							event.bets.length >= 1 && $style.yellow,
 							event.bets.length === 0 && $style.gray,
 						]"
 					>
 						<Icon
 							:name="
 								(event.bets.length >= 3 && 'liquidity_high') ||
-								(event.bets.length > 1 && 'liquidity_medium') ||
+								(event.bets.length >= 1 &&
+									'liquidity_medium') ||
 								(event.bets.length === 0 && 'liquidity_low')
 							"
 							size="14"
@@ -783,7 +784,7 @@ onUnmounted(() => {
 						<div>
 							<span>{{
 								(event.bets.length >= 3 && "High") ||
-								(event.bets.length > 1 && "Medium") ||
+								(event.bets.length >= 1 && "Medium") ||
 								(event.bets.length === 0 && "Low")
 							}}</span>
 							Demand
