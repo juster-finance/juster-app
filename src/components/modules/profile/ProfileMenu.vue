@@ -49,8 +49,7 @@ const handleLogout = () => {
 		notification: {
 			icon: "logout",
 			title: "You are signed out",
-			description:
-				"To work with the application, you definitely need an account :)",
+			description: "If you need to change your account, use the settings",
 			autoDestroy: true,
 
 			actions: [
