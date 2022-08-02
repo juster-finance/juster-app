@@ -214,7 +214,7 @@ const endDiff = computed(() =>
 
 					<template #content>{{
 						verifiedMakers[currentNetwork].includes(event.creatorId)
-							? "Recurring event from Juster"
+							? "Recurring event by Juster"
 							: "Custom event from user"
 					}}</template>
 				</Tooltip>
