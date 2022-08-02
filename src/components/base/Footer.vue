@@ -214,9 +214,9 @@ onBeforeUnmount(() => {
 										$style[statusBlock.color],
 									]"
 								>
-									<Icon name="bolt" size="12" />{{
-										statusBlock.text
-									}}
+									<!-- <Icon name="bolt" size="12" /> -->
+									<div :class="$style.dot" />
+									{{ statusBlock.text }}
 								</Button>
 							</a>
 
@@ -438,16 +438,22 @@ onBeforeUnmount(() => {
 	color: var(--text-secondary);
 }
 
-.footer_btn.green svg:first-child {
-	fill: var(--green);
+.dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
 }
 
-.footer_btn.yellow svg:first-child {
-	fill: var(--yellow);
+.footer_btn.green .dot {
+	background: var(--green);
 }
 
-.footer_btn.red svg:first-child {
-	fill: var(--red);
+.footer_btn.yellow .dot {
+	background: var(--yellow);
+}
+
+.footer_btn.red .dot {
+	background: var(--red);
 }
 
 .copyrights {
