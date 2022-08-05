@@ -1,6 +1,20 @@
+<script setup>
+defineProps({
+	width: {
+		type: [String, Number],
+		default: 1250,
+	},
+})
+</script>
+
 <template>
 	<div :class="$style.wrapper">
-		<div :class="$style.content">
+		<div
+			:class="$style.content"
+			:style="{
+				maxWidth: `${width}px`,
+			}"
+		>
 			<slot />
 		</div>
 	</div>
@@ -19,7 +33,6 @@
 
 .content {
 	width: 100%;
-	max-width: 1250px;
 }
 
 @media (max-width: 700px) {

@@ -129,6 +129,12 @@ const routes = [
 	},
 
 	{
+		path: "/blog",
+		name: "Blog",
+		component: () =>
+			import(/* webpackChunkName: "blog" */ "@/views/Other/BlogPage"),
+	},
+	{
 		path: "/terms",
 		name: "Terms",
 		component: () =>
