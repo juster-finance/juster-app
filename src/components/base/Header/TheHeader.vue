@@ -234,7 +234,7 @@ const handleNetworkDblClick = () => {
 						:to="bringMeBack.path"
 					>
 						<Button type="secondary" size="small">
-							<Icon name="logout" size="16" />
+							<Icon name="back" size="16" />
 							Back to {{ bringMeBack.name }}
 						</Button>
 					</router-link>
