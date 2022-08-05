@@ -50,7 +50,7 @@ const resourcesLinks = ref([
 		url: "/",
 	},
 	{
-		icon: "code",
+		icon: "code_circle",
 		title: "Developers",
 		description: "Learn the product in more detail",
 		url: "/events",
@@ -89,7 +89,7 @@ const communityLinks = ref([
 		url: "/",
 	},
 	{
-		icon: "spark",
+		icon: "asterisk",
 		title: "Releases",
 		description: "Learn the product in more detail",
 		url: "/events",
