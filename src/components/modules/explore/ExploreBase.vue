@@ -212,7 +212,7 @@ useMeta({
 			<div :class="$style.block">
 				<div :class="$style.head">
 					<div :class="$style.left">
-						<h1>Hot Events</h1>
+						<h1>Notable Events</h1>
 						<div :class="$style.description">
 							Events that have not yet begun, but are attracting
 							the interest of participants

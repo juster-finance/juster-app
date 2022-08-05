@@ -29,7 +29,7 @@ export default defineComponent({
 				path: "/events",
 			},
 			{
-				name: "Hot events",
+				name: "Notable",
 				path: "/events/top",
 			},
 		])
@@ -75,7 +75,7 @@ export default defineComponent({
 
 		<Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-		<h1 :class="$style.title">Hot events</h1>
+		<h1 :class="$style.title">Notable Events</h1>
 		<div :class="$style.description">
 			Events that have not yet begun, but are attracting the interest of
 			participants
