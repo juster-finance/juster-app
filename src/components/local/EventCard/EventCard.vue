@@ -546,17 +546,18 @@ onUnmounted(() => {
 
 			<div :class="$style.description">
 				<span>
-					<img
-						v-if="event.winnerBets == 'ABOVE_EQ'"
-						:src="require('@/assets/icons/higher_won.svg')"
-						alt="won_side_icon"
+					<Icon
+						name="price_event"
+						size="12"
+						:style="{
+							fill:
+								(event.winnerBets === 'ABOVE_EQ' &&
+									'var(--green)') ||
+								(event.winnerBets === 'BELOW' && 'var(--red)'),
+							transform:
+								event.winnerBets === 'BELOW' && 'scaleX(-1)',
+						}"
 					/>
-					<img
-						v-else-if="event.winnerBets == 'BELOW'"
-						:src="require('@/assets/icons/lower_won.svg')"
-						alt="won_side_icon"
-					/>
-					<Icon v-else name="sides" size="12" />
 					Price Event
 				</span>
 

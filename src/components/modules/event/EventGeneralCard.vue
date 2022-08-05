@@ -134,17 +134,17 @@ const endDiff = computed(() =>
 	<div :class="$style.wrapper">
 		<div :class="$style.header">
 			<div :class="$style.title">
-				<img
-					v-if="event.winnerBets == 'ABOVE_EQ'"
-					:src="require('@/assets/icons/higher_won.svg')"
-					alt="won_side_icon"
+				<Icon
+					name="price_event"
+					size="16"
+					:style="{
+						fill:
+							(event.winnerBets === 'ABOVE_EQ' &&
+								'var(--green)') ||
+							(event.winnerBets === 'BELOW' && 'var(--red)'),
+						transform: event.winnerBets === 'BELOW' && 'scaleX(-1)',
+					}"
 				/>
-				<img
-					v-else-if="event.winnerBets == 'BELOW'"
-					:src="require('@/assets/icons/lower_won.svg')"
-					alt="won_side_icon"
-				/>
-				<Icon v-else name="sides" size="16" />
 				{{
 					supportedMarkets[symbol] && supportedMarkets[symbol].target
 				}}
@@ -620,7 +620,7 @@ const endDiff = computed(() =>
 }
 
 .verified_icon {
-	fill: var(--orange);
+	fill: var(--brand);
 	background: var(--card-bg);
 	border-radius: 50%;
 
