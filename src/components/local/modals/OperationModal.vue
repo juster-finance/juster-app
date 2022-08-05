@@ -98,7 +98,7 @@ const getTypeOfOperation = () => {
 				:class="$style.content"
 			>
 				<div :class="$style.center_icon">
-					<Icon name="check" size="32" />
+					<Icon name="check_circle_right" size="32" />
 				</div>
 
 				<router-link
@@ -266,12 +266,11 @@ const getTypeOfOperation = () => {
 .center_icon {
 	display: flex;
 
-	padding: 14px;
 	border-radius: 50%;
 	fill: var(--green);
-	box-shadow: inset 0px 0px 15px rgba(26, 161, 104, 0.5);
+	box-shadow: 0px 0px 30px rgba(26, 161, 104, 0.51);
 
-	margin-bottom: 32px;
+	margin-bottom: 40px;
 }
 
 .type {
