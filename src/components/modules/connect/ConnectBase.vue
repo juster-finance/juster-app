@@ -168,7 +168,7 @@ onMounted(async () => {
 
 			<div v-if="!accountStore.isLoggined" :class="$style.buttons">
 				<Button @click="handleBeacon" type="primary" size="large" block>
-					<Icon name="beacon" size="16" />
+					<Icon name="login" size="16" />
 					Beacon Wallet
 				</Button>
 				<Button

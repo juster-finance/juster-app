@@ -499,7 +499,7 @@ const handleClose = () => {
 
 			<Flex direction="column" gap="16">
 				<Button @click="handleLogin" size="large" type="primary" block>
-					<Icon name="beacon" size="16" />Continue to Beacon Wallet
+					<Icon name="login" size="16" />Continue to Beacon Wallet
 				</Button>
 				<router-link to="/connect">
 					<Button size="large" type="secondary" block>

@@ -173,7 +173,9 @@ const handleCloseCustomRpcInfo = () => {
 							$style.radio,
 							selectedNode.name == node.name && $style.selected,
 						]"
-					/>
+					>
+						<div :class="$style.dot" />
+					</div>
 
 					<div :class="$style.base">
 						<div>{{ node.name }}</div>
@@ -245,7 +247,7 @@ const handleCloseCustomRpcInfo = () => {
 			:disabled="!selectedNode.name"
 			block
 		>
-			<Icon name="beacon" size="16" />Continue to Beacon</Button
+			<Icon name="login" size="16" />Continue to Beacon</Button
 		>
 	</Modal>
 </template>
@@ -302,6 +304,10 @@ const handleCloseCustomRpcInfo = () => {
 }
 
 .radio {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
 	min-width: 14px;
 	height: 14px;
 	border-radius: 50%;
@@ -309,8 +315,21 @@ const handleCloseCustomRpcInfo = () => {
 	transition: all 0.2s ease;
 }
 
+.dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--blue);
+	opacity: 0;
+	transition: all 0.2s ease;
+}
+
 .radio.selected {
 	border: 2px solid var(--blue) !important;
+}
+
+.radio.selected .dot {
+	opacity: 1;
 }
 
 .node:hover .radio {
