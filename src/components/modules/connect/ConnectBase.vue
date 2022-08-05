@@ -217,7 +217,7 @@ onMounted(async () => {
 					>
 				</div>
 				<div v-if="currentNetwork === 'mainnet'" :class="$style.label">
-					<Icon name="lock" size="14" />
+					<Icon name="shield_tick" size="14" />
 					<span>
 						<b>Secure smart contracts.</b> Audited by Baking Bad
 						Security 34 days ago

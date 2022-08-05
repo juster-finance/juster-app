@@ -1055,12 +1055,6 @@ onUnmounted(() => {
 }
 
 .main_badge {
-	background: linear-gradient(
-		180deg,
-		rgba(255, 255, 255, 0.1) 0%,
-		rgba(255, 255, 255, 0) 100%
-	) !important;
-
 	margin-right: 8px;
 }
 

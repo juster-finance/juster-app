@@ -23,7 +23,7 @@ const browseLinks = ref([
 		url: "/",
 	},
 	{
-		icon: "arrows",
+		icon: "flag_1",
 		title: "Events",
 		description: "All events with advanced filters",
 		url: "/events",
@@ -44,7 +44,7 @@ const browseLinks = ref([
 
 const resourcesLinks = ref([
 	{
-		icon: "book",
+		icon: "compass_1",
 		title: "Documentation",
 		description: "Everything you need is here",
 		url: "/",
@@ -134,7 +134,9 @@ const communityLinks = ref([
 						<div :class="$style.label">advanced</div>
 
 						<div :class="[$style.item, $style.disabled]">
-							<Icon name="lock" size="20" />
+							<div :class="$style.icon_wrapper">
+								<Icon name="lock" size="20" />
+							</div>
 
 							<div :class="$style.text">
 								<span>Untitled Feature</span>
@@ -204,7 +206,9 @@ const communityLinks = ref([
 							:key="i"
 							:class="$style.item"
 						>
-							<Icon :name="link.icon" size="20" />
+							<div :class="$style.icon_wrapper">
+								<Icon :name="link.icon" size="20" />
+							</div>
 
 							<div :class="$style.text">
 								<span>{{ link.title }}</span>
@@ -288,7 +292,9 @@ const communityLinks = ref([
 							:to="link.url"
 							:class="$style.item"
 						>
-							<Icon :name="link.icon" size="20" />
+							<div :class="$style.icon_wrapper">
+								<Icon :name="link.icon" size="20" />
+							</div>
 
 							<div :class="$style.text">
 								<span>{{ link.title }}</span>

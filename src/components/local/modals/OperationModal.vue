@@ -46,13 +46,21 @@ watch(
 	},
 )
 
-const handleCopy = (target) => {
+const handleCopy = (target, name) => {
 	notificationsStore.create({
 		notification: {
-			icon: "info",
+			icon: "copy",
 			title: "Successfully copied to clipboard",
-			description: "Use Ctrl+V to paste",
 			autoDestroy: true,
+
+			badges: [
+				{
+					secondaryText: "",
+					tertiaryText:
+						name === "hash" ? shorten(target, 6, 6) : target,
+					icon: name === "hash" ? "hash" : "calendar",
+				},
+			],
 		},
 	})
 
@@ -170,7 +178,7 @@ const getTypeOfOperation = () => {
 						<Icon name="hash" size="12" />Hash
 					</div>
 					<div
-						@click="handleCopy(data.opgHash)"
+						@click="handleCopy(data.opgHash, 'hash')"
 						:class="$style.value"
 					>
 						{{ shorten(data.opgHash, 6, 6) }}
@@ -187,7 +195,7 @@ const getTypeOfOperation = () => {
 						:class="$style.value"
 					>
 						{{
-							DateTime.fromISO(data.createdTime)
+							DateTime.fromISO(data.createdTime, "calendar")
 								.setLocale("en")
 								.toFormat("T, dd LLLL yyyy")
 						}}

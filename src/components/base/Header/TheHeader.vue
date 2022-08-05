@@ -51,7 +51,7 @@ const links = reactive([
 	{
 		name: "Resources",
 		url: "/docs",
-		icon: "book",
+		icon: "package",
 	},
 	{
 		name: "Community",
