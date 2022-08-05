@@ -29,7 +29,7 @@ const browseLinks = ref([
 		url: "/events",
 	},
 	{
-		icon: "layers",
+		icon: "wallet_1",
 		title: "Markets",
 		description: "Available symbols for betting",
 		url: "/markets",
@@ -83,7 +83,7 @@ const communityLinks = ref([
 		url: "/rank",
 	},
 	{
-		icon: "document",
+		icon: "feather",
 		title: "Blog",
 		description: "Everything you need is here",
 		url: "/",
@@ -163,7 +163,7 @@ const communityLinks = ref([
 						<router-link to="/releases">
 							<Button size="mini" type="secondary" block>
 								<Icon
-									name="spark"
+									name="asterisk"
 									size="14"
 									style="fill: var(--green)"
 								/>Release 1.1
@@ -258,7 +258,7 @@ const communityLinks = ref([
 						<div :class="$style.button_group">
 							<Button size="mini" type="secondary" block>
 								<Icon
-									name="lock"
+									name="shield_tick"
 									size="14"
 									style="fill: var(--green)"
 								/>Security Audits
