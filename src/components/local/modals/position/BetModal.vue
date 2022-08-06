@@ -12,6 +12,11 @@ import { verifiedMakers } from "@/services/config"
 import { flags, updateFlag } from "@/services/flags"
 
 /**
+ * Constants
+ */
+import { Networks } from "@/services/constants"
+
+/**
  * Local
  */
 import SplittedPool from "@/components/local/SplittedPool"
@@ -374,7 +379,10 @@ const handleClose = () => {
 			<div :class="$style.title">Stake</div>
 
 			<Block
-				v-if="flags.showTestnetWarningInStakeModal"
+				v-if="
+					flags.showTestnetWarningInStakeModal &&
+					currentNetwork === Networks.TESTNET
+				"
 				@onClose="handleCloseTestnetWarning"
 				:class="$style.banner"
 			>
@@ -407,7 +415,7 @@ const handleClose = () => {
 					:class="[$style.tab, side == 'Rise' && $style.higher]"
 				>
 					<div :class="$style.tab_left">
-						<Icon name="higher" size="16" />Rise
+						<Icon name="arrow_circle_top_right" size="16" />Rise
 					</div>
 					<div :class="$style.tab_ratio">
 						<Icon name="close" size="10" />
@@ -425,7 +433,7 @@ const handleClose = () => {
 
 					<div :class="$style.tab_left">
 						Fall
-						<Icon name="lower" size="16" />
+						<Icon name="arrow_circle_bottom_right" size="16" />
 					</div>
 				</div>
 			</div>

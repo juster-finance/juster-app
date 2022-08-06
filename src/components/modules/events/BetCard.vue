@@ -92,7 +92,14 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 			<div
 				:class="[$style.param, side == 'Up' ? $style.up : $style.down]"
 			>
-				<Icon name="higher" size="12" />
+				<Icon
+					:name="
+						side === 'Up'
+							? 'arrow_circle_top_right'
+							: 'arrow_circle_bottom_right'
+					"
+					size="12"
+				/>
 				{{ side }}
 			</div>
 
@@ -137,7 +144,15 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 				<div :class="$style.key">Side</div>
 
 				<div :class="$style.value">
-					<Icon name="higher" size="12" /> {{ side }}
+					<Icon
+						:name="
+							side === 'Up'
+								? 'arrow_circle_top_right'
+								: 'arrow_circle_bottom_right'
+						"
+						size="12"
+					/>
+					{{ side }}
 				</div>
 			</div>
 
@@ -289,10 +304,6 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 .param.down {
 	fill: var(--red);
-}
-
-.param.down svg {
-	transform: rotate(180deg);
 }
 
 .param svg {

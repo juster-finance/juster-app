@@ -805,7 +805,7 @@ onUnmounted(() => {
 					placement="bottom-start"
 				>
 					<div :class="[$style.hint, $style.red]">
-						<Icon name="lower" size="14" />
+						<Icon name="arrow_circle_bottom_right" size="14" />
 						<div><span>Fall</span> won</div>
 					</div>
 
@@ -825,7 +825,7 @@ onUnmounted(() => {
 					placement="bottom-start"
 				>
 					<div :class="[$style.hint, $style.green]">
-						<Icon name="higher" size="14" />
+						<Icon name="arrow_circle_top_right" size="14" />
 						<div><span>Rise</span> won</div>
 					</div>
 

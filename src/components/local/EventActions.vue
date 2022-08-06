@@ -67,7 +67,11 @@ const btnType = computed(() => {
 				]"
 			>
 				<div :class="$style.left">
-					<Icon name="higher" size="14" :class="$style.higher_icon" />
+					<Icon
+						name="arrow_circle_top_right"
+						size="14"
+						:class="$style.higher_icon"
+					/>
 
 					<span>Rise</span>
 				</div>
@@ -100,7 +104,11 @@ const btnType = computed(() => {
 				<div :class="$style.left">
 					<span>Fall</span>
 
-					<Icon name="lower" size="14" :class="$style.lower_icon" />
+					<Icon
+						name="arrow_circle_bottom_right"
+						size="14"
+						:class="$style.lower_icon"
+					/>
 				</div>
 			</div>
 		</template>

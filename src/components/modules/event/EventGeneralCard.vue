@@ -419,7 +419,7 @@ const endDiff = computed(() =>
 							? $style.green_icon
 							: $style.red_icon
 					"
-					><Icon name="higher" size="12" />{{
+					><Icon name="arrow_circle_top_right" size="12" />{{
 						event.winnerBets == "ABOVE_EQ" ? "Up" : "Down"
 					}}</span
 				>
@@ -869,7 +869,7 @@ const endDiff = computed(() =>
 
 .param span:nth-child(2).red_icon svg,
 .param span:nth-child(2).red_full svg {
-	transform: rotate(180deg);
+	transform: scaleY(-1);
 }
 
 .param span:nth-child(1) img {

@@ -128,13 +128,13 @@ const returnForLiquidity = computed(() => {
 		<!-- Desktop Template -->
 		<div :class="$style.desktop">
 			<div :class="[$style.param, $style.up]">
-				<Icon name="higher" size="12" />{{
+				<Icon name="arrow_circle_top_right" size="12" />{{
 					numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
 				}}&nbsp;<span>ꜩ</span>
 			</div>
 
 			<div :class="[$style.param, $style.down]">
-				<Icon name="higher" size="12" />{{
+				<Icon name="arrow_circle_top_right" size="12" />{{
 					numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
 				}}&nbsp;<span>ꜩ</span>
 			</div>
@@ -161,7 +161,7 @@ const returnForLiquidity = computed(() => {
 				<div :class="$style.key">Rise</div>
 
 				<div :class="$style.value">
-					<Icon name="higher" size="12" />{{
+					<Icon name="arrow_circle_top_right" size="12" />{{
 						numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
 					}}&nbsp;<span>ꜩ</span>
 				</div>
@@ -171,7 +171,7 @@ const returnForLiquidity = computed(() => {
 				<div :class="$style.key">Rise</div>
 
 				<div :class="$style.value">
-					<Icon name="higher" size="12" />{{
+					<Icon name="arrow_circle_top_right" size="12" />{{
 						numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
 					}}&nbsp;<span>ꜩ</span>
 				</div>
@@ -299,7 +299,7 @@ const returnForLiquidity = computed(() => {
 }
 
 .param.down svg {
-	transform: rotate(180deg);
+	transform: scaleY(-1);
 }
 
 .param svg {
