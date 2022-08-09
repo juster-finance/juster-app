@@ -71,18 +71,6 @@ const resourcesLinks = ref([
 
 const communityLinks = ref([
 	{
-		icon: "discord",
-		title: "Discord",
-		description: "Explore the product path",
-		url: "/markets",
-	},
-	{
-		icon: "twitter",
-		title: "Twitter",
-		description: "Explore our code & Contribute",
-		url: "/rank",
-	},
-	{
 		icon: "feather",
 		title: "Blog",
 		description: "Everything you need is here",
@@ -93,6 +81,18 @@ const communityLinks = ref([
 		title: "Releases",
 		description: "Learn the product in more detail",
 		url: "/events",
+	},
+	{
+		icon: "discord",
+		title: "Discord",
+		description: "Explore the product path",
+		url: "/markets",
+	},
+	{
+		icon: "twitter",
+		title: "Twitter",
+		description: "Explore our code & Contribute",
+		url: "/rank",
 	},
 ])
 </script>
@@ -107,8 +107,6 @@ const communityLinks = ref([
 			<div v-if="activeLink === 'Browse'" :class="$style.card">
 				<div :class="$style.column">
 					<div :class="$style.atlas_block">
-						<div :class="$style.label">Participate</div>
-
 						<router-link
 							v-for="(link, i) in browseLinks"
 							:key="i"
@@ -131,8 +129,6 @@ const communityLinks = ref([
 
 				<div :class="$style.column">
 					<div :class="$style.advanced_block">
-						<div :class="$style.label">advanced</div>
-
 						<div :class="[$style.item, $style.disabled]">
 							<div :class="$style.icon_wrapper">
 								<Icon name="lock" size="20" />
@@ -199,8 +195,6 @@ const communityLinks = ref([
 			<div v-if="activeLink === 'Resources'" :class="$style.card">
 				<div :class="$style.column">
 					<div :class="$style.atlas_block">
-						<div :class="$style.label">learn</div>
-
 						<div
 							v-for="(link, i) in resourcesLinks"
 							:key="i"
@@ -284,8 +278,6 @@ const communityLinks = ref([
 			<div v-if="activeLink === 'Community'" :class="$style.card">
 				<div :class="$style.column">
 					<div :class="$style.atlas_block">
-						<div :class="$style.label">Communicate</div>
-
 						<router-link
 							v-for="(link, i) in communityLinks"
 							:key="i"
@@ -377,7 +369,7 @@ const communityLinks = ref([
 	background: #262626;
 	border-radius: 8px;
 
-	padding: 24px 16px 20px 16px;
+	padding: 16px 16px 20px 16px;
 }
 
 .content {
@@ -395,7 +387,7 @@ const communityLinks = ref([
 .divider {
 	width: 1px;
 
-	margin: 0 24px 0 50px;
+	margin: 0 24px 0 32px;
 
 	background: var(--border);
 }
@@ -409,12 +401,6 @@ const communityLinks = ref([
 	text-transform: uppercase;
 
 	padding: 0 8px;
-}
-
-.items {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
 }
 
 .item {
@@ -438,12 +424,25 @@ const communityLinks = ref([
 	color: var(--text-secondary);
 }
 
+.item:hover .icon_wrapper {
+	fill: var(--brand);
+}
+
 .icon_wrapper {
 	display: flex;
-	background: rgba(255, 255, 255, 0.05);
+
+	background: linear-gradient(rgba(49, 49, 49), rgba(55, 55, 55)) padding-box,
+		linear-gradient(
+				to bottom,
+				rgba(255, 255, 255, 0.3),
+				rgba(255, 255, 255, 0)
+			)
+			border-box;
+	border-radius: 10px;
+	border: 1px solid transparent;
+
 	fill: var(--text-primary);
 
-	border-radius: 10px;
 	padding: 13px;
 
 	box-sizing: content-box;
