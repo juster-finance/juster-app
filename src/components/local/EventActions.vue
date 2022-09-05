@@ -51,12 +51,20 @@ const btnType = computed(() => {
         return "secondary"
     }
 })
+
+const isFinished = computed(() => {
+    return (
+        (props.event.status === "FINISHED")
+        || (props.event.status === "CANCELED")
+    )
+})
+
 </script>
 
 <template>
     <div :class="$style.wrapper">
         <template
-            v-if="!isWon && !positionForWithdraw && !successfulWithdrawal"
+            v-if="!isWon && !positionForWithdraw && !successfulWithdrawal && !isFinished"
         >
             <div
                 @click.prevent="emit('onBet', 'rise')"
@@ -119,6 +127,7 @@ const btnType = computed(() => {
                 (isWon && !positionForWithdraw) ||
                 !!successfulWithdrawal?.amount ||
                 accountStore.pendingTransaction.awaiting
+                || isFinished
             "
             block
         >
@@ -135,6 +144,10 @@ const btnType = computed(() => {
                 <Icon name="crown" size="16" />Withdraw
                 {{ f(positionForWithdraw.value) }} ꜩ
             </template>
+
+            <template v-else-if="!isWon"
+                >Event was lost</template
+            >
 
             <template v-else
                 ><Spin size="12" />Awaiting confirmation..

@@ -88,7 +88,6 @@ export default defineComponent({
 				address: address.value,
 			})
 			events.value = positions
-				.filter((position) => position.value)
 				.map((position) => position.event)
 		}
 
