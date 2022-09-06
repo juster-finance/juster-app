@@ -146,7 +146,7 @@ const isFinished = computed(() => {
             </template>
 
             <template v-else-if="!isWon"
-                >Event was lost</template
+                >No funds to withdraw</template
             >
 
             <template v-else
