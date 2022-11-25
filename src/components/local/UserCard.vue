@@ -2,25 +2,21 @@
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import {
-	Dropdown,
-	DropdownItem,
-	DropdownDivider,
-} from "@/components/ui/Dropdown"
+import Button from "@ui/Button.vue"
+import { Dropdown, DropdownItem, DropdownDivider } from "@ui/Dropdown"
 
 /**
  * Services
  */
-import { currentNetwork } from "@/services/sdk"
-import { toClipboard, shorten } from "@/services/utils/global"
-import { verifiedMakers } from "@/services/config"
+import { currentNetwork } from "@sdk"
+import { toClipboard, shorten } from "@utils/global"
+import { verifiedMakers } from "@config"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
 
 const props = defineProps({ user: { type: Object, default: () => {} } })
 

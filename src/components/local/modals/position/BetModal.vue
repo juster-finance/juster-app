@@ -7,9 +7,10 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { juster, analytics, currentNetwork } from "@/services/sdk"
-import { verifiedMakers } from "@/services/config"
+import { juster, analytics, currentNetwork } from "@sdk"
+import { verifiedMakers } from "@config"
 import { flags, updateFlag } from "@/services/flags"
+import { sanitizeInput } from "@/services/utils/global"
 
 /**
  * Constants
@@ -19,28 +20,28 @@ import { Networks } from "@/services/constants"
 /**
  * Local
  */
-import SplittedPool from "@/components/local/SplittedPool"
-import SlippageSelector from "@/components/local/SlippageSelector"
+import SplittedPool from "@local/SplittedPool.vue"
+import SlippageSelector from "@local/SlippageSelector.vue"
 
-import PositionDirection from "./PositionDirection"
+import PositionDirection from "./PositionDirection.vue"
 
 /**
  * UI
  */
-import Spin from "@/components/ui/Spin"
-import Modal from "@/components/ui/Modal"
-import Input from "@/components/ui/Input"
-import Button from "@/components/ui/Button"
-import Banner from "@/components/ui/Banner"
-import Block from "@/components/ui/Block"
+import Spin from "@ui/Spin.vue"
+import Modal from "@ui/Modal.vue"
+import Input from "@ui/Input.vue"
+import Button from "@ui/Button.vue"
+import Banner from "@ui/Banner.vue"
+import Block from "@ui/Block.vue"
 
 /**
  * Store
  */
-import { useAppStore } from "@/store/app"
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
-import { useApplicationCacheStore } from "@/store/cache"
+import { useNotificationsStore } from "@store/notifications"
+import { useAppStore } from "@store/app"
+import { useAccountStore } from "@store/account"
+import { useApplicationCacheStore } from "@store/cache"
 
 /**
  * Composable
@@ -85,10 +86,6 @@ const handleAmountInput = () => {
 
 const handleKeydown = (e) => {
 	sanitizeInput(e)
-}
-
-const sanitizeInput = (e) => {
-	if (["-", "e"].includes(e.key)) e.preventDefault()
 }
 
 const sendingBet = ref(false)
@@ -387,7 +384,7 @@ const handleClose = () => {
 				:class="$style.banner"
 			>
 				<span>This stake is for the test network.</span> Use it to test
-				tools or to understand how to interact with events.
+				tools or to understand how to interact with product.
 			</Block>
 
 			<PositionDirection
@@ -396,16 +393,6 @@ const handleClose = () => {
 				:countdown="countdownText"
 				:class="$style.direction"
 			/>
-
-			<Banner
-				v-if="!verifiedMakers[currentNetwork].includes(event.creatorId)"
-				icon="warning"
-				color="yellow"
-				size="small"
-				:class="$style.banner"
-			>
-				This event is Custom, its behavior may depend on the parameters
-			</Banner>
 
 			<div :class="$style.subtitle">The price will</div>
 
@@ -470,6 +457,16 @@ const handleClose = () => {
 				v-model="slippage"
 				:class="$style.slippage_block"
 			/>
+
+			<Banner
+				v-if="!verifiedMakers[currentNetwork].includes(event.creatorId)"
+				icon="warning"
+				color="yellow"
+				size="small"
+				:class="$style.banner"
+			>
+				This event is Custom, its behavior may depend on the parameters
+			</Banner>
 
 			<Button
 				@click="handleBet"

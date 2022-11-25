@@ -18,6 +18,10 @@ const props = defineProps({
 	gap: {
 		type: String,
 	},
+	wide: {
+		type: Boolean,
+		default: false,
+	},
 })
 
 const classes = computed(() => {
@@ -37,6 +41,9 @@ const classes = computed(() => {
 	}
 	if (props.gap) {
 		flexClasses.push(`gap--${props.gap}`)
+	}
+	if (props.wide) {
+		flexClasses.push("f--wide")
 	}
 
 	return flexClasses

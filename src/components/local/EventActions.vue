@@ -1,18 +1,18 @@
 <script setup>
 import { computed } from "vue"
 
-import { f } from "@/services/utils/amounts"
+import { f } from "@utils/amounts"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Spin from "@/components/ui/Spin"
+import Button from "@ui/Button.vue"
+import Spin from "@ui/Spin.vue"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 const accountStore = useAccountStore()
 
 const props = defineProps({
@@ -163,7 +163,7 @@ const btnType = computed(() => {
 	justify-content: space-between;
 	flex: 1;
 
-	background: #29292b;
+	background: rgba(255, 255, 255, 0.08);
 
 	padding: 0 12px;
 	height: 32px;
@@ -181,7 +181,7 @@ const btnType = computed(() => {
 }
 
 .action:hover {
-	background: #313133;
+	background: rgba(255, 255, 255, 0.12);
 }
 
 .action.primary:hover {

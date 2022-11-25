@@ -5,12 +5,12 @@ import { DateTime } from "luxon"
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
+import Modal from "@ui/Modal.vue"
 
 /**
  * Services
  */
-import { toReadableDuration } from "@/services/utils/date"
+import { toReadableDuration } from "@utils/date"
 
 const props = defineProps({
 	show: { type: Boolean },

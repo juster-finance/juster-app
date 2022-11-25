@@ -14,32 +14,32 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { juster, currentNetwork, analytics } from "@/services/sdk"
-import { verifiedMakers } from "@/services/config"
+import { juster, currentNetwork, analytics } from "@sdk"
+import { verifiedMakers } from "@config"
 
 /**
  * Local
  */
-import SplittedPool from "@/components/local/SplittedPool"
-import SlippageSelector from "@/components/local/SlippageSelector"
+import SplittedPool from "@local/SplittedPool.vue"
+import SlippageSelector from "@local/SlippageSelector.vue"
 
-import PositionDirection from "./PositionDirection"
+import PositionDirection from "./PositionDirection.vue"
 
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
-import Input from "@/components/ui/Input"
-import Stat from "@/components/ui/Stat"
-import Button from "@/components/ui/Button"
-import Spin from "@/components/ui/Spin"
-import Banner from "@/components/ui/Banner"
+import Modal from "@ui/Modal.vue"
+import Input from "@ui/Input.vue"
+import Stat from "@ui/Stat.vue"
+import Button from "@ui/Button.vue"
+import Spin from "@ui/Spin.vue"
+import Banner from "@ui/Banner.vue"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
 
 /**
  * Composable

@@ -2,6 +2,10 @@
 	display: flex;
 }
 
+.f--wide {
+	width: 100%;
+}
+
 .f-ai--start {
 	align-items: flex-start;
 }
@@ -78,8 +82,16 @@
 	gap: var(--spacing-8);
 }
 
+.gap--10 {
+	gap: var(--spacing-10);
+}
+
 .gap--12 {
 	gap: var(--spacing-12);
+}
+
+.gap--14 {
+	gap: var(--spacing-14);
 }
 
 .gap--16 {

@@ -38,7 +38,7 @@ defineProps({ disabled: { type: Boolean } })
 .wrapper svg {
 	fill: var(--opacity-40);
 
-	margin-right: 10px;
+	margin-right: 8px;
 }
 
 .wrapper:hover {

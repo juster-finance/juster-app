@@ -2,8 +2,8 @@
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
-import Button from "@/components/ui/Button"
+import Modal from "@ui/Modal.vue"
+import Button from "@ui/Button.vue"
 
 defineProps({
 	show: { type: Boolean },

@@ -5,19 +5,19 @@ import { DateTime } from "luxon"
 /**
  * Modals
  */
-import OperationModal from "@/components/local/modals/OperationModal"
+import OperationModal from "@local/modals/OperationModal.vue"
 
 /**
  * Services
  */
-import { currentNetwork } from "@/services/sdk"
-import { verifiedMakers } from "@/services/config"
-import { numberWithSymbol } from "@/services/utils/amounts"
+import { currentNetwork } from "@sdk"
+import { verifiedMakers } from "@config"
+import { numberWithSymbol } from "@utils/amounts"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 
 const accountStore = useAccountStore()
 

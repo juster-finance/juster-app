@@ -13,22 +13,18 @@ import { DateTime } from "luxon"
 /**
  * UI
  */
-import {
-	Dropdown,
-	DropdownItem,
-	DropdownDivider,
-} from "@/components/ui/Dropdown"
-import Badge from "@/components/ui/Badge"
-import Tooltip from "@/components/ui/Tooltip"
+import { Dropdown, DropdownItem, DropdownDivider } from "@ui/Dropdown"
+import Badge from "@ui/Badge.vue"
+import Tooltip from "@ui/Tooltip.vue"
 
 /**
  * Local
  */
-import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
-import NotifyMeModal from "@/components/local/modals/NotifyMeModal"
-import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
-import BetModal from "@/components/local/modals/position/BetModal"
-import EventActions from "@/components/local/EventActions"
+import ParticipantsModal from "@local/modals/ParticipantsModal.vue"
+import NotifyMeModal from "@local/modals/NotifyMeModal.vue"
+import LiquidityModal from "@local/modals/position/LiquidityModal.vue"
+import BetModal from "@local/modals/position/BetModal.vue"
+import EventActions from "@local/EventActions.vue"
 
 /**
  * Services
@@ -37,12 +33,11 @@ import {
 	toClipboard,
 	getCurrencyIcon,
 	capitalizeFirstLetter,
-	pluralize,
-} from "@/services/utils/global"
-import { juster, analytics, currentNetwork } from "@/services/sdk"
-import { abbreviateNumber } from "@/services/utils/amounts"
-import { supportedMarkets, verifiedMakers } from "@/services/config"
-import { toReadableDuration } from "@/services/utils/date"
+} from "@utils/global"
+import { juster, analytics, currentNetwork } from "@sdk"
+import { abbreviateNumber } from "@utils/amounts"
+import { supportedMarkets, verifiedMakers } from "@config"
+import { toReadableDuration } from "@utils/date"
 
 /**
  * Composable
@@ -53,9 +48,9 @@ import { useMarket } from "@/composable/market"
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useMarketStore } from "@store/market"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
 
 // eslint-disable-next-line no-undef
 const props = defineProps({ event: { type: Object, default: () => {} } })
@@ -863,7 +858,7 @@ onUnmounted(() => {
 	position: relative;
 	background: var(--card-bg);
 	border-radius: 8px;
-	border: 1px solid var(--border);
+	border: 1px solid transparent;
 
 	padding: 20px;
 	max-width: 617px;
@@ -872,7 +867,7 @@ onUnmounted(() => {
 }
 
 .wrapper:hover {
-	border: 1px solid var(--border-highlight);
+	border: 1px solid var(--border);
 }
 
 .dropdown {
@@ -955,7 +950,7 @@ onUnmounted(() => {
 	width: 34px;
 	height: 34px;
 
-	background: rgb(35, 35, 35);
+	background: rgba(0, 0, 0, 0.15);
 	border-radius: 50px;
 	border: 3px solid var(--card-bg);
 

@@ -4,17 +4,17 @@ import { computed } from "vue"
 /**
  * Utils
  */
-import { f } from "@/services/utils/amounts"
+import { f } from "@utils/amounts"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 
 /**
  * UI
  */
-import Tooltip from "@/components/ui/Tooltip"
+import Tooltip from "@ui/Tooltip.vue"
 
 const accountStore = useAccountStore()
 

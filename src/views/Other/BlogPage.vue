@@ -2,12 +2,12 @@
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import BlogBase from "@/components/modules/blog/BlogBase"
+import BlogBase from "@modules/blog/BlogBase"
 </script>
 
 <template>

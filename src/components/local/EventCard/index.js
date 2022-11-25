@@ -1,4 +1,4 @@
-import EventCard from "./EventCard"
-import EventCardLoading from "./EventCardLoading"
+import EventCard from "./EventCard.vue"
+import EventCardLoading from "./EventCardLoading.vue"
 
 export { EventCard, EventCardLoading }

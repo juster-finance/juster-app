@@ -4,13 +4,13 @@ import { ref } from "vue"
 /**
  * Charts
  */
-import EventPriceChart from "@/components/modules/events/charts/EventPriceChart"
-import EventTVLChart from "@/components/modules/events/charts/EventTVLChart"
+import EventPriceChart from "@modules/events/charts/EventPriceChart.vue"
+import EventTVLChart from "@modules/events/charts/EventTVLChart.vue"
 
 /**
  * UI
  */
-import Tooltip from "@/components/ui/Tooltip"
+import Tooltip from "@ui/Tooltip.vue"
 
 defineProps({ event: { type: Object, default: () => {} } })
 

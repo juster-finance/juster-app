@@ -5,16 +5,16 @@ import { ref, computed, watch } from "vue"
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
-import Banner from "@/components/ui/Banner"
-import Button from "@/components/ui/Button"
+import Modal from "@ui/Modal.vue"
+import Banner from "@ui/Banner.vue"
+import Button from "@ui/Button.vue"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useMarketStore } from "@/store/market"
-import { useApplicationCacheStore } from "@/store/cache"
+import { useAccountStore } from "@store/account"
+import { useMarketStore } from "@store/market"
+import { useApplicationCacheStore } from "@store/cache"
 
 const props = defineProps({
 	show: Boolean,

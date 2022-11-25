@@ -8,36 +8,36 @@ import cloneDeep from "lodash.clonedeep"
 /**
  * UI
  */
-import Breadcrumbs from "@/components/ui/Breadcrumbs"
-import Button from "@/components/ui/Button"
-import Banner from "@/components/ui/Banner"
-import Pagination from "@/components/ui/Pagination"
+import Breadcrumbs from "@ui/Breadcrumbs.vue"
+import Button from "@ui/Button.vue"
+import Banner from "@ui/Banner.vue"
+import Pagination from "@ui/Pagination.vue"
 import {
 	Dropdown,
 	DropdownItem,
 	DropdownTitle,
 	DropdownDivider,
-} from "@/components/ui/Dropdown"
+} from "@ui/Dropdown"
 
 /**
  * Local
  */
-import EventChart from "./EventChart"
-import EventGeneralCard from "./EventGeneralCard"
-import EventPriceCard from "./EventPriceCard"
-import EventAnalyticsCard from "./EventAnalyticsCard"
-import EventPoolCard from "./EventPoolCard"
-import EventPersonalStats from "./EventPersonalStats"
+import EventChart from "./EventChart.vue"
+import EventGeneralCard from "./EventGeneralCard.vue"
+import EventPriceCard from "./EventPriceCard.vue"
+import EventAnalyticsCard from "./EventAnalyticsCard.vue"
+import EventPoolCard from "./EventPoolCard.vue"
+import EventPersonalStats from "./EventPersonalStats.vue"
 
-import BetCard from "@/components/modules/events/BetCard"
-import DepositCard from "@/components/modules/events/DepositCard"
+import BetCard from "@modules/events/BetCard.vue"
+import DepositCard from "@modules/events/DepositCard.vue"
 
-import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
-import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
-import BetModal from "@/components/local/modals/position/BetModal"
-import ConfirmTransactionModal from "@/components/local/modals/ConfirmTransactionModal"
-import EventDetailsModal from "@/components/local/modals/EventDetailsModal"
-import NotifyMeModal from "@/components/local/modals/NotifyMeModal"
+import ParticipantsModal from "@local/modals/ParticipantsModal.vue"
+import LiquidityModal from "@local/modals/position/LiquidityModal.vue"
+import BetModal from "@local/modals/position/BetModal.vue"
+import ConfirmTransactionModal from "@local/modals/ConfirmTransactionModal.vue"
+import EventDetailsModal from "@local/modals/EventDetailsModal.vue"
+import NotifyMeModal from "@local/modals/NotifyMeModal.vue"
 
 /**
  * Composable
@@ -53,18 +53,18 @@ import { fetchEventById, fetchEventParticipants } from "@/api/events"
 /**
  * Services
  */
-import { numberWithSymbol } from "@/services/utils/amounts"
-import { capitalizeFirstLetter, toClipboard } from "@/services/utils/global"
-import { juster, analytics, currentNetwork } from "@/services/sdk"
-import { supportedMarkets, verifiedMakers } from "@/services/config"
+import { numberWithSymbol } from "@utils/amounts"
+import { capitalizeFirstLetter, toClipboard } from "@utils/global"
+import { juster, analytics, currentNetwork } from "@sdk"
+import { supportedMarkets, verifiedMakers } from "@config"
 
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
-import { useApplicationCacheStore } from "@/store/cache"
+import { useMarketStore } from "@store/market"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
+import { useApplicationCacheStore } from "@store/cache"
 
 /**
  * gql
@@ -128,7 +128,7 @@ const getEvent = async () => {
 	/** meta */
 	meta.meta.title = `Price Event - ${
 		supportedMarkets[event.value.currencyPair.symbol].target
-	} (#${event.value.id})`
+	} (#${numberWithSymbol(event.value.id, ",")})`
 
 	if (!event.value) {
 		router.push("/events")
@@ -827,7 +827,7 @@ onUnmounted(() => {
 									supportedMarkets[event.currencyPair.symbol]
 										.target
 								}}
-								(#{{ event.id }})
+								(#{{ numberWithSymbol(event.id, ",") }})
 
 								<Icon
 									v-if="

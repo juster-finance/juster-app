@@ -5,22 +5,22 @@ import { DateTime } from "luxon"
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
-import Button from "@/components/ui/Button"
+import Modal from "@ui/Modal.vue"
+import Button from "@ui/Button.vue"
 
 /**
  * Services
  */
-import { shorten } from "@/services/utils/global"
-import { toClipboard } from "@/services/utils/global"
-import { numberWithSymbol } from "@/services/utils/amounts"
-import { currentNetwork } from "@/services/sdk"
+import { shorten } from "@utils/global"
+import { toClipboard } from "@utils/global"
+import { numberWithSymbol } from "@utils/amounts"
+import { currentNetwork } from "@sdk"
 
 /**
  * Store
  */
-import { useNotificationsStore } from "@/store/notifications"
-import { useMarketStore } from "@/store/market"
+import { useNotificationsStore } from "@store/notifications"
+import { useMarketStore } from "@store/market"
 
 const notificationsStore = useNotificationsStore()
 const marketStore = useMarketStore()
@@ -268,9 +268,23 @@ const getTypeOfOperation = () => {
 
 	border-radius: 50%;
 	fill: var(--green);
-	box-shadow: 0px 0px 30px rgba(26, 161, 104, 0.51);
+	box-shadow: 0px 0px 30px rgba(26, 161, 104, 0.8);
+
+	animation: pulse 2s infinite;
 
 	margin-bottom: 40px;
+}
+
+@keyframes pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(26, 161, 104, 0.8);
+	}
+	70% {
+		box-shadow: 0 0 0 15px rgba(26, 161, 104, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(26, 161, 104, 0);
+	}
 }
 
 .type {

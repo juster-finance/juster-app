@@ -6,7 +6,7 @@ import ArticleContent from "./ArticleContent"
 /**
  * Store
  */
-import { useDocsStore } from "@/store/docs"
+import { useDocsStore } from "@store/docs"
 
 export default defineComponent({
 	name: "DocBase",

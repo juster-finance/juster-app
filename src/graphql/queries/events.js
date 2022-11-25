@@ -307,7 +307,7 @@ export const getEventsWithUserPosition = gql`
 `
 
 export const getEventParticipants = gql`
-	query getEventParticipants($id: Int) {
+	query getEventParticipants($id: bigint) {
 		event(where: { id: { _eq: $id } }) {
 			positions {
 				userId

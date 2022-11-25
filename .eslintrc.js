@@ -1,13 +1,13 @@
 module.exports = {
 	root: true,
 	env: {
-		node: true,
+		es2021: true,
 		"vue/setup-compiler-macros": true,
 	},
 	parserOptions: {
 		ecmaVersion: 2020,
-		parser: "babel-eslint",
 	},
+	plugins: ["prettier"],
 	extends: [
 		"plugin:vue/base",
 		"plugin:vue/vue3-essential",

@@ -7,20 +7,20 @@ import cloneDeep from "lodash.clonedeep"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Banner from "@/components/ui/Banner"
-import Pagination from "@/components/ui/Pagination"
+import Button from "@ui/Button.vue"
+import Banner from "@ui/Banner.vue"
+import Pagination from "@ui/Pagination.vue"
 
 /**
  * Local
  */
-import { EventCard } from "@/components/local/EventCard"
+import { EventCard } from "@local/EventCard"
 
 /**
  * Modals
  */
-import WithdrawAllModal from "@/components/local/modals/WithdrawAllModal"
-import OperationModal from "@/components/local/modals/OperationModal"
+import WithdrawAllModal from "@local/modals/WithdrawAllModal.vue"
+import OperationModal from "@local/modals/OperationModal.vue"
 
 /**
  * API
@@ -30,12 +30,12 @@ import { fetchUserWithdrawals } from "@/api/users"
 /**
  * Services
  */
-import { numberWithSymbol } from "@/services/utils/amounts"
+import { numberWithSymbol } from "@utils/amounts"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 
 const accountStore = useAccountStore()
 

@@ -11,13 +11,13 @@ import { fetchTopEvents } from "@/api/events"
 /**
  * UI
  */
-import Breadcrumbs from "@/components/ui/Breadcrumbs"
-import Banner from "@/components/ui/Banner"
+import Breadcrumbs from "@ui/Breadcrumbs.vue"
+import Banner from "@ui/Banner.vue"
 
 /**
  * Local
  */
-import { EventCard } from "@/components/local/EventCard"
+import { EventCard } from "@local/EventCard"
 
 export default defineComponent({
 	name: "TopEventsBase",

@@ -5,22 +5,22 @@ import { DateTime } from "luxon"
 /**
  * UI
  */
-import Spin from "@/components/ui/Spin"
+import Spin from "@ui/Spin.vue"
 
 /**
  * Modals
  */
-import OperationModal from "@/components/local/modals/OperationModal"
+import OperationModal from "@local/modals/OperationModal.vue"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 
 /**
  * Services
  */
-import { numberWithSymbol } from "@/services/utils/amounts"
+import { numberWithSymbol } from "@utils/amounts"
 
 const accountStore = useAccountStore()
 

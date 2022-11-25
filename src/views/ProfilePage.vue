@@ -1,25 +1,17 @@
-<script>
-import { defineComponent } from "vue"
-
+<script setup>
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import ProfileBase from "@/components/modules/profile/ProfileBase"
-
-export default defineComponent({
-    name: "ProfilePage",
-
-    components: { Page, ProfileBase },
-})
+import ProfileBase from "@modules/profile/ProfileBase.vue"
 </script>
 
 <template>
-    <Page>
-        <ProfileBase />
-    </Page>
+	<Page>
+		<ProfileBase />
+	</Page>
 </template>

@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import {
 	nextTick,
 	onBeforeMount,
@@ -7,6 +10,7 @@ import {
 	ref,
 	watch,
 } from "vue"
+import * as focusTrap from "focus-trap"
 
 /**
  * Composable
@@ -15,6 +19,11 @@ import { useOnOutsidePress } from "@/composable/onOutside"
 
 const emit = defineEmits(["onClose"])
 const props = defineProps({
+	new: {
+		type: Boolean,
+		default: false,
+	},
+
 	show: {
 		type: Boolean,
 	},
@@ -46,18 +55,23 @@ const props = defineProps({
 
 let removeOutside
 const modal = ref(null)
+const trap = ref({})
 
 watch(
 	() => props.show,
 	() => {
 		if (!props.show) {
+			trap.value.deactivate()
+
 			if (removeOutside) {
 				removeOutside()
 			}
 		} else {
-			if (!props.closeOutside) return
-
 			nextTick(() => {
+				trap.value = focusTrap.createFocusTrap(modal.value)
+				trap.value.activate()
+
+				if (!props.closeOutside) return
 				removeOutside = useOnOutsidePress(modal, () => {
 					if (props.blockClosing) return
 					handleClose()
@@ -79,6 +93,8 @@ const calcModalStyles = computed(() => {
 	const styles = {
 		width: props.width ? `${props.width}px` : `400px`,
 	}
+
+	props.new && (styles.padding = "0")
 
 	return styles
 })
@@ -110,8 +126,10 @@ const onKeydown = (event) => {
 <template>
 	<teleport to="#modal">
 		<transition name="popup">
-			<div
+			<Flex
 				v-if="show"
+				align="center"
+				justify="center"
 				:class="$style.wrapper"
 				:style="{ zIndex: zIndex }"
 			>
@@ -123,14 +141,14 @@ const onKeydown = (event) => {
 					<slot />
 
 					<Icon
+						v-if="closable && !props.new"
 						name="close"
 						size="16"
 						@click="handleClose"
-						v-if="closable"
 						:class="$style.close_icon"
 					/>
 				</div>
-			</div>
+			</Flex>
 		</transition>
 	</teleport>
 </template>
@@ -143,12 +161,12 @@ const onKeydown = (event) => {
 	right: 0;
 	bottom: 0;
 
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	overflow: hidden;
 
-	backdrop-filter: blur(3px);
+	backdrop-filter: blur(2px);
 	background: rgba(0, 0, 0, 0.2);
+
+	transition: all 0.2s ease;
 }
 
 .modal {
@@ -157,7 +175,7 @@ const onKeydown = (event) => {
 
 	border-radius: 8px;
 	background: var(--modal-bg);
-	box-shadow: rgb(0 0 0 / 20%) 0px 0px 1px, rgb(0 0 0 / 20%) 0px 20px 40px;
+	box-shadow: rgb(0 0 0 / 20%) 0px 0px 1px, rgb(0 0 0 / 30%) 0px 10px 40px;
 
 	padding: 32px;
 	margin: 0 20px;

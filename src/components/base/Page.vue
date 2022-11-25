@@ -37,7 +37,7 @@ defineProps({
 
 @media (max-width: 700px) {
 	.wrapper {
-		margin: 0 24px 100px 24px;
+		margin: 0 16px 100px 16px;
 		padding-top: 24px;
 	}
 }

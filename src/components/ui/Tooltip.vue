@@ -4,13 +4,14 @@ import { reactive, onMounted, ref } from "vue"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
+import Button from "@ui/Button.vue"
 
 const props = defineProps({
 	placement: { type: String, default: "bottom" },
 	textAlign: { type: String, default: "center" },
 	isWide: { type: Boolean, default: null },
 	button: { type: Object, default: null },
+	disabled: { type: Boolean, default: false },
 })
 
 const trigger = ref(null)
@@ -89,7 +90,11 @@ const updateStyles = () => {
 			<slot />
 		</div>
 
-		<div ref="tip" :class="[$style.content]" :style="styles">
+		<div
+			ref="tip"
+			:class="[$style.content, disabled ? $style.disabled : $style.show]"
+			:style="styles"
+		>
 			<div :class="[$style.text]" :style="{ textAlign }">
 				<slot name="content" />
 			</div>
@@ -132,10 +137,15 @@ const updateStyles = () => {
 	transition: all 0.15s ease;
 }
 
-.wrapper:hover .content {
+.wrapper:hover .content.show {
 	visibility: visible;
 	opacity: 1;
 	transform: scale(1);
+}
+
+.wrapper:hover .content.disabled {
+	visibility: hidden;
+	opacity: 0;
 }
 
 .text {

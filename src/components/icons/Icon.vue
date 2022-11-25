@@ -13,8 +13,15 @@ const styles = computed(() => {
 	return {
 		minWidth: `${props.size}px`,
 		minHeight: `${props.size}px`,
-		fill: props.color,
 	}
+})
+
+const classes = computed(() => {
+	const iconClasses = []
+
+	if (props.color) iconClasses.push(`fill--${props.color}`)
+
+	return iconClasses
 })
 
 const getIcon = () => {
@@ -36,6 +43,7 @@ const isSplitted = () => {
 		:width="size"
 		:height="size"
 		:style="styles"
+		:class="classes"
 		role="img"
 	>
 		<path v-if="!isSplitted(name)" :d="getIcon(name)" />

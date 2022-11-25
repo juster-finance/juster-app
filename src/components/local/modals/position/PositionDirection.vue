@@ -5,12 +5,12 @@ import { DateTime } from "luxon"
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 
 /**
  * Services
  */
-import { supportedMarkets } from "@/services/config"
+import { supportedMarkets } from "@config"
 
 const props = defineProps(["event", "amount", "countdown"])
 

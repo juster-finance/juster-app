@@ -5,21 +5,21 @@ import { DateTime } from "luxon"
 /**
  * UI
  */
-import Tooltip from "@/components/ui/Tooltip"
+import Tooltip from "@ui/Tooltip.vue"
 
 /**
  * Local
  */
-import EventActions from "@/components/local/EventActions"
+import EventActions from "@local/EventActions.vue"
 
 /**
  * Services
  */
-import { numberWithSymbol } from "@/services/utils/amounts"
-import { pluralize } from "@/services/utils/global"
-import { currentNetwork } from "@/services/sdk"
-import { toReadableDuration } from "@/services/utils/date"
-import { supportedMarkets, verifiedMakers } from "@/services/config"
+import { numberWithSymbol } from "@utils/amounts"
+import { pluralize } from "@utils/global"
+import { currentNetwork } from "@sdk"
+import { toReadableDuration } from "@utils/date"
+import { supportedMarkets, verifiedMakers } from "@config"
 
 const props = defineProps({
 	event: {

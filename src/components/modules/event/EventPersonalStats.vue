@@ -4,17 +4,17 @@ import { computed } from "vue"
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 
 /**
  * Services
  */
-import { abbreviateNumber, numberWithSymbol } from "@/services/utils/amounts"
+import { abbreviateNumber, numberWithSymbol } from "@utils/amounts"
 
 /**
  * UI
  */
-import Tooltip from "@/components/ui/Tooltip"
+import Tooltip from "@ui/Tooltip.vue"
 
 const props = defineProps({
 	event: {

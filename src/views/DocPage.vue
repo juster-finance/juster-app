@@ -4,28 +4,28 @@ import { defineComponent } from "vue"
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import DocBase from "@/components/modules/docs/DocBase"
+import DocBase from "@modules/docs/DocBase.vue"
 
 export default defineComponent({
-    name: "DocPage",
+	name: "DocPage",
 
-    components: { Page, DocBase },
+	components: { Page, DocBase },
 })
 </script>
 
 <template>
-    <Page style="padding: 0; margin-bottom: 0">
-        <DocBase />
-    </Page>
+	<Page style="padding: 0; margin-bottom: 0">
+		<DocBase />
+	</Page>
 </template>
 
 <style module>
 .wrapper {
-    max-width: 1250px;
+	max-width: 1250px;
 }
 </style>

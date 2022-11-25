@@ -22,7 +22,7 @@ const props = defineProps({
 })
 
 const classes = computed(() => {
-	const flexClasses = ["flex"]
+	const flexClasses = []
 
 	if (props.size) {
 		flexClasses.push(`fz--${props.size}`)

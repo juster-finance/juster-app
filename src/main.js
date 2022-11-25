@@ -6,9 +6,9 @@ import { createPinia } from "pinia"
 /** Analytics */
 import VueGtag from "vue-gtag"
 import amplitude from "amplitude-js"
-amplitude.getInstance().init("a515d3d1969a8f25c340476842b19836")
+amplitude.getInstance().init(import.meta.env.VITE_AMPLITUDE)
 
-import "@/services/sdk"
+import "@sdk"
 
 import { initFlags } from "@/services/flags"
 initFlags()
@@ -36,9 +36,9 @@ app.provide("amplitude", amplitude.getInstance())
 /**
  * Global components
  */
-import Icon from "@/components/icons/Icon"
-import Flex from "@/components/layout/Flex"
-import Text from "@/components/typography/Text"
+import Icon from "@/components/icons/Icon.vue"
+import Flex from "@layout/Flex.vue"
+import Text from "@typography/Text.vue"
 app.component("Icon", Icon)
 app.component("Flex", Flex)
 app.component("Text", Text)

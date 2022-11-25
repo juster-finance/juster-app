@@ -4,8 +4,8 @@ import { computed, defineComponent, ref, toRefs, watch } from "vue"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Tooltip from "@/components/ui/Tooltip"
+import Button from "@ui/Button.vue"
+import Tooltip from "@ui/Tooltip.vue"
 
 export default defineComponent({
 	name: "Pagination",

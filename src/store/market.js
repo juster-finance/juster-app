@@ -9,6 +9,8 @@ export const useMarketStore = defineStore({
 
 			events: [],
 
+			pools: [],
+
 			markets: {
 				"BTC-USD": {
 					events: [],

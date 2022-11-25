@@ -4,12 +4,12 @@ import { ref, onMounted } from "vue"
 /**
  * Local
  */
-import UserCard from "@/components/local/UserCard"
+import UserCard from "@local/UserCard.vue"
 
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
+import Modal from "@ui/Modal.vue"
 
 /**
  * API

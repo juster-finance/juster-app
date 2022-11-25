@@ -4,23 +4,24 @@ import { reactive, ref, watch, computed } from "vue"
 /**
  * Modals
  */
-import FindParticipantModal from "@/components/local/modals/FindParticipantModal"
+import FindParticipantModal from "@local/modals/FindParticipantModal.vue"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Toggle from "@/components/ui/Toggle"
+import Button from "@ui/Button.vue"
+import Toggle from "@ui/Toggle.vue"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 
 /**
  * Services
  */
-import { analytics } from "@/services/sdk"
+import { analytics } from "@sdk"
+import { getCurrencyIcon } from "@utils/global"
 
 const props = defineProps({
 	filters: { type: Object },
@@ -198,13 +199,7 @@ const handleKeydown = (e) => {
 						]"
 					>
 						<img
-							:src="
-								require(`@/assets/symbols/${
-									(symbol.name == 'XTZ-USD' && 'tz') ||
-									(symbol.name == 'ETH-USD' && 'eth') ||
-									(symbol.name == 'BTC-USD' && 'btc')
-								}.png`)
-							"
+							:src="getCurrencyIcon(symbol.name.split('-')[0])"
 							alt="symbol"
 						/>
 						{{ symbol.name.replace("-USD", "") }}
@@ -455,7 +450,6 @@ const handleKeydown = (e) => {
 
 	background: var(--card-bg);
 	border-radius: 8px;
-	border: 1px solid var(--border);
 	padding: 20px 0 12px 0;
 	height: fit-content;
 }

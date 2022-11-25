@@ -5,13 +5,13 @@
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
-import Button from "@/components/ui/Button"
+import Modal from "@ui/Modal.vue"
+import Button from "@ui/Button.vue"
 
 /**
  * Store
  */
-import { useAppStore } from "@/store/app"
+import { useAppStore } from "@store/app"
 
 defineProps({
 	show: Boolean,

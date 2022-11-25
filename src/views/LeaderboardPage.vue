@@ -4,12 +4,12 @@ import { defineComponent } from "vue"
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import LeaderboardBase from "@/components/modules/leaderboard/LeaderboardBase"
+import LeaderboardBase from "@modules/leaderboard/LeaderboardBase.vue"
 
 export default defineComponent({
 	name: "LeaderboardPage",

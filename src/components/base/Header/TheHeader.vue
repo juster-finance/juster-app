@@ -6,7 +6,7 @@ import { useRoute, useRouter } from "vue-router"
 /**
  * Services
  */
-import { juster, switchNetwork, currentNetwork } from "@/services/sdk"
+import { juster, switchNetwork, currentNetwork } from "@sdk"
 
 /**
  * Constants
@@ -16,25 +16,25 @@ import { Networks } from "@/services/constants"
 /**
  * Components: UI
  */
-import Tooltip from "@/components/ui/Tooltip"
-import Button from "@/components/ui/Button"
+import Tooltip from "@ui/Tooltip.vue"
+import Button from "@ui/Button.vue"
 
 /**
  * Components: Modules
  */
-import ProfileMenu from "@/components/modules/profile/ProfileMenu"
+import ProfileMenu from "@modules/profile/ProfileMenu.vue"
 
 /**
  * Local
  */
-import ThePendingTransaction from "./ThePendingTransaction"
-import NavigationPopup from "./NavigationPopup"
-import RewardAlert from "@/components/local/RewardAlert"
+import ThePendingTransaction from "./ThePendingTransaction.vue"
+import NavigationPopup from "./NavigationPopup.vue"
+import RewardAlert from "@local/RewardAlert.vue"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 
 const accountStore = useAccountStore()
 
@@ -190,7 +190,7 @@ const handleNetworkDblClick = () => {
 					<Icon :name="showMobileMenu ? 'close' : 'menu'" size="16" />
 				</div>
 
-				<router-link to="/" :class="$style.logo">
+				<router-link to="/" :class="$style.logo" tabindex="-1">
 					<Icon name="logo_symbol" size="28" />
 				</router-link>
 			</div>
@@ -200,7 +200,9 @@ const handleNetworkDblClick = () => {
 					v-for="link in links"
 					:key="link.name"
 					:to="link.url"
+					:id="link.name"
 					@mouseenter="activeLink = link.name"
+					@focus="activeLink = link.name"
 					:class="[$style.link, isActive(link.url) && $style.active]"
 				>
 					<Icon :name="link.icon" size="16" fill />{{ link.name }}
@@ -300,7 +302,7 @@ const handleNetworkDblClick = () => {
 
 @supports (backdrop-filter: blur(5px)) {
 	.wrapper {
-		backdrop-filter: blur(5px);
+		backdrop-filter: blur(10px);
 	}
 }
 
@@ -420,7 +422,7 @@ const handleNetworkDblClick = () => {
 
 @media (max-width: 700px) {
 	.base {
-		margin: 0 24px;
+		margin: 0 16px;
 	}
 
 	.logo img {

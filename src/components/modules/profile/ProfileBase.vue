@@ -6,21 +6,21 @@ import { useMeta } from "vue-meta"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Tooltip from "@/components/ui/Tooltip"
-import Pagination from "@/components/ui/Pagination"
+import Button from "@ui/Button.vue"
+import Tooltip from "@ui/Tooltip.vue"
+import Pagination from "@ui/Pagination.vue"
 
 /**
  * Local
  */
-import { EventCard } from "@/components/local/EventCard"
+import { EventCard } from "@local/EventCard"
 
 /**
  * Services
  */
-import { currentNetwork, fetchBalance } from "@/services/sdk"
-import { toClipboard } from "@/services/utils/global"
-import { abbreviateNumber } from "@/services/utils/amounts"
+import { currentNetwork, fetchBalance } from "@sdk"
+import { toClipboard } from "@utils/global"
+import { abbreviateNumber } from "@utils/amounts"
 
 /**
  * API
@@ -31,8 +31,8 @@ import { fetchAllUserPositions } from "@/api/positions"
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
 
 export default defineComponent({
 	name: "ProfileBase",

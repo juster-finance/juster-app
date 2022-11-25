@@ -3,9 +3,9 @@ import { ref, watch, reactive } from "vue"
 /**
  * Services
  */
-import { countdown } from "@/services/utils/date"
+import { countdown } from "@utils/date"
 
-export const useCountdown = target => {
+export const useCountdown = (target) => {
 	const countdownText = ref("00:00:00")
 	const status = ref("In progress")
 	const time = reactive({ d: 0, h: 0, m: 0 })

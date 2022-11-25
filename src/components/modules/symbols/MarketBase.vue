@@ -21,25 +21,25 @@ import { fetchEventsByMarket } from "@/api/events"
 /**
  * Local
  */
-import Market from "./Market"
-import { EventCard, EventCardLoading } from "@/components/local/EventCard"
+import Market from "./Market.vue"
+import { EventCard, EventCardLoading } from "@local/EventCard"
 
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
+import { useMarketStore } from "@store/market"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Pagination from "@/components/ui/Pagination"
-import Breadcrumbs from "@/components/ui/Breadcrumbs"
+import Button from "@ui/Button.vue"
+import Pagination from "@ui/Pagination.vue"
+import Breadcrumbs from "@ui/Breadcrumbs.vue"
 
 /**
  * Services
  */
-import { analytics } from "@/services/sdk"
+import { analytics } from "@sdk"
 
 export default defineComponent({
 	name: "MarketBase",

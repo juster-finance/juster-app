@@ -21,13 +21,13 @@ import { fetchQuoteByRange } from "@/api/quotes"
 /**
  * Services
  */
-import { prepareQuotesForD3 } from "@/services/utils/quotes"
-import { juster } from "@/services/sdk"
+import { prepareQuotesForD3 } from "@utils/quotes"
+import { juster } from "@sdk"
 
 /**
  * UI
  */
-import Banner from "@/components/ui/Banner"
+import Banner from "@ui/Banner.vue"
 
 export default defineComponent({
 	name: "EventPriceChart",

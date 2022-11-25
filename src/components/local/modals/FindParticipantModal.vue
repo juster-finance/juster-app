@@ -5,9 +5,9 @@ import { computed, ref, watch } from "vue"
 /**
  * Components: UI
  */
-import Modal from "@/components/ui/Modal"
-import Input from "@/components/ui/Input"
-import Button from "@/components/ui/Button"
+import Modal from "@ui/Modal.vue"
+import Input from "@ui/Input.vue"
+import Button from "@ui/Button.vue"
 
 const props = defineProps({
 	show: {

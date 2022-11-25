@@ -1,8 +1,8 @@
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
-import { contracts } from "@/services/config"
+import { juster } from "@sdk"
+import { contracts } from "@config"
 
 export const withdrawAll = async ({ eventIds, address }) => {
 	try {

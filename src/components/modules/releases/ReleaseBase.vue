@@ -7,7 +7,7 @@ import Markdown from "markdown-it"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
+import Button from "@ui/Button.vue"
 
 /**
  * API
@@ -17,7 +17,7 @@ import { fetchReleases } from "@/api/sanity"
 /**
  * Store
  */
-import { useReleasesStore } from "@/store/releases"
+import { useReleasesStore } from "@store/releases"
 
 export default defineComponent({
 	name: "ReleaseBase",

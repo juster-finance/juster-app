@@ -1,12 +1,12 @@
 <script setup>
-import { ref } from "vue"
+import { ref, watch, nextTick } from "vue"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
+import Button from "@ui/Button.vue"
 
-defineProps({
+const props = defineProps({
 	activeLink: {
 		type: String,
 		default: "",
@@ -95,6 +95,25 @@ const communityLinks = ref([
 		url: "/rank",
 	},
 ])
+
+const posX = ref(0)
+const carretRef = ref(null)
+watch(
+	() => props.activeLink,
+	() => {
+		if (!props.activeLink) return
+
+		const navEl = document.getElementById(props.activeLink)
+		const navElRect = navEl.getBoundingClientRect()
+
+		nextTick(() => {
+			posX.value =
+				navElRect.left +
+				navElRect.width / 2 -
+				navEl.parentElement.getBoundingClientRect().left
+		})
+	},
+)
 </script>
 
 <template>
@@ -104,244 +123,269 @@ const communityLinks = ref([
 			@click="emit('onClick')"
 			:class="[$style.wrapper, activeLink.length && $style.animate]"
 		>
-			<div v-if="activeLink === 'Browse'" :class="$style.card">
-				<div :class="$style.column">
-					<div :class="$style.atlas_block">
-						<router-link
-							v-for="(link, i) in browseLinks"
-							:key="i"
-							:to="link.url"
-							:class="$style.item"
-						>
-							<div :class="$style.icon_wrapper">
-								<Icon :name="link.icon" size="20" />
-							</div>
+			<div :class="$style.carret">
+				<svg
+					ref="carretRef"
+					width="16"
+					height="8"
+					viewBox="0 0 16 8"
+					xmlns="http://www.w3.org/2000/svg"
+					:style="{ transform: `translateX(${posX}px)` }"
+				>
+					<path d="M8 0L16 8H0L8 0Z" />
+				</svg>
+			</div>
 
-							<div :class="$style.text">
-								<span>{{ link.title }}</span>
-								<span>{{ link.description }}</span>
-							</div>
-						</router-link>
-					</div>
-				</div>
-
-				<div :class="$style.divider" />
-
-				<div :class="$style.column">
-					<div :class="$style.advanced_block">
-						<div :class="[$style.item, $style.disabled]">
-							<div :class="$style.icon_wrapper">
-								<Icon name="lock" size="20" />
-							</div>
-
-							<div :class="$style.text">
-								<span>Untitled Feature</span>
-								<span>Coming soon!</span>
-							</div>
-						</div>
-					</div>
-
-					<div :class="$style.guides_block">
-						<div :class="$style.label">featured guides</div>
-
-						<div :class="$style.guide">
-							<span>What are liquidity pools?</span>
-							<span>Advanced</span>
-						</div>
-
-						<div :class="$style.guide">
-							<span>Creating and managing events</span>
-							<span>Advanced</span>
-						</div>
-					</div>
-
-					<div :class="$style.buttons">
-						<router-link to="/releases">
-							<Button size="mini" type="secondary" block>
-								<Icon
-									name="asterisk"
-									size="14"
-									style="fill: var(--green)"
-								/>Release 1.1
-							</Button>
-						</router-link>
-
-						<div :class="$style.button_group">
-							<Button size="mini" type="secondary" block>
-								<Icon
-									name="layers"
-									size="14"
-									style="fill: var(--orange)"
-								/>All Features
-							</Button>
-
-							<Button
-								size="mini"
-								type="secondary"
-								block
-								as-link
-								link="https://discord.gg/FeGDCkHhnB"
+			<div
+				v-if="activeLink.length"
+				:class="[
+					$style.card,
+					activeLink === 'Browse' && $style.left,
+					activeLink === 'Resources' && $style.center,
+					activeLink === 'Community' && $style.right,
+				]"
+			>
+				<template v-if="activeLink === 'Browse'">
+					<div :class="$style.column">
+						<div :class="$style.atlas_block">
+							<router-link
+								v-for="(link, i) in browseLinks"
+								:key="i"
+								:to="link.url"
+								:class="$style.item"
 							>
+								<div :class="$style.icon_wrapper">
+									<Icon :name="link.icon" size="20" />
+								</div>
+
+								<div :class="$style.text">
+									<span>{{ link.title }}</span>
+									<span>{{ link.description }}</span>
+								</div>
+							</router-link>
+						</div>
+					</div>
+
+					<div :class="$style.divider" />
+
+					<div :class="$style.column">
+						<div :class="$style.advanced_block">
+							<router-link to="/pools" :class="$style.item">
+								<div :class="$style.icon_wrapper">
+									<Icon name="pool" size="20" />
+								</div>
+
+								<div :class="$style.text">
+									<span>Liquidity Pools</span>
+									<span>Provide liquidity to events</span>
+								</div>
+							</router-link>
+						</div>
+
+						<div :class="$style.guides_block">
+							<div :class="$style.label">featured guides</div>
+
+							<div :class="$style.guide">
+								<span>What are liquidity pools?</span>
+								<span>Advanced</span>
+							</div>
+
+							<div :class="$style.guide">
+								<span>Creating and managing events</span>
+								<span>Advanced</span>
+							</div>
+						</div>
+
+						<div :class="$style.buttons">
+							<router-link to="/releases">
+								<Button size="mini" type="secondary" block>
+									<Icon
+										name="asterisk"
+										size="14"
+										style="fill: var(--green)"
+									/>Release 1.1
+								</Button>
+							</router-link>
+
+							<div :class="$style.button_group">
+								<Button size="mini" type="secondary" block>
+									<Icon
+										name="layers"
+										size="14"
+										style="fill: var(--orange)"
+									/>All Features
+								</Button>
+
+								<Button
+									size="mini"
+									type="secondary"
+									block
+									as-link
+									link="https://discord.gg/FeGDCkHhnB"
+								>
+									<Icon
+										name="chat"
+										size="14"
+										style="fill: var(--text-primary)"
+									/>Discussions
+								</Button>
+							</div>
+						</div>
+					</div>
+				</template>
+
+				<template v-if="activeLink === 'Resources'">
+					<div :class="$style.column">
+						<div :class="$style.atlas_block">
+							<div
+								v-for="(link, i) in resourcesLinks"
+								:key="i"
+								:class="$style.item"
+							>
+								<div :class="$style.icon_wrapper">
+									<Icon :name="link.icon" size="20" />
+								</div>
+
+								<div :class="$style.text">
+									<span>{{ link.title }}</span>
+									<span>{{ link.description }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div :class="$style.divider" />
+
+					<div :class="$style.column">
+						<div :class="$style.guides_block">
+							<div :class="$style.label">GETTING STARTED</div>
+
+							<div :class="$style.guide">
+								<span>How to participate?</span>
+								<span>Basic</span>
+							</div>
+
+							<div :class="$style.guide">
+								<span>Liquidity & Payouts</span>
+								<span>Basic</span>
+							</div>
+						</div>
+
+						<div :class="$style.guides_block">
+							<div :class="$style.label">use cases</div>
+
+							<div :class="$style.guide">
+								<span>Betting: Symbols, Sports, etc</span>
+								<span>Guide</span>
+							</div>
+
+							<div :class="$style.guide">
+								<span>Binary Options Mode</span>
+								<span>Guide</span>
+							</div>
+
+							<div :class="$style.guide">
+								<span>Shared Liquidity Pool</span>
+								<span>Guide</span>
+							</div>
+						</div>
+
+						<div :class="$style.buttons">
+							<div :class="$style.button_group">
+								<Button size="mini" type="secondary" block>
+									<Icon
+										name="shield_tick"
+										size="14"
+										style="fill: var(--green)"
+									/>Security Audits
+								</Button>
+
+								<Button
+									size="mini"
+									type="secondary"
+									block
+									as-link
+									link="https://discord.gg/FeGDCkHhnB"
+								>
+									<Icon
+										name="document"
+										size="14"
+										style="fill: var(--text-primary)"
+									/>White-Papper
+								</Button>
+							</div>
+						</div>
+					</div></template
+				>
+
+				<template v-if="activeLink === 'Community'">
+					<div :class="$style.column">
+						<div :class="$style.atlas_block">
+							<router-link
+								v-for="(link, i) in communityLinks"
+								:key="i"
+								:to="link.url"
+								:class="$style.item"
+							>
+								<div :class="$style.icon_wrapper">
+									<Icon :name="link.icon" size="20" />
+								</div>
+
+								<div :class="$style.text">
+									<span>{{ link.title }}</span>
+									<span>{{ link.description }}</span>
+								</div>
+							</router-link>
+						</div>
+					</div>
+
+					<div :class="$style.divider" />
+
+					<div :class="$style.column">
+						<div :class="$style.guides_block">
+							<div :class="$style.label">GETTING STARTED</div>
+
+							<div :class="$style.guide">
+								<span>How to participate?</span>
+								<span>Basic</span>
+							</div>
+
+							<div :class="$style.guide">
+								<span>Liquidity & Payouts</span>
+								<span>Basic</span>
+							</div>
+						</div>
+
+						<div :class="$style.guides_block">
+							<div :class="$style.label">use cases</div>
+
+							<div :class="$style.guide">
+								<span>Betting: Symbols, Sports, etc</span>
+								<span>Guide</span>
+							</div>
+
+							<div :class="$style.guide">
+								<span>Binary Options Mode</span>
+								<span>Guide</span>
+							</div>
+
+							<div :class="$style.guide">
+								<span>Shared Liquidity Pool</span>
+								<span>Guide</span>
+							</div>
+						</div>
+
+						<div :class="$style.buttons">
+							<Button size="mini" type="secondary" block>
 								<Icon
-									name="chat"
+									name="telegram"
 									size="14"
 									style="fill: var(--text-primary)"
-								/>Discussions
+								/>Telegram Channel: Notifications
 							</Button>
 						</div>
-					</div>
-				</div>
-			</div>
-			<div v-if="activeLink === 'Resources'" :class="$style.card">
-				<div :class="$style.column">
-					<div :class="$style.atlas_block">
-						<div
-							v-for="(link, i) in resourcesLinks"
-							:key="i"
-							:class="$style.item"
-						>
-							<div :class="$style.icon_wrapper">
-								<Icon :name="link.icon" size="20" />
-							</div>
-
-							<div :class="$style.text">
-								<span>{{ link.title }}</span>
-								<span>{{ link.description }}</span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div :class="$style.divider" />
-
-				<div :class="$style.column">
-					<div :class="$style.guides_block">
-						<div :class="$style.label">GETTING STARTED</div>
-
-						<div :class="$style.guide">
-							<span>How to participate?</span>
-							<span>Basic</span>
-						</div>
-
-						<div :class="$style.guide">
-							<span>Liquidity & Payouts</span>
-							<span>Basic</span>
-						</div>
-					</div>
-
-					<div :class="$style.guides_block">
-						<div :class="$style.label">use cases</div>
-
-						<div :class="$style.guide">
-							<span>Betting: Symbols, Sports, etc</span>
-							<span>Guide</span>
-						</div>
-
-						<div :class="$style.guide">
-							<span>Binary Options Mode</span>
-							<span>Guide</span>
-						</div>
-
-						<div :class="$style.guide">
-							<span>Shared Liquidity Pool</span>
-							<span>Guide</span>
-						</div>
-					</div>
-
-					<div :class="$style.buttons">
-						<div :class="$style.button_group">
-							<Button size="mini" type="secondary" block>
-								<Icon
-									name="shield_tick"
-									size="14"
-									style="fill: var(--green)"
-								/>Security Audits
-							</Button>
-
-							<Button
-								size="mini"
-								type="secondary"
-								block
-								as-link
-								link="https://discord.gg/FeGDCkHhnB"
-							>
-								<Icon
-									name="document"
-									size="14"
-									style="fill: var(--text-primary)"
-								/>White-Papper
-							</Button>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div v-if="activeLink === 'Community'" :class="$style.card">
-				<div :class="$style.column">
-					<div :class="$style.atlas_block">
-						<router-link
-							v-for="(link, i) in communityLinks"
-							:key="i"
-							:to="link.url"
-							:class="$style.item"
-						>
-							<div :class="$style.icon_wrapper">
-								<Icon :name="link.icon" size="20" />
-							</div>
-
-							<div :class="$style.text">
-								<span>{{ link.title }}</span>
-								<span>{{ link.description }}</span>
-							</div>
-						</router-link>
-					</div>
-				</div>
-
-				<div :class="$style.divider" />
-
-				<div :class="$style.column">
-					<div :class="$style.guides_block">
-						<div :class="$style.label">GETTING STARTED</div>
-
-						<div :class="$style.guide">
-							<span>How to participate?</span>
-							<span>Basic</span>
-						</div>
-
-						<div :class="$style.guide">
-							<span>Liquidity & Payouts</span>
-							<span>Basic</span>
-						</div>
-					</div>
-
-					<div :class="$style.guides_block">
-						<div :class="$style.label">use cases</div>
-
-						<div :class="$style.guide">
-							<span>Betting: Symbols, Sports, etc</span>
-							<span>Guide</span>
-						</div>
-
-						<div :class="$style.guide">
-							<span>Binary Options Mode</span>
-							<span>Guide</span>
-						</div>
-
-						<div :class="$style.guide">
-							<span>Shared Liquidity Pool</span>
-							<span>Guide</span>
-						</div>
-					</div>
-
-					<div :class="$style.buttons">
-						<Button size="mini" type="secondary" block>
-							<Icon
-								name="telegram"
-								size="14"
-								style="fill: var(--text-primary)"
-							/>Telegram Channel: Notifications
-						</Button>
-					</div>
-				</div>
+					</div></template
+				>
 			</div>
 		</div>
 	</transition>
@@ -360,16 +404,41 @@ const communityLinks = ref([
 	z-index: 1005;
 }
 
+.carret svg {
+	position: absolute;
+	top: -8px;
+	left: 0;
+
+	fill: var(--card-bg);
+
+	transition: transform 0.2s ease;
+}
+
 .card {
 	display: flex;
 
 	min-width: 692px;
 	height: fit-content;
 
-	background: #262626;
+	background: var(--card-bg);
 	border-radius: 8px;
 
 	padding: 16px 16px 20px 16px;
+	box-shadow: rgb(0 0 0 / 30%) 0px 20px 40px;
+
+	transition: transform 0.2s ease;
+}
+
+.card.left {
+	transform: translateX(-20px);
+}
+
+.card.center {
+	transform: translateX(0);
+}
+
+.card.right {
+	transform: translateX(20px);
 }
 
 .content {
@@ -431,10 +500,10 @@ const communityLinks = ref([
 .icon_wrapper {
 	display: flex;
 
-	background: linear-gradient(rgba(49, 49, 49), rgba(55, 55, 55)) padding-box,
+	background: linear-gradient(rgb(40, 40, 43), rgb(50, 50, 53)) padding-box,
 		linear-gradient(
 				to bottom,
-				rgba(255, 255, 255, 0.3),
+				rgba(255, 255, 255, 0.2),
 				rgba(255, 255, 255, 0)
 			)
 			border-box;
@@ -443,7 +512,7 @@ const communityLinks = ref([
 
 	fill: var(--text-primary);
 
-	padding: 13px;
+	padding: 12px;
 
 	box-sizing: content-box;
 }

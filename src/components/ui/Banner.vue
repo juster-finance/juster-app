@@ -2,7 +2,7 @@
 /**
  * UI
  */
-import Spin from "@/components/ui/Spin"
+import Spin from "@ui/Spin.vue"
 
 defineProps({
 	icon: { type: String, default: "warning" },

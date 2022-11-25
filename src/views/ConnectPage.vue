@@ -2,12 +2,12 @@
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import ConnectBase from "@/components/modules/connect/ConnectBase"
+import ConnectBase from "@modules/connect/ConnectBase.vue"
 </script>
 
 <template>

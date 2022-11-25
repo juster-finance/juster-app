@@ -5,22 +5,22 @@ import { DateTime } from "luxon"
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
-import Button from "@/components/ui/Button"
-import Block from "@/components/ui/Block"
-import Spin from "@/components/ui/Spin"
-import Tooltip from "@/components/ui/Tooltip"
+import Modal from "@ui/Modal.vue"
+import Button from "@ui/Button.vue"
+import Block from "@ui/Block.vue"
+import Spin from "@ui/Spin.vue"
+import Tooltip from "@ui/Tooltip.vue"
 
 /**
  * Store
  */
-import { useNotificationsStore } from "@/store/notifications"
+import { useNotificationsStore } from "@store/notifications"
 
 /**
  * Services
  */
-import { rpcNodes } from "@/services/config"
-import { currentNetwork } from "@/services/sdk"
+import { rpcNodes } from "@config"
+import { currentNetwork } from "@sdk"
 import { flags, updateFlag } from "@/services/flags"
 import { RpcStatuses } from "@/services/constants"
 
@@ -242,10 +242,12 @@ const handleCloseCustomRpcInfo = () => {
 
 		<Button
 			@click="handleContinue"
+			@onKeybind="handleContinue"
 			:type="selectedNode.name ? 'primary' : 'secondary'"
 			size="large"
 			:disabled="!selectedNode.name"
 			block
+			keybind="C"
 		>
 			<Icon name="login" size="16" />Continue to Beacon</Button
 		>

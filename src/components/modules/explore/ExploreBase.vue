@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { ref, onMounted, onBeforeUnmount, onUnmounted, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
@@ -7,22 +10,27 @@ import cloneDeep from "lodash.clonedeep"
 /**
  * Local
  */
-import RatingCard from "./RatingCard"
-import RatingCardLoading from "./RatingCardLoading"
-import MyPositionCard from "./MyPositionCard"
-import MarketCard from "@/components/local/MarketCard"
-import { EventCard, EventCardLoading } from "@/components/local/EventCard"
+import RatingCard from "./RatingCard.vue"
+import RatingCardLoading from "./RatingCardLoading.vue"
+import MyPositionCard from "./MyPositionCard.vue"
+import FreshAccountBanner from "./FreshAccountBanner.vue"
+import MarketCard from "@local/MarketCard.vue"
+import { EventCard, EventCardLoading } from "@local/EventCard"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
+import Button from "@ui/Button.vue"
 
 /**
  * API
  */
 import { fetchTopEvents } from "@/api/events"
-import { fetchTopBettors, fetchTopLiquidityProviders } from "@/api/users"
+import {
+	fetchUser,
+	fetchTopBettors,
+	fetchTopLiquidityProviders,
+} from "@/api/users"
 
 /**
  * Subscriptions
@@ -32,19 +40,20 @@ import { event as eventModel } from "@/graphql/models/events"
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
-import { useAccountStore } from "@/store/account"
+import { useMarketStore } from "@store/market"
+import { useAccountStore } from "@store/account"
 
 /**
  * Services
  */
-import { juster, analytics } from "@/services/sdk"
+import { juster, analytics } from "@sdk"
 
 const router = useRouter()
 
 const marketStore = useMarketStore()
 const accountStore = useAccountStore()
 
+const user = ref({})
 const subToMyPositions = ref({})
 const myPositions = ref([])
 
@@ -59,6 +68,8 @@ const handleViewTopEvents = () => {
 }
 
 const init = async () => {
+	user.value = await fetchUser({ address: accountStore.pkh })
+
 	/**
 	 * Block: My Positions
 	 */
@@ -152,15 +163,20 @@ useMeta({
 </script>
 
 <template>
-	<transition name="fade">
-		<div :class="$style.wrapper">
-			<metainfo>
-				<template #title="{ content }">{{ content }} • Juster</template>
-			</metainfo>
+	<div :class="$style.wrapper">
+		<metainfo>
+			<template #title="{ content }">{{ content }} • Juster</template>
+		</metainfo>
+
+		<transition-group name="fade" mode="out-in">
+			<FreshAccountBanner
+				v-if="accountStore.pkh && !user"
+				:class="$style.block"
+			/>
 
 			<!-- My Positions -->
 			<div v-if="myPositions.length" :class="$style.block">
-				<h1>My Positions</h1>
+				<h2>My Positions</h2>
 				<div :class="$style.description">
 					Events in which you have liquidity or bet
 				</div>
@@ -176,7 +192,7 @@ useMeta({
 
 			<!-- Top markets -->
 			<div v-if="marketStore.isMarketsLoaded" :class="$style.block">
-				<h1>Top Markets</h1>
+				<h2>Top Markets</h2>
 				<div :class="$style.description">
 					Currency pairs available for betting
 				</div>
@@ -190,80 +206,78 @@ useMeta({
 					/>
 				</div>
 			</div>
+		</transition-group>
 
-			<!-- Top Liquidity -->
-			<div :class="$style.block">
-				<h1>Top Liquidity</h1>
-				<div :class="$style.description">
-					Rating of users providing liquidity
-				</div>
-
-				<RatingCard
-					v-if="!isTopProvidersLoading"
-					:users="topProviders"
-					suffix="ꜩ"
-					data-cy="rating-card-liquidity"
-					:class="$style.rating_card"
-				/>
-				<RatingCardLoading v-else :class="$style.rating_card" />
+		<!-- Top Liquidity -->
+		<div :class="$style.block">
+			<h2>Top Liquidity</h2>
+			<div :class="$style.description">
+				Rating of users providing liquidity
 			</div>
 
-			<!-- Hot events -->
-			<div :class="$style.block">
-				<div :class="$style.head">
-					<div :class="$style.left">
-						<h1>Notable Events</h1>
-						<div :class="$style.description">
-							Events that have not yet begun, but are attracting
-							the interest of participants
-						</div>
-					</div>
-
-					<Button
-						@click="handleViewTopEvents"
-						size="small"
-						type="secondary"
-					>
-						<Icon name="collection" size="16" />View all
-					</Button>
-				</div>
-
-				<transition name="fastfade" mode="out-in">
-					<div v-if="marketStore.events.length" :class="$style.items">
-						<EventCard
-							v-for="event in marketStore.events"
-							:key="event.id"
-							:event="event"
-							data-cy="event-card"
-						/>
-					</div>
-
-					<div v-else :class="$style.items">
-						<EventCardLoading />
-						<EventCardLoading />
-						<EventCardLoading />
-					</div>
-				</transition>
-			</div>
-
-			<!-- Top Bettors -->
-			<div :class="$style.block">
-				<h1>Top Bettors</h1>
-				<div :class="$style.description">
-					Rating of users placing bets
-				</div>
-
-				<RatingCard
-					v-if="!isTopBettorsLoading"
-					:users="topBettors"
-					suffix="Bets"
-					data-cy="rating-card-bettors"
-					:class="$style.rating_card"
-				/>
-				<RatingCardLoading v-else :class="$style.rating_card" />
-			</div>
+			<RatingCard
+				v-if="!isTopProvidersLoading"
+				:users="topProviders"
+				suffix="ꜩ"
+				data-cy="rating-card-liquidity"
+				:class="$style.rating_card"
+			/>
+			<RatingCardLoading v-else :class="$style.rating_card" />
 		</div>
-	</transition>
+
+		<!-- Hot events -->
+		<div :class="$style.block">
+			<div :class="$style.head">
+				<div :class="$style.left">
+					<h2>Notable Events</h2>
+					<div :class="$style.description">
+						Events that have not yet begun, but are attracting the
+						interest of participants
+					</div>
+				</div>
+
+				<Button
+					@click="handleViewTopEvents"
+					size="small"
+					type="secondary"
+				>
+					<Icon name="collection" size="16" />View all
+				</Button>
+			</div>
+
+			<transition name="fastfade" mode="out-in">
+				<div v-if="marketStore.events.length" :class="$style.items">
+					<EventCard
+						v-for="event in marketStore.events"
+						:key="event.id"
+						:event="event"
+						data-cy="event-card"
+					/>
+				</div>
+
+				<div v-else :class="$style.items">
+					<EventCardLoading />
+					<EventCardLoading />
+					<EventCardLoading />
+				</div>
+			</transition>
+		</div>
+
+		<!-- Top Bettors -->
+		<div :class="$style.block">
+			<h2>Top Bettors</h2>
+			<div :class="$style.description">Rating of users placing bets</div>
+
+			<RatingCard
+				v-if="!isTopBettorsLoading"
+				:users="topBettors"
+				suffix="Bets"
+				data-cy="rating-card-bettors"
+				:class="$style.rating_card"
+			/>
+			<RatingCardLoading v-else :class="$style.rating_card" />
+		</div>
+	</div>
 </template>
 
 <style module>

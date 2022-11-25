@@ -3,14 +3,14 @@ import { ref, computed, onMounted } from "vue"
 import { DateTime } from "luxon"
 
 /** UI */
-import Tooltip from "@/components/ui/Tooltip"
+import Tooltip from "@ui/Tooltip.vue"
 
 /**
  * Services
  */
-import { toReadableDuration } from "@/services/utils/date"
-import { pluralize } from "@/services/utils/global"
-import { supportedMarkets } from "@/services/config"
+import { toReadableDuration } from "@utils/date"
+import { pluralize } from "@utils/global"
+import { supportedMarkets } from "@config"
 
 /**
  * API
@@ -20,7 +20,7 @@ import { fetchQuoteByTimestamp } from "@/api/quotes"
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
+import { useMarketStore } from "@store/market"
 
 const marketStore = useMarketStore()
 

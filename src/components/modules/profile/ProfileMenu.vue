@@ -5,19 +5,19 @@ import { useRouter } from "vue-router"
 /**
  * Components: UI
  */
-import { Dropdown } from "@/components/ui/Dropdown"
+import { Dropdown } from "@ui/Dropdown"
 
 /**
  * Services
  */
-import { shorten } from "@/services/utils/global"
-import { analytics } from "@/services/sdk"
+import { shorten } from "@utils/global"
+import { analytics } from "@sdk"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
 
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
@@ -94,6 +94,27 @@ const handleLogout = () => {
 					</Flex>
 
 					<Flex
+						@click="handleOpenWithdrawals"
+						align="center"
+						gap="12"
+						:class="$style.general_link"
+					>
+						<Icon name="money" size="20" :class="$style.icon" />
+
+						<Flex direction="column" gap="6">
+							<Text size="13" weight="600" color="primary">
+								<Flex>
+									{{ accountStore.balance }}&nbsp;
+									<Text color="tertiary">XTZ</Text>
+								</Flex>
+							</Text>
+							<Text size="11" weight="600" color="tertiary">
+								Manage your assets
+							</Text>
+						</Flex>
+					</Flex>
+
+					<Flex
 						align="center"
 						gap="12"
 						:class="[$style.general_link, $style.disabled]"
@@ -106,24 +127,6 @@ const handleLogout = () => {
 							</Text>
 							<Text size="11" weight="600" color="tertiary">
 								Unavailable Now
-							</Text>
-						</Flex>
-					</Flex>
-
-					<Flex
-						@click="handleOpenWithdrawals"
-						align="center"
-						gap="12"
-						:class="$style.general_link"
-					>
-						<Icon name="money" size="20" :class="$style.icon" />
-
-						<Flex direction="column" gap="8">
-							<Text size="13" weight="600" color="primary">
-								Assets
-							</Text>
-							<Text size="11" weight="600" color="tertiary">
-								Manage your withdrawals
 							</Text>
 						</Flex>
 					</Flex>

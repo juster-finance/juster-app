@@ -4,22 +4,22 @@ import { defineComponent } from "vue"
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import ReleaseBase from "@/components/modules/releases/ReleaseBase"
+import ReleaseBase from "@modules/releases/ReleaseBase.vue"
 
 export default defineComponent({
-    name: "ReleasePage",
+	name: "ReleasePage",
 
-    components: { Page, ReleaseBase },
+	components: { Page, ReleaseBase },
 })
 </script>
 
 <template>
-    <Page>
-        <ReleaseBase />
-    </Page>
+	<Page>
+		<ReleaseBase />
+	</Page>
 </template>

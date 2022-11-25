@@ -4,8 +4,8 @@ export const dipdup = {
 		ws: "wss://juster.dipdup.net/v1/graphql",
 	},
 	testnet: {
-		graphq: `https://api.ithacanet.juster.fi/v1/graphql`,
-		ws: "wss://api.ithacanet.juster.fi/v1/graphql",
+		graphq: `https://api.ithacanet-pool.juster.fi/v1/graphql`,
+		ws: "wss://api.ithacanet-pool.juster.fi/v1/graphql",
 	},
 }
 

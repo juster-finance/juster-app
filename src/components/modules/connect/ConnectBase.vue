@@ -10,18 +10,18 @@ import { useRouter } from "vue-router"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Tooltip from "@/components/ui/Tooltip"
+import Button from "@ui/Button.vue"
+import Tooltip from "@ui/Tooltip.vue"
 
 /**
  * Modals
  */
-import CustomLoginModal from "@/components/local/modals/CustomLoginModal"
+import CustomLoginModal from "@local/modals/CustomLoginModal.vue"
 
 /**
  * Services
  */
-import { juster, analytics, currentNetwork } from "@/services/sdk"
+import { juster, analytics, currentNetwork } from "@sdk"
 
 /**
  * Composable
@@ -36,8 +36,8 @@ import { fetchAllUsers } from "@/api/users"
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 const { setupUser } = useMarket()
@@ -167,33 +167,50 @@ onMounted(async () => {
 			</div>
 
 			<div v-if="!accountStore.isLoggined" :class="$style.buttons">
-				<Button @click="handleBeacon" type="primary" size="large" block>
+				<Button
+					@click="handleBeacon"
+					@onKeybind="handleBeacon"
+					type="primary"
+					size="large"
+					block
+					keybind="B"
+				>
 					<Icon name="login" size="16" />
 					Beacon Wallet
 				</Button>
 				<Button
 					@click="handleCustomLogin"
+					@onKeybind="handleCustomLogin"
 					type="secondary"
 					size="large"
 					block
+					keybind="C"
 				>
 					<Icon name="settings" size="16" />Custom Connection</Button
 				>
 			</div>
 			<div v-else :class="$style.buttons">
 				<router-link :to="`/profile/${accountStore.pkh}`">
-					<Button type="primary" size="large" block>
+					<Button
+						@onKeybind="router.push(`/profile/${accountStore.pkh}`)"
+						type="secondary"
+						size="large"
+						block
+						keybind="P"
+					>
 						<Icon name="grid" size="16" />Go to my profile</Button
 					>
 				</router-link>
 				<Button
 					@click="handleLogout"
+					@onKeybind="handleLogout"
 					type="secondary"
 					size="large"
 					block
+					keybind="L"
 				>
-					<Icon name="logout" size="16" />Logout</Button
-				>
+					<Icon name="logout" size="16" />Logout
+				</Button>
 			</div>
 
 			<div :class="$style.divider" />

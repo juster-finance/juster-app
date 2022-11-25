@@ -5,24 +5,24 @@ import * as d3 from "d3"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
+import Button from "@ui/Button.vue"
 
 /**
  * Local
  */
-import MarketStatus from "./MarketStatus"
+import MarketStatus from "./MarketStatus.vue"
 
 /**
  * Services
  */
-import { numberWithSymbol, calcChange } from "@/services/utils/amounts"
-import { supportedMarkets } from "@/services/config"
-import { prepareQuotesForD3 } from "@/services/utils/quotes"
+import { numberWithSymbol, calcChange } from "@utils/amounts"
+import { supportedMarkets } from "@config"
+import { prepareQuotesForD3 } from "@utils/quotes"
 
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
+import { useMarketStore } from "@store/market"
 
 export default defineComponent({
 	name: "MarketCard",
@@ -221,7 +221,7 @@ export default defineComponent({
 </script>
 
 <template>
-	<div :class="$style.wrapper">
+	<router-link :to="`/markets/${market.symbol}`" :class="$style.wrapper">
 		<div :class="$style.header">
 			<div :class="$style.left">
 				<h3>
@@ -284,30 +284,22 @@ export default defineComponent({
 				@mouseleave="onMouseLeave"
 			/>
 		</div>
-
-		<div :class="$style.bottom">
-			<div :class="$style.actions">
-				<router-link
-					:to="`/markets/${market.symbol}`"
-					:class="$style.action"
-					>Open Market</router-link
-				>
-			</div>
-
-			<div :class="$style.timeframe">
-				<Icon name="bolt" size="12" />Real-time
-			</div>
-		</div>
-	</div>
+	</router-link>
 </template>
 
 <style module>
 .wrapper {
 	background: var(--card-bg);
 	border-radius: 10px;
-	border: 1px solid var(--border);
+	border: 1px solid transparent;
 
 	padding: 20px;
+
+	transition: all 0.2s ease;
+}
+
+.wrapper:hover {
+	border: 1px solid var(--border);
 }
 
 .header {
@@ -406,73 +398,5 @@ export default defineComponent({
 .chart > div {
 	/* See #15 and https://github.com/w3c/uievents/issues/135 */
 	position: relative;
-}
-
-.timer {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-
-	font-size: 12px;
-	font-weight: 500;
-	color: var(--text-tertiary);
-
-	fill: var(--opacity-20);
-}
-
-.wrapper:hover .actions {
-	opacity: 1;
-}
-
-.bottom {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-
-	margin-top: 16px;
-}
-
-.actions {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-
-	opacity: 0.5;
-
-	transition: opacity 0.2s ease;
-}
-
-.action {
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--blue);
-	cursor: pointer;
-}
-
-.timeframe {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-
-	padding: 4px 6px 4px 4px;
-	border-radius: 6px;
-	border: 1px solid var(--border);
-
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-tertiary);
-}
-
-.timeframe svg {
-	fill: var(--opacity-20);
-}
-
-.dot {
-	width: 4px;
-	height: 4px;
-	border-radius: 50%;
-	background: var(--border);
 }
 </style>

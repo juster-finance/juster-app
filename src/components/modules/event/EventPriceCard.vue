@@ -4,7 +4,7 @@ import { computed } from "vue"
 /**
  * Services
  */
-import { numberWithSymbol } from "@/services/utils/amounts"
+import { numberWithSymbol } from "@utils/amounts"
 
 const props = defineProps({
 	event: { type: Object },

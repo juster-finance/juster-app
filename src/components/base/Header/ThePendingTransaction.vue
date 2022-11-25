@@ -4,8 +4,8 @@ import { onBeforeUnmount, onMounted, ref } from "vue"
 /**
  * UI
  */
-import Spin from "@/components/ui/Spin"
-import Tooltip from "@/components/ui/Tooltip"
+import Spin from "@ui/Spin.vue"
+import Tooltip from "@ui/Tooltip.vue"
 
 let timerInterval = null
 const timer = ref(0)
@@ -23,27 +23,33 @@ onBeforeUnmount(() => {
 
 <template>
 	<div :class="$style.wrapper">
-		<div :class="$style.base">
-			<Tooltip side="left">
-				<div :class="$style.left">
-					<div :class="$style.spin">
+		<Flex align="center" justify="between" :class="$style.base">
+			<Tooltip placement="right">
+				<Flex align="center" gap="8">
+					<Flex align="center" justify="center" :class="$style.spin">
 						<Spin size="14" />
-					</div>
+					</Flex>
 
-					<div :class="$style.name">
-						<span>Pending</span> transaction
-					</div>
-					<Icon name="help" size="14" />
-				</div>
+					<Text size="13" height="11" weight="600" color="secondary"
+						>Pending operation</Text
+					>
 
-				<template v-slot:content
+					<Icon name="help" size="14" color="tertiary" />
+				</Flex>
+
+				<template #content
 					>Wait for the completion of the sent transaction to
 					continue</template
 				>
 			</Tooltip>
 
-			<div :class="$style.timer">{{ timer }}<span>s</span></div>
-		</div>
+			<Flex align="center">
+				<Text size="12" weight="600" color="secondary">{{
+					timer
+				}}</Text>
+				<Text size="12" weight="600" color="tertiary">s</Text>
+			</Flex>
+		</Flex>
 	</div>
 </template>
 
@@ -65,53 +71,13 @@ onBeforeUnmount(() => {
 	max-width: 1250px;
 	margin: 0 32px;
 	height: 48px;
-
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-}
-
-.left {
-	display: flex;
-	align-items: center;
-	gap: 10px;
 }
 
 .spin {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
 	width: 24px;
 	height: 24px;
 	border-radius: 5px;
 	background: var(--opacity-05);
-}
-
-.name {
-	font-size: 13px;
-	line-height: 1.1;
-	font-weight: 600;
-	color: var(--text-secondary);
-}
-
-.name span {
-	color: var(--text-primary);
-}
-
-.left svg {
-	fill: var(--text-tertiary);
-}
-
-.timer {
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-secondary);
-}
-
-.timer span {
-	color: var(--text-tertiary);
 }
 
 @media (max-width: 700px) {

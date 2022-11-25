@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router"
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
 
 const routes = [
 	{
@@ -9,8 +9,7 @@ const routes = [
 	{
 		path: "/error",
 		name: "error",
-		component: () =>
-			import(/* webpackChunkName: "error" */ "@/views/ErrorPage"),
+		component: () => import("@views/ErrorPage.vue"),
 	},
 	{
 		path: "/:pathMatch(.*)*",
@@ -20,66 +19,62 @@ const routes = [
 	{
 		path: "/connect",
 		name: "Connect",
-		component: () =>
-			import(/* webpackChunkName: "connect" */ "@/views/ConnectPage"),
+		component: () => import("@views/ConnectPage.vue"),
 	},
 	{
 		path: "/landing",
 		name: "Landing",
-		component: () =>
-			import(/* webpackChunkName: "landing" */ "@/views/LandingPage"),
+		component: () => import("@views/LandingPage.vue"),
 	},
 	{
 		path: "/launch",
 		name: "Launch",
-		component: () =>
-			import(/* webpackChunkName: "launch" */ "@/views/LaunchPage"),
+		component: () => import("@views/LaunchPage.vue"),
 	},
 
 	{
 		path: "/",
 		name: "Explore",
-		component: () =>
-			import(/* webpackChunkName: "explore" */ "@/views/ExplorePage"),
+		component: () => import("@views/ExplorePage.vue"),
 	},
 
 	{
 		path: "/events",
 		name: "Events",
-		component: () =>
-			import(/* webpackChunkName: "events" */ "@/views/EventsPage"),
+		component: () => import("@views/EventsPage.vue"),
 	},
 	{
 		path: "/events/top",
 		name: "TopEvents",
-		component: () =>
-			import(/* webpackChunkName: "topevents" */ "@/views/TopEventsPage"),
+		component: () => import("@views/TopEventsPage.vue"),
 	},
 	{
 		path: "/events/:id",
 		name: "Event",
-		component: () =>
-			import(/* webpackChunkName: "event" */ "@/views/EventPage"),
+		component: () => import("@views/EventPage.vue"),
 	},
 
 	{
 		path: "/markets",
 		name: "Markets",
-		component: () =>
-			import(/* webpackChunkName: "markets" */ "@/views/MarketsPage"),
+		component: () => import("@views/MarketsPage.vue"),
 	},
 	{
 		path: "/markets/:name",
 		name: "Market",
-		component: () =>
-			import(/* webpackChunkName: "market" */ "@/views/MarketPage"),
+		component: () => import("@views/MarketPage.vue"),
+	},
+
+	{
+		path: "/pools",
+		name: "Liquidity Pools",
+		component: () => import("@views/PoolsPage.vue"),
 	},
 
 	{
 		path: "/rating",
 		name: "Rating",
-		component: () =>
-			import(/* webpackChunkName: "rating" */ "@/views/LeaderboardPage"),
+		component: () => import("@views/LeaderboardPage.vue"),
 	},
 	{
 		path: "/profile",
@@ -98,16 +93,12 @@ const routes = [
 				next({ name: "Explore" })
 			}
 		},
-		component: () =>
-			import(/* webpackChunkName: "myprofile" */ "@/views/ProfilePage"),
+		component: () => import("@views/ProfilePage.vue"),
 		children: [
 			{
 				path: ":address",
 				name: "Profile",
-				component: () =>
-					import(
-						/* webpackChunkName: "profile" */ "@/views/ProfilePage"
-					),
+				component: () => import("@views/ProfilePage.vue"),
 			},
 		],
 	},
@@ -122,91 +113,66 @@ const routes = [
 				next({ name: "Explore" })
 			}
 		},
-		component: () =>
-			import(
-				/* webpackChunkName: "withdrawals" */ "@/views/WithdrawalsPage"
-			),
+		component: () => import("@views/WithdrawalsPage.vue"),
 	},
 
 	{
 		path: "/blog",
 		name: "Blog",
-		component: () =>
-			import(/* webpackChunkName: "blog" */ "@/views/Other/BlogPage"),
+		component: () => import("@views/Other/BlogPage.vue"),
 	},
 	{
 		path: "/terms",
 		name: "Terms",
-		component: () =>
-			import(/* webpackChunkName: "terms" */ "@/views/Other/TermsPage"),
+		component: () => import("@views/Other/TermsPage.vue"),
 	},
 	{
 		path: "/policy",
 		name: "Policy",
-		component: () =>
-			import(/* webpackChunkName: "policy" */ "@/views/Other/PolicyPage"),
+		component: () => import("@views/Other/PolicyPage.vue"),
 	},
 	{
 		path: "/sitemap",
 		name: "Sitemap",
-		component: () =>
-			import(
-				/* webpackChunkName: "sitemap" */ "@/views/Other/SitemapPage"
-			),
+		component: () => import("@views/Other/SitemapPage.vue"),
 	},
 
 	{
 		path: "/docs",
 		name: "Docs",
-		component: () =>
-			import(/* webpackChunkName: "docs" */ "@/views/DocsPage"),
+		component: () => import("@views/DocsPage.vue"),
 		redirect: "/docs/discover",
 		children: [
 			{
 				path: "discover",
 				name: "Discover",
-				component: () =>
-					import(
-						/* webpackChunkName: "discoverpage" */ "@/components/modules/docs/DiscoverBase"
-					),
+				component: () => import("@modules/docs/DiscoverBase.vue"),
 			},
 			{
 				path: "betting",
 				name: "Betting",
-				component: () =>
-					import(
-						/* webpackChunkName: "bettingpage" */ "@/components/modules/docs/BettingBase"
-					),
+				component: () => import("@modules/docs/BettingBase.vue"),
 			},
 			{
 				path: "liquidity",
 				name: "Liquidity",
-				component: () =>
-					import(
-						/* webpackChunkName: "liquiditypage" */ "@/components/modules/docs/LiquidityBase"
-					),
+				component: () => import("@modules/docs/LiquidityBase.vue"),
 			},
 			{
 				path: "withdraw",
 				name: "Withdraw",
-				component: () =>
-					import(
-						/* webpackChunkName: "withdrawpage" */ "@/components/modules/docs/WithdrawBase"
-					),
+				component: () => import("@modules/docs/WithdrawBase.vue"),
 			},
 			{
 				path: "roadmap",
 				name: "Roadmap",
-				component: () =>
-					import(
-						/* webpackChunkName: "roadmappage" */ "@/components/modules/docs/RoadmapBase"
-					),
+				component: () => import("@modules/docs/RoadmapBase.vue"),
 			},
 			// {
 			// 	path: ":slug",
 			// 	name: "Doc",
 			// 	component: () =>
-			// 		import(/* webpackChunkName: "doc" */ "@/views/DocPage"),
+			// 		import( "@views/DocPage"),
 			// },
 		],
 	},
@@ -215,19 +181,17 @@ const routes = [
 	{
 		path: "/releases",
 		name: "Releases",
-		component: () =>
-			import(/* webpackChunkName: "releases" */ "@/views/ReleasesPage"),
+		component: () => import("@views/ReleasesPage.vue"),
 	},
 	{
 		path: "/releases/:slug",
 		name: "Release",
-		component: () =>
-			import(/* webpackChunkName: "release" */ "@/views/ReleasePage"),
+		component: () => import("@views/ReleasePage.vue"),
 	},
 ]
 
 const router = createRouter({
-	history: createWebHistory(process.env.BASE_URL),
+	history: createWebHistory(import.meta.env.BASE_URL),
 	routes,
 })
 

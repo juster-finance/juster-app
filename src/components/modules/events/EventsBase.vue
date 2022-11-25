@@ -15,8 +15,8 @@ import cloneDeep from "lodash.clonedeep"
 /**
  * Services
  */
-import { juster, analytics, currentNetwork } from "@/services/sdk"
-import { verifiedMakers } from "@/services/config"
+import { juster, analytics, currentNetwork } from "@sdk"
+import { verifiedMakers } from "@config"
 
 /**
  * API
@@ -26,16 +26,16 @@ import { fetchEventsByStatus } from "@/api/events"
 /**
  * UI
  */
-import Pagination from "@/components/ui/Pagination"
-import Breadcrumbs from "@/components/ui/Breadcrumbs"
-import Banner from "@/components/ui/Banner"
-import Button from "@/components/ui/Button"
+import Pagination from "@ui/Pagination.vue"
+import Breadcrumbs from "@ui/Breadcrumbs.vue"
+import Banner from "@ui/Banner.vue"
+import Button from "@ui/Button.vue"
 
 /**
  * Local
  */
-import EventsFilters from "./EventsFilters"
-import { EventCard, EventCardLoading } from "@/components/local/EventCard"
+import EventsFilters from "./EventsFilters.vue"
+import { EventCard, EventCardLoading } from "@local/EventCard"
 
 /**
  * gql
@@ -45,7 +45,7 @@ import { event as eventModel } from "@/graphql/models"
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
+import { useMarketStore } from "@store/market"
 
 const defaultFilters = {
 	symbols: [

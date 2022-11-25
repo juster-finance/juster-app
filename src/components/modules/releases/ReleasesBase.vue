@@ -5,7 +5,7 @@ import { useMeta } from "vue-meta"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
+import Button from "@ui/Button.vue"
 
 /**
  * API
@@ -15,12 +15,12 @@ import { fetchReleases } from "@/api/sanity"
 /**
  * Local
  */
-import ReleaseCard from "./ReleaseCard"
+import ReleaseCard from "./ReleaseCard.vue"
 
 /**
  * Store
  */
-import { useReleasesStore } from "@/store/releases"
+import { useReleasesStore } from "@store/releases"
 
 export default defineComponent({
 	name: "ReleasesBase",

@@ -2,15 +2,15 @@
 /**
  * UI
  */
-import Button from '@/components/ui/Button'
+import Button from "@ui/Button.vue"
 
 /**
  * Local
  */
-import Pool from '@/components/local/Pool'
+import Pool from "@local/Pool.vue"
 
 defineProps({ event: { type: Object } })
-const emit = defineEmits(['onLiquidity'])
+const emit = defineEmits(["onLiquidity"])
 </script>
 
 <template>
@@ -24,7 +24,9 @@ const emit = defineEmits(['onLiquidity'])
 			type="secondary"
 			size="small"
 			block
-			:disabled="event.status !== 'NEW' || event.totalLiquidityProvided == 0"
+			:disabled="
+				event.status !== 'NEW' || event.totalLiquidityProvided == 0
+			"
 			:class="$style.liquidity_btn"
 			><Icon name="liquidity" size="12" />Add Liquidity</Button
 		>

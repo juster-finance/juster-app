@@ -1,6 +1,12 @@
 <script setup>
-import { onBeforeMount, ref } from "vue"
+/**
+ * Vendor
+ */
+import { ref, onBeforeMount, onMounted } from "vue"
 
+/**
+ * Styles
+ */
 import "@/styles/variables.css"
 import "@/styles/padding.css"
 import "@/styles/margin.css"
@@ -10,28 +16,30 @@ import "@/styles/text.css"
 /**
  * Base
  */
-import TheHeader from "./components/base/Header/TheHeader"
-import Footer from "@/components/base/Footer"
+import TheHeader from "./components/base/Header/TheHeader.vue"
+import Footer from "@base/Footer.vue"
 
 /** Local */
-import TheWelcomeScreen from "@/components/local/onboarding/TheWelcomeScreen"
+import TheWelcomeScreen from "@local/onboarding/TheWelcomeScreen.vue"
 
 /**
  * UI
  */
-import Notifications from "@/components/local/Notifications"
-import ConfirmationModal from "@/components/local/modals/ConfirmationModal"
+import Notifications from "@local/Notifications.vue"
+import ConfirmationModal from "@local/modals/ConfirmationModal.vue"
 
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster, initPools } from "@sdk"
+import { fetchAllPools } from "@/api/pools"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useAppStore } from "@/store/app"
+import { useAccountStore } from "@store/account"
+import { useAppStore } from "@store/app"
+import { useMarketStore } from "@store/market"
 
 /**
  * Composable
@@ -49,6 +57,7 @@ else favicon.href = "/favicon_light.svg"
 
 const accountStore = useAccountStore()
 const appStore = useAppStore()
+const marketStore = useMarketStore()
 
 onBeforeMount(() => {
 	juster.sdk._provider.client.getActiveAccount().then(async (account) => {
@@ -59,6 +68,10 @@ onBeforeMount(() => {
 
 		setupUser()
 	})
+})
+onMounted(async () => {
+	marketStore.pools = await fetchAllPools()
+	initPools(marketStore.pools)
 })
 
 /**
@@ -98,7 +111,9 @@ accountStore.$subscribe((mutation, state) => {
 
 	<div v-if="!showWelcomeScreen" class="app_wrapper">
 		<TheHeader />
-		<router-view />
+		<div class="app_base">
+			<router-view />
+		</div>
 		<Footer class="footer" />
 	</div>
 </template>
@@ -142,7 +157,7 @@ html {
 .popup-enter-from,
 .popup-leave-to {
 	opacity: 0;
-	transform: scale(0.95);
+	transform: scale(0.95) translateY(5px);
 }
 
 .navpopup-enter-active,
@@ -208,10 +223,15 @@ html {
 	padding-top: 80px;
 }
 
+.app_base {
+	flex: 1;
+}
+
 :root {
-	--app-bg: #1b1b1b;
-	--modal-bg: #252528;
-	--notification-bg: #252528;
+	/* --app-bg: #1b1b1b; */
+	--app-bg: #1a1a1d;
+	--modal-bg: #232327;
+	--notification-bg: #232327;
 
 	/** General */
 	--blue: #457ee8;
@@ -239,6 +259,7 @@ html {
 	--text-primary: rgba(255, 255, 255, 0.9);
 	--text-secondary: rgba(255, 255, 255, 0.7);
 	--text-tertiary: rgba(255, 255, 255, 0.4);
+	--text-support: rgba(255, 255, 255, 0.2);
 	--text-white: rgba(255, 255, 255, 0.95);
 	--text-black: rgba(0, 0, 0, 0.9);
 	--text-blue: #6d9cf3;
@@ -248,10 +269,10 @@ html {
 	--icon-high: #fff;
 
 	/** Card */
-	--card-bg: #171717;
+	--card-bg: #232326;
 
 	/** Dropdown */
-	--dropdown-bg: #252528;
+	--dropdown-bg: #27272a;
 
 	/** Toggle */
 	--toggle-bg: #393939;
@@ -302,6 +323,7 @@ html {
 	--text-primary: rgba(0, 0, 0, 0.9);
 	--text-secondary: rgba(0, 0, 0, 0.7);
 	--text-tertiary: rgba(0, 0, 0, 0.3);
+	--text-support: rgba(0, 0, 0, 0.15);
 	--text-white: rgba(255, 255, 255, 0.95);
 	--text-black: rgba(0, 0, 0, 0.9);
 
@@ -361,6 +383,7 @@ body:hover *::-webkit-scrollbar-thumb {
 }
 
 body {
+	overflow-y: hidden;
 	overscroll-behavior-x: none;
 	overscroll-behavior-y: none;
 	user-select: none;
@@ -384,6 +407,9 @@ input {
 a {
 	color: inherit;
 	text-decoration: none;
+}
+a:active {
+	outline: none;
 }
 
 a,

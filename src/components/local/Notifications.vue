@@ -4,7 +4,7 @@ import { ref, reactive, nextTick } from "vue"
 /**
  * Store
  */
-import { useNotificationsStore } from "@/store/notifications"
+import { useNotificationsStore } from "@store/notifications"
 const notificationsStore = useNotificationsStore()
 
 const firstNotificationHeight = ref(0)

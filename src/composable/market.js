@@ -4,8 +4,8 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { supportedMarkets } from "@/services/config"
-import { juster } from "@/services/sdk"
+import { supportedMarkets } from "@config"
+import { juster } from "@sdk"
 
 /**
  * API
@@ -18,8 +18,8 @@ import { fetchUserWithdrawals } from "@/api/users"
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
-import { useAccountStore } from "@/store/account"
+import { useMarketStore } from "@store/market"
+import { useAccountStore } from "@store/account"
 
 /**
  * gql

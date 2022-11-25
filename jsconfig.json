@@ -5,7 +5,20 @@
 			"~/*": ["./src/*"],
 			"@/*": ["./src/*"],
 			"~~/*": ["./src/*"],
-			"@@/*": ["./src/*"]
+			"@@/*": ["./src/*"],
+
+			"@ui": ["./src/components/ui/*"],
+			"@base": ["./src/components/base/*"],
+			"@views": ["./src/views/*"],
+			"@local": ["./src/components/local/*"],
+			"@layout": ["./src/components/layout/*"],
+			"@modals": ["./src/components/local/modals/*"],
+			"@modules": ["./src/components/modules/*"],
+			"@typography": ["./src/components/typography/*"],
+			"@config": ["./src/services/config"],
+			"@sdk": ["./src/services/sdk/*"],
+			"@utils": ["./src/services/utils/*"],
+			"@store": ["./src/store/*"]
 		},
 		"jsx": "preserve",
 		"lib": ["dom"]

@@ -3,8 +3,8 @@ import { defineStore } from "pinia"
 /**
  * Services
  */
-import { juster, analytics } from "@/services/sdk"
-import { fetchBalance } from "@/services/sdk"
+import { juster, analytics } from "@sdk"
+import { fetchBalance } from "@sdk"
 
 export const useAccountStore = defineStore({
 	id: "account",

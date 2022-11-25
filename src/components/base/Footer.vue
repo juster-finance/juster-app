@@ -7,20 +7,20 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { juster, switchNetwork, currentNetwork } from "@/services/sdk"
-import { capitalizeFirstLetter } from "@/services/utils/global"
+import { juster, switchNetwork, currentNetwork } from "@sdk"
+import { capitalizeFirstLetter } from "@utils/global"
 
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
+import { useMarketStore } from "@store/market"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Tooltip from "@/components/ui/Tooltip"
-import { Dropdown, DropdownItem, DropdownTitle } from "@/components/ui/Dropdown"
+import Button from "@ui/Button.vue"
+import Tooltip from "@ui/Tooltip.vue"
+import { Dropdown, DropdownItem, DropdownTitle } from "@ui/Dropdown"
 
 const marketStore = useMarketStore()
 
@@ -65,7 +65,7 @@ const checkDipdup = async () => {
 	const urlToCheck =
 		currentNetwork.value == "mainnet"
 			? "https://juster.dipdup.net/api/rest/dipdupHead?name=https://tzkt-mainnet.dipdup.net"
-			: "https://api.ithacanet.juster.fi/api/rest/dipdupHead?name=https://api.ithacanet.tzkt.io"
+			: "https://api.ithacanet-pool.juster.fi/api/rest/dipdupHead?name=https://api.ghostnet.tzkt.io"
 	const {
 		data: { dipdupHeadByPk },
 	} = await axios.get(urlToCheck)

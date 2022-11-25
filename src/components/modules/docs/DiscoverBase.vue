@@ -4,14 +4,14 @@ import { reactive } from "vue"
 /**
  * Modules: Docs
  */
-import HeaderAnchor from "./HeaderAnchor"
-import TableOfContents from "./TableOfContents"
+import HeaderAnchor from "./HeaderAnchor.vue"
+import TableOfContents from "./TableOfContents.vue"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Banner from "@/components/ui/Banner"
+import Button from "@ui/Button.vue"
+import Banner from "@ui/Banner.vue"
 
 const cards = reactive([
 	{
@@ -27,6 +27,10 @@ const cards = reactive([
 		image: "providingliquidity.png",
 	},
 ])
+
+const getImageUrl = (image) => {
+	return new URL(`../../../assets/docs/${image}`, import.meta.url).href
+}
 </script>
 
 <template>
@@ -50,7 +54,9 @@ const cards = reactive([
 						v-if="card.image"
 						:class="$style.cover"
 						:style="{
-							backgroundImage: `linear-gradient(rgba(21, 21, 21, 0) 0%, rgba(21, 21, 21, 1) 120%), url(${require(`@/assets/docs/${card.image}`)})`,
+							backgroundImage: `linear-gradient(rgba(21, 21, 21, 0) 0%, rgba(21, 21, 21, 1) 120%), url(${getImageUrl(
+								card.image,
+							)})`,
 						}"
 					/>
 					<span>{{ card.name }}</span>

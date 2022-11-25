@@ -13,13 +13,13 @@ export const toClipboard = (value) => {
 export const getCurrencyIcon = (name) => {
 	switch (name) {
 		case "XTZ":
-			return require(`@/assets/symbols/tz.png`)
+			return new URL(`../../assets/symbols/tz.png`, import.meta.url).href
 		case "ETH":
-			return require(`@/assets/symbols/eth.png`)
+			return new URL(`../../assets/symbols/eth.png`, import.meta.url).href
 		case "BTC":
-			return require(`@/assets/symbols/btc.png`)
+			return new URL(`../../assets/symbols/btc.png`, import.meta.url).href
 		case "USD":
-			return require(`@/assets/symbols/usd.png`)
+			return new URL(`../../assets/symbols/usd.png`, import.meta.url).href
 	}
 }
 
@@ -40,4 +40,8 @@ export const shorten = (str, left = 6, right = 4) => {
 		str.length - right,
 		str.length,
 	)}`
+}
+
+export const sanitizeInput = (e) => {
+	if (["-", "e"].includes(e.key)) e.preventDefault()
 }

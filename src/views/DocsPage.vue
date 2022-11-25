@@ -2,12 +2,12 @@
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import DocsBase from "@/components/modules/docs/DocsBase"
+import DocsBase from "@modules/docs/DocsBase.vue"
 </script>
 
 <template>

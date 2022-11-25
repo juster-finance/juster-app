@@ -4,28 +4,28 @@ import { defineComponent } from "vue"
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import EventBase from "@/components/modules/event/EventBase"
+import EventBase from "@modules/event/EventBase.vue"
 
 export default defineComponent({
-    name: "EventPage",
+	name: "EventPage",
 
-    components: { Page, EventBase },
+	components: { Page, EventBase },
 })
 </script>
 
 <template>
-    <Page>
-        <EventBase />
-    </Page>
+	<Page>
+		<EventBase />
+	</Page>
 </template>
 
 <style module>
 .wrapper {
-    max-width: 1250px;
+	max-width: 1250px;
 }
 </style>

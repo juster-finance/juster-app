@@ -1,7 +1,7 @@
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster } from "@sdk"
 
 /**
  * GQL: Queries

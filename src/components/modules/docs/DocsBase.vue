@@ -11,7 +11,7 @@ import { fetchArticles, fetchSections } from "@/api/sanity"
 /**
  * Store
  */
-import { useDocsStore } from "@/store/docs"
+import { useDocsStore } from "@store/docs"
 
 const router = useRouter()
 const route = useRoute()

@@ -4,26 +4,26 @@ import { computed, defineComponent, ref, toRefs, watch } from "vue"
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
-import Button from "@/components/ui/Button"
-import Spin from "@/components/ui/Spin"
-import Checkbox from "@/components/ui/Checkbox"
+import Modal from "@ui/Modal.vue"
+import Button from "@ui/Button.vue"
+import Spin from "@ui/Spin.vue"
+import Checkbox from "@ui/Checkbox"
 
 /**
  * Store
  */
-import { useNotificationsStore } from "@/store/notifications"
-import { useAccountStore } from "@/store/account"
+import { useNotificationsStore } from "@store/notifications"
+import { useAccountStore } from "@store/account"
 
 /**
  * SDK
  */
-import { withdrawAll } from "@/services/sdk"
+import { withdrawAll } from "@sdk"
 
 /**
  * Services
  */
-import { supportedMarkets } from "@/services/config"
+import { supportedMarkets } from "@config"
 
 export default defineComponent({
 	name: "WithdrawAllModal",

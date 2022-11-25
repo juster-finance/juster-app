@@ -3,7 +3,7 @@ import cloneDeep from "lodash.clonedeep"
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster } from "@sdk"
 
 /**
  * GQL: Queries

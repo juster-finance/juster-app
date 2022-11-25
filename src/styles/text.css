@@ -1,4 +1,8 @@
 /* Font Size */
+.fz--8 {
+	font-size: 8px;
+}
+
 .fz--11 {
 	font-size: 11px;
 }
@@ -89,4 +93,49 @@
 
 .color--tertiary {
 	color: var(--text-tertiary);
+}
+
+.color--support {
+	color: var(--text-support);
+}
+
+.color--blue {
+	color: var(--text-blue);
+}
+
+.color--green {
+	color: var(--green);
+}
+
+.color--brand {
+	color: var(--brand);
+}
+
+/* Icon Color (From Main Design System) */
+.fill--primary {
+	color: var(--text-primary);
+}
+
+.fill--secondary {
+	fill: var(--text-secondary);
+}
+
+.fill--tertiary {
+	fill: var(--text-tertiary);
+}
+
+.fill--support {
+	fill: var(--text-support);
+}
+
+.fill--blue {
+	fill: var(--text-blue);
+}
+
+.fill--green {
+	fill: var(--green);
+}
+
+.fill--brand {
+	fill: var(--brand);
 }

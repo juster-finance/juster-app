@@ -1,7 +1,7 @@
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster } from "@sdk"
 
 /**
  * GQL: Queries
@@ -9,17 +9,17 @@ import { juster } from "@/services/sdk"
 import { getDepositsByEvent } from "@/graphql/queries/deposits"
 
 export const fetchDepositsByEvent = async ({ eventId }) => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getDepositsByEvent,
-            variables: { eventId },
-        })
+	try {
+		const { data } = await juster.apollo.query({
+			query: getDepositsByEvent,
+			variables: { eventId },
+		})
 
-        return data.deposit
-    } catch (error) {
-        console.error(
-            `Error during fetching deposits by event \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+		return data.deposit
+	} catch (error) {
+		console.error(
+			`Error during fetching deposits by event \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }

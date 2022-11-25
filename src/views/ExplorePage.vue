@@ -4,28 +4,28 @@ import { defineComponent } from "vue"
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import ExploreBase from "@/components/modules/explore/ExploreBase"
+import ExploreBase from "@modules/explore/ExploreBase.vue"
 
 export default defineComponent({
-    name: "ExplorePage",
+	name: "ExplorePage",
 
-    components: { Page, ExploreBase },
+	components: { Page, ExploreBase },
 })
 </script>
 
 <template>
-    <Page>
-        <ExploreBase />
-    </Page>
+	<Page>
+		<ExploreBase />
+	</Page>
 </template>
 
 <style module>
 .wrapper {
-    max-width: 1250px;
+	max-width: 1250px;
 }
 </style>

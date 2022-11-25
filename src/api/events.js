@@ -1,7 +1,12 @@
 /**
+ * Vendor
+ */
+import BigNumber from "bignumber.js"
+
+/**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster } from "@sdk"
 
 /**
  * GQL: Queries
@@ -83,7 +88,7 @@ export const fetchEventParticipants = async ({ id }) => {
 	try {
 		const { data } = await juster.apollo.query({
 			query: getEventParticipants,
-			variables: { id },
+			variables: { id: BigNumber(id) },
 		})
 
 		return data.event[0].positions

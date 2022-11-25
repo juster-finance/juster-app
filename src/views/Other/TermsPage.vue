@@ -2,7 +2,7 @@
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 </script>
 
 <template>

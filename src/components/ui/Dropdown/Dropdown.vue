@@ -59,6 +59,15 @@ watch(isOpen, () => {
 	if (!isOpen.value) {
 		removeOutside()
 
+		if (Object.prototype.hasOwnProperty.call(dropdownStyles.value, "top")) {
+			delete dropdownStyles.value.top
+		}
+		if (
+			Object.prototype.hasOwnProperty.call(dropdownStyles.value, "bottom")
+		) {
+			delete dropdownStyles.value.bottom
+		}
+
 		document.removeEventListener("keydown", onKeydown)
 	} else {
 		document.addEventListener("keydown", onKeydown)
@@ -73,18 +82,37 @@ watch(isOpen, () => {
 			window.innerWidth - triggerRect.x - triggerRect.width
 		}px`
 
-		if (props.side == "bottom") {
-			dropdownStyles.value.top = `${
-				triggerRect.y + triggerRect.height + 6
-			}px`
-		}
-		if (props.side == "top") {
-			dropdownStyles.value.bottom = `${
-				window.innerHeight - triggerRect.y + 6
-			}px`
-		}
-
 		nextTick(() => {
+			/** Check if there is enough space to open (top/bottom) */
+			const dropdownRect = dropdown.value.getBoundingClientRect()
+
+			if (props.side === "bottom") {
+				if (
+					window.innerHeight - dropdownRect.height - triggerRect.top <
+					50
+				) {
+					dropdownStyles.value.bottom = `${
+						window.innerHeight - triggerRect.y + 6
+					}px`
+				} else {
+					dropdownStyles.value.top = `${
+						triggerRect.y + triggerRect.height + 6
+					}px`
+				}
+			}
+
+			if (props.side == "top") {
+				if (triggerRect.top < dropdownRect.height) {
+					dropdownStyles.value.top = `${
+						triggerRect.y + triggerRect.height + 6
+					}px`
+				} else {
+					dropdownStyles.value.bottom = `${
+						window.innerHeight - triggerRect.y + 6
+					}px`
+				}
+			}
+
 			removeOutside = useOnOutsidePress(dropdown, handleOutside)
 		})
 	}
@@ -127,19 +155,6 @@ const onKeydown = (event) => {
 	</div>
 </template>
 
-<style>
-.popup-enter-active,
-.popup-leave-active {
-	transition: all 0.07s ease-out;
-}
-
-.popup-enter-from,
-.popup-leave-to {
-	opacity: 0;
-	transform: scale(0.95);
-}
-</style>
-
 <style module>
 .wrapper {
 	position: relative;
@@ -161,6 +176,6 @@ const onKeydown = (event) => {
 	padding: 8px 0;
 	border-radius: 8px;
 	background: var(--dropdown-bg);
-	box-shadow: rgb(0 0 0 / 30%) 0px 20px 40px;
+	box-shadow: rgb(0 0 0 / 20%) 0px 20px 40px;
 }
 </style>
