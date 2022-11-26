@@ -122,12 +122,17 @@ onMounted(() => {
 					amount: true,
 					poolEntryId: true,
 					entryId: true,
+					status: true,
 				},
 			],
 		})
 		.subscribe({
 			next: (data) => {
-				console.log(data)
+				console.log(
+					data.entryLiquidity.map((e) => {
+						return { s: e.status, a: e.amount }
+					}),
+				)
 			},
 			error: console.error,
 		})

@@ -211,22 +211,6 @@
     ws "^6.1.4"
     zen-observable-ts "^0.8.21"
 
-"@genql/runtime@2.6.0":
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/@genql/runtime/-/runtime-2.6.0.tgz#7942e7b48fe74f38bdff47da2ac6cae205258fe5"
-  integrity sha512-AqkFwApU3W0G8jbAiPrAS+7KYxSnFB/4gCN1BPkcKBLa2Y58jATLHSt5FNY+I18xF9M7rlLcCaM9T8ZCtCoMCw==
-  dependencies:
-    "@types/qs" "^6.9.0"
-    "@types/ws" "^6.0.1"
-    graphql-query-batcher "^1.0.1"
-    isomorphic-unfetch "^3.0.0"
-    lodash "^4.17.20"
-    subscriptions-transport-ws "^0.9.16"
-    tslib "^2.0.0"
-    utility-types "^3.10.0"
-    ws "^6.1.4"
-    zen-observable-ts "^0.8.21"
-
 "@graphql-typed-document-node/core@^3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.1.1.tgz#076d78ce99822258cf813ecc1e7fa460fa74d052"
@@ -250,14 +234,6 @@
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
-
-"@juster-finance/gql-client@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@juster-finance/gql-client/-/gql-client-0.0.6.tgz#3e7bdb9dc3133fa587fb7a07e075a0e363d290f5"
-  integrity sha512-aS2uhpESvAIybnEjcxaA6rLL6AUexFKmWXmNxqq11TL6kO6Y2uHv55R9sjk+tbbOIEXjrbbem7+ZkVtDhVqWZQ==
-  dependencies:
-    "@genql/runtime" "2.6.0"
-    graphql "^15.5.0"
 
 "@juster-finance/gql-client@^0.1.0":
   version "0.1.0"
