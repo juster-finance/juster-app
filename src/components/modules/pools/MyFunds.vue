@@ -13,6 +13,7 @@ const emit = defineEmits(["onDepositLiquidity"])
 const props = defineProps({
 	pools: Array,
 	poolsStates: Object,
+	entries: Array,
 })
 
 const isDepositAvailable = computed(() => {
@@ -26,6 +27,14 @@ const handleDepositLiquidityClick = () => {
 	if (!isDepositAvailable.value) return
 	emit("onDepositLiquidity")
 }
+
+const pendingEntries = computed(() =>
+	props.entries.filter((entry) => entry.status === "PENDING"),
+)
+
+const valueLocked = computed(() =>
+	props.entries.reduce((acc, curr) => (acc += curr.amount), 0),
+)
 </script>
 
 <template>
@@ -46,7 +55,9 @@ const handleDepositLiquidityClick = () => {
 				/>
 
 				<Flex direction="column" gap="8">
-					<Text color="primary" size="16" weight="600">3,521.34</Text>
+					<Text color="primary" size="16" weight="600">
+						{{ valueLocked }}
+					</Text>
 					<Text
 						color="tertiary"
 						size="13"
@@ -67,7 +78,7 @@ const handleDepositLiquidityClick = () => {
 				/>
 
 				<Flex direction="column" gap="8">
-					<Text color="primary" size="16" weight="600">3,521.34</Text>
+					<Text color="primary" size="16" weight="600">0.00</Text>
 					<Text
 						color="tertiary"
 						size="13"
@@ -80,6 +91,31 @@ const handleDepositLiquidityClick = () => {
 			</Flex>
 		</Flex>
 
+		<Flex
+			v-if="pendingEntries.length"
+			direction="column"
+			gap="12"
+			:class="$style.progress"
+		>
+			<Flex align="center" justify="between" wide>
+				<Text size="14" color="secondary" weight="600">
+					Pending Entries
+				</Text>
+
+				<Flex align="center" gap="4">
+					<Text size="14" color="tertiary" weight="600">
+						{{ pendingEntries.length }} entry
+					</Text>
+
+					<!-- <Icon name="arrow" size="14" color="tertiary" /> -->
+				</Flex>
+			</Flex>
+
+			<div :class="$style.bar">
+				<div :class="[$style.bar_progress, $style.blue]" />
+			</div>
+		</Flex>
+
 		<Flex direction="column" gap="12" :class="$style.progress">
 			<Flex align="center" justify="between" wide>
 				<Text size="14" color="secondary" weight="600">
@@ -88,32 +124,10 @@ const handleDepositLiquidityClick = () => {
 
 				<Flex align="center" gap="4">
 					<Text size="14" color="tertiary" weight="600">
-						7 of 10,
+						0 of 0,
 					</Text>
 
-					<Text size="14" color="secondary" weight="600"> 70% </Text>
-
-					<Icon name="arrow" size="14" color="tertiary" />
-				</Flex>
-			</Flex>
-
-			<div :class="$style.bar">
-				<div :class="$style.bar_progress" />
-			</div>
-		</Flex>
-
-		<Flex direction="column" gap="12" :class="$style.progress">
-			<Flex align="center" justify="between" wide>
-				<Text size="14" color="secondary" weight="600">
-					Progress of Acceptance
-				</Text>
-
-				<Flex align="center" gap="4">
-					<Text size="14" color="tertiary" weight="600">
-						7 of 10,
-					</Text>
-
-					<Text size="14" color="secondary" weight="600"> 70% </Text>
+					<Text size="14" color="secondary" weight="600">0%</Text>
 
 					<Icon name="arrow" size="14" color="tertiary" />
 				</Flex>
@@ -199,6 +213,29 @@ const handleDepositLiquidityClick = () => {
 	height: 12px;
 	border-radius: 3px;
 	background: rgba(255, 255, 255, 0.05);
+
+	overflow: hidden;
+}
+
+.bar_progress {
+	width: 100%;
+	height: 100%;
+}
+
+.bar_progress.blue {
+	animation: mig 3s infinite;
+}
+
+@keyframes mig {
+	0% {
+		background: rgba(69, 126, 232, 0.15);
+	}
+	50% {
+		background: rgba(69, 126, 232, 0.8);
+	}
+	100% {
+		background: rgba(69, 126, 232, 0.15);
+	}
 }
 
 .buttons {

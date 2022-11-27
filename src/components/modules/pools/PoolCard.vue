@@ -292,7 +292,7 @@ const copy = (target) => {
 					<Flex align="center" gap="6">
 						<Icon name="price_event" size="14" color="secondary" />
 						<Text size="15" weight="600" color="secondary">
-							5
+							2
 						</Text>
 					</Flex>
 				</Flex>
@@ -317,7 +317,7 @@ const copy = (target) => {
 					<Flex align="center" gap="6">
 						<Icon name="checkcircle" size="14" color="green" />
 						<Text size="15" weight="600" color="secondary">
-							98%
+							100%
 						</Text>
 					</Flex>
 				</Flex>

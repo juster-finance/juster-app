@@ -2,7 +2,7 @@
 /**
  * Vendor
  */
-import { ref, onMounted, computed, watch } from "vue"
+import { ref, onMounted, onUnmounted, computed, watch } from "vue"
 import { useMeta } from "vue-meta"
 
 /**
@@ -31,6 +31,11 @@ import DepositModal from "@local/modals/pools/DepositModal.vue"
  */
 import { flags, updateFlag } from "@/services/flags"
 import { juster } from "@sdk"
+
+/**
+ * Models
+ */
+import { entryLiquidity as entryLiquidityModel } from "@/graphql/models"
 
 /**
  * Store
@@ -89,6 +94,9 @@ const selectedPool = ref({})
 
 const poolsStates = ref({})
 
+const subEntries = ref({})
+const entries = ref([])
+
 const populatePools = async () => {
 	for (const index in pools.value) {
 		if (!Object.hasOwnProperty.call(pools.value, index)) return
@@ -100,47 +108,53 @@ const populatePools = async () => {
 	}
 }
 
-onMounted(() => {
-	if (Object.keys(juster.pools).length) populatePools()
-
-	// console.log(juster.gql);
-	juster.gql
+const setupSubscriptionToEntries = async () => {
+	subEntries.value = await juster.gql
 		.subscription({
 			entryLiquidity: [
 				{
 					where: {
 						pool: {
 							address: {
-								_eq: "KT1M6fueToCaYBTeG25XZEFCa7YXcNDMn12x",
+								_in: pools.value.map((pool) => pool.address),
 							},
 						},
 						user: { address: { _eq: accountStore.pkh } },
 					},
 				},
-				{
-					acceptTime: true,
-					amount: true,
-					poolEntryId: true,
-					entryId: true,
-					status: true,
-				},
+				entryLiquidityModel,
 			],
 		})
 		.subscribe({
-			next: (data) => {
-				console.log(
-					data.entryLiquidity.map((e) => {
-						return { s: e.status, a: e.amount }
-					}),
-				)
+			next: ({ entryLiquidity }) => {
+				entries.value = entryLiquidity
 			},
 			error: console.error,
 		})
+}
+
+onMounted(() => {
+	if (Object.keys(juster.pools).length) {
+		setupSubscriptionToEntries()
+		populatePools()
+	}
+
+	/** Test: entryLiquidity */
+})
+
+onUnmounted(() => {
+	if (
+		Object.prototype.hasOwnProperty.call(subEntries.value, "_state") &&
+		!subEntries.value?.closed
+	) {
+		subEntries.value.unsubscribe()
+	}
 })
 
 watch(
 	() => juster.pools,
 	() => {
+		setupSubscriptionToEntries()
 		populatePools()
 	},
 	{
@@ -189,10 +203,11 @@ const { meta } = useMeta({
 				<MyFunds
 					:pools="pools"
 					:poolsStates="poolsStates"
+					:entries="entries"
 					@onDepositLiquidity="showPoolsModal = true"
 				/>
 
-				<MyStatistics />
+				<MyStatistics :entries="entries" />
 
 				<BottomInfo
 					v-if="pools.length"

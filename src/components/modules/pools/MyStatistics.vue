@@ -2,12 +2,16 @@
 /**
  * Vendor
  */
-import { ref, reactive } from "vue"
+import { ref, reactive, computed } from "vue"
 
 /**
  * UI
  */
 import Button from "@ui/Button.vue"
+
+const props = defineProps({
+	entries: Array,
+})
 
 const tabs = reactive([
 	{
@@ -24,6 +28,36 @@ const tabs = reactive([
 	},
 ])
 const selectedTab = ref(tabs[0].title)
+
+const valueLocked = computed(() =>
+	props.entries.reduce((acc, curr) => (acc += curr.amount), 0),
+)
+
+const poolsDistribution = computed(() => {
+	const distribution = []
+
+	props.entries.forEach((entry) => {
+		if (!distribution.length) {
+			distribution.push({
+				name: entry.pool.name,
+				tvl: entry.amount,
+			})
+		} else {
+			const pool = distribution.find((e) => e.name === entry.pool.name)
+
+			if (pool) {
+				pool.tvl += entry.amount
+			} else {
+				distribution.push({
+					name: entry.pool.name,
+					tvl: entry.amount,
+				})
+			}
+		}
+	})
+
+	return distribution.sort((a, b) => b.tvl - a.tvl)
+})
 </script>
 
 <template>
@@ -42,19 +76,54 @@ const selectedTab = ref(tabs[0].title)
 						Total Value Locked
 					</Text>
 
-					<Text color="secondary" size="13" weight="600"> 0 </Text>
+					<Text color="secondary" size="13" weight="600">
+						{{ valueLocked }}
+					</Text>
 				</Flex>
 
 				<div :class="$style.bar">
-					<div :class="$style.bar_progress" />
+					<div v-if="valueLocked" :class="$style.bar_progress" />
 				</div>
 
 				<!-- Hint for empty state -->
-				<Text size="12" color="support" weight="500" height="16">
+				<Text
+					v-if="!valueLocked"
+					size="12"
+					color="support"
+					weight="500"
+					height="16"
+				>
 					After the first deposits here you will see what pools were
 					provided with liquidity and in what amount
 				</Text>
 			</Flex>
+
+			<template v-if="valueLocked">
+				<Flex
+					v-for="pool in poolsDistribution"
+					direction="column"
+					gap="8"
+				>
+					<Flex align="center" justify="between">
+						<Text color="secondary" size="13" weight="600">
+							{{ pool.name.replace("Juster Pool: ", "") }}
+						</Text>
+
+						<Text color="secondary" size="13" weight="600">
+							{{ pool.tvl }}
+						</Text>
+					</Flex>
+
+					<div :class="$style.bar">
+						<div
+							:style="{
+								width: `${(pool.tvl * 100) / valueLocked}%`,
+							}"
+							:class="$style.bar_progress"
+						/>
+					</div>
+				</Flex>
+			</template>
 		</Flex>
 
 		<Flex align="center" gap="6" :class="$style.tabs">
@@ -98,6 +167,16 @@ const selectedTab = ref(tabs[0].title)
 	height: 12px;
 	border-radius: 3px;
 	background: rgba(255, 255, 255, 0.05);
+
+	overflow: hidden;
+}
+
+.bar_progress {
+	width: 100%;
+	height: 100%;
+	background: var(--blue);
+
+	transition: width 1s ease;
 }
 
 .tabs {
