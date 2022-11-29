@@ -9,7 +9,7 @@ import Tooltip from "@ui/Tooltip.vue"
  * Services
  */
 import { toReadableDuration } from "@utils/date"
-import { pluralize } from "@utils/global"
+import { pluralize } from "@utils/misc"
 import { supportedMarkets } from "@config"
 
 /**
@@ -328,7 +328,6 @@ const distributionOfBets = computed(() => {
 <style module>
 .wrapper {
 	border-radius: 8px;
-	border: 1px solid var(--border);
 	padding: 20px;
 	background: var(--card-bg);
 }

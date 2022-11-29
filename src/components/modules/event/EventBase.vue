@@ -54,7 +54,7 @@ import { fetchEventById, fetchEventParticipants } from "@/api/events"
  * Services
  */
 import { numberWithSymbol } from "@utils/amounts"
-import { capitalizeFirstLetter, toClipboard } from "@utils/global"
+import { capitalizeFirstLetter, toClipboard } from "@utils/misc"
 import { juster, analytics, currentNetwork } from "@sdk"
 import { supportedMarkets, verifiedMakers } from "@config"
 
@@ -789,7 +789,12 @@ onUnmounted(() => {
 					</div>
 				</div>
 
-				<div v-if="event" :class="$style.side">
+				<Flex
+					v-if="event"
+					direction="column"
+					gap="24"
+					:class="$style.side"
+				>
 					<EventGeneralCard
 						:event="event"
 						:start-status="startStatus"
@@ -906,7 +911,7 @@ onUnmounted(() => {
 							</template>
 						</Dropdown>
 					</div>
-				</div>
+				</Flex>
 			</div>
 		</Transition>
 	</div>
@@ -930,10 +935,6 @@ onUnmounted(() => {
 }
 
 .side {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-
 	min-width: 384px;
 	max-width: 384px;
 	height: fit-content;

@@ -19,7 +19,7 @@ import { EventCard } from "@local/EventCard"
  * Services
  */
 import { currentNetwork, fetchBalance } from "@sdk"
-import { toClipboard } from "@utils/global"
+import { toClipboard } from "@utils/misc"
 import { abbreviateNumber } from "@utils/amounts"
 
 /**

@@ -4,16 +4,16 @@
 import { juster } from "@sdk"
 
 /**
- * GQL: Queries
+ * GQL: Models
  */
-import { getAllPools } from "@/graphql/queries/pools"
+import { pool as poolModel } from "@/graphql/models"
 
 export const fetchAllPools = async () => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getAllPools,
+		const { pool } = await juster.gql.query({
+			pool: poolModel,
 		})
-		return data.pool
+		return pool
 	} catch (error) {
 		console.error(
 			`Error during fetching pools \n\n ${error.name}: ${error.message}`,

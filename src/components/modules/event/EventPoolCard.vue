@@ -36,7 +36,6 @@ const emit = defineEmits(["onLiquidity"])
 <style module>
 .wrapper {
 	border-radius: 8px;
-	border: 1px solid var(--border);
 	padding: 20px;
 	background: var(--card-bg);
 }

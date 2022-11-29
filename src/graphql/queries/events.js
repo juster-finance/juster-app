@@ -1,7 +1,7 @@
 import gql from "graphql-tag"
 
 export const getEventById = gql`
-	query getEventById($id: Int!) {
+	query getEventById($id: bigint!) {
 		eventByPk(id: $id) {
 			id
 			status

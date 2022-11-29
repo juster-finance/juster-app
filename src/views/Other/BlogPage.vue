@@ -7,7 +7,7 @@ import Page from "@base/Page.vue"
 /**
  * Module
  */
-import BlogBase from "@modules/blog/BlogBase"
+import BlogBase from "@modules/blog/BlogBase.vue"
 </script>
 
 <template>

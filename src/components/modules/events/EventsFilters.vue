@@ -21,7 +21,7 @@ import { useAccountStore } from "@store/account"
  * Services
  */
 import { analytics } from "@sdk"
-import { getCurrencyIcon } from "@utils/global"
+import { getCurrencyIcon } from "@utils/misc"
 
 const props = defineProps({
 	filters: { type: Object },

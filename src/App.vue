@@ -17,7 +17,7 @@ import "@/styles/text.css"
  * Base
  */
 import TheHeader from "./components/base/Header/TheHeader.vue"
-import Footer from "@base/Footer.vue"
+// import Footer from "@base/Footer.vue"
 
 /** Local */
 import TheWelcomeScreen from "@local/onboarding/TheWelcomeScreen.vue"
@@ -114,7 +114,7 @@ accountStore.$subscribe((mutation, state) => {
 		<div class="app_base">
 			<router-view />
 		</div>
-		<Footer class="footer" />
+		<!-- <Footer class="footer" /> -->
 	</div>
 </template>
 

@@ -10,7 +10,7 @@ import { Dropdown } from "@ui/Dropdown"
 /**
  * Services
  */
-import { shorten } from "@utils/global"
+import { shorten } from "@utils/misc"
 import { analytics } from "@sdk"
 
 /**

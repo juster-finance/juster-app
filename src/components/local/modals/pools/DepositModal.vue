@@ -19,7 +19,7 @@ import LoadingDots from "@ui/LoadingDots.vue"
  * Services
  */
 import { juster, analytics } from "@sdk"
-import { sanitizeInput, capitalizeFirstLetter } from "@utils/global"
+import { sanitizeInput, capitalizeFirstLetter } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
 
 /**

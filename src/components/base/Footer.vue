@@ -8,12 +8,7 @@ import { DateTime } from "luxon"
  * Services
  */
 import { juster, switchNetwork, currentNetwork } from "@sdk"
-import { capitalizeFirstLetter } from "@utils/global"
-
-/**
- * Store
- */
-import { useMarketStore } from "@store/market"
+import { capitalizeFirstLetter } from "@utils/misc"
 
 /**
  * UI
@@ -21,6 +16,11 @@ import { useMarketStore } from "@store/market"
 import Button from "@ui/Button.vue"
 import Tooltip from "@ui/Tooltip.vue"
 import { Dropdown, DropdownItem, DropdownTitle } from "@ui/Dropdown"
+
+/**
+ * Store
+ */
+import { useMarketStore } from "@store/market"
 
 const marketStore = useMarketStore()
 

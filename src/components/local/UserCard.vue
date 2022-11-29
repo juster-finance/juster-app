@@ -9,7 +9,7 @@ import { Dropdown, DropdownItem, DropdownDivider } from "@ui/Dropdown"
  * Services
  */
 import { currentNetwork } from "@sdk"
-import { toClipboard, shorten } from "@utils/global"
+import { toClipboard, shorten } from "@utils/misc"
 import { verifiedMakers } from "@config"
 
 /**

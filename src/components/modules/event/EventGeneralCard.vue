@@ -16,7 +16,7 @@ import EventActions from "@local/EventActions.vue"
  * Services
  */
 import { numberWithSymbol } from "@utils/amounts"
-import { pluralize } from "@utils/global"
+import { pluralize } from "@utils/misc"
 import { currentNetwork } from "@sdk"
 import { toReadableDuration } from "@utils/date"
 import { supportedMarkets, verifiedMakers } from "@config"
@@ -548,8 +548,7 @@ const endDiff = computed(() =>
 <style module>
 .wrapper {
 	border-radius: 8px;
-	border: 1px solid var(--border);
-	padding: 20px;
+	padding: 16px 20px;
 	background: var(--card-bg);
 }
 

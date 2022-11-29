@@ -33,7 +33,7 @@ import {
 	toClipboard,
 	getCurrencyIcon,
 	capitalizeFirstLetter,
-} from "@utils/global"
+} from "@utils/misc"
 import { juster, analytics, currentNetwork } from "@sdk"
 import { abbreviateNumber } from "@utils/amounts"
 import { supportedMarkets, verifiedMakers } from "@config"

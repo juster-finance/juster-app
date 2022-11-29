@@ -11,8 +11,7 @@ import Button from "@ui/Button.vue"
 /**
  * Services
  */
-import { shorten } from "@utils/global"
-import { toClipboard } from "@utils/global"
+import { shorten, toClipboard } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
 import { currentNetwork } from "@sdk"
 

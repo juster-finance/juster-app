@@ -14,7 +14,7 @@ import {
 /**
  * Services
  */
-import { toClipboard, getCurrencyIcon, shorten } from "@utils/global"
+import { toClipboard, getCurrencyIcon, shorten } from "@utils/misc"
 
 /**
  * Store
