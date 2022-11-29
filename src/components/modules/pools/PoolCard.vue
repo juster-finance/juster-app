@@ -123,6 +123,7 @@ const copy = (target) => {
 					@click="emit('onSelectPool', pool)"
 					type="secondary"
 					size="small"
+					:disabled="!accountStore.pkh"
 				>
 					<Icon name="plus_circle" size="16" color="blue" />
 					Deposit

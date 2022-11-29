@@ -120,12 +120,11 @@ const handleDeposit = async () => {
 }
 
 const buttonState = computed(() => {
-	if (accountStore.pendingTransaction.awaiting) {
+	if (accountStore.pendingTransaction.awaiting)
 		return {
 			text: "Previous transaction in process",
 			disabled: true,
 		}
-	}
 	if (opConfirmationInProgress.value)
 		return {
 			text: "Awaiting confirmation..",
