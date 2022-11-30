@@ -1,4 +1,12 @@
+/**
+ * Vendor
+ */
 import { createRouter, createWebHistory } from "vue-router"
+
+/**
+ * Store
+ */
+import { useAppStore } from "@store/app"
 import { useAccountStore } from "@store/account"
 
 const routes = [
@@ -193,6 +201,14 @@ const routes = [
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes,
+})
+
+router.beforeEach((target, prev, next) => {
+	const appStore = useAppStore()
+
+	if (prev.name) appStore.prevRoute = prev
+
+	next()
 })
 
 export default router

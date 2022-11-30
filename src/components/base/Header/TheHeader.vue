@@ -1,6 +1,6 @@
 <script setup>
 /** Vendor */
-import { ref, reactive, computed } from "vue"
+import { ref, reactive, computed, nextTick } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
 /**
@@ -34,8 +34,10 @@ import RewardAlert from "@local/RewardAlert.vue"
 /**
  * Store
  */
+import { useAppStore } from "@store/app"
 import { useAccountStore } from "@store/account"
 
+const appStore = useAppStore()
 const accountStore = useAccountStore()
 
 const route = useRoute()
@@ -73,33 +75,6 @@ const isActive = (url) => {
 }
 
 const pkh = computed(() => accountStore.pkh)
-
-/** Back button logic */
-const bringMeBack = reactive({
-	name: "Explore",
-	path: "/",
-})
-const handleButtons = () => {
-	const historyState = router.options.history.state
-	const splittedPath = historyState.back.split("/").filter(Boolean)
-
-	/** find route name */
-	const prevRoute = router.options.routes.find((rt) => {
-		if (splittedPath.length === 1) {
-			return rt.path === historyState.back
-		} else {
-			return rt.path.includes(splittedPath[0])
-		}
-	})
-
-	if (prevRoute && prevRoute.name !== "Connect") {
-		bringMeBack.name = prevRoute.name
-		bringMeBack.path = prevRoute.path
-	} else {
-		bringMeBack.name = "Explore"
-		bringMeBack.path = "/"
-	}
-}
 
 const handleNetworkDblClick = () => {
 	juster.sdk._provider.client.clearActiveAccount().then(async () => {
@@ -217,7 +192,7 @@ const handleNetworkDblClick = () => {
 			<div :class="$style.right">
 				<RewardAlert :class="$style.reward_alert" />
 
-				<div @click="handleButtons" :class="$style.buttons">
+				<Flex gap="8">
 					<router-link
 						v-if="!pkh && route.path !== '/connect'"
 						to="/connect"
@@ -228,16 +203,16 @@ const handleNetworkDblClick = () => {
 						</Button>
 					</router-link>
 					<router-link
-						v-if="
+						v-else-if="
 							!pkh &&
 							route.path === '/connect' &&
-							bringMeBack.path
+							appStore.prevRoute
 						"
-						:to="bringMeBack.path"
+						:to="appStore.prevRoute.path"
 					>
 						<Button type="secondary" size="small">
 							<Icon name="back" size="16" />
-							Back to {{ bringMeBack.name }}
+							Back to {{ appStore.prevRoute.name }}
 						</Button>
 					</router-link>
 
@@ -249,7 +224,7 @@ const handleNetworkDblClick = () => {
 							/>
 						</div>
 					</ProfileMenu>
-				</div>
+				</Flex>
 			</div>
 		</div>
 	</header>
@@ -385,11 +360,6 @@ const handleNetworkDblClick = () => {
 .link:hover {
 	color: var(--text-primary);
 	fill: var(--text-primary);
-}
-
-.buttons {
-	display: flex;
-	gap: 8px;
 }
 
 .reward_alert {

@@ -13,6 +13,8 @@ export const useAppStore = defineStore({
 				callback: null,
 				show: false,
 			},
+
+			prevRoute: null,
 		}
 	},
 
