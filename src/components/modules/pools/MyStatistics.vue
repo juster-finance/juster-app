@@ -109,9 +109,17 @@ const poolsDistribution = computed(() => {
 							{{ pool.name.replace("Juster Pool: ", "") }}
 						</Text>
 
-						<Text color="secondary" size="13" weight="600">
-							{{ pool.tvl }}
-						</Text>
+						<Flex align="center" gap="8">
+							<Text color="tertiary" size="13" weight="600">
+								{{ pool.tvl }}
+							</Text>
+
+							<Text color="secondary" size="13" weight="600">
+								{{
+									((pool.tvl * 100) / valueLocked).toFixed(0)
+								}}%
+							</Text>
+						</Flex>
 					</Flex>
 
 					<div :class="$style.bar">

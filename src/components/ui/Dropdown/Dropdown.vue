@@ -175,7 +175,7 @@ const onKeydown = (event) => {
 
 	padding: 8px 0;
 	border-radius: 8px;
-	background: rgba(39, 39, 42, 0.6);
+	background: rgba(39, 39, 42, 0.8);
 	box-shadow: rgb(0 0 0 / 20%) 0px 4px 24px;
 	backdrop-filter: blur(10px) saturate(190%) contrast(80%) brightness(75%);
 	border: 1px solid rgb(60, 63, 68);
