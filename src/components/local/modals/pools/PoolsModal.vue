@@ -76,6 +76,10 @@ const handleSort = () => {
 	}
 }
 
+const activePools = computed(() =>
+	props.pools.filter((pool) => !pool.isDepositPaused),
+)
+
 const filteredPools = computed(() => {
 	if (searchText.value) {
 		let findedPools = poolsSearcher.value
@@ -280,26 +284,34 @@ const handleCloseTestnetWarning = () => {
 								<Flex align="center" gap="8">
 									<Flex align="center" gap="4">
 										<Icon
-											name="zap_circle"
+											:name="
+												!pool.isDepositPaused
+													? 'zap_circle'
+													: 'pause'
+											"
 											size="12"
-											color="green"
+											:color="
+												!pool.isDepositPaused
+													? 'green'
+													: 'yellow'
+											"
 										/>
 										<Text
 											size="12"
-											weight="700"
-											color="green"
-											>Stable</Text
+											weight="600"
+											:color="
+												!pool.isDepositPaused
+													? 'green'
+													: 'yellow'
+											"
 										>
+											{{
+												!pool.isDepositPaused
+													? "Active"
+													: "Paused"
+											}}
+										</Text>
 									</Flex>
-
-									<Text size="8" color="support">✦</Text>
-
-									<Text
-										size="12"
-										weight="600"
-										color="tertiary"
-										>Pool</Text
-									>
 								</Flex>
 							</Flex>
 						</Flex>
@@ -381,14 +393,13 @@ const handleCloseTestnetWarning = () => {
 				</Flex>
 
 				<Text size="12" weight="600" color="tertiary">
-					{{ filteredPools.length }}
 					{{
-						pools.length == filteredPools.length
-							? "active"
-							: "found"
+						searchText.length
+							? filteredPools.length
+							: activePools.length
 					}}
-					pools</Text
-				>
+					{{ searchText.length ? "found" : "active" }} pools
+				</Text>
 			</Flex>
 
 			<!-- <Flex direction="column" gap="12" align="center">

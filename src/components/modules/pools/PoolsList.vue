@@ -3,7 +3,7 @@
  * Vendor
  */
 import { ref, computed, onMounted, nextTick } from "vue"
-import { Searcher } from "fast-fuzzy"
+import { search, Searcher } from "fast-fuzzy"
 
 /**
  * UI
@@ -55,6 +55,10 @@ const filteredPools = computed(() => {
 	}
 })
 
+const activePools = computed(() =>
+	props.pools.filter((pool) => !pool.isDepositPaused),
+)
+
 const handleSearchKeydown = (e) => {
 	e.stopPropagation()
 
@@ -102,7 +106,12 @@ onMounted(() => {
 			<Flex direction="column" gap="8">
 				<Text size="16" weight="600" color="primary">Pools</Text>
 				<Text size="14" weight="500" color="tertiary">
-					{{ pools.length }} active pools
+					{{
+						searchText.length
+							? filteredPools.length
+							: activePools.length
+					}}
+					{{ searchText.length ? "found" : "active" }} pools
 				</Text>
 			</Flex>
 
