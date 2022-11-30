@@ -54,8 +54,7 @@ const handleCopy = (target, name) => {
 
 			badges: [
 				{
-					secondaryText: "",
-					tertiaryText:
+					secondaryText:
 						name === "hash" ? shorten(target, 6, 6) : target,
 					icon: name === "hash" ? "hash" : "calendar",
 				},
@@ -208,11 +207,10 @@ const getTypeOfOperation = () => {
 				}tzkt.io/${data.opgHash}`"
 				target="_blank"
 			>
-				<Button type="secondary" size="small" block
-					><Icon name="open" size="16" /> View operation on
-					TzKT</Button
-				></a
-			>
+				<Button type="secondary" size="small" block>
+					<Icon name="database" size="12" /> View operation on TzKT
+				</Button>
+			</a>
 
 			<div :class="[$style.bg, showRadialBg && $style.visible]" />
 		</div>

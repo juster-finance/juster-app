@@ -142,10 +142,9 @@ const handleCopy = (target) => {
 
 			<template #dropdown>
 				<router-link :to="`/profile/${user.userId}`">
-					<DropdownItem
-						><Icon name="open" size="16" />User
-						profile</DropdownItem
-					>
+					<DropdownItem>
+						<Icon name="user" size="16" />User profile
+					</DropdownItem>
 
 					<DropdownDivider />
 				</router-link>
@@ -156,8 +155,8 @@ const handleCopy = (target) => {
 					}tzkt.io/${user.userId}`"
 					target="_blank"
 				>
-					<DropdownItem
-						><Icon name="open" size="16" />View on TzKT
+					<DropdownItem>
+						<Icon name="database" size="16" />View on TzKT
 					</DropdownItem>
 				</a>
 

@@ -310,7 +310,7 @@ export default defineComponent({
 							target="_blank"
 						>
 							<Button type="secondary" size="small">
-								<Icon name="open" size="14" />
+								<Icon name="database" size="14" />
 								View on TzKT
 							</Button>
 						</a>

@@ -183,7 +183,7 @@ const handleCloseTestnetWarning = () => {
 	<Modal new :show="show" width="550" closable @onClose="emit('onClose')">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
-				<Icon name="pool" size="16" color="secondary" />
+				<Icon name="server" size="16" color="secondary" />
 				<Text size="14" weight="600" color="primary">
 					Pool Selection
 				</Text>

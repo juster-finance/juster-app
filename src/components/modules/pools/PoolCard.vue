@@ -332,7 +332,7 @@ const copy = (target) => {
 		<Flex justify="between">
 			<Flex direction="column" gap="8">
 				<Flex align="center" gap="6">
-					<Icon name="pool" size="12" color="tertiary" />
+					<Icon name="server" size="12" color="tertiary" />
 					<Text size="13" weight="600" color="tertiary">
 						Liquidity Pool
 					</Text>

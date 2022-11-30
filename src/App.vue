@@ -133,20 +133,15 @@ html {
 
 .dropdown-enter-active,
 .dropdown-leave-active {
-	animation: fade-in 0.2s;
-	transform-origin: top;
+	transform-origin: 0px 0px;
+
+	transition: all 0.2s ease;
 }
 
-@keyframes fade-in {
-	0% {
-		opacity: 0;
-		transform: translateY(10px);
-	}
-
-	100% {
-		opacity: 1;
-		transform: translateY(0);
-	}
+.dropdown-enter-from,
+.dropdown-leave-to {
+	opacity: 0;
+	transform: scale(0.95);
 }
 
 .popup-enter-active,
@@ -407,9 +402,12 @@ input {
 a {
 	color: inherit;
 	text-decoration: none;
+
+	transition: box-shadow 0.2s ease;
 }
-a:active {
+a:focus {
 	outline: none;
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 a,

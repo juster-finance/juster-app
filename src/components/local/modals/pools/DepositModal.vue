@@ -171,7 +171,7 @@ watch(
 	<Modal new :show="show" width="550" closable @onClose="emit('onClose')">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
-				<Icon name="pool" size="16" color="secondary" />
+				<Icon name="server" size="16" color="secondary" />
 
 				<Text
 					@click="emit('onBack')"
