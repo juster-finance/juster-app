@@ -60,13 +60,13 @@ export default {
 
 @keyframes mig {
 	0% {
-		background: #2d2d2d;
+		background: rgba(255, 255, 255, 0.05);
 	}
 	50% {
-		background: #555555;
+		background: rgba(255, 255, 255, 0.15);
 	}
 	100% {
-		background: #2d2d2d;
+		background: rgba(255, 255, 255, 0.05);
 	}
 }
 
@@ -89,7 +89,6 @@ export default {
 .symbol div {
 	width: 20px;
 	height: 20px;
-	background: #2d2d2d;
 	border-radius: 6px;
 
 	animation: mig 2s infinite;
@@ -120,13 +119,11 @@ export default {
 	width: 24px;
 	height: 24px;
 	border-radius: 50%;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 
 	animation: mig 2s infinite;
 
 	outline: 4px solid var(--card-bg);
-
-	margin-right: -4px;
 }
 
 .naming {
@@ -141,7 +138,7 @@ export default {
 	width: 20px;
 	height: 20px;
 	border-radius: 4px;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 	animation: mig 2s infinite;
 	animation-delay: 1s;
 }
@@ -150,7 +147,7 @@ export default {
 	width: 120px;
 	height: 12px;
 	border-radius: 4px;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 	animation: mig 2s infinite;
 	animation-delay: 1s;
 }
@@ -167,7 +164,7 @@ export default {
 	width: 45px;
 	height: 12px;
 	border-radius: 4px;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 	animation: mig 2s infinite;
 	animation-delay: 1s;
 }
@@ -176,7 +173,7 @@ export default {
 	width: 100px;
 	height: 12px;
 	border-radius: 4px;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 	animation: mig 2s infinite;
 	animation-delay: 1s;
 }
@@ -191,7 +188,7 @@ export default {
 	width: 84px;
 	height: 28px;
 	border-radius: 6px;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 	animation: mig 2s infinite;
 	animation-delay: 2s;
 
@@ -201,7 +198,7 @@ export default {
 .badge {
 	width: 28px;
 	height: 28px;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 	animation: mig 2s infinite;
 	animation-delay: 2s;
 
@@ -227,7 +224,7 @@ export default {
 .label .icon {
 	width: 14px;
 	height: 14px;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 	animation: mig 2s infinite;
 	animation-delay: 3s;
 	border-radius: 4px;
@@ -236,7 +233,7 @@ export default {
 .label .title {
 	width: 120px;
 	height: 12px;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 	animation: mig 2s infinite;
 	animation-delay: 3s;
 	border-radius: 4px;
@@ -250,7 +247,7 @@ export default {
 	width: 100%;
 	height: 32px;
 	border-radius: 6px;
-	background: #2d2d2d;
+	background: rgba(255, 255, 255, 0.05);
 	animation: mig 2s infinite;
 	animation-delay: 4s;
 }

@@ -12,7 +12,7 @@ import LoadingDots from "@ui/LoadingDots.vue"
 /**
  * Services
  */
-import { numberWithSymbol } from "@/services/utils/amounts"
+import { numberWithSymbol } from "@utils/amounts"
 
 const props = defineProps({
 	poolsStates: Object,

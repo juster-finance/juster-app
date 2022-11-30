@@ -143,7 +143,7 @@ export default defineComponent({
 .wrapper {
 	padding: 24px;
 	border-radius: 10px;
-	border: 1px solid var(--border);
+	border: 1px solid transparent;
 	background: var(--card-bg);
 	min-height: 132px;
 
@@ -155,7 +155,7 @@ export default defineComponent({
 }
 
 .wrapper:hover {
-	border: 1px solid var(--border-highlight);
+	border: 1px solid var(--border);
 }
 
 .name {

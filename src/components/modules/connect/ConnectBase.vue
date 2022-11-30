@@ -54,7 +54,6 @@ useMeta({
 const handleBeacon = async () => {
 	try {
 		await juster.sdk.sync()
-
 		login()
 	} catch (error) {
 		if (error.title === "Aborted") {

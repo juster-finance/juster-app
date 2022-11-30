@@ -10,7 +10,7 @@ import { DateTime } from "luxon"
 import { juster, analytics, currentNetwork } from "@sdk"
 import { verifiedMakers } from "@config"
 import { flags, updateFlag } from "@/services/flags"
-import { sanitizeInput } from "@/services/utils/global"
+import { sanitizeInput } from "@utils/misc"
 
 /**
  * Constants
