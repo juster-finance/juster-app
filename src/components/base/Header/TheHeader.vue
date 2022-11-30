@@ -64,13 +64,40 @@ const links = reactive([
 
 const showMobileMenu = ref(false)
 
-const isActive = (url) => {
-	if (!route.name) return
+/** hardcoded active links */
+const isActive = (linkName) => {
+	if (linkName === "Browse") {
+		if (
+			[
+				"Explore",
+				"Events",
+				"Markets",
+				"Ranking",
+				"Market",
+				"Event",
+				"Liquidity Pools",
+				"Liquidity Pool",
+			].includes(route.name)
+		)
+			return true
+	}
 
-	if (url.length == 1) {
-		return route.path == url
-	} else {
-		return route.path.startsWith(url)
+	if (linkName === "Resources") {
+		if (
+			[
+				"Docs",
+				"DocDiscover",
+				"DocBetting",
+				"DocLiquidity",
+				"DocWithdraw",
+				"DocRoadmap",
+			].includes(route.name)
+		)
+			return true
+	}
+
+	if (linkName === "Community") {
+		if (["Blog", "Releases"].includes(route.name)) return true
 	}
 }
 
@@ -178,7 +205,7 @@ const handleNetworkDblClick = () => {
 					:id="link.name"
 					@mouseenter="activeLink = link.name"
 					@focus="activeLink = link.name"
-					:class="[$style.link, isActive(link.url) && $style.active]"
+					:class="[$style.link, isActive(link.name) && $style.active]"
 				>
 					<Icon :name="link.icon" size="16" fill />{{ link.name }}
 				</router-link>

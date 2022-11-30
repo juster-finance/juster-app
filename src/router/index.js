@@ -153,27 +153,27 @@ const routes = [
 		children: [
 			{
 				path: "discover",
-				name: "Discover",
+				name: "DocDiscover",
 				component: () => import("@modules/docs/DiscoverBase.vue"),
 			},
 			{
 				path: "betting",
-				name: "Betting",
+				name: "DocBetting",
 				component: () => import("@modules/docs/BettingBase.vue"),
 			},
 			{
 				path: "liquidity",
-				name: "Liquidity",
+				name: "DocLiquidity",
 				component: () => import("@modules/docs/LiquidityBase.vue"),
 			},
 			{
 				path: "withdraw",
-				name: "Withdraw",
+				name: "DocWithdraw",
 				component: () => import("@modules/docs/WithdrawBase.vue"),
 			},
 			{
 				path: "roadmap",
-				name: "Roadmap",
+				name: "DocRoadmap",
 				component: () => import("@modules/docs/RoadmapBase.vue"),
 			},
 			// {
