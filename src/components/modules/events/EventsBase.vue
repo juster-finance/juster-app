@@ -476,6 +476,14 @@ useMeta({
 							:key="event.id"
 							:event="event"
 						/>
+
+						<Pagination
+							v-if="filteredEvents.length > 6"
+							v-model="currentPage"
+							:total="filteredEvents.length"
+							:limit="6"
+							:class="$style.pagination"
+						/>
 					</div>
 
 					<div v-else-if="!isNewEventsLoaded" :class="$style.events">
@@ -493,14 +501,6 @@ useMeta({
 						No events with the selected filters were found
 					</Banner>
 				</transition>
-
-				<Pagination
-					v-if="filteredEvents.length > 6"
-					v-model="currentPage"
-					:total="filteredEvents.length"
-					:limit="6"
-					:class="$style.pagination"
-				/>
 			</div>
 		</div>
 	</div>
