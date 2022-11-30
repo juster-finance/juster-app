@@ -141,7 +141,7 @@ const stats = computed(() => {
 .stat {
 	flex: 1;
 
-	border-radius: 10px;
+	border-radius: 8px;
 	background: var(--card-bg);
 
 	padding: 20px 24px;
