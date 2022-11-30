@@ -55,7 +55,7 @@ const emit = defineEmits(["onClose"])
 
 .general_icon {
 	box-sizing: content-box;
-	border-radius: 50%;
+	border-radius: 8px;
 
 	padding: 8px;
 }

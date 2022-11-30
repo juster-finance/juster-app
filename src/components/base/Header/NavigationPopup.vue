@@ -47,25 +47,25 @@ const resourcesLinks = ref([
 		icon: "compass_1",
 		title: "Documentation",
 		description: "Everything you need is here",
-		url: "/",
+		url: "/docs",
 	},
 	{
 		icon: "code_circle",
 		title: "Developers",
 		description: "Learn the product in more detail",
-		url: "/events",
+		url: "/docs",
 	},
 	{
 		icon: "map",
 		title: "Roadmap",
 		description: "Explore the product path",
-		url: "/markets",
+		url: "/docs",
 	},
 	{
 		icon: "github",
 		title: "Source Code",
 		description: "Explore our code & Contribute",
-		url: "/rank",
+		url: "https://github.com/juster-finance",
 	},
 ])
 
@@ -74,25 +74,25 @@ const communityLinks = ref([
 		icon: "feather",
 		title: "Blog",
 		description: "Everything you need is here",
-		url: "/",
+		url: "/blog",
 	},
 	{
 		icon: "asterisk",
 		title: "Releases",
 		description: "Learn the product in more detail",
-		url: "/events",
+		url: "/releases",
 	},
 	{
 		icon: "discord",
 		title: "Discord",
 		description: "Explore the product path",
-		url: "/markets",
+		url: "https://discord.gg/FeGDCkHhnB",
 	},
 	{
 		icon: "twitter",
 		title: "Twitter",
 		description: "Explore our code & Contribute",
-		url: "/rank",
+		url: "https://twitter.com/Juster_fi",
 	},
 ])
 
@@ -148,10 +148,19 @@ watch(
 				<template v-if="activeLink === 'Browse'">
 					<div :class="$style.column">
 						<div :class="$style.atlas_block">
-							<router-link
+							<component
 								v-for="(link, i) in browseLinks"
+								:is="
+									link.url.startsWith('https://')
+										? 'a'
+										: 'router-link'
+								"
 								:key="i"
 								:to="link.url"
+								:href="link.url"
+								:target="
+									link.url.startsWith('https://') && _blank
+								"
 								:class="$style.item"
 							>
 								<div :class="$style.icon_wrapper">
@@ -162,7 +171,7 @@ watch(
 									<span>{{ link.title }}</span>
 									<span>{{ link.description }}</span>
 								</div>
-							</router-link>
+							</component>
 						</div>
 					</div>
 
@@ -237,9 +246,19 @@ watch(
 				<template v-if="activeLink === 'Resources'">
 					<div :class="$style.column">
 						<div :class="$style.atlas_block">
-							<div
+							<component
+								:is="
+									link.url.startsWith('https://')
+										? 'a'
+										: 'router-link'
+								"
 								v-for="(link, i) in resourcesLinks"
 								:key="i"
+								:to="link.url"
+								:href="link.url"
+								:target="
+									link.url.startsWith('https://') && '_blank'
+								"
 								:class="$style.item"
 							>
 								<div :class="$style.icon_wrapper">
@@ -250,7 +269,7 @@ watch(
 									<span>{{ link.title }}</span>
 									<span>{{ link.description }}</span>
 								</div>
-							</div>
+							</component>
 						</div>
 					</div>
 
@@ -321,10 +340,19 @@ watch(
 				<template v-if="activeLink === 'Community'">
 					<div :class="$style.column">
 						<div :class="$style.atlas_block">
-							<router-link
+							<component
+								:is="
+									link.url.startsWith('https://')
+										? 'a'
+										: 'router-link'
+								"
 								v-for="(link, i) in communityLinks"
 								:key="i"
 								:to="link.url"
+								:href="link.url"
+								:target="
+									link.url.startsWith('https://') && '_blank'
+								"
 								:class="$style.item"
 							>
 								<div :class="$style.icon_wrapper">
@@ -335,7 +363,7 @@ watch(
 									<span>{{ link.title }}</span>
 									<span>{{ link.description }}</span>
 								</div>
-							</router-link>
+							</component>
 						</div>
 					</div>
 
