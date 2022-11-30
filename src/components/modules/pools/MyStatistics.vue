@@ -4,13 +4,8 @@
  */
 import { ref, reactive, computed } from "vue"
 
-/**
- * UI
- */
-import Button from "@ui/Button.vue"
-
 const props = defineProps({
-	entries: Array,
+	positions: Array,
 })
 
 const tabs = reactive([
@@ -30,33 +25,48 @@ const tabs = reactive([
 const selectedTab = ref(tabs[0].title)
 
 const valueLocked = computed(() =>
-	props.entries.reduce((acc, curr) => (acc += curr.amount), 0),
+	props.positions.reduce(
+		(acc, curr) =>
+			(acc = acc + curr.depositedAmount + curr.lockedEstimateAmount),
+		0,
+	),
 )
 
-const poolsDistribution = computed(() => {
-	const distribution = []
+// const poolsDistribution = computed(() => {
+// 	const distribution = []
 
-	props.entries.forEach((entry) => {
-		if (!distribution.length) {
-			distribution.push({
-				name: entry.pool.name,
-				tvl: entry.amount,
-			})
-		} else {
-			const pool = distribution.find((e) => e.name === entry.pool.name)
+// 	props.positions.forEach((entry) => {
+// 		if (!distribution.length) {
+// 			distribution.push({
+// 				name: entry.pool.name,
+// 				tvl: entry.amount,
+// 			})
+// 		} else {
+// 			const pool = distribution.find((e) => e.name === entry.pool.name)
 
-			if (pool) {
-				pool.tvl += entry.amount
-			} else {
-				distribution.push({
-					name: entry.pool.name,
-					tvl: entry.amount,
-				})
-			}
+// 			if (pool) {
+// 				pool.tvl += entry.amount
+// 			} else {
+// 				distribution.push({
+// 					name: entry.pool.name,
+// 					tvl: entry.amount,
+// 				})
+// 			}
+// 		}
+// 	})
+
+// 	return distribution.sort((a, b) => b.tvl - a.tvl)
+// })
+
+const sortedPositions = computed(() => {
+	const sPositions = props.positions.map((position) => {
+		return {
+			...position,
+			tvl: position.depositedAmount + position.lockedEstimateAmount,
 		}
 	})
 
-	return distribution.sort((a, b) => b.tvl - a.tvl)
+	return sPositions.sort((a, b) => b.tvl - a.tvl)
 })
 </script>
 
@@ -64,16 +74,16 @@ const poolsDistribution = computed(() => {
 	<div :class="$style.wrapper">
 		<Flex direction="column" gap="8" :class="$style.head">
 			<Text color="primary" size="16" weight="600">My Statistics</Text>
-			<Text color="tertiary" size="14" weight="500" height="14"
-				>Splitted data by pools</Text
-			>
+			<Text color="tertiary" size="14" weight="500" height="14">
+				Splitted data by pools
+			</Text>
 		</Flex>
 
 		<Flex direction="column" gap="24">
 			<Flex direction="column" gap="8">
 				<Flex align="center" justify="between">
 					<Text color="secondary" size="13" weight="600">
-						Total Value Locked
+						Total Value
 					</Text>
 
 					<Text color="secondary" size="13" weight="600">
@@ -81,7 +91,7 @@ const poolsDistribution = computed(() => {
 					</Text>
 				</Flex>
 
-				<div :class="$style.bar">
+				<div :class="$style.progress_wrapper">
 					<div v-if="valueLocked" :class="$style.bar_progress" />
 				</div>
 
@@ -100,38 +110,67 @@ const poolsDistribution = computed(() => {
 
 			<template v-if="valueLocked">
 				<Flex
-					v-for="pool in poolsDistribution"
+					v-for="position in sortedPositions"
 					direction="column"
 					gap="8"
 				>
 					<Flex align="center" justify="between">
 						<Text color="secondary" size="13" weight="600">
-							{{ pool.name.replace("Juster Pool: ", "") }}
+							{{
+								position.pool.name.replace("Juster Pool: ", "")
+							}}
 						</Text>
 
 						<Flex align="center" gap="8">
 							<Text color="tertiary" size="13" weight="600">
-								{{ pool.tvl }}
+								{{ position.tvl }}
 							</Text>
 
 							<Text color="secondary" size="13" weight="600">
 								{{
-									((pool.tvl * 100) / valueLocked).toFixed(0)
+									(
+										(position.tvl * 100) /
+										valueLocked
+									).toFixed(0)
 								}}%
 							</Text>
 						</Flex>
 					</Flex>
 
-					<div :class="$style.bar">
-						<div
+					<Flex :class="$style.progress_wrapper">
+						<!-- <div
 							:style="{
-								width: `${(pool.tvl * 100) / valueLocked}%`,
+								width: `${(position.tvl * 100) / valueLocked}%`,
 							}"
 							:class="$style.bar_progress"
+						/> -->
+						<div
+							:style="{ width: `${50}%` }"
+							:class="$style.bar_deposited"
 						/>
-					</div>
+						<div
+							:style="{
+								width: `${30}%`,
+								borderRadius: '0 3px 3px 0',
+							}"
+							:class="$style.bar_locked"
+						/>
+					</Flex>
 				</Flex>
 			</template>
+
+			<Flex align="center" gap="16">
+				<Flex align="center" gap="6">
+					<div :class="$style.deposited_dot" />
+					<Text size="12" weight="600" color="secondary">
+						Deposited
+					</Text>
+				</Flex>
+				<Flex align="center" gap="6">
+					<div :class="$style.locked_dot" />
+					<Text size="12" weight="600" color="secondary">Locked</Text>
+				</Flex>
+			</Flex>
 		</Flex>
 
 		<Flex align="center" gap="6" :class="$style.tabs">
@@ -170,19 +209,34 @@ const poolsDistribution = computed(() => {
 	margin-bottom: 24px;
 }
 
-.bar {
+.progress_wrapper {
 	width: 100%;
 	height: 12px;
 	border-radius: 3px;
 	background: rgba(255, 255, 255, 0.05);
-
-	overflow: hidden;
 }
 
 .bar_progress {
 	width: 100%;
 	height: 100%;
 	background: var(--blue);
+	border-radius: 3px;
+
+	transition: width 1s ease;
+}
+
+.bar_deposited {
+	height: 100%;
+
+	background: var(--blue);
+
+	transition: width 1s ease;
+}
+
+.bar_locked {
+	height: 100%;
+
+	background: #3a568e;
 
 	transition: width 1s ease;
 }
@@ -213,5 +267,19 @@ const poolsDistribution = computed(() => {
 .tab.active {
 	background: rgba(255, 255, 255, 0.05);
 	color: var(--text-primary);
+}
+
+.deposited_dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--blue);
+}
+
+.locked_dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #3a568e;
 }
 </style>

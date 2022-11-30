@@ -134,7 +134,7 @@ const updateStyles = () => {
 	border-radius: 8px;
 	backdrop-filter: blur(5px);
 
-	transition: all 0.15s ease;
+	transition: all 0.15s var(--bezier);
 }
 
 .wrapper:hover .content.show {

@@ -4,3 +4,13 @@ export const pool = {
 	address: true,
 	isDepositPaused: true,
 }
+
+export const poolPosition = {
+	id: true,
+	poolId: true,
+	depositedAmount: true,
+	lockedEstimateAmount: true,
+	pool: {
+		name: true,
+	},
+}

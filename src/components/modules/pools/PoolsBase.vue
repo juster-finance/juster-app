@@ -35,7 +35,10 @@ import { juster } from "@sdk"
 /**
  * Models
  */
-import { entryLiquidity as entryLiquidityModel } from "@/graphql/models"
+import {
+	entryLiquidity as entryLiquidityModel,
+	poolPosition as poolPositionModel,
+} from "@/graphql/models"
 
 /**
  * Store
@@ -94,6 +97,15 @@ const selectedPool = ref({})
 
 const poolsStates = ref({})
 
+/**
+ * Pool Position
+ */
+const subPositions = ref({})
+const positions = ref([])
+
+/**
+ * Entries
+ */
 const subEntries = ref({})
 const entries = ref([])
 
@@ -108,7 +120,7 @@ const populatePools = async () => {
 	}
 }
 
-const setupSubscriptionToEntries = async () => {
+const setupSubToEntries = async () => {
 	subEntries.value = await juster.gql
 		.subscription({
 			entryLiquidity: [
@@ -133,9 +145,32 @@ const setupSubscriptionToEntries = async () => {
 		})
 }
 
+const setupSubToPositions = async () => {
+	subPositions.value = await juster.gql
+		.subscription({
+			poolPosition: [
+				{
+					where: {
+						userId: {
+							_eq: accountStore.pkh,
+						},
+					},
+				},
+				poolPositionModel,
+			],
+		})
+		.subscribe({
+			next: ({ poolPosition }) => {
+				positions.value = poolPosition
+			},
+			error: console.error,
+		})
+}
+
 onMounted(() => {
 	if (Object.keys(juster.pools).length) {
-		setupSubscriptionToEntries()
+		setupSubToEntries()
+		setupSubToPositions()
 		populatePools()
 	}
 
@@ -149,12 +184,20 @@ onUnmounted(() => {
 	) {
 		subEntries.value.unsubscribe()
 	}
+
+	if (
+		Object.prototype.hasOwnProperty.call(subPositions.value, "_state") &&
+		!subPositions.value?.closed
+	) {
+		subPositions.value.unsubscribe()
+	}
 })
 
 watch(
 	() => juster.pools,
 	() => {
-		setupSubscriptionToEntries()
+		setupSubToEntries()
+		setupSubToPositions()
 		populatePools()
 	},
 	{
@@ -204,10 +247,11 @@ const { meta } = useMeta({
 					:pools="pools"
 					:poolsStates="poolsStates"
 					:entries="entries"
+					:positions="positions"
 					@onDepositLiquidity="showPoolsModal = true"
 				/>
 
-				<MyStatistics :entries="entries" />
+				<MyStatistics :positions="positions" />
 
 				<BottomInfo
 					v-if="pools.length"

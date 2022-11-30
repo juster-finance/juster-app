@@ -2,19 +2,30 @@
 /**
  * Vendor
  */
-import { computed } from "vue"
+import { ref, computed } from "vue"
 
 /**
  * UI
  */
 import Button from "@ui/Button.vue"
 
+/**
+ * Services
+ */
+import { numberWithSymbol } from "@utils/amounts"
+
 const emit = defineEmits(["onDepositLiquidity"])
 const props = defineProps({
 	pools: Array,
 	poolsStates: Object,
 	entries: Array,
+	positions: Array,
 })
+
+const showEntries = ref(false)
+const togglePendingEntries = () => {
+	showEntries.value = !showEntries.value
+}
 
 const isDepositAvailable = computed(() => {
 	return (
@@ -33,7 +44,11 @@ const pendingEntries = computed(() =>
 )
 
 const valueLocked = computed(() =>
-	props.entries.reduce((acc, curr) => (acc += curr.amount), 0),
+	props.positions.reduce(
+		(acc, curr) =>
+			(acc = acc + curr.depositedAmount + curr.lockedEstimateAmount),
+		0,
+	),
 )
 </script>
 
@@ -64,7 +79,7 @@ const valueLocked = computed(() =>
 						weight="500"
 						:class="$style.badge__subtitle"
 					>
-						Total Value Locked
+						Total Value Used
 					</Text>
 				</Flex>
 			</Flex>
@@ -93,6 +108,7 @@ const valueLocked = computed(() =>
 
 		<Flex
 			v-if="pendingEntries.length"
+			@click="togglePendingEntries()"
 			direction="column"
 			gap="12"
 			:class="$style.progress"
@@ -104,16 +120,63 @@ const valueLocked = computed(() =>
 
 				<Flex align="center" gap="4">
 					<Text size="14" color="tertiary" weight="600">
-						{{ pendingEntries.length }} entry
+						{{ pendingEntries.length }}
+						{{ pendingEntries.length == 1 ? "entry" : "entries" }}
 					</Text>
 
-					<!-- <Icon name="arrow" size="14" color="tertiary" /> -->
+					<Icon name="arrow" size="14" color="tertiary" />
 				</Flex>
 			</Flex>
 
 			<div :class="$style.bar">
 				<div :class="[$style.bar_progress, $style.blue]" />
+
+				<svg
+					width="200%"
+					height="12"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					:class="$style.bar_anim"
+				>
+					<defs>
+						<pattern
+							id="lines"
+							patternUnits="userSpaceOnUse"
+							width="20"
+							height="12"
+						>
+							<path
+								fill-rule="evenodd"
+								clip-rule="evenodd"
+								d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
+								fill="white"
+								fill-opacity="0.2"
+							/>
+						</pattern>
+					</defs>
+					<rect width="100%" height="100%" fill="url(#lines)" />
+				</svg>
 			</div>
+
+			<Flex v-if="showEntries" direction="column" gap="12">
+				<Flex
+					v-for="entry in pendingEntries"
+					justify="between"
+					align="center"
+				>
+					<Flex>
+						<Text size="14" weight="600" color="support">—</Text>
+						&nbsp;
+						<Text size="14" weight="600" color="secondary">
+							Entry #{{ entry.entryId }}
+						</Text>
+					</Flex>
+
+					<Text size="14" weight="600" color="secondary">
+						{{ numberWithSymbol(entry.amount, ",") }} ꜩ
+					</Text>
+				</Flex>
+			</Flex>
 		</Flex>
 
 		<Flex direction="column" gap="12" :class="$style.progress">
@@ -206,15 +269,28 @@ const valueLocked = computed(() =>
 }
 
 .progress {
+	cursor: pointer;
+
 	margin-top: 24px;
 }
 
 .bar {
+	position: relative;
+
 	height: 12px;
 	border-radius: 3px;
 	background: rgba(255, 255, 255, 0.05);
 
 	overflow: hidden;
+}
+
+.bar_anim {
+	position: absolute;
+
+	top: 0;
+	left: 0;
+
+	animation: mig 38s infinite linear;
 }
 
 .bar_progress {
@@ -223,18 +299,18 @@ const valueLocked = computed(() =>
 }
 
 .bar_progress.blue {
-	animation: mig 3s infinite;
+	background: var(--blue);
 }
 
 @keyframes mig {
 	0% {
-		background: rgba(69, 126, 232, 0.15);
+		transform: translateX(0);
 	}
 	50% {
-		background: rgba(69, 126, 232, 0.8);
+		transform: translateX(-300px);
 	}
 	100% {
-		background: rgba(69, 126, 232, 0.15);
+		transform: translateX(0);
 	}
 }
 

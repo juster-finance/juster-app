@@ -135,7 +135,7 @@ html {
 .dropdown-leave-active {
 	transform-origin: 0px 0px;
 
-	transition: all 0.2s ease;
+	transition: all 0.2s var(--bezier);
 }
 
 .dropdown-enter-from,
@@ -146,7 +146,7 @@ html {
 
 .popup-enter-active,
 .popup-leave-active {
-	transition: all 0.07s ease-out;
+	transition: all 0.15s var(--bezier);
 }
 
 .popup-enter-from,
@@ -293,6 +293,8 @@ html {
 	--separator: rgba(255, 255, 255, 0.08);
 
 	--dot: rgba(255, 255, 255, 0.06);
+
+	--bezier: cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 [theme="light"] {
