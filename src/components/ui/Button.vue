@@ -66,29 +66,54 @@ const getStyles = () => {
  */
 
 const hotkey = ref(null)
-const pressed = ref(false)
+const pressed = ref({})
 
 const handleKeyDown = (e) => {
-	if (pressed.value) {
-		return
-	} else if (e.key.toLowerCase() === props.keybind.toLowerCase()) {
-		pressed.value = true
+	const eventKey = e.key.toLowerCase()
+	const keybind = props.keybind.toLowerCase()
+
+	if (pressed.value[eventKey]) return
+
+	if (eventKey === keybind) pressed.value[eventKey] = true
+
+	if (keybind.split("+").length) {
+		const hotkeys = keybind.split("+")
+		if (hotkeys.includes(eventKey)) pressed.value[eventKey] = true
 	}
 }
 
 const handleKeyUp = (e) => {
-	if (!pressed.value) {
-		return
-	} else if (e.key.toLowerCase() === props.keybind.toLowerCase()) {
-		pressed.value = false
+	const eventKey = e.key.toLowerCase()
+	const keybind = props.keybind.toLowerCase()
+
+	if (!pressed.value[eventKey]) return
+
+	if (eventKey === keybind) {
+		pressed.value[eventKey] = false
 		emit("onKeybind")
+	}
+
+	if (keybind.split("+").length) {
+		const hotkeys = keybind.split("+")
+
+		if (hotkeys.every((k) => pressed.value[k])) emit("onKeybind")
+
+		if (hotkeys.includes(eventKey)) pressed.value[eventKey] = false
 	}
 }
 
-onMounted((el, binding, vnode) => {
+onMounted(() => {
 	if (props.keybind) {
 		document.addEventListener("keydown", handleKeyDown)
 		document.addEventListener("keyup", handleKeyUp)
+
+		if (props.keybind.split("+").length) {
+			props.keybind.split("+").forEach((k) => {
+				pressed.value[k.toLowerCase()] = false
+			})
+		} else {
+			pressed.value[props.keybind.toLowerCase()] = false
+		}
 	}
 })
 onBeforeUnmount(() => {
@@ -104,13 +129,29 @@ onBeforeUnmount(() => {
 		<slot v-if="!icon" />
 		<Icon v-else :name="icon" size="16" />
 
-		<div
-			v-if="keybind"
-			ref="hotkey"
-			:class="[$style.hotkey, pressed && $style.pressed]"
-		>
-			{{ keybind }}
-		</div>
+		<Flex v-if="keybind" align="center" gap="4" :class="$style.keybinds">
+			<div
+				v-if="keybind && keybind.split('+').length < 2"
+				ref="hotkey"
+				:class="[
+					$style.keybind,
+					pressed[keybind.toLowerCase()] && $style.pressed,
+				]"
+			>
+				{{ keybind }}
+			</div>
+
+			<div
+				v-else
+				v-for="hotkey in keybind.split('+')"
+				:class="[
+					$style.keybind,
+					pressed[hotkey.toLowerCase()] && $style.pressed,
+				]"
+			>
+				{{ hotkey }}
+			</div>
+		</Flex>
 	</button>
 
 	<a
@@ -152,10 +193,12 @@ onBeforeUnmount(() => {
 	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
-.hotkey {
+.keybinds {
 	position: absolute;
 	right: 12px;
+}
 
+.keybind {
 	font-size: 12px;
 	font-weight: 700;
 	padding: 3px 6px;
@@ -166,7 +209,7 @@ onBeforeUnmount(() => {
 	transition: all 0.2s ease;
 }
 
-.wrapper.primary .hotkey {
+.wrapper.primary .keybind {
 	background: linear-gradient(
 		rgba(255, 255, 255, 0.2),
 		rgba(255, 255, 255, 0.1)
@@ -175,7 +218,7 @@ onBeforeUnmount(() => {
 	box-shadow: 0px 2px 0 0px rgba(255, 255, 255, 0.2);
 }
 
-.wrapper.secondary .hotkey {
+.wrapper.secondary .keybind {
 	background: linear-gradient(
 		rgba(255, 255, 255, 0.1),
 		rgba(255, 255, 255, 0.05)
@@ -184,7 +227,7 @@ onBeforeUnmount(() => {
 	box-shadow: 0 2px 0 0px rgba(0, 0, 0, 0.3);
 }
 
-.hotkey.pressed {
+.keybind.pressed {
 	transform: translateY(1px);
 	box-shadow: 0 0 0 0 transparent !important;
 }

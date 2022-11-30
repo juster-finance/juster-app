@@ -211,15 +211,15 @@ const returnForLiquidity = computed(() => {
 	height: 60px;
 	border-radius: 8px;
 	background: var(--card-bg);
-	border: 1px solid transparent;
+	outline: 2px solid transparent;
 	padding: 0 16px;
 	cursor: pointer;
 
-	transition: border 0.2s ease;
+	transition: outline 0.2s ease;
 }
 
 .wrapper:hover {
-	border: 1px solid var(--border);
+	outline: 2px solid var(--border);
 }
 
 .base {

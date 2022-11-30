@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { computed } from "vue"
 import { DateTime } from "luxon"
 
@@ -54,6 +57,11 @@ const props = defineProps({
 	},
 })
 const emit = defineEmits(["openParticipants", "onBet", "onWithdraw"])
+
+const getImageUrl = async (name) => {
+	console.log(await import(`@/assets/icons/${name}`))
+	return await import(`${name}`)
+}
 
 const symbol = computed(() => props.event.currencyPair.symbol)
 
@@ -358,7 +366,7 @@ const endDiff = computed(() =>
 				"
 				:class="$style.param"
 			>
-				<span><Icon name="time" size="12" />Start</span>
+				<span><Icon name="time" size="14" />Start</span>
 
 				<span v-if="startStatus == 'In progress'">
 					<!-- in X days -->
@@ -384,7 +392,7 @@ const endDiff = computed(() =>
 				"
 				:class="$style.param"
 			>
-				<span><Icon name="time" size="12" />Finish</span>
+				<span> <Icon name="time" size="14" />Finish </span>
 
 				<span v-if="finishStatus == 'In progress'">
 					<!-- in X days -->
@@ -411,7 +419,10 @@ const endDiff = computed(() =>
 				"
 				:class="$style.param"
 			>
-				<span><Icon name="time" size="12" />Won Side</span>
+				<span>
+					<Icon name="checkcircle" size="14" />
+					Won Side
+				</span>
 
 				<span
 					:class="
@@ -427,7 +438,7 @@ const endDiff = computed(() =>
 
 			<!-- *Canceled* -->
 			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
-				<span><Icon name="time" size="12" />Won Side</span>
+				<span> <Icon name="time" size="14" /> Won Side </span>
 
 				<span>Draw</span>
 			</div>
@@ -448,7 +459,7 @@ const endDiff = computed(() =>
 				is-wide
 			>
 				<div :class="$style.param">
-					<span><Icon name="sides" size="12" />Target Dynamics</span>
+					<span><Icon name="sides" size="14" />Target Dynamics</span>
 
 					<span>
 						<Icon
@@ -489,19 +500,20 @@ const endDiff = computed(() =>
 				:class="$style.param"
 			>
 				<span>
-					<img
-						v-if="event.winnerBets == 'ABOVE_EQ'"
-						:src="require('@/assets/icons/higher_won.svg')"
-						alt="won_side_icon"
+					<Icon
+						v-if="event.winnerBets == 'BELOW'"
+						name="lower_won"
+						size="14"
 					/>
-					<img
-						v-else-if="event.winnerBets == 'BELOW'"
-						:src="require('@/assets/icons/lower_won.svg')"
-						alt="won_side_icon"
+					<Icon
+						v-else-if="event.winnerBets == 'ABOVE_EQ'"
+						name="higher_won"
+						size="14"
 					/>
-					<Icon v-else name="sides" size="12" />
-					Price Dynamics</span
-				>
+					<Icon v-else name="sides" size="14" />
+
+					Price Dynamics
+				</span>
 
 				<span
 					v-if="priceDynamics.diff"
@@ -521,7 +533,7 @@ const endDiff = computed(() =>
 			<!-- *Canceled* -->
 			<div v-if="event.status == 'CANCELED'" :class="$style.param">
 				<span>
-					<Icon name="sides" size="12" />
+					<Icon name="sides" size="14" />
 					Price Dynamics</span
 				>
 
@@ -548,8 +560,10 @@ const endDiff = computed(() =>
 <style module>
 .wrapper {
 	border-radius: 8px;
-	padding: 16px 20px;
+	border-top: 3px solid var(--border);
 	background: var(--card-bg);
+
+	padding: 16px 20px 20px 20px;
 }
 
 .header {
@@ -633,7 +647,7 @@ const endDiff = computed(() =>
 	width: 34px;
 	height: 34px;
 
-	background: rgb(35, 35, 35);
+	background: rgba(0, 0, 0, 0.15);
 	border-radius: 50px;
 	border: 3px solid var(--card-bg);
 
@@ -663,7 +677,7 @@ const endDiff = computed(() =>
 	flex-direction: column;
 	gap: 4px;
 
-	margin-top: 20px;
+	margin-top: 16px;
 }
 
 .card__header {

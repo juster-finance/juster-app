@@ -426,16 +426,16 @@ const copy = (target) => {
 .wrapper {
 	border-radius: 8px;
 	background: var(--card-bg);
-	border: 1px solid transparent;
+	outline: 2px solid transparent;
 	cursor: pointer;
 
 	padding: 24px;
 
-	transition: border 0.2s ease;
+	transition: outline 0.2s ease;
 }
 
 .wrapper:hover {
-	border: 1px solid var(--border);
+	outline: 2px solid var(--border);
 }
 
 .symbols {

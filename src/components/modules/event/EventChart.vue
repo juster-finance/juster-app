@@ -66,10 +66,11 @@ const tabs = ref(["Price", "TVL"])
 
 <style module>
 .wrapper {
-	background: var(--card-bg);
 	border-radius: 8px;
+	border-top: 3px solid var(--border);
+	background: var(--card-bg);
+
 	padding: 4px;
-	flex: 1;
 }
 
 .header {

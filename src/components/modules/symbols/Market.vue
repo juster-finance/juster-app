@@ -79,83 +79,89 @@ export default defineComponent({
 
 <template>
 	<router-link :to="`/markets/${market.symbol}`" :class="$style.wrapper">
-		<div :class="$style.base">
-			<div :class="$style.name">
-				{{ market.symbol }},
-				<span>{{ supportedMarkets[market.symbol].description }}</span>
-			</div>
-
-			<h1 v-if="quotes.length" :class="$style.price">
-				$ {{ price.integer
-				}}<span>.{{ price.fraction.slice(0, 2) }}</span>
-			</h1>
-
-			<div :class="[$style.diff, $style[color]]">
-				<Icon v-if="change !== 'Loading'" name="carret" size="12" />{{
-					change
-				}}
-			</div>
-		</div>
-
-		<div :class="$style.right">
-			<div :class="$style.actions">
-				<Button @click="handleJoin" size="medium" type="secondary">
-					<Icon name="collection" size="16" />
-					View events
-				</Button>
-			</div>
-
-			<div :class="$style.info">
-				<div :class="$style.param">
-					<span>Events:</span>
-					<span>{{ market.totalEvents }}</span>
+		<Flex align="center" justify="between">
+			<div :class="$style.base">
+				<div :class="$style.name">
+					{{ market.symbol }},
+					<span>{{
+						supportedMarkets[market.symbol].description
+					}}</span>
 				</div>
 
-				<div :class="$style.dot" />
+				<h1 v-if="quotes.length" :class="$style.price">
+					$ {{ price.integer
+					}}<span>.{{ price.fraction.slice(0, 2) }}</span>
+				</h1>
 
-				<div :class="$style.param">
-					<span>TVL:</span>
-					<span
-						>{{
-							abbreviateNumber(market.totalValueLocked.toFixed(0))
-						}}
-						ꜩ</span
-					>
-				</div>
-
-				<div :class="$style.dot" />
-
-				<div :class="$style.param">
-					<span>Volume (24h):</span>
-					<span
-						>{{
-							abbreviateNumber(market.totalVolume.toFixed(0))
-						}}
-						ꜩ</span
-					>
+				<div :class="[$style.diff, $style[color]]">
+					<Icon
+						v-if="change !== 'Loading'"
+						name="carret"
+						size="12"
+					/>{{ change }}
 				</div>
 			</div>
-		</div>
+
+			<div :class="$style.right">
+				<div :class="$style.actions">
+					<Button @click="handleJoin" size="medium" type="secondary">
+						<Icon name="collection" size="16" />
+						View events
+					</Button>
+				</div>
+
+				<div :class="$style.info">
+					<div :class="$style.param">
+						<span>Events:</span>
+						<span>{{ market.totalEvents }}</span>
+					</div>
+
+					<div :class="$style.dot" />
+
+					<div :class="$style.param">
+						<span>TVL:</span>
+						<span
+							>{{
+								abbreviateNumber(
+									market.totalValueLocked.toFixed(0),
+								)
+							}}
+							ꜩ</span
+						>
+					</div>
+
+					<div :class="$style.dot" />
+
+					<div :class="$style.param">
+						<span>Volume (24h):</span>
+						<span
+							>{{
+								abbreviateNumber(market.totalVolume.toFixed(0))
+							}}
+							ꜩ</span
+						>
+					</div>
+				</div>
+			</div>
+		</Flex>
 	</router-link>
 </template>
 
 <style module>
 .wrapper {
-	padding: 24px;
-	border-radius: 10px;
-	border: 1px solid transparent;
-	background: var(--card-bg);
 	min-height: 132px;
 
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+	border-radius: 10px;
+	outline: 2px solid transparent;
+	background: var(--card-bg);
 
-	transition: border 0.2s ease;
+	padding: 24px;
+
+	transition: outline 0.2s ease;
 }
 
 .wrapper:hover {
-	border: 1px solid var(--border);
+	outline: 2px solid var(--border);
 }
 
 .name {

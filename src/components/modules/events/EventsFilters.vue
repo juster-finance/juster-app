@@ -447,11 +447,13 @@ const handleKeydown = (e) => {
 .wrapper {
 	position: sticky;
 	top: 100px;
+	height: fit-content;
 
 	background: var(--card-bg);
 	border-radius: 8px;
+	border-top: 3px solid var(--border);
+
 	padding: 20px 0 12px 0;
-	height: fit-content;
 }
 
 @media (max-width: 700px) {

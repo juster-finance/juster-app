@@ -144,9 +144,11 @@ const distributionOfBets = computed(() => {
 <template>
 	<div :class="$style.wrapper">
 		<div :class="$style.header">
-			<div :class="$style.title">Details</div>
+			<Text color="primary" size="16" height="12" weight="600">
+				Details
+			</Text>
 
-			<Tooltip placement="left">
+			<Tooltip placement="left" text-align="right">
 				<Icon name="help" size="16" />
 
 				<template #content>
@@ -328,8 +330,10 @@ const distributionOfBets = computed(() => {
 <style module>
 .wrapper {
 	border-radius: 8px;
-	padding: 20px;
+	border-top: 3px solid var(--border);
 	background: var(--card-bg);
+
+	padding: 20px;
 }
 
 .header {
@@ -354,7 +358,7 @@ const distributionOfBets = computed(() => {
 .title {
 	font-size: 14px;
 	line-height: 1;
-	font-weight: 500;
+	font-weight: 600;
 	color: var(--text-primary);
 }
 

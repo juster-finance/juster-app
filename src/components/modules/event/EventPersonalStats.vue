@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { computed } from "vue"
 
 /**
@@ -213,11 +216,15 @@ const hasHedge = computed(() => {
 		</div>
 	</div>
 
-	<div :class="$style.hint">
-		<Icon name="help" size="14" />
-		<span>Returning & Profit</span> is depends on the current winning side.
-		Exact calculations will be indicated at the end of the event
-	</div>
+	<Flex align="center" gap="6">
+		<Icon name="help" size="14" color="tertiary" />
+		<Flex>
+			<Text size="12" height="16" weight="500" color="tertiary">
+				<b>Returning & Profit</b> is depends on the current winning
+				side.
+			</Text>
+		</Flex>
+	</Flex>
 </template>
 
 <style module>
@@ -293,25 +300,6 @@ const hasHedge = computed(() => {
 .icon.yellow {
 	background: rgba(245, 183, 43, 0.15);
 	fill: var(--yellow);
-}
-
-.hint {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-
-	font-size: 12px;
-	font-weight: 500;
-	line-height: 1.6;
-	color: var(--text-tertiary);
-	fill: var(--text-tertiary);
-
-	margin-top: 12px;
-}
-
-.hint span {
-	font-weight: 600;
-	color: var(--text-secondary);
 }
 
 @media (max-width: 650px) {

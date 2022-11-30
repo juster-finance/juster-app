@@ -538,16 +538,8 @@ watch(
 
 	background: rgba(255, 255, 255, 0.05);
 	border-radius: 8px;
-	border: 1px solid transparent;
-	cursor: pointer;
 
 	padding: 0 16px;
-
-	transition: all 0.2s ease;
-}
-
-.pool:hover {
-	border: 1px solid var(--border);
 }
 
 .arrow_icon {

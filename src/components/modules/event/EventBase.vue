@@ -589,206 +589,6 @@ onUnmounted(() => {
 
 		<Transition name="slide">
 			<div v-if="event" :class="$style.container">
-				<div :class="$style.base">
-					<EventChart v-if="event" :event="event" />
-
-					<div v-if="accountStore.pkh" :class="$style.block">
-						<div :class="$style.title">Personal stats</div>
-						<div :class="$style.description">
-							Aggregated data for all your positions for this
-							event
-						</div>
-
-						<Banner
-							v-if="hasWonBet"
-							icon="checkcircle"
-							color="green"
-							:class="$style.banner"
-							>{{ wonText }}</Banner
-						>
-
-						<EventPersonalStats
-							:event="event"
-							:position="userPosition"
-							:user-deposits="userDeposits"
-							:user-bets="userBets"
-						/>
-					</div>
-
-					<div :class="$style.block">
-						<div :class="$style.header">
-							<div :class="$style.info">
-								<div :class="$style.title">Stakes</div>
-								<div :class="$style.description">
-									All stakes from users for this event
-								</div>
-							</div>
-
-							<div :class="$style.filters">
-								<div
-									@click="
-										handleSelectFilter({
-											target: 'bets',
-											value: 'all',
-										})
-									"
-									:class="[
-										$style.filter,
-										filters.bets == 'all' && $style.active,
-									]"
-								>
-									All
-								</div>
-								<span>/</span>
-								<div
-									@click="
-										handleSelectFilter({
-											target: 'bets',
-											value: 'my',
-										})
-									"
-									:class="[
-										$style.filter,
-										filters.bets == 'my' && $style.active,
-									]"
-								>
-									Only me
-								</div>
-							</div>
-						</div>
-
-						<!-- todo: new component BetsTable -->
-						<div v-if="filteredBets.length" :class="$style.columns">
-							<div :class="$style.column">TYPE</div>
-							<div :class="$style.column">SIDE</div>
-							<div :class="$style.column">AMOUNT</div>
-							<div :class="$style.column">
-								{{
-									(event.status == "CANCELED" && "REFUND") ||
-									(["NEW", "STARTED"].includes(
-										event.status,
-									) &&
-										"POTENTIAL") ||
-									(event.status == "FINISHED" && "PROFIT")
-								}}
-							</div>
-						</div>
-
-						<div
-							v-if="pendingBet || filteredBets.length"
-							:class="$style.bets"
-						>
-							<BetCard
-								v-if="pendingBet"
-								:bet="pendingBet"
-								:event="event"
-								pending
-							/>
-							<BetCard
-								v-for="bet in paginatedBets"
-								:event="event"
-								:key="bet.id"
-								:bet="bet"
-							/>
-						</div>
-
-						<Banner v-else icon="help" color="gray">{{
-							filters.bets == "all"
-								? `Still no stakes for this event, maybe yours will be the first?`
-								: `If you have placed a stake, but it is not in this list yet — please wait for the transaction confirmation`
-						}}</Banner>
-
-						<Pagination
-							v-if="filteredBets.length > 3"
-							v-model="selectedPageForBets"
-							:total="filteredBets.length"
-							:limit="3"
-							:class="$style.pagination"
-						/>
-					</div>
-
-					<div :class="$style.block">
-						<div :class="$style.header">
-							<div :class="$style.info">
-								<div :class="$style.title">Liquidity</div>
-								<div :class="$style.description">
-									Provided liquidity for this event
-								</div>
-							</div>
-
-							<div :class="$style.filters">
-								<div
-									@click="
-										handleSelectFilter({
-											target: 'liquidity',
-											value: 'all',
-										})
-									"
-									:class="[
-										$style.filter,
-										filters.liquidity == 'all' &&
-											$style.active,
-									]"
-								>
-									All
-								</div>
-								<span>/</span>
-								<div
-									@click="
-										handleSelectFilter({
-											target: 'liquidity',
-											value: 'my',
-										})
-									"
-									:class="[
-										$style.filter,
-										filters.liquidity == 'my' &&
-											$style.active,
-									]"
-								>
-									Only me
-								</div>
-							</div>
-						</div>
-
-						<div
-							v-if="filteredDeposits.length"
-							:class="$style.columns"
-						>
-							<div :class="$style.column">TYPE</div>
-							<div :class="$style.column">RISE</div>
-							<div :class="$style.column">FALL</div>
-
-							<div :class="$style.column">RETURN</div>
-						</div>
-						<div
-							v-if="filteredDeposits.length"
-							:class="$style.bets"
-						>
-							<DepositCard
-								v-for="deposit in paginatedDeposits"
-								:key="deposit.id"
-								:deposit="deposit"
-								:event="event"
-							/>
-						</div>
-
-						<Banner v-else icon="help" color="gray">{{
-							filters.liquidity == "all"
-								? `This event has not yet received initial liquidity, please wait for a few minutes`
-								: `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
-						}}</Banner>
-
-						<Pagination
-							v-if="filteredDeposits.length > 3"
-							v-model="selectedPageForDeposits"
-							:total="filteredDeposits.length"
-							:limit="3"
-							:class="$style.pagination"
-						/>
-					</div>
-				</div>
-
 				<Flex
 					v-if="event"
 					direction="column"
@@ -842,6 +642,7 @@ onUnmounted(() => {
 									"
 									name="verified"
 									size="13"
+									color="brand"
 							/></span>
 
 							<span
@@ -912,6 +713,272 @@ onUnmounted(() => {
 						</Dropdown>
 					</div>
 				</Flex>
+
+				<Flex direction="column" gap="40" :class="$style.base">
+					<EventChart v-if="event" :event="event" />
+
+					<Flex direction="column" gap="24" v-if="accountStore.pkh">
+						<Flex direction="column" gap="8">
+							<Text size="16" weight="600" color="primary">
+								My Statistics
+							</Text>
+							<Text size="14" weight="500" color="tertiary">
+								Aggregated data for all your positions
+							</Text>
+						</Flex>
+
+						<Flex direction="column" gap="8">
+							<Banner
+								v-if="hasWonBet"
+								icon="checkcircle"
+								color="green"
+							>
+								{{ wonText }}
+							</Banner>
+
+							<EventPersonalStats
+								:event="event"
+								:position="userPosition"
+								:user-deposits="userDeposits"
+								:user-bets="userBets"
+							/>
+						</Flex>
+					</Flex>
+
+					<Flex direction="column" gap="24">
+						<Flex justify="between">
+							<Flex direction="column" gap="8">
+								<Text size="16" weight="600" color="primary">
+									Stakes
+								</Text>
+								<Text size="14" weight="500" color="tertiary">
+									All stakes from users for this event
+								</Text>
+							</Flex>
+
+							<div :class="$style.filters">
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'bets',
+											value: 'all',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.bets == 'all' && $style.active,
+									]"
+								>
+									All
+								</div>
+								<span>/</span>
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'bets',
+											value: 'my',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.bets == 'my' && $style.active,
+									]"
+								>
+									Only me
+								</div>
+							</div>
+						</Flex>
+
+						<Flex
+							v-if="pendingBet || filteredBets.length"
+							direction="column"
+							gap="8"
+						>
+							<Flex
+								v-if="filteredBets.length"
+								align="center"
+								:class="$style.columns"
+							>
+								<Text
+									size="12"
+									color="support"
+									weight="700"
+									:class="$style.column"
+									>TYPE</Text
+								>
+								<Text
+									size="12"
+									color="support"
+									weight="700"
+									:class="$style.column"
+									>SIDE</Text
+								>
+								<Text
+									size="12"
+									color="support"
+									weight="700"
+									:class="$style.column"
+									>AMOUNT</Text
+								>
+								<Text
+									size="12"
+									color="support"
+									weight="700"
+									:class="$style.column"
+								>
+									{{
+										(event.status == "CANCELED" &&
+											"REFUND") ||
+										(["NEW", "STARTED"].includes(
+											event.status,
+										) &&
+											"POTENTIAL") ||
+										(event.status == "FINISHED" && "PROFIT")
+									}}
+								</Text>
+							</Flex>
+							<Flex direction="column" gap="8">
+								<BetCard
+									v-if="pendingBet"
+									:bet="pendingBet"
+									:event="event"
+									pending
+								/>
+								<BetCard
+									v-for="bet in paginatedBets"
+									:event="event"
+									:key="bet.id"
+									:bet="bet"
+								/>
+							</Flex>
+						</Flex>
+
+						<Banner v-else icon="help" color="gray">{{
+							filters.bets == "all"
+								? `Still no stakes for this event, maybe yours will be the first?`
+								: `If you have placed a stake, but it is not in this list yet — please wait for the transaction confirmation`
+						}}</Banner>
+
+						<Pagination
+							v-if="filteredBets.length > 3"
+							v-model="selectedPageForBets"
+							:total="filteredBets.length"
+							:limit="3"
+							:class="$style.pagination"
+						/>
+					</Flex>
+
+					<Flex direction="column" gap="24">
+						<Flex justify="between">
+							<Flex direction="column" gap="8">
+								<Text size="16" weight="600" color="primary">
+									Liquidity
+								</Text>
+								<Text size="14" weight="500" color="tertiary">
+									Provided to maintain this event
+								</Text>
+							</Flex>
+
+							<div :class="$style.filters">
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'liquidity',
+											value: 'all',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.liquidity == 'all' &&
+											$style.active,
+									]"
+								>
+									All
+								</div>
+								<span>/</span>
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'liquidity',
+											value: 'my',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.liquidity == 'my' &&
+											$style.active,
+									]"
+								>
+									Only me
+								</div>
+							</div>
+						</Flex>
+
+						<Flex
+							v-if="filteredDeposits.length"
+							direction="column"
+							gap="8"
+						>
+							<Flex align="center" :class="$style.columns">
+								<Text
+									size="12"
+									weight="700"
+									color="support"
+									:class="$style.column"
+									>TYPE
+								</Text>
+								<Text
+									size="12"
+									weight="700"
+									color="support"
+									:class="$style.column"
+									>RISE</Text
+								>
+								<Text
+									size="12"
+									weight="700"
+									color="support"
+									:class="$style.column"
+									>FALL</Text
+								>
+
+								<Text
+									size="12"
+									weight="700"
+									color="support"
+									:class="$style.column"
+									>RETURN</Text
+								>
+							</Flex>
+							<Flex
+								v-if="filteredDeposits.length"
+								direction="column"
+								gap="8"
+							>
+								<DepositCard
+									v-for="deposit in paginatedDeposits"
+									:key="deposit.id"
+									:deposit="deposit"
+									:event="event"
+								/>
+							</Flex>
+						</Flex>
+
+						<Banner v-else icon="help" color="gray">{{
+							filters.liquidity == "all"
+								? `This event has not yet received initial liquidity, please wait for a few minutes`
+								: `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
+						}}</Banner>
+
+						<Pagination
+							v-if="filteredDeposits.length > 3"
+							v-model="selectedPageForDeposits"
+							:total="filteredDeposits.length"
+							:limit="3"
+							:class="$style.pagination"
+						/>
+					</Flex>
+				</Flex>
 			</div>
 		</Transition>
 	</div>
@@ -927,7 +994,7 @@ onUnmounted(() => {
 
 .container {
 	display: flex;
-	gap: 32px;
+	gap: 40px;
 }
 
 .base {
@@ -935,13 +1002,9 @@ onUnmounted(() => {
 }
 
 .side {
-	min-width: 384px;
-	max-width: 384px;
+	min-width: 450px;
+	max-width: 450px;
 	height: fit-content;
-}
-
-.banner {
-	margin-bottom: 16px;
 }
 
 .header {
@@ -955,50 +1018,6 @@ onUnmounted(() => {
 	flex-direction: column;
 
 	margin-right: 16px;
-}
-
-.block {
-	position: relative;
-
-	margin-top: 40px;
-}
-
-.block .title {
-	font-size: 17px;
-	line-height: 1.2;
-	font-weight: 500;
-	color: var(--text-primary);
-
-	margin-bottom: 8px;
-}
-
-.block .description {
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-tertiary);
-
-	margin-bottom: 24px;
-}
-
-.columns {
-	display: flex;
-	align-items: center;
-
-	padding: 0 16px;
-	margin-bottom: 8px;
-}
-
-.column {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 700;
-	color: var(--text-tertiary);
-	fill: var(--text-tertiary);
 }
 
 .column:nth-child(1) {
@@ -1015,12 +1034,6 @@ onUnmounted(() => {
 
 .column:nth-child(4) {
 	flex: 1;
-}
-
-.bets {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
 }
 
 .details_btn {
@@ -1115,16 +1128,13 @@ onUnmounted(() => {
 
 @media (max-width: 940px) {
 	.container {
-		flex-direction: column-reverse;
+		flex-direction: column;
+		gap: 40px;
 	}
 
 	.side {
 		max-width: initial;
 		min-width: initial;
-	}
-
-	.container {
-		gap: 0;
 	}
 }
 

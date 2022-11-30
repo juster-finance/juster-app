@@ -14,7 +14,9 @@ defineProps({
 </script>
 
 <template>
-	<div
+	<Flex
+		align="center"
+		gap="8"
 		:class="[
 			$style.wrapper,
 			$style[color],
@@ -25,28 +27,21 @@ defineProps({
 		<Spin v-if="loading" size="14" />
 		<Icon v-else :name="icon" size="14" />
 
-		<div :class="$style.base"><slot /></div>
-	</div>
+		<Flex align="center" gap="8" :class="$style.base"><slot /></Flex>
+	</Flex>
 </template>
 
 <style module>
 .wrapper {
 	width: 100%;
-	display: flex;
-	align-items: center;
-	gap: 8px;
+	min-height: 40px;
+
+	border-radius: 8px;
 
 	padding: 0 14px;
-
-	min-height: 40px;
-	border-radius: 8px;
 }
 
 .base {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
 	font-size: 12px;
 	line-height: 1.6;
 	font-weight: 600;

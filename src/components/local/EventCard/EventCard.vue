@@ -396,8 +396,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<router-link :to="`/events/${event.id}`">
-		<div ref="card" :class="$style.wrapper">
+	<router-link :to="`/events/${event.id}`" :class="$style.wrapper">
+		<div ref="card">
 			<BetModal
 				:show="showBetModal"
 				:event="event"
@@ -856,18 +856,19 @@ onUnmounted(() => {
 <style module>
 .wrapper {
 	position: relative;
+	max-width: 617px;
+
 	background: var(--card-bg);
 	border-radius: 8px;
-	border: 1px solid transparent;
+	outline: 2px solid transparent;
 
 	padding: 20px;
-	max-width: 617px;
 
 	transition: all 0.2s ease;
 }
 
 .wrapper:hover {
-	border: 1px solid var(--border);
+	outline: 2px solid var(--border);
 }
 
 .dropdown {

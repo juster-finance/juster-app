@@ -39,91 +39,101 @@ const finishTimeText = computed(() => {
 </script>
 
 <template>
-	<div :class="$style.wrapper">
-		<div :class="$style.title">Price</div>
+	<Flex direction="column" gap="24" :class="$style.wrapper">
+		<Text color="primary" size="16" height="12" weight="600"> Price </Text>
 
-		<div :class="$style.prices">
-			<div :class="$style.side">
-				<Icon name="go" size="12" />
+		<Flex direction="column" gap="10">
+			<div :class="$style.prices">
+				<div :class="$style.side">
+					<Icon name="go" size="12" />
 
-				<div v-if="event.status == 'NEW'" :class="$style.price">
-					TBD
+					<div v-if="event.status == 'NEW'" :class="$style.price">
+						TBD
+					</div>
+					<div v-else :class="$style.price">
+						{{ disaggregate(event.startRate * 100)[0] }}.<span>{{
+							disaggregate(event.startRate * 100)[1]
+						}}</span>
+					</div>
 				</div>
-				<div v-else :class="$style.price">
-					{{ disaggregate(event.startRate * 100)[0] }}.<span>{{
-						disaggregate(event.startRate * 100)[1]
-					}}</span>
-				</div>
-			</div>
 
-			<div
-				:class="[$style.dots, event.status == 'STARTED' && $style.anim]"
-			>
-				<div :class="$style.dot" />
-				<div :class="$style.dot" />
-				<div :class="$style.dot" />
-				<div :class="$style.dot" />
-				<div :class="$style.dot" />
-				<div :class="$style.dot" />
-				<div :class="$style.dot" />
-			</div>
-
-			<div :class="$style.side">
-				<Icon
-					:name="event.status == 'STARTED' ? 'bolt' : 'flag'"
-					size="12"
-					:class="[event.status == 'STARTED' && $style.active]"
-				/>
-
-				<div v-if="event.status == 'NEW'" :class="$style.price">
-					TBD
-				</div>
 				<div
-					v-else-if="event.status == 'STARTED'"
-					:class="$style.price"
+					:class="[
+						$style.dots,
+						event.status == 'STARTED' && $style.anim,
+					]"
 				>
-					{{ price.integer
-					}}<span>.{{ price.fraction?.slice(0, 2) }}</span>
+					<div :class="$style.dot" />
+					<div :class="$style.dot" />
+					<div :class="$style.dot" />
+					<div :class="$style.dot" />
+					<div :class="$style.dot" />
+					<div :class="$style.dot" />
+					<div :class="$style.dot" />
+				</div>
+
+				<div :class="$style.side">
+					<Icon
+						:name="event.status == 'STARTED' ? 'bolt' : 'flag'"
+						size="12"
+						:class="[event.status == 'STARTED' && $style.active]"
+					/>
+
+					<div v-if="event.status == 'NEW'" :class="$style.price">
+						TBD
+					</div>
+					<div
+						v-else-if="event.status == 'STARTED'"
+						:class="$style.price"
+					>
+						{{ price.integer
+						}}<span>.{{ price.fraction?.slice(0, 2) }}</span>
+					</div>
+					<div
+						v-else-if="event.status == 'FINISHED'"
+						:class="$style.price"
+					>
+						{{ disaggregate(event.closedRate * 100)[0] }}.<span>{{
+							disaggregate(event.closedRate * 100)[1]
+						}}</span>
+					</div>
+				</div>
+			</div>
+
+			<div :class="$style.labels">
+				<div :class="$style.label">Start price</div>
+
+				<span v-if="event.status == 'STARTED' && finishTime.m > 0">{{
+					finishTimeText
+				}}</span>
+				<span v-if="event.status == 'STARTED' && finishTime.m <= 0"
+					>Ending</span
+				>
+
+				<div
+					v-if="['STARTED', 'NEW'].includes(event.status)"
+					:class="$style.label"
+				>
+					Current price
 				</div>
 				<div
 					v-else-if="event.status == 'FINISHED'"
-					:class="$style.price"
+					:class="$style.label"
 				>
-					{{ disaggregate(event.closedRate * 100)[0] }}.<span>{{
-						disaggregate(event.closedRate * 100)[1]
-					}}</span>
+					Closed price
 				</div>
 			</div>
-		</div>
-
-		<div :class="$style.labels">
-			<div :class="$style.label">Start price</div>
-
-			<span v-if="event.status == 'STARTED' && finishTime.m > 0">{{
-				finishTimeText
-			}}</span>
-			<span v-if="event.status == 'STARTED' && finishTime.m <= 0"
-				>Ending</span
-			>
-
-			<div
-				v-if="['STARTED', 'NEW'].includes(event.status)"
-				:class="$style.label"
-			>
-				Current price
-			</div>
-			<div v-else-if="event.status == 'FINISHED'" :class="$style.label">
-				Closed price
-			</div>
-		</div>
-	</div>
+		</Flex>
+	</Flex>
 </template>
 
 <style module>
 .wrapper {
 	border-radius: 8px;
-	padding: 20px;
+	border-top: 3px solid var(--border);
 	background: var(--card-bg);
+
+	padding: 20px;
 }
 
 .title {
@@ -139,8 +149,6 @@ const finishTimeText = computed(() => {
 	display: Flex;
 	align-items: center;
 	justify-content: space-between;
-
-	margin-bottom: 10px;
 }
 
 .side {

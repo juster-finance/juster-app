@@ -291,15 +291,15 @@ export default defineComponent({
 .wrapper {
 	background: var(--card-bg);
 	border-radius: 10px;
-	border: 1px solid transparent;
+	outline: 2px solid transparent;
 
 	padding: 20px;
 
-	transition: all 0.2s ease;
+	transition: outline 0.2s ease;
 }
 
 .wrapper:hover {
-	border: 1px solid var(--border);
+	outline: 2px solid var(--border);
 }
 
 .header {

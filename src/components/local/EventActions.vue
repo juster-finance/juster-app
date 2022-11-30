@@ -176,6 +176,7 @@ const btnType = computed(() => {
 }
 
 .action.disabled {
+	background: var(--opacity-05);
 	pointer-events: none;
 	opacity: 0.5;
 }
