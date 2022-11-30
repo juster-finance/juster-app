@@ -2,8 +2,6 @@
 import { computed, reactive } from "vue"
 import { JusterCore, JusterPool } from "@juster-finance/sdk"
 import { createClient } from "@juster-finance/gql-client"
-import { ApolloClient, InMemoryCache } from "@apollo/client/core"
-import { WebSocketLink } from "apollo-link-ws"
 import { BeaconWallet } from "@taquito/beacon-wallet"
 import { TezosToolkit } from "@taquito/taquito"
 
@@ -20,7 +18,6 @@ import { Networks } from "@/services/constants"
 const juster = reactive({
 	sdk: null,
 	gql: null,
-	apollo: null,
 	tezos: null,
 	pools: {},
 })
@@ -58,33 +55,10 @@ const init = () => {
 		localStorage.activeNetwork,
 	)
 
-	// juster.pool = JusterPool.create(
-	// 	juster.tezos,
-	// 	beaconWallet,
-	// 	localStorage.activeNetwork,
-	// )
-
 	/** GQL */
 	juster.gql = createClient({
 		url: dipdup[currentNetwork.value].graphq,
 		subscription: { url: dipdup[currentNetwork.value].ws },
-	})
-
-	/** Apollo */
-	// const link = from([
-	// 	new HttpLink({ uri: dipdup[currentNetwork.value].graphq }),
-	// ])
-	const wsLink = new WebSocketLink({
-		uri: dipdup[currentNetwork.value].ws,
-		options: {
-			reconnect: true,
-		},
-		webSocketImpl: WebSocket,
-	})
-	juster.apollo = new ApolloClient({
-		link: wsLink,
-		cache: new InMemoryCache(),
-		connectToDevTools: true,
 	})
 }
 init()

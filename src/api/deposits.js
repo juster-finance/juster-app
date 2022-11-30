@@ -4,18 +4,26 @@
 import { juster } from "@sdk"
 
 /**
- * GQL: Queries
+ * Models>
  */
-import { getDepositsByEvent } from "@/graphql/queries/deposits"
+import { deposit as depositModel } from "@/graphql/models"
 
 export const fetchDepositsByEvent = async ({ eventId }) => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getDepositsByEvent,
-			variables: { eventId },
+		const { deposit } = await juster.gql.query({
+			deposit: [
+				{
+					where: {
+						eventId: {
+							_eq: eventId,
+						},
+					},
+				},
+				depositModel,
+			],
 		})
 
-		return data.deposit
+		return deposit
 	} catch (error) {
 		console.error(
 			`Error during fetching deposits by event \n\n ${error.name}: ${error.message}`,

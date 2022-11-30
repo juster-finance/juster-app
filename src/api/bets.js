@@ -4,18 +4,26 @@
 import { juster } from "@sdk"
 
 /**
- * GQL: Queries
+ * Models
  */
-import { getBetsByEvent, getBetsByUser } from "@/graphql/queries/bets"
+import { bet as betModel } from "@/graphql/models"
 
 export const fetchBetsByEvent = async ({ eventId }) => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getBetsByEvent,
-			variables: { eventId },
+		const { bet } = await juster.gql.query({
+			bet: [
+				{
+					where: {
+						eventId: {
+							_eq: eventId,
+						},
+					},
+				},
+				betModel,
+			],
 		})
 
-		return data.bet
+		return bet
 	} catch (error) {
 		console.error(
 			`Error during fetching bets by event \n\n ${error.name}: ${error.message}`,
@@ -26,12 +34,23 @@ export const fetchBetsByEvent = async ({ eventId }) => {
 
 export const fetchBetsByUser = async ({ eventId, address }) => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getBetsByUser,
-			variables: { eventId, address },
+		const { bet } = await juster.gql.query({
+			bet: [
+				{
+					where: {
+						eventId: {
+							_eq: eventId,
+						},
+						userId: {
+							_eq: address,
+						},
+					},
+				},
+				betModel,
+			],
 		})
 
-		return data.bet
+		return bet
 	} catch (error) {
 		console.error(
 			`Error during fetching bets by user \n\n ${error.name}: ${error.message}`,

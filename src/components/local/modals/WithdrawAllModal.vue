@@ -7,7 +7,7 @@ import { computed, defineComponent, ref, toRefs, watch } from "vue"
 import Modal from "@ui/Modal.vue"
 import Button from "@ui/Button.vue"
 import Spin from "@ui/Spin.vue"
-import Checkbox from "@ui/Checkbox"
+import Checkbox from "@ui/Checkbox.vue"
 
 /**
  * Store

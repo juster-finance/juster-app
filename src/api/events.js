@@ -1,33 +1,25 @@
 /**
- * Vendor
- */
-import BigNumber from "bignumber.js"
-
-/**
  * Services
  */
 import { juster } from "@sdk"
 
 /**
- * GQL: Queries
+ * Models
  */
-import {
-	getAllEvents,
-	getTopEvents,
-	getEventById,
-	getEventsByMarket,
-	getEventsByStatus,
-	getEventParticipants,
-	getEventsWithUserPosition,
-} from "@/graphql/queries/events"
+import { event as eventModel } from "@/graphql/models"
 
 export const fetchAllEvents = async () => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getAllEvents,
+		const { event } = await juster.gql.query({
+			event: [
+				{
+					order_by: { createdTime: "desc" },
+				},
+				eventModel,
+			],
 		})
 
-		return data.event
+		return event
 	} catch (error) {
 		console.error(
 			`Error during fetching all events \n\n ${error.name}: ${error.message}`,
@@ -38,12 +30,16 @@ export const fetchAllEvents = async () => {
 
 export const fetchEventsByStatus = async ({ status }) => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getEventsByStatus,
-			variables: { status },
+		const { event } = await juster.gql.query({
+			event: [
+				{
+					where: { status: { _in: status } },
+				},
+				eventModel,
+			],
 		})
 
-		return data.event
+		return event
 	} catch (error) {
 		console.error(
 			`Error during fetching events by status \n\n ${error.name}: ${error.message}`,
@@ -54,12 +50,20 @@ export const fetchEventsByStatus = async ({ status }) => {
 
 export const fetchEventsByMarket = async ({ id, status }) => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getEventsByMarket,
-			variables: { id, status },
+		const { event } = await juster.gql.query({
+			event: [
+				{
+					where: {
+						currencyPairId: { _eq: id },
+						status: { _eq: status },
+					},
+					order_by: { createdTime: "desc" },
+				},
+				eventModel,
+			],
 		})
 
-		return data.event
+		return event
 	} catch (error) {
 		console.error(
 			`Error during fetching events by id \n\n ${error.name}: ${error.message}`,
@@ -70,12 +74,16 @@ export const fetchEventsByMarket = async ({ id, status }) => {
 
 export const fetchEventById = async ({ id }) => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getEventById,
-			variables: { id },
+		const { eventByPk } = await juster.gql.query({
+			eventByPk: [
+				{
+					id,
+				},
+				eventModel,
+			],
 		})
 
-		return data.eventByPk
+		return eventByPk
 	} catch (error) {
 		console.error(
 			`Error during fetching event by id \n\n ${error.name}: ${error.message}`,
@@ -86,12 +94,26 @@ export const fetchEventById = async ({ id }) => {
 
 export const fetchEventParticipants = async ({ id }) => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getEventParticipants,
-			variables: { id: BigNumber(id) },
+		const { event } = await juster.gql.query({
+			event: [
+				{
+					where: { id: { _eq: id } },
+				},
+				{
+					positions: {
+						userId: true,
+						liquidityProvidedAboveEq: true,
+						liquidityProvidedBelow: true,
+						rewardAboveEq: true,
+						rewardBelow: true,
+						eventId: true,
+						shares: true,
+					},
+				},
+			],
 		})
 
-		return data.event[0].positions
+		return event[0].positions
 	} catch (error) {
 		console.error(
 			`Error during fetching event participant \n\n ${error.name}: ${error.message}`,
@@ -102,12 +124,18 @@ export const fetchEventParticipants = async ({ id }) => {
 
 export const fetchTopEvents = async ({ limit }) => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getTopEvents,
-			variables: { limit },
+		const { event } = await juster.gql.query({
+			event: [
+				{
+					where: { status: { _eq: "NEW" } },
+					order_by: { id: "desc" },
+					limit,
+				},
+				eventModel,
+			],
 		})
 
-		return data.event
+		return event
 	} catch (error) {
 		console.error(
 			`Error during fetching top events \n\n ${error.name}: ${error.message}`,
@@ -118,12 +146,19 @@ export const fetchTopEvents = async ({ limit }) => {
 
 export const fetchEventsWithUserPosition = async ({ userId }) => {
 	try {
-		const { data } = await juster.apollo.query({
-			query: getEventsWithUserPosition,
-			variables: { userId },
+		const { event } = await juster.gql.query({
+			event: [
+				{
+					where: {
+						bets: { userId: { _eq: userId } },
+						status: { _in: ["NEW", "STARTED"] },
+					},
+				},
+				eventModel,
+			],
 		})
 
-		return data.event
+		return event
 	} catch (error) {
 		console.error(
 			`Error during fetching user positions \n\n ${error.name}: ${error.message}`,

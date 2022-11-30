@@ -4,14 +4,16 @@
 import { juster } from "@sdk"
 
 /**
- * GQL: Queries
+ * Models
  */
-import { getMarkets } from "@/graphql/queries/markets"
+import { market as marketModel } from "@/graphql/models"
 
 export const fetchMarkets = async () => {
 	try {
-		const { data } = await juster.apollo.query({ query: getMarkets })
-		return data.currencyPair
+		const { currencyPair } = await juster.gql.query({
+			currencyPair: marketModel,
+		})
+		return currencyPair
 	} catch (error) {
 		console.error(
 			`Error during fetching markets \n\n ${error.name}: ${error.message}`,

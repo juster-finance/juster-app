@@ -8,13 +8,10 @@
 		"serve": "vite preview"
 	},
 	"dependencies": {
-		"@apollo/client": "^3.7.1",
 		"@juster-finance/gql-client": "^0.1.0",
 		"@juster-finance/sdk": "^0.1.0",
 		"@rollup/plugin-inject": "^5.0.2",
-		"@vue/apollo-composable": "4.0.0-beta.1",
 		"amplitude-js": "^8.12.0",
-		"apollo-link-ws": "^1.0.20",
 		"axios": "^0.21.4",
 		"bignumber.js": "^9.0.1",
 		"buffer": "^6.0.3",
@@ -22,8 +19,6 @@
 		"d3": "^7.0.0",
 		"fast-fuzzy": "^1.12.0",
 		"focus-trap": "^7.1.0",
-		"graphql": "^15.5.1",
-		"graphql-tag": "^2.12.5",
 		"lodash.clonedeep": "^4.5.0",
 		"luxon": "^2.0.1",
 		"markdown-it": "^12.2.0",
@@ -37,7 +32,6 @@
 		"vue-router": "^4.0.14"
 	},
 	"devDependencies": {
-		"@esbuild-plugins/node-modules-polyfill": "^0.1.4",
 		"@vitejs/plugin-vue": "3.0.1",
 		"eslint": "8.21.0",
 		"eslint-plugin-prettier": "^3.3.1",
