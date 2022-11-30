@@ -36,10 +36,14 @@ import { fetchAllUsers } from "@/api/users"
 /**
  * Store
  */
+import { useAppStore } from "@store/app"
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
+
+const appStore = useAppStore()
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
+
 const { setupUser } = useMarket()
 
 const router = useRouter()
@@ -78,7 +82,7 @@ const login = () => {
 
 		setupUser()
 
-		router.push("/")
+		router.push(appStore.prevRoute ? appStore.prevRoute.path : "/")
 	})
 }
 
