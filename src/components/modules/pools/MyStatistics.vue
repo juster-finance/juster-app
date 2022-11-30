@@ -13,14 +13,14 @@ const tabs = reactive([
 		icon: "splitted_chart",
 		title: "TVL",
 	},
-	{
-		icon: "splitted_chart",
-		title: "APY",
-	},
-	{
-		icon: "money",
-		title: "Profit",
-	},
+	// {
+	// 	icon: "splitted_chart",
+	// 	title: "APY",
+	// },
+	// {
+	// 	icon: "money",
+	// 	title: "Profit",
+	// },
 ])
 const selectedTab = ref(tabs[0].title)
 
@@ -138,23 +138,20 @@ const sortedPositions = computed(() => {
 					</Flex>
 
 					<Flex :class="$style.progress_wrapper">
-						<!-- <div
+						<div
 							:style="{
 								width: `${(position.tvl * 100) / valueLocked}%`,
+								borderRadius: '0 3px 3px 0',
 							}"
-							:class="$style.bar_progress"
-						/> -->
-						<div
-							:style="{ width: `${50}%` }"
 							:class="$style.bar_deposited"
 						/>
-						<div
+						<!-- <div
 							:style="{
 								width: `${30}%`,
 								borderRadius: '0 3px 3px 0',
 							}"
 							:class="$style.bar_locked"
-						/>
+						/> -->
 					</Flex>
 				</Flex>
 			</template>
@@ -213,6 +210,7 @@ const sortedPositions = computed(() => {
 	width: 100%;
 	height: 12px;
 	border-radius: 3px;
+	overflow: hidden;
 	background: rgba(255, 255, 255, 0.05);
 }
 
