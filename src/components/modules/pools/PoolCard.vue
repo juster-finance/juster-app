@@ -424,7 +424,7 @@ const copy = (target) => {
 
 <style module>
 .wrapper {
-	border-radius: 10px;
+	border-radius: 8px;
 	background: var(--card-bg);
 	border: 1px solid transparent;
 	cursor: pointer;
