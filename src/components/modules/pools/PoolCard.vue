@@ -1,8 +1,14 @@
 <script setup>
 /**
+ * Vendor
+ */
+import { computed } from "vue"
+
+/**
  * UI
  */
 import Button from "@ui/Button.vue"
+import Tooltip from "@ui/Tooltip.vue"
 import LoadingDots from "@ui/LoadingDots.vue"
 import {
 	Dropdown,
@@ -35,6 +41,17 @@ const props = defineProps({
 	},
 })
 const emit = defineEmits(["onSelectPool"])
+
+const handleDeposit = () => {
+	if (!isDepositAvailable.value) return
+	emit("onSelectPool", props.pool)
+}
+
+const isDepositAvailable = computed(() => {
+	if (!accountStore.pkh) return false
+	if (props.pool.isDepositPaused) return false
+	return true
+})
 
 const copy = (target) => {
 	if (target == "address") {
@@ -103,70 +120,57 @@ const copy = (target) => {
 
 					<Flex align="center" gap="8">
 						<Flex align="center" gap="4">
-							<Icon name="zap_circle" size="12" color="green" />
-							<Text size="12" weight="600" color="green">
-								Stable
+							<Icon
+								:name="
+									!pool.isDepositPaused
+										? 'zap_circle'
+										: 'pause'
+								"
+								size="12"
+								:color="
+									!pool.isDepositPaused ? 'green' : 'yellow'
+								"
+							/>
+							<Text
+								size="12"
+								weight="600"
+								:color="
+									!pool.isDepositPaused ? 'green' : 'yellow'
+								"
+							>
+								{{
+									!pool.isDepositPaused ? "Active" : "Paused"
+								}}
 							</Text>
 						</Flex>
-
-						<Text size="8" color="support">✦</Text>
-
-						<Text size="12" weight="600" color="tertiary">
-							Pool
-						</Text>
 					</Flex>
 				</Flex>
 			</Flex>
 
 			<Flex gap="8">
-				<Button
-					@click="emit('onSelectPool', pool)"
-					type="secondary"
-					size="small"
-					:disabled="!accountStore.pkh"
+				<Tooltip
+					placement="bottom-end"
+					:disabled="!!isDepositAvailable"
 				>
-					<Icon name="plus_circle" size="16" color="blue" />
-					Deposit
-				</Button>
+					<Button
+						@click="handleDeposit"
+						type="secondary"
+						size="small"
+						:disabled="!isDepositAvailable"
+					>
+						<Icon name="plus_circle" size="16" color="blue" />
+						Deposit
+					</Button>
 
-				<Dropdown>
-					<template #trigger>
-						<Button type="secondary" size="small">
-							<Icon name="dots" size="12" />
-						</Button>
+					<template #content>
+						{{
+							(pool.isDepositPaused &&
+								"The pool has been paused") ||
+							(!accountStore.pkh &&
+								"Connect a wallet to make a deposit")
+						}}
 					</template>
-
-					<template #dropdown>
-						<DropdownItem>
-							<Icon name="money" size="16" /> Request funds
-						</DropdownItem>
-
-						<DropdownDivider />
-
-						<a
-							:href="`https://ghostnet.tzkt.io/${pool.address}`"
-							target="_blank"
-						>
-							<DropdownItem>
-								<Icon name="database" size="16" />
-								View in explorer
-							</DropdownItem>
-						</a>
-						<DropdownItem>
-							<Icon name="time" size="16" />Pool timeline
-						</DropdownItem>
-
-						<DropdownDivider />
-
-						<DropdownTitle>Copy</DropdownTitle>
-						<DropdownItem @click="copy('address')">
-							<Icon name="copy" size="16" /> Pool address
-						</DropdownItem>
-						<DropdownItem @click="copy('url')">
-							<Icon name="copy" size="16" /> Pool explorer link
-						</DropdownItem>
-					</template>
-				</Dropdown>
+				</Tooltip>
 			</Flex>
 		</Flex>
 
@@ -325,7 +329,7 @@ const copy = (target) => {
 			</Flex>
 		</Flex>
 
-		<!-- <Flex justify="between">
+		<Flex justify="between">
 			<Flex direction="column" gap="8">
 				<Flex align="center" gap="6">
 					<Icon name="pool" size="12" color="tertiary" />
@@ -335,19 +339,49 @@ const copy = (target) => {
 				</Flex>
 
 				<Text size="12" color="support" weight="600">
-					Smart Contract&nbsp;&nbsp;•&nbsp;&nbsp;24 participants
+					Smart Contract&nbsp;&nbsp;•&nbsp;&nbsp;0 participants
 				</Text>
 			</Flex>
 
 			<Flex align="center" gap="8">
-				<Button type="secondary" size="small">
+				<Button
+					type="secondary"
+					size="small"
+					asLink
+					:link="`https://ghostnet.tzkt.io/${pool.address}`"
+				>
 					<Icon name="database" size="12" />
 				</Button>
-				<Button type="secondary" size="small">
-					<Icon name="dots" size="12" />
-				</Button>
+
+				<Dropdown>
+					<template #trigger>
+						<Button type="secondary" size="small">
+							<Icon name="dots" size="12" />
+						</Button>
+					</template>
+
+					<template #dropdown>
+						<DropdownItem>
+							<Icon name="money" size="16" /> Request claims
+						</DropdownItem>
+
+						<DropdownItem>
+							<Icon name="time" size="16" />Pool timeline
+						</DropdownItem>
+
+						<DropdownDivider />
+
+						<DropdownTitle>Copy</DropdownTitle>
+						<DropdownItem @click="copy('address')">
+							<Icon name="copy" size="16" /> Pool address
+						</DropdownItem>
+						<DropdownItem @click="copy('url')">
+							<Icon name="copy" size="16" /> Pool explorer link
+						</DropdownItem>
+					</template>
+				</Dropdown>
 			</Flex>
-		</Flex> -->
+		</Flex>
 	</Flex>
 </template>
 

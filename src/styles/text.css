@@ -111,6 +111,10 @@
 	color: var(--brand);
 }
 
+.color--yellow {
+	color: var(--yellow);
+}
+
 /* Icon Color (From Main Design System) */
 .fill--primary {
 	color: var(--text-primary);
@@ -138,4 +142,8 @@
 
 .fill--brand {
 	fill: var(--brand);
+}
+
+.fill--yellow {
+	fill: var(--yellow);
 }
