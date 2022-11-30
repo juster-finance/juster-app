@@ -1,4 +1,7 @@
 <script>
+/**
+ * Vendor
+ */
 import { computed, defineComponent, ref, toRefs, watch } from "vue"
 
 /**
