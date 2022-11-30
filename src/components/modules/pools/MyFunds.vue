@@ -240,15 +240,15 @@ const valueLocked = computed(() =>
 				:disabled="!isDepositAvailable"
 				type="primary"
 				size="medium"
-				keybind="D"
+				keybind="D+L"
 				block
 			>
 				<Icon name="plus_circle" size="16" />Deposit Liquidity
 			</Button>
 
-			<Button type="secondary" size="medium" block keybind="C">
-				<Icon name="credit_add" size="16" color="green" />Get available
-				claims
+			<Button type="secondary" size="medium" block keybind="G+C">
+				<Icon name="credit_add" size="16" color="green" />
+				Get available claims
 			</Button>
 
 			<Text

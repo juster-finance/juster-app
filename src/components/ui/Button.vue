@@ -129,7 +129,15 @@ onBeforeUnmount(() => {
 		<slot v-if="!icon" />
 		<Icon v-else :name="icon" size="16" />
 
-		<Flex v-if="keybind" align="center" gap="4" :class="$style.keybinds">
+		<Flex
+			v-if="keybind"
+			align="center"
+			gap="4"
+			:class="[
+				$style.keybinds,
+				pressed[keybind.split('+')[0].toLowerCase()] && $style.pressed,
+			]"
+		>
 			<div
 				v-if="keybind && keybind.split('+').length < 2"
 				ref="hotkey"
@@ -196,6 +204,14 @@ onBeforeUnmount(() => {
 .keybinds {
 	position: absolute;
 	right: 12px;
+
+	opacity: 0.5;
+
+	transition: opacity 0.2s ease;
+}
+
+.keybinds.pressed {
+	opacity: 1;
 }
 
 .keybind {
