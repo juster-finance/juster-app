@@ -2,7 +2,7 @@
 /**
  * Vendor
  */
-import { computed } from "vue"
+import { ref, computed, onMounted, onBeforeUnmount } from "vue"
 
 /**
  * UI
@@ -31,6 +31,8 @@ import { useNotificationsStore } from "@store/notifications"
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 
+const cardEl = ref(null)
+
 const props = defineProps({
 	pool: {
 		type: Object,
@@ -41,6 +43,20 @@ const props = defineProps({
 	},
 })
 const emit = defineEmits(["onSelectPool"])
+
+onMounted(() => {
+	cardEl.value.addEventListener("contextmenu", contextMenuHandler)
+})
+
+onBeforeUnmount(() => {
+	cardEl.value.removeEventListener("contextmenu", contextMenuHandler)
+})
+
+const openContextMenu = ref(false)
+const contextMenuHandler = (e) => {
+	e.preventDefault()
+	openContextMenu.value = true
+}
 
 const handleDeposit = () => {
 	if (!isDepositAvailable.value) return
@@ -105,284 +121,305 @@ const copy = (target) => {
 </script>
 
 <template>
-	<Flex direction="column" gap="32" :class="$style.wrapper">
-		<Flex justify="between">
-			<Flex align="center" gap="16">
-				<div :class="$style.symbols">
-					<img :src="getCurrencyIcon('XTZ')" alt="symbol" />
-					<img :src="getCurrencyIcon('USD')" alt="symbol" />
-				</div>
+	<div ref="cardEl">
+		<Flex direction="column" gap="32" :class="$style.wrapper">
+			<Flex justify="between">
+				<Flex align="center" gap="16">
+					<div :class="$style.symbols">
+						<img :src="getCurrencyIcon('XTZ')" alt="symbol" />
+						<img :src="getCurrencyIcon('USD')" alt="symbol" />
+					</div>
 
-				<Flex direction="column" gap="8">
-					<Text size="14" color="primary" weight="600">
-						{{ pool.name.replace("Juster Pool: ", "") }}
-					</Text>
+					<Flex direction="column" gap="8">
+						<Text size="14" color="primary" weight="600">
+							{{ pool.name.replace("Juster Pool: ", "") }}
+						</Text>
 
-					<Flex align="center" gap="8">
-						<Flex align="center" gap="4">
-							<Icon
-								:name="
-									!pool.isDepositPaused
-										? 'zap_circle'
-										: 'pause'
-								"
-								size="12"
-								:color="
-									!pool.isDepositPaused ? 'green' : 'yellow'
-								"
-							/>
+						<Flex align="center" gap="8">
+							<Flex align="center" gap="4">
+								<Icon
+									:name="
+										!pool.isDepositPaused
+											? 'zap_circle'
+											: 'pause'
+									"
+									size="12"
+									:color="
+										!pool.isDepositPaused
+											? 'green'
+											: 'yellow'
+									"
+								/>
+								<Text
+									size="12"
+									weight="600"
+									:color="
+										!pool.isDepositPaused
+											? 'green'
+											: 'yellow'
+									"
+								>
+									{{
+										!pool.isDepositPaused
+											? "Active"
+											: "Paused"
+									}}
+								</Text>
+							</Flex>
+						</Flex>
+					</Flex>
+				</Flex>
+
+				<Flex gap="8">
+					<Tooltip
+						placement="bottom-end"
+						:disabled="!!isDepositAvailable"
+					>
+						<Button
+							@click="handleDeposit"
+							type="secondary"
+							size="small"
+							:disabled="!isDepositAvailable"
+						>
+							<Icon name="plus_circle" size="16" color="blue" />
+							Deposit
+						</Button>
+
+						<template #content>
+							{{
+								(pool.isDepositPaused &&
+									"The pool has been paused") ||
+								(!accountStore.pkh &&
+									"Connect a wallet to make a deposit")
+							}}
+						</template>
+					</Tooltip>
+				</Flex>
+			</Flex>
+
+			<Flex
+				align="center"
+				justify="between"
+				gap="16"
+				:class="$style.bottom"
+			>
+				<Flex align="center" gap="24" :class="$style.stats">
+					<!-- TVL -->
+					<Flex direction="column" gap="8" :class="$style.stat">
+						<Text
+							size="13"
+							weight="600"
+							color="tertiary"
+							:class="$style.stat__title"
+							>TVL</Text
+						>
+
+						<Flex align="center" gap="6">
+							<Icon name="coins" size="14" color="secondary" />
+
 							<Text
-								size="12"
+								v-if="state"
+								size="15"
 								weight="600"
-								:color="
-									!pool.isDepositPaused ? 'green' : 'yellow'
-								"
+								color="secondary"
 							>
-								{{
-									!pool.isDepositPaused ? "Active" : "Paused"
-								}}
+								{{ state.totalLiquidity.toFixed(2) }}
+							</Text>
+							<LoadingDots v-else />
+						</Flex>
+					</Flex>
+
+					<Text
+						size="12"
+						weight="500"
+						color="tertiary"
+						:class="$style.star_icon"
+						>✦</Text
+					>
+
+					<!-- Share Price -->
+					<Flex direction="column" gap="8" :class="$style.stat">
+						<Text
+							size="13"
+							weight="600"
+							color="tertiary"
+							:class="$style.stat__title"
+						>
+							Share Price
+						</Text>
+
+						<Flex align="center" gap="6">
+							<Icon name="banknote" size="14" color="secondary" />
+
+							<Text
+								v-if="state"
+								size="15"
+								weight="600"
+								color="secondary"
+							>
+								{{ state.sharePrice.toFixed(2) }}
+							</Text>
+							<LoadingDots v-else />
+						</Flex>
+					</Flex>
+
+					<Text
+						size="12"
+						weight="500"
+						color="tertiary"
+						:class="$style.star_icon"
+						>✦</Text
+					>
+
+					<!-- APY -->
+					<Flex direction="column" gap="8" :class="$style.stat">
+						<Text
+							size="13"
+							weight="600"
+							color="tertiary"
+							:class="$style.stat__title"
+							>APY</Text
+						>
+
+						<Flex align="center" gap="6">
+							<Icon name="stars" size="14" color="green" />
+							<Text size="15" weight="600" color="secondary">
+								0%
+							</Text>
+						</Flex>
+					</Flex>
+
+					<!-- Switch Button -->
+					<Flex
+						v-if="accountStore.pkh"
+						align="center"
+						gap="8"
+						:class="$style.switch_btn"
+					>
+						<Icon name="arrows" size="16" color="secondary" />
+						<Text
+							size="12"
+							weight="700"
+							color="secondary"
+							:class="$style.switch_btn__text"
+						>
+							Switch to my statistics
+						</Text>
+						<img
+							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
+							alt="avatar"
+						/>
+					</Flex>
+				</Flex>
+
+				<Flex align="center" gap="24" :class="$style.stats">
+					<Flex direction="column" gap="8" :class="$style.stat">
+						<Text
+							size="13"
+							weight="600"
+							color="tertiary"
+							:class="$style.stat__title"
+							>Events</Text
+						>
+
+						<Flex align="center" gap="6">
+							<Icon
+								name="price_event"
+								size="14"
+								color="secondary"
+							/>
+							<Text size="15" weight="600" color="secondary">
+								2
+							</Text>
+						</Flex>
+					</Flex>
+
+					<Text
+						size="12"
+						weight="500"
+						color="tertiary"
+						:class="$style.star_icon"
+						>✦</Text
+					>
+
+					<Flex direction="column" gap="8" :class="$style.stat">
+						<Text
+							size="13"
+							weight="600"
+							color="tertiary"
+							:class="$style.stat__title"
+							>Stake Index</Text
+						>
+
+						<Flex align="center" gap="6">
+							<Icon name="checkcircle" size="14" color="green" />
+							<Text size="15" weight="600" color="secondary">
+								100%
 							</Text>
 						</Flex>
 					</Flex>
 				</Flex>
 			</Flex>
 
-			<Flex gap="8">
-				<Tooltip
-					placement="bottom-end"
-					:disabled="!!isDepositAvailable"
-				>
+			<Flex justify="between">
+				<Flex direction="column" gap="8">
+					<Flex align="center" gap="6">
+						<Icon name="server" size="12" color="tertiary" />
+						<Text size="13" weight="600" color="tertiary">
+							Liquidity Pool
+						</Text>
+					</Flex>
+
+					<Text size="12" color="support" weight="600">
+						Smart Contract&nbsp;&nbsp;•&nbsp;&nbsp;0 participants
+					</Text>
+				</Flex>
+
+				<Flex align="center" gap="8">
 					<Button
-						@click="handleDeposit"
 						type="secondary"
 						size="small"
-						:disabled="!isDepositAvailable"
+						asLink
+						:link="`https://ghostnet.tzkt.io/${pool.address}`"
 					>
-						<Icon name="plus_circle" size="16" color="blue" />
-						Deposit
+						<Icon name="database" size="12" />
 					</Button>
 
-					<template #content>
-						{{
-							(pool.isDepositPaused &&
-								"The pool has been paused") ||
-							(!accountStore.pkh &&
-								"Connect a wallet to make a deposit")
-						}}
-					</template>
-				</Tooltip>
-			</Flex>
-		</Flex>
-
-		<Flex align="center" justify="between" gap="16" :class="$style.bottom">
-			<Flex align="center" gap="24" :class="$style.stats">
-				<!-- TVL -->
-				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-						>TVL</Text
+					<Dropdown
+						:force-open="openContextMenu"
+						@onClose="openContextMenu = false"
 					>
+						<template #trigger>
+							<Button type="secondary" size="small">
+								<Icon name="dots" size="12" />
+							</Button>
+						</template>
 
-					<Flex align="center" gap="6">
-						<Icon name="coins" size="14" color="secondary" />
+						<template #dropdown>
+							<DropdownItem>
+								<Icon name="money" size="16" /> Request claims
+							</DropdownItem>
 
-						<Text
-							v-if="state"
-							size="15"
-							weight="600"
-							color="secondary"
-						>
-							{{ state.totalLiquidity.toFixed(2) }}
-						</Text>
-						<LoadingDots v-else />
-					</Flex>
-				</Flex>
+							<DropdownItem>
+								<Icon name="time" size="16" />Pool timeline
+							</DropdownItem>
 
-				<Text
-					size="12"
-					weight="500"
-					color="tertiary"
-					:class="$style.star_icon"
-					>✦</Text
-				>
+							<DropdownDivider />
 
-				<!-- Share Price -->
-				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-					>
-						Share Price
-					</Text>
-
-					<Flex align="center" gap="6">
-						<Icon name="banknote" size="14" color="secondary" />
-
-						<Text
-							v-if="state"
-							size="15"
-							weight="600"
-							color="secondary"
-						>
-							{{ state.sharePrice.toFixed(2) }}
-						</Text>
-						<LoadingDots v-else />
-					</Flex>
-				</Flex>
-
-				<Text
-					size="12"
-					weight="500"
-					color="tertiary"
-					:class="$style.star_icon"
-					>✦</Text
-				>
-
-				<!-- APY -->
-				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-						>APY</Text
-					>
-
-					<Flex align="center" gap="6">
-						<Icon name="stars" size="14" color="green" />
-						<Text size="15" weight="600" color="secondary">
-							0%
-						</Text>
-					</Flex>
-				</Flex>
-
-				<!-- Switch Button -->
-				<Flex
-					v-if="accountStore.pkh"
-					align="center"
-					gap="8"
-					:class="$style.switch_btn"
-				>
-					<Icon name="arrows" size="16" color="secondary" />
-					<Text
-						size="12"
-						weight="700"
-						color="secondary"
-						:class="$style.switch_btn__text"
-					>
-						Switch to my statistics
-					</Text>
-					<img
-						:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-						alt="avatar"
-					/>
-				</Flex>
-			</Flex>
-
-			<Flex align="center" gap="24" :class="$style.stats">
-				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-						>Events</Text
-					>
-
-					<Flex align="center" gap="6">
-						<Icon name="price_event" size="14" color="secondary" />
-						<Text size="15" weight="600" color="secondary">
-							2
-						</Text>
-					</Flex>
-				</Flex>
-
-				<Text
-					size="12"
-					weight="500"
-					color="tertiary"
-					:class="$style.star_icon"
-					>✦</Text
-				>
-
-				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-						>Stake Index</Text
-					>
-
-					<Flex align="center" gap="6">
-						<Icon name="checkcircle" size="14" color="green" />
-						<Text size="15" weight="600" color="secondary">
-							100%
-						</Text>
-					</Flex>
+							<DropdownTitle>Copy</DropdownTitle>
+							<DropdownItem @click="copy('address')">
+								<Icon name="copy" size="16" /> Pool address
+							</DropdownItem>
+							<DropdownItem @click="copy('url')">
+								<Icon name="copy" size="16" /> Pool explorer
+								link
+							</DropdownItem>
+						</template>
+					</Dropdown>
 				</Flex>
 			</Flex>
 		</Flex>
-
-		<Flex justify="between">
-			<Flex direction="column" gap="8">
-				<Flex align="center" gap="6">
-					<Icon name="server" size="12" color="tertiary" />
-					<Text size="13" weight="600" color="tertiary">
-						Liquidity Pool
-					</Text>
-				</Flex>
-
-				<Text size="12" color="support" weight="600">
-					Smart Contract&nbsp;&nbsp;•&nbsp;&nbsp;0 participants
-				</Text>
-			</Flex>
-
-			<Flex align="center" gap="8">
-				<Button
-					type="secondary"
-					size="small"
-					asLink
-					:link="`https://ghostnet.tzkt.io/${pool.address}`"
-				>
-					<Icon name="database" size="12" />
-				</Button>
-
-				<Dropdown>
-					<template #trigger>
-						<Button type="secondary" size="small">
-							<Icon name="dots" size="12" />
-						</Button>
-					</template>
-
-					<template #dropdown>
-						<DropdownItem>
-							<Icon name="money" size="16" /> Request claims
-						</DropdownItem>
-
-						<DropdownItem>
-							<Icon name="time" size="16" />Pool timeline
-						</DropdownItem>
-
-						<DropdownDivider />
-
-						<DropdownTitle>Copy</DropdownTitle>
-						<DropdownItem @click="copy('address')">
-							<Icon name="copy" size="16" /> Pool address
-						</DropdownItem>
-						<DropdownItem @click="copy('url')">
-							<Icon name="copy" size="16" /> Pool explorer link
-						</DropdownItem>
-					</template>
-				</Dropdown>
-			</Flex>
-		</Flex>
-	</Flex>
+	</div>
 </template>
 
 <style module>

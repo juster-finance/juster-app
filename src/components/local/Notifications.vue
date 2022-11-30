@@ -195,9 +195,10 @@ notificationsStore.$subscribe(() => {
 
 	box-sizing: border-box;
 	width: 330px;
-	background: var(--notification-bg);
-	backdrop-filter: blur(10px);
-	box-shadow: rgb(0 0 0 / 8%) 0px 4px 13px;
+	background: rgba(39, 39, 42, 0.8);
+	box-shadow: rgb(0 0 0 / 20%) 0px 4px 24px;
+	backdrop-filter: blur(10px) saturate(190%) contrast(80%) brightness(75%);
+	border: 1px solid rgb(60, 63, 68);
 	border-radius: 8px;
 	padding: 16px;
 
