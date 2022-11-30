@@ -59,7 +59,33 @@ const contextMenuHandler = (e) => {
 }
 
 const handleDeposit = () => {
-	if (!isDepositAvailable.value) return
+	if (!isDepositAvailable.value) {
+		if (!accountStore.pkh)
+			notificationsStore.create({
+				notification: {
+					type: "warning",
+					title: "Connect wallet to deposit liquidity",
+					description:
+						"You can connect your wallet through the button in the upper right corner",
+					autoDestroy: true,
+				},
+			})
+		if (props.pool.isDepositPaused)
+			notificationsStore.create({
+				notification: {
+					type: "warning",
+					title: `"${props.pool.name.replace(
+						"Juster Pool: ",
+						"",
+					)} pool" is paused`,
+					description: "It may be restored soon, try again later. ",
+					autoDestroy: true,
+				},
+			})
+
+		return
+	}
+
 	emit("onSelectPool", props.pool)
 }
 
@@ -179,7 +205,6 @@ const copy = (target) => {
 							@click="handleDeposit"
 							type="secondary"
 							size="small"
-							:disabled="!isDepositAvailable"
 						>
 							<Icon name="plus_circle" size="16" color="blue" />
 							Deposit

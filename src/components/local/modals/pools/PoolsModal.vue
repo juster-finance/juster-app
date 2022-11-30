@@ -8,7 +8,7 @@ import { Searcher } from "fast-fuzzy"
 /**
  * Services
  */
-import { juster, currentNetwork } from "@sdk"
+import { currentNetwork } from "@sdk"
 import { flags, updateFlag } from "@/services/flags"
 
 /**
@@ -28,8 +28,10 @@ import LoadingDots from "@ui/LoadingDots.vue"
 /**
  * Store
  */
+import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
 
+const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 
 const props = defineProps({
@@ -97,6 +99,20 @@ const filteredPools = computed(() => {
 })
 
 const handleSelectPool = (pool) => {
+	if (!accountStore.pkh) {
+		notificationsStore.create({
+			notification: {
+				type: "warning",
+				title: "Connect wallet to deposit liquidity",
+				description:
+					"You can connect your wallet through the button in the upper right corner",
+				autoDestroy: true,
+			},
+		})
+
+		return
+	}
+
 	emit("onSelectPool", pool)
 }
 
