@@ -280,7 +280,7 @@ const hasHedge = computed(() => {
 
 	width: 44px;
 	height: 44px;
-	border-radius: 50%;
+	border-radius: 12px;
 	background: var(--opacity-05);
 	fill: var(--text-secondary);
 }
