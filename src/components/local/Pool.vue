@@ -86,7 +86,7 @@ const belowPercent = computed(() => {
 
 .name.fall svg {
 	fill: var(--orange);
-	transform: rotate(180deg);
+	transform: rotateX(180deg);
 }
 
 .pool {
