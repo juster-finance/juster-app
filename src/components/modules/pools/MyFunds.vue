@@ -8,6 +8,7 @@ import { ref, computed } from "vue"
  * UI
  */
 import Button from "@ui/Button.vue"
+import Tooltip from "@ui/Tooltip.vue"
 
 /**
  * Services
@@ -114,9 +115,25 @@ const valueLocked = computed(() =>
 			:class="$style.progress"
 		>
 			<Flex align="center" justify="between" wide>
-				<Text size="14" color="secondary" weight="600">
-					Pending Entries
-				</Text>
+				<Tooltip placement="top-start" text-align="left">
+					<Flex align="center" gap="6">
+						<Text size="14" color="secondary" weight="600">
+							Pending Entries
+						</Text>
+
+						<Icon name="help" size="14" color="support" />
+					</Flex>
+
+					<template #content>
+						<Flex direction="column" gap="6">
+							Your deposits awaiting confirmation
+							<span>
+								This may take some time depending on<br />the
+								selected pool, or rather its period
+							</span>
+						</Flex>
+					</template>
+				</Tooltip>
 
 				<Flex align="center" gap="4">
 					<Text size="14" color="tertiary" weight="600">
@@ -181,9 +198,24 @@ const valueLocked = computed(() =>
 
 		<Flex direction="column" gap="12" :class="$style.progress">
 			<Flex align="center" justify="between" wide>
-				<Text size="14" color="secondary" weight="600">
-					Progress of Claims
-				</Text>
+				<Tooltip placement="bottom-start" text-align="left">
+					<Flex align="center" gap="6">
+						<Text size="14" color="secondary" weight="600">
+							Progress of Claims
+						</Text>
+						<Icon name="help" size="14" color="support" />
+					</Flex>
+
+					<template #content>
+						<Flex direction="column" gap="6">
+							Your funds are being prepared for withdrawal
+							<span>
+								You need to wait for their output from the<br />
+								pool, and then make a withdrawal of your funds
+							</span>
+						</Flex>
+					</template>
+				</Tooltip>
 
 				<Flex align="center" gap="4">
 					<Text size="14" color="tertiary" weight="600">
