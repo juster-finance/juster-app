@@ -116,10 +116,6 @@ const handleSelectPool = (pool) => {
 	emit("onSelectPool", pool)
 }
 
-const handleSearchInput = (e) => {
-	e.stopPropagation()
-}
-
 onMounted(() => {
 	poolsSearcher.value = new Searcher(props.pools, {
 		keySelector: (item) => {
@@ -234,7 +230,6 @@ const handleCloseTestnetWarning = () => {
 			<Input
 				ref="searchEl"
 				v-model="searchText"
-				@keydown="handleSearchInput"
 				type="text"
 				icon="search"
 				placeholder="Search a pool"

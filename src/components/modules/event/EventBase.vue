@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { ref, reactive, watch, computed, onMounted, onUnmounted } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
