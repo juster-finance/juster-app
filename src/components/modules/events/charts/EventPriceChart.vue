@@ -479,6 +479,8 @@ export default defineComponent({
 
                 symbol.quotes = [...symbol.quotes, ...newQuotes]
 
+                if (!newQuotes[newQuotes.length - 1]) return
+
                 if (
                     DateTime.fromISO(newQuotes[newQuotes.length - 1].timestamp)
                         .ts !== tsGt.ts
