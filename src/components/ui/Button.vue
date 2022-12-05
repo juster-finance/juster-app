@@ -31,10 +31,6 @@ const props = defineProps({
 	icon: {
 		type: String,
 	},
-	asLink: {
-		type: Boolean,
-		default: false,
-	},
 	link: {
 		type: String,
 	},
@@ -125,7 +121,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-	<button v-if="!asLink" :class="[...getStyles(), loading && $style.loading]">
+	<button v-if="!link" :class="[...getStyles(), loading && $style.loading]">
 		<slot v-if="!icon" />
 		<Icon v-else :name="icon" size="16" />
 
@@ -166,7 +162,7 @@ onBeforeUnmount(() => {
 		v-else
 		:href="link"
 		target="_blank"
-		:class="[...getStyles(), loading && $style.loading]"
+		:class="[...getStyles(), $style.link, loading && $style.loading]"
 	>
 		<slot v-if="!icon" />
 		<Icon v-else :name="icon" size="16" />
@@ -366,5 +362,9 @@ onBeforeUnmount(() => {
 
 .wrapper.border {
 	border: 1px solid var(--border);
+}
+
+.link {
+	outline: none;
 }
 </style>

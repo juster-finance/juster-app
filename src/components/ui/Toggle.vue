@@ -13,7 +13,11 @@ const toggle = () => {
 </script>
 
 <template>
-	<div @click="toggle" :class="[$style.wrapper, modelValue && $style.active]">
+	<div
+		@click="toggle"
+		:class="[$style.wrapper, modelValue && $style.active]"
+		tabindex="1"
+	>
 		<div
 			v-if="!disabled"
 			:class="[$style.slider, modelValue && $style.active]"
@@ -29,14 +33,19 @@ const toggle = () => {
 .wrapper {
 	position: relative;
 
-	width: 32px;
+	min-width: 32px;
 	height: 20px;
 
 	background: var(--toggle-bg);
 	border-radius: 50px;
 	cursor: pointer;
 
-	transition: background 0.2s ease;
+	transition: all 0.2s ease;
+}
+
+.wrapper:focus {
+	box-shadow: rgb(75 135 244 / 50%) 0px 0px 0px 3px;
+	outline: none;
 }
 
 .slider {

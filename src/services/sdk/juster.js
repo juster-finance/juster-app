@@ -1,4 +1,6 @@
-/** Vendor */
+/**
+ * Vendor
+ */
 import { computed, reactive } from "vue"
 import { JusterCore, JusterPool } from "@juster-finance/sdk"
 import { createClient } from "@juster-finance/gql-client"

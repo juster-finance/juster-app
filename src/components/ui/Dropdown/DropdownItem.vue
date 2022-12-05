@@ -3,7 +3,7 @@ defineProps({ disabled: { type: Boolean } })
 </script>
 
 <template>
-	<div :class="[$style.wrapper, disabled && $style.disabled]">
+	<div :class="[$style.wrapper, disabled && $style.disabled]" tabindex="1">
 		<slot />
 	</div>
 </template>
@@ -27,7 +27,7 @@ defineProps({ disabled: { type: Boolean } })
 
 	cursor: pointer;
 
-	transition: background 0.2s ease;
+	transition: all 0.2s ease;
 }
 
 .wrapper.disabled {
@@ -43,5 +43,10 @@ defineProps({ disabled: { type: Boolean } })
 
 .wrapper:hover {
 	background: var(--opacity-05);
+}
+
+.wrapper:focus {
+	outline: none;
+	background: rgba(255, 255, 255, 0.05);
 }
 </style>

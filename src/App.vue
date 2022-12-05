@@ -73,6 +73,14 @@ onBeforeMount(() => {
 onMounted(async () => {
 	marketStore.pools = await fetchAllPools()
 	initPools(marketStore.pools)
+
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Enter") {
+			const { activeElement } = document
+			if (activeElement.tagName.toLowerCase() === "a") return
+			activeElement.click()
+		}
+	})
 })
 
 /**
@@ -404,6 +412,9 @@ input {
 a {
 	color: inherit;
 	text-decoration: none;
+	outline: none;
+
+	box-shadow: 0 0 0 0 transparent;
 
 	transition: box-shadow 0.2s ease;
 }

@@ -1,5 +1,9 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { ref, watch, nextTick } from "vue"
+import * as focusTrap from "focus-trap"
 
 /**
  * Composable
@@ -16,6 +20,10 @@ const props = defineProps({
 		type: String,
 		default: null,
 	},
+	disableAutofocus: {
+		type: Boolean,
+		default: false,
+	},
 })
 
 const emit = defineEmits(["onClose"])
@@ -23,6 +31,7 @@ const emit = defineEmits(["onClose"])
 const trigger = ref(null)
 const dropdown = ref(null)
 const isOpen = ref(false)
+const trap = ref({})
 
 watch(
 	() => props.forceOpen,
@@ -57,6 +66,7 @@ const handleOutside = (e) => {
 
 watch(isOpen, () => {
 	if (!isOpen.value) {
+		trap.value.deactivate()
 		removeOutside()
 
 		if (Object.prototype.hasOwnProperty.call(dropdownStyles.value, "top")) {
@@ -83,8 +93,34 @@ watch(isOpen, () => {
 		}px`
 
 		nextTick(() => {
+			/**
+			 * Autofocus first item & activate focus-trap
+			 */
+			trap.value = focusTrap.createFocusTrap(dropdown.value.$el, {
+				initialFocus: !props.disableAutofocus,
+			})
+			trap.value.activate()
+
+			if (!props.disableAutofocus) {
+				let focused = false
+				for (
+					let index = 0;
+					index < dropdown.value.$el.children.length;
+					index++
+				) {
+					const child = dropdown.value.$el.children[index]
+
+					/** check as a string because of data-set specifics */
+					if (child.dataset.active === "true") {
+						child.focus()
+						focused = true
+					}
+				}
+				if (!focused) dropdown.value.$el.children[0].focus()
+			}
+
 			/** Check if there is enough space to open (top/bottom) */
-			const dropdownRect = dropdown.value.getBoundingClientRect()
+			const dropdownRect = dropdown.value.$el.getBoundingClientRect()
 
 			if (props.side === "bottom") {
 				if (
@@ -138,16 +174,18 @@ const onKeydown = (event) => {
 			<transition name="fastfade">
 				<div v-if="isOpen" :class="$style.canvas">
 					<transition name="dropdown" appear>
-						<div
+						<Flex
 							ref="dropdown"
 							@click="close"
 							:class="$style.dropdown"
 							:style="{
 								...dropdownStyles,
 							}"
+							direction="column"
+							gap="4"
 						>
 							<slot name="dropdown" />
-						</div>
+						</Flex>
 					</transition>
 				</div>
 			</transition>
@@ -175,9 +213,8 @@ const onKeydown = (event) => {
 
 	padding: 8px 0;
 	border-radius: 8px;
-	background: rgba(39, 39, 42, 0.8);
+	background: rgba(38, 38, 42, 1);
 	box-shadow: rgb(0 0 0 / 20%) 0px 4px 24px;
-	backdrop-filter: blur(10px) saturate(190%) contrast(80%) brightness(75%);
-	border: 1px solid rgb(60, 63, 68);
+	border: 1px solid var(--border);
 }
 </style>

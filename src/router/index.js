@@ -80,6 +80,132 @@ const routes = [
 	},
 
 	{
+		path: "/settings",
+		name: "Settings",
+		component: () => import("@views/SettingsPage.vue"),
+		beforeEnter: (to, from, next) => {
+			const accountStore = useAccountStore()
+
+			if (accountStore.isLoggined) {
+				next()
+			} else {
+				next({ name: "Explore" })
+			}
+		},
+		redirect: "/settings/account/",
+		children: [
+			// General Settings
+			{
+				name: "AccountSettings",
+				path: "account",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/AccountSettings.vue"
+					),
+			},
+			{
+				name: "ApplicationSettings",
+				path: "application",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/ApplicationSettings.vue"
+					),
+			},
+			{
+				name: "WalletSettings",
+				path: "wallet",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/WalletSettings.vue"
+					),
+			},
+			// Appearance Settings
+			{
+				name: "DisplaySettings",
+				path: "display",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/DisplaySettings.vue"
+					),
+			},
+			{
+				name: "AmountsSettings",
+				path: "amounts",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/AmountsSettings.vue"
+					),
+			},
+			{
+				name: "ThemeSettings",
+				path: "theme",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/ThemeSettings.vue"
+					),
+			},
+			// Accessibility Settings
+			{
+				name: "SearchSettings",
+				path: "search",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/SearchSettings.vue"
+					),
+			},
+			{
+				name: "EffectsSettings",
+				path: "effects",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/EffectsSettings.vue"
+					),
+			},
+			{
+				name: "ShortcutsSettings",
+				path: "shortcuts",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/ShortcutsSettings.vue"
+					),
+			},
+			// Other Settings
+			{
+				name: "AdvancedSettings",
+				path: "advanced",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/AdvancedSettings.vue"
+					),
+			},
+			{
+				name: "ReleasesSettings",
+				path: "releases",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/ReleasesSettings.vue"
+					),
+			},
+			{
+				name: "DebuggingSettings",
+				path: "debugging",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/DebuggingSettings.vue"
+					),
+			},
+			{
+				name: "ResetsSettings",
+				path: "resets",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/ResetsSettings.vue"
+					),
+			},
+		],
+	},
+
+	{
 		path: "/rating",
 		name: "Rating",
 		component: () => import("@views/LeaderboardPage.vue"),

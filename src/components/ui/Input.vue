@@ -1,108 +1,112 @@
-<script>
-export default {
-	name: "Input",
-	props: {
-		type: {
-			type: String,
-		},
-		label: {
-			type: String,
-		},
-		icon: {
-			type: String,
-		},
-		cleanable: {
-			type: Boolean,
-		},
-		subtext: {
-			type: String,
-		},
-		placeholder: {
-			type: String,
-			required: true,
-		},
-		modelValue: {
-			type: [String, Number],
-		},
-		disabled: {
-			type: Boolean,
-		},
-		limit: {
-			type: Number,
-		},
+<script setup>
+/**
+ * Vendor
+ */
+import { ref, watch, computed } from "vue"
+
+const emit = defineEmits(["update:modelValue"])
+const props = defineProps({
+	type: {
+		type: String,
 	},
-
-	data() {
-		return {
-			isFocused: false,
-
-			text: this.modelValue ? this.modelValue : "",
-		}
+	label: {
+		type: String,
 	},
-
-	watch: {
-		modelValue() {
-			this.text = this.modelValue
-		},
+	hint: {
+		type: String,
 	},
-	computed: {
-		getInputType() {
-			if (!!this.type) return this.type
-			return "text"
-		},
+	icon: {
+		type: String,
 	},
-	methods: {
-		handleInput() {
-			if (this.type === "number") {
-				this.$emit(
-					"update:modelValue",
-					isNaN(parseFloat(this.text))
-						? this.text
-						: parseFloat(this.text),
-				)
-			} else {
-				this.$emit("update:modelValue", this.text)
-			}
-
-			if (parseFloat(this.text) > this.limit) {
-				this.$emit("update:modelValue", this.limit)
-				this.text = this.limit
-			}
-		},
-
-		handleClear() {
-			this.$emit("update:modelValue", "")
-		},
-
-		handleKeydown(e) {
-			if (this.type == "number") {
-				if (e.key === "-") e.preventDefault()
-			}
-		},
-
-		handleClick() {
-			if (this.$refs.input) this.$refs.input.focus()
-		},
-
-		handleFocus() {
-			this.isFocused = true
-
-			this.$emit("clearError")
-		},
-		handleBlur() {
-			this.isFocused = false
-		},
+	cleanable: {
+		type: Boolean,
 	},
+	subtext: {
+		type: String,
+	},
+	placeholder: {
+		type: String,
+		required: true,
+	},
+	modelValue: {
+		type: [String, Number],
+	},
+	disabled: {
+		type: Boolean,
+	},
+	limit: {
+		type: Number,
+	},
+})
+
+const isFocused = ref(false)
+
+const inputEl = ref(null)
+const text = ref(props.modelValue ? props.modelValue : "")
+
+watch(
+	() => props.modelValue,
+	() => {
+		text.value = props.modelValue
+	},
+)
+
+const getInputType = computed(() => {
+	if (!!props.type) return props.type
+	return "text"
+})
+
+const handleInput = () => {
+	if (props.disabled) return
+
+	if (props.type === "number") {
+		emit(
+			"update:modelValue",
+			isNaN(parseFloat(text.value)) ? text.value : parseFloat(text.value),
+		)
+	} else {
+		emit("update:modelValue", text.value)
+	}
+
+	if (parseFloat(text.value) > props.limit) {
+		emit("update:modelValue", props.limit)
+		text.value = props.limit
+	}
+}
+
+const handleClear = () => {
+	emit("update:modelValue", "")
+}
+
+const handleKeydown = (e) => {
+	if (props.disabled && e.key !== "Tab") e.preventDefault()
+	if (props.type == "number") {
+		if (e.key === "-") e.preventDefault()
+	}
+}
+
+const handleClick = () => {
+	if (inputEl.value) inputEl.value.focus()
+}
+
+const handleFocus = () => {
+	isFocused.value = true
+
+	emit("clearError")
+}
+
+const handleBlur = () => {
+	isFocused.value = false
 }
 </script>
 
 <template>
-	<div :class="$style.wrapper">
-		<div v-if="label" :class="$style.header">
-			<div :class="$style.label">{{ label }}</div>
+	<Flex direction="column" gap="8">
+		<Flex v-if="label" align="center" justify="between">
+			<Text size="12" weight="600" color="primary">{{ label }}</Text>
 
 			<slot name="rightText" />
-		</div>
+		</Flex>
 
 		<div
 			ref="base"
@@ -116,7 +120,7 @@ export default {
 			<Flex align="center" gap="4" wide>
 				<Icon v-if="icon" :name="icon" size="16" color="tertiary" />
 				<input
-					ref="input"
+					ref="inputEl"
 					:type="getInputType"
 					v-model="text"
 					@input="handleInput"
@@ -139,28 +143,14 @@ export default {
 
 			<div v-if="subtext" :class="$style.subtext">{{ subtext }}</div>
 		</div>
-	</div>
+
+		<Text v-if="hint" size="12" weight="600" color="support" height="14">
+			{{ hint }}
+		</Text>
+	</Flex>
 </template>
 
 <style module>
-.wrapper {
-}
-
-.header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-
-	margin-bottom: 8px;
-}
-
-.label {
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-primary);
-}
-
 .base {
 	display: flex;
 	align-items: center;

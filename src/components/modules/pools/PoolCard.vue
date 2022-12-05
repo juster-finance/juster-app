@@ -404,7 +404,6 @@ const copy = (target) => {
 					<Button
 						type="secondary"
 						size="small"
-						asLink
 						:link="`https://ghostnet.tzkt.io/${pool.address}`"
 					>
 						<Icon name="database" size="12" />
@@ -412,6 +411,7 @@ const copy = (target) => {
 
 					<Dropdown
 						:force-open="openContextMenu"
+						disable-autofocus
 						@onClose="openContextMenu = false"
 					>
 						<template #trigger>

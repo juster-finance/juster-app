@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { computed, onBeforeUnmount, onMounted, reactive } from "vue"
 import { useRouter } from "vue-router"
 import axios from "axios"
@@ -201,24 +204,19 @@ onBeforeUnmount(() => {
 				<div :class="$style.block">
 					<div :class="$style.left">
 						<Tooltip placement="top-start">
-							<a
-								href="https://status.juster.fi"
-								target="_blank"
-								data-cy="systems-status"
+							<Button
+								type="secondary"
+								size="small"
+								link="https://status.juster.fi"
+								:class="[
+									$style.footer_btn,
+									$style[statusBlock.color],
+								]"
 							>
-								<Button
-									type="secondary"
-									size="small"
-									:class="[
-										$style.footer_btn,
-										$style[statusBlock.color],
-									]"
-								>
-									<!-- <Icon name="bolt" size="12" /> -->
-									<div :class="$style.dot" />
-									{{ statusBlock.text }}
-								</Button>
-							</a>
+								<!-- <Icon name="bolt" size="12" /> -->
+								<div :class="$style.dot" />
+								{{ statusBlock.text }}
+							</Button>
 
 							<template #content
 								><span>DipDup:</span> {{ status.dipdup
@@ -257,7 +255,11 @@ onBeforeUnmount(() => {
 
 							<template #dropdown>
 								<DropdownTitle>Network</DropdownTitle>
-								<DropdownItem @click="handleSwitch('mainnet')"
+								<DropdownItem
+									@click="handleSwitch('mainnet')"
+									:data-active="
+										currentNetwork === 'mainnet' && true
+									"
 									><Icon
 										:name="
 											currentNetwork === 'mainnet'
@@ -272,7 +274,12 @@ onBeforeUnmount(() => {
 									/>
 									Mainnet
 								</DropdownItem>
-								<DropdownItem @click="handleSwitch('testnet')">
+								<DropdownItem
+									@click="handleSwitch('testnet')"
+									:data-active="
+										currentNetwork === 'testnet' && true
+									"
+								>
 									<Icon
 										:name="
 											currentNetwork === 'testnet'
@@ -479,7 +486,7 @@ onBeforeUnmount(() => {
 	font-size: 12px;
 	line-height: 1;
 	font-weight: 500;
-	color: var(--text-tertiary);
+	color: var(--text-support);
 }
 
 .blue_icon svg {

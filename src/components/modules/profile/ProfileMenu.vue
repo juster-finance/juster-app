@@ -66,7 +66,7 @@ const handleLogout = () => {
 </script>
 
 <template>
-	<Dropdown width="270" :class="$style.wrapper">
+	<Dropdown width="270" :class="$style.wrapper" disable-autofocus>
 		<template #trigger>
 			<slot />
 		</template>
@@ -79,6 +79,7 @@ const handleLogout = () => {
 						align="center"
 						gap="12"
 						:class="$style.general_link"
+						tabindex="1"
 					>
 						<img
 							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
@@ -100,6 +101,7 @@ const handleLogout = () => {
 						align="center"
 						gap="12"
 						:class="$style.general_link"
+						tabindex="1"
 					>
 						<Icon name="money" size="20" :class="$style.icon" />
 
@@ -120,6 +122,7 @@ const handleLogout = () => {
 						align="center"
 						gap="12"
 						:class="[$style.general_link, $style.disabled]"
+						tabindex="-1"
 					>
 						<Icon name="grid" size="20" :class="$style.icon" />
 
@@ -136,10 +139,11 @@ const handleLogout = () => {
 
 				<Flex direction="column" :class="$style.links">
 					<Flex
-						@click="openSettingsPopup"
+						@click="router.push('/settings')"
 						align="center"
 						gap="8"
 						:class="$style.link"
+						tabindex="1"
 					>
 						<Icon name="settings" size="16" />
 						<Text size="13" color="primary" weight="500">
@@ -151,6 +155,7 @@ const handleLogout = () => {
 						align="center"
 						gap="8"
 						:class="$style.link"
+						tabindex="1"
 					>
 						<Icon name="spark" size="16" />
 						<Text size="13" color="primary" weight="500">
@@ -162,6 +167,7 @@ const handleLogout = () => {
 						align="center"
 						gap="8"
 						:class="$style.link"
+						tabindex="1"
 					>
 						<Icon name="logout" size="16" />
 						<Text size="13" color="primary" weight="500">
@@ -203,6 +209,11 @@ const handleLogout = () => {
 	background: rgba(255, 255, 255, 0.1);
 }
 
+.general_link:focus {
+	outline: none;
+	background: rgba(255, 255, 255, 0.1);
+}
+
 .general_link img {
 	width: 32px;
 	height: 32px;
@@ -230,6 +241,11 @@ const handleLogout = () => {
 }
 
 .link:hover {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.link:focus {
+	outline: none;
 	background: rgba(255, 255, 255, 0.05);
 }
 

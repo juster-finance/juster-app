@@ -117,3 +117,7 @@
 .gap--48 {
 	gap: var(--spacing-48);
 }
+
+.gap--60 {
+	gap: var(--spacing-60);
+}

@@ -37,7 +37,7 @@ const props = defineProps({
 					</Button>
 				</a>
 
-				<Dropdown side="top">
+				<Dropdown side="top" disable-autofocus>
 					<template #trigger>
 						<Button type="secondary" size="small">
 							<Icon name="dots" size="12" />
