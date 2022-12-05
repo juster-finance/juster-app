@@ -16,7 +16,8 @@ import "@/styles/text.css"
 /**
  * Base
  */
-import TheHeader from "./components/base/Header/TheHeader.vue"
+import Teleports from "@base/Teleports.vue"
+import TheHeader from "@base/Header/TheHeader.vue"
 import Footer from "@base/Footer.vue"
 
 /** Local */
@@ -95,8 +96,7 @@ accountStore.$subscribe((mutation, state) => {
 </script>
 
 <template>
-	<div id="modal" />
-	<div id="dropdown" />
+	<Teleports />
 
 	<ConfirmationModal :show="appStore.confirmation.show" />
 

@@ -48,7 +48,7 @@ const beaconWallet = new BeaconWallet({
 })
 juster.tezos = new TezosToolkit(rpcNodes[localStorage.activeNetwork][0].url)
 
-const init = () => {
+const init = async () => {
 	juster.sdk = JusterCore.create(
 		juster.tezos,
 		beaconWallet,

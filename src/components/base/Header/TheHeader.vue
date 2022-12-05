@@ -48,7 +48,7 @@ const links = reactive([
 	{
 		name: "Browse",
 		url: "/",
-		icon: "star",
+		icon: "compass",
 	},
 	{
 		name: "Resources",
@@ -210,6 +210,7 @@ const handleNetworkDblClick = () => {
 					<Icon :name="link.icon" size="16" fill />{{ link.name }}
 				</router-link>
 
+				<!-- Popups -->
 				<NavigationPopup
 					:active-link="activeLink"
 					@onClick="activeLink = ''"

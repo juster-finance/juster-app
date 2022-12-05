@@ -16,9 +16,11 @@ import { analytics } from "@sdk"
 /**
  * Store
  */
+import { useAppStore } from "@store/app"
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
 
+const appStore = useAppStore()
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 
@@ -133,7 +135,12 @@ const handleLogout = () => {
 				</Flex>
 
 				<Flex direction="column" :class="$style.links">
-					<Flex align="center" gap="8" :class="$style.link">
+					<Flex
+						@click="openSettingsPopup"
+						align="center"
+						gap="8"
+						:class="$style.link"
+					>
 						<Icon name="settings" size="16" />
 						<Text size="13" color="primary" weight="500">
 							Settings
