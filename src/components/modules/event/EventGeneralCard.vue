@@ -58,11 +58,6 @@ const props = defineProps({
 })
 const emit = defineEmits(["openParticipants", "onBet", "onWithdraw"])
 
-const getImageUrl = async (name) => {
-	console.log(await import(`@/assets/icons/${name}`))
-	return await import(`${name}`)
-}
-
 const symbol = computed(() => props.event.currencyPair.symbol)
 
 const participantsAvatars = computed(() => {

@@ -213,7 +213,6 @@ onBeforeUnmount(() => {
 									$style[statusBlock.color],
 								]"
 							>
-								<!-- <Icon name="bolt" size="12" /> -->
 								<div :class="$style.dot" />
 								{{ statusBlock.text }}
 							</Button>
@@ -299,45 +298,45 @@ onBeforeUnmount(() => {
 					</div>
 
 					<div :class="$style.right">
-						<a
-							href="https://discord.gg/FeGDCkHhnB"
-							target="_blank"
-							rel="nofolow noreferrer"
+						<Button
+							type="secondary"
+							size="small"
+							link="https://discord.gg/FeGDCkHhnB"
+							:class="$style.footer_btn"
 						>
-							<Button
-								type="secondary"
-								size="small"
-								:class="$style.footer_btn"
-							>
-								Discord <Icon name="arrowrighttop" size="16" />
-							</Button>
-						</a>
-						<a
-							href="https://twitter.com/Juster_fi"
-							target="_blank"
-							rel="nofolow noreferrer"
+							Discord
+							<Icon
+								name="arrowrighttop"
+								size="16"
+								color="tertiary"
+							/>
+						</Button>
+						<Button
+							type="secondary"
+							size="small"
+							link="https://twitter.com/Juster_fi"
+							:class="$style.footer_btn"
 						>
-							<Button
-								type="secondary"
-								size="small"
-								:class="$style.footer_btn"
-							>
-								Twitter <Icon name="arrowrighttop" size="16" />
-							</Button>
-						</a>
-						<a
-							href="https://github.com/juster-finance"
-							target="_blank"
-							rel="nofolow noreferrer"
+							Twitter
+							<Icon
+								name="arrowrighttop"
+								size="16"
+								color="tertiary"
+							/>
+						</Button>
+						<Button
+							type="secondary"
+							size="small"
+							link="https://github.com/juster-finance"
+							:class="$style.footer_btn"
 						>
-							<Button
-								type="secondary"
-								size="small"
-								:class="$style.footer_btn"
-							>
-								GitHub <Icon name="arrowrighttop" size="16" />
-							</Button>
-						</a>
+							GitHub
+							<Icon
+								name="arrowrighttop"
+								size="16"
+								color="tertiary"
+							/>
+						</Button>
 					</div>
 				</div>
 
@@ -417,6 +416,11 @@ onBeforeUnmount(() => {
 }
 
 .link:hover {
+	color: var(--text-primary);
+}
+
+.link:focus {
+	box-shadow: 0 0 0 transparent;
 	color: var(--text-primary);
 }
 

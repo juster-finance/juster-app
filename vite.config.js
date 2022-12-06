@@ -1,5 +1,5 @@
 import { defineConfig } from "vite"
-
+import { visualizer } from "rollup-plugin-visualizer"
 import vue from "@vitejs/plugin-vue"
 import path from "path"
 
@@ -25,7 +25,23 @@ export default (ctx) => {
 	const isBuild = ctx.command === "build"
 
 	return defineConfig({
-		plugins: [vue(), nodePolyfills()],
+		plugins: [
+			vue(),
+			nodePolyfills(),
+			...(process.env.STATS
+				? [
+						{
+							...visualizer({
+								filename: "./dist/stats.html",
+								gzipSize: true,
+								open: true,
+							}),
+							enforce: "post",
+							apply: "build",
+						},
+				  ]
+				: []),
+		],
 		define: {
 			global: "window",
 			"process.env": {},
