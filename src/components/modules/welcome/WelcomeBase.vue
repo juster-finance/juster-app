@@ -116,7 +116,7 @@ const handleStart = () => {
 const handleEnd = () => {
 	localStorage.isOnboardingShown = true
 
-	router.push("/explore")
+	router.push("/?welcome=1")
 }
 </script>
 

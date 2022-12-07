@@ -142,8 +142,8 @@ html {
 .navpopup-enter-active,
 .navpopup-leave-active {
 	will-change: transform, opacity;
-	transition: transform 0.2s ease, opacity 0.2s ease;
 	transform-origin: 50% -50%;
+	transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .navpopup-enter-from,
@@ -173,15 +173,25 @@ html {
 	opacity: 0;
 }
 
-.slide-enter-active,
-.slice-leave-active {
+.slide-enter-active {
 	transition: all 0.4s ease;
 }
 
-.slide-enter-from,
-.slice-leave-to {
+.slide-enter-from {
 	opacity: 0;
 	transform: translateY(-4px);
+}
+
+.slowslide-enter-active {
+	transition: all 3.5s var(--bezier);
+	will-change: transform, opacity;
+	transform-origin: 50% -50%;
+}
+
+.slowslide-enter-from {
+	opacity: 0;
+	transform: translateY(-10px) scale(1.2);
+	transform-origin: 50% -50%;
 }
 
 #app {

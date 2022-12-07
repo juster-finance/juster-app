@@ -23,9 +23,3 @@ export default defineComponent({
 		<ExploreBase />
 	</Page>
 </template>
-
-<style module>
-.wrapper {
-	max-width: 1250px;
-}
-</style>
