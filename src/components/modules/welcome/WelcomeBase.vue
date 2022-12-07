@@ -87,6 +87,8 @@ const currencyItems = reactive([
 ])
 const selectedCurrencyItem = ref(currencyItems[0].name)
 
+const isViewed = localStorage.isOnboardingShown
+
 onMounted(async () => {
 	event.value = (await fetchEventsByStatus({ status: "STARTED" }))[0]
 })
@@ -106,6 +108,14 @@ const getCirclePos = (index) => {
 }
 
 const handleStart = () => {
+	localStorage.isOnboardingShown = true
+
+	activeStepIndex.value = 1
+}
+
+const handleEnd = () => {
+	localStorage.isOnboardingShown = true
+
 	router.push("/explore")
 }
 </script>
@@ -266,14 +276,38 @@ const handleStart = () => {
 						</Text>
 					</Flex>
 
-					<Button
-						@click="activeStepIndex = 1"
-						type="white"
-						size="small"
-					>
-						Let's get started
-						<Icon name="login" size="16" color="black" />
-					</Button>
+					<Flex direction="column" gap="60" align="center">
+						<Button @click="handleStart" type="white" size="small">
+							Let's get started
+							<Icon name="login" size="16" color="black" />
+						</Button>
+
+						<Flex
+							v-if="isViewed"
+							direction="column"
+							gap="8"
+							align="center"
+						>
+							<Icon name="warning" size="16" color="orange" />
+							<Text
+								size="13"
+								weight="600"
+								color="tertiary"
+								align="center"
+								height="16"
+							>
+								You've already been through onboarding
+							</Text>
+							<Button
+								@click="handleEnd"
+								type="tertiary"
+								size="small"
+							>
+								Close it
+								<Icon name="login" size="16" color="black" />
+							</Button>
+						</Flex>
+					</Flex>
 				</Flex>
 
 				<!-- DeFi Step -->
@@ -912,7 +946,7 @@ const handleStart = () => {
 						</Text>
 					</Flex>
 
-					<Button @click="handleStart" type="primary" size="small">
+					<Button @click="handleEnd" type="primary" size="small">
 						Alright, let's start
 						<Icon name="login" size="16" color="black" />
 					</Button>

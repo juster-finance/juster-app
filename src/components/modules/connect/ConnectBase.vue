@@ -86,8 +86,6 @@ const login = () => {
 		if (!localStorage.isOnboardingShown) {
 			router.push("/welcome")
 
-			localStorage.isOnboardingShown = true
-
 			notificationsStore.create({
 				notification: {
 					type: "success",
