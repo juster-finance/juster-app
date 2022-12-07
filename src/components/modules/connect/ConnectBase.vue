@@ -82,7 +82,48 @@ const login = () => {
 
 		setupUser()
 
-		router.push(appStore.prevRoute ? appStore.prevRoute.path : "/")
+		/** Onboarding redirect */
+		if (!localStorage.isOnboardingShown) {
+			router.push("/welcome")
+
+			localStorage.isOnboardingShown = true
+
+			notificationsStore.create({
+				notification: {
+					type: "success",
+					title: "Successfuly connected",
+					description:
+						"Go through a little onboarding to quickly explore the features of the project",
+					autoDestroy: true,
+
+					actions: [
+						{
+							name: "Skip Onboarding",
+							callback: () => router.push("/explore"),
+						},
+					],
+				},
+			})
+		} else {
+			router.push(appStore.prevRoute ? appStore.prevRoute.path : "/")
+
+			notificationsStore.create({
+				notification: {
+					type: "success",
+					title: "Successfuly connected",
+					description:
+						"Wallet is connected and we recovered the previous page before login",
+					autoDestroy: true,
+
+					actions: [
+						{
+							name: "Go to Explore",
+							callback: () => router.push("/"),
+						},
+					],
+				},
+			})
+		}
 	})
 }
 

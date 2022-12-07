@@ -4,7 +4,7 @@ import icons from "./icons.json"
 
 const props = defineProps({
 	name: { type: String, required: true, default: "warning" },
-	size: { type: String, default: "16" },
+	size: { type: [String, Number], default: "16" },
 	fill: { type: Boolean, default: false },
 	color: { type: String, default: null },
 })

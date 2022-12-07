@@ -53,7 +53,10 @@ import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
 
 // eslint-disable-next-line no-undef
-const props = defineProps({ event: { type: Object, default: () => {} } })
+const props = defineProps({
+	event: { type: Object, default: () => {} },
+	disableSub: { type: Boolean },
+})
 
 /** Stores */
 const notificationsStore = useNotificationsStore()
@@ -326,6 +329,8 @@ onMounted(async () => {
 
 	if (props.event.status === "FINISHED") return
 
+	if (props.disableSub) return
+
 	/** Subscription, TODO: refactor */
 	subscription.value = await juster.gql
 		.subscription({
@@ -427,14 +432,6 @@ onUnmounted(() => {
 				:style="{ ...contextMenuStyles }"
 			>
 				<template #dropdown>
-					<router-link :to="`/events/${event.id}`" target="_blank">
-						<DropdownItem>
-							<Icon name="open" size="16" />Open in new tab
-						</DropdownItem>
-					</router-link>
-
-					<DropdownDivider />
-
 					<DropdownItem @click.prevent="showNotifyMeModal = true">
 						<Icon name="notifications" size="16" />Notify Me
 					</DropdownItem>
@@ -590,26 +587,29 @@ onUnmounted(() => {
 						startStatus == 'Finished' && event.status == 'NEW'
 					"
 					placement="bottom-start"
+					text-align="left"
 				>
 					<Badge color="yellow" :class="$style.main_badge">
 						<Icon name="event_new" size="12" />Starting
 					</Badge>
 
-					<template #content
-						>Submissions is closed. The event is starting</template
-					>
+					<template #content>
+						Submissions is closed.<br />
+						<span>The end of the event is pending</span>
+					</template>
 				</Tooltip>
 				<Tooltip
 					v-else-if="event.status == 'STARTED'"
 					placement="bottom-start"
+					text-align="left"
 				>
 					<Badge color="yellow" :class="$style.main_badge">
 						<Icon name="event_active" size="12" />Running
 					</Badge>
-					<template #content
-						>Submissions is closed. The end of the event is
-						pending</template
-					>
+					<template #content>
+						Submissions is closed.<br />
+						<span>The end of the event is pending</span>
+					</template>
 				</Tooltip>
 				<Tooltip
 					v-else-if="event.status == 'FINISHED'"

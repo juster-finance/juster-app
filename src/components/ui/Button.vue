@@ -197,6 +197,10 @@ onBeforeUnmount(() => {
 	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
+.wrapper.white:focus {
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
 .keybinds {
 	position: absolute;
 	right: 12px;

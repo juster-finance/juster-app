@@ -210,6 +210,12 @@ const routes = [
 		name: "Rating",
 		component: () => import("@views/LeaderboardPage.vue"),
 	},
+
+	{
+		path: "/welcome",
+		name: "Welcome",
+		component: () => import("@views/WelcomePage.vue"),
+	},
 	{
 		path: "/profile",
 		name: "MyProfile",

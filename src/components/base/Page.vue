@@ -25,7 +25,7 @@ defineProps({
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin: 0 32px 100px 32px;
+	margin: 0 32px 80px 32px;
 	padding-top: 40px;
 
 	flex: 1;
@@ -37,7 +37,7 @@ defineProps({
 
 @media (max-width: 700px) {
 	.wrapper {
-		margin: 0 16px 100px 16px;
+		margin: 0 16px 80px 16px;
 		padding-top: 24px;
 	}
 }

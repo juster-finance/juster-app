@@ -23,6 +23,10 @@
 	font-size: 15px;
 }
 
+.fz--24 {
+	font-size: 24px;
+}
+
 /* Font Weight */
 .fw--400 {
 	font-weight: 400;
@@ -117,7 +121,7 @@
 
 /* Icon Color (From Main Design System) */
 .fill--primary {
-	color: var(--text-primary);
+	fill: var(--text-primary);
 }
 
 .fill--secondary {
@@ -134,6 +138,10 @@
 
 .fill--blue {
 	fill: var(--text-blue);
+}
+
+.fill--orange {
+	fill: var(--orange);
 }
 
 .fill--green {

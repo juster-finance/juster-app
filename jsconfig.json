@@ -15,6 +15,7 @@
 			"@modals": ["./src/components/local/modals/*"],
 			"@modules": ["./src/components/modules/*"],
 			"@typography": ["./src/components/typography/*"],
+			"@api": ["./src/api/*"],
 			"@config": ["./src/services/config"],
 			"@sdk": ["./src/services/sdk/*"],
 			"@utils": ["./src/services/utils/*"],

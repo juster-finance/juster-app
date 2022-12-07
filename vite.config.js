@@ -15,6 +15,7 @@ const aliases = {
 	"@modals": path.resolve(__dirname, "./src/components/local/modals"),
 	"@modules": path.resolve(__dirname, "./src/components/modules"),
 	"@typography": path.resolve(__dirname, "./src/components/typography"),
+	"@api": path.resolve(__dirname, "./src/api"),
 	"@config": path.resolve(__dirname, "./src/services/config"),
 	"@sdk": path.resolve(__dirname, "./src/services/sdk"),
 	"@utils": path.resolve(__dirname, "./src/services/utils"),

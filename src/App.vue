@@ -2,7 +2,7 @@
 /**
  * Vendor
  */
-import { ref, onBeforeMount, onMounted } from "vue"
+import { onBeforeMount, onMounted } from "vue"
 
 /**
  * Styles
@@ -19,9 +19,6 @@ import "@/styles/text.css"
 import Teleports from "@base/Teleports.vue"
 import TheHeader from "@base/Header/TheHeader.vue"
 import Footer from "@base/Footer.vue"
-
-/** Local */
-import TheWelcomeScreen from "@local/onboarding/TheWelcomeScreen.vue"
 
 /**
  * UI
@@ -87,20 +84,6 @@ onMounted(async () => {
  * Setup Market (Markets & Quotes & Subscriptinos)
  */
 setupMarket()
-
-/** Onboarding */
-const showWelcomeScreen = ref(false)
-accountStore.$subscribe((mutation, state) => {
-	/** forced display */
-	if (state.showOnboarding) {
-		showWelcomeScreen.value = true
-	}
-
-	if (state.pkh && !localStorage.isOnboardingShown) {
-		localStorage.isOnboardingShown = true
-		showWelcomeScreen.value = true
-	}
-})
 </script>
 
 <template>
@@ -110,14 +93,7 @@ accountStore.$subscribe((mutation, state) => {
 
 	<Notifications />
 
-	<transition name="popup">
-		<TheWelcomeScreen
-			v-if="showWelcomeScreen"
-			@skip="showWelcomeScreen = false"
-		/>
-	</transition>
-
-	<div v-if="!showWelcomeScreen" class="app_wrapper">
+	<div class="app_wrapper">
 		<TheHeader />
 		<div class="app_base">
 			<router-view />
