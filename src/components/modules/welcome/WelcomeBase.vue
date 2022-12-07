@@ -87,7 +87,7 @@ const currencyItems = reactive([
 ])
 const selectedCurrencyItem = ref(currencyItems[0].name)
 
-const isViewed = localStorage.isOnboardingShown
+const isViewed = localStorage.isOnbShown
 
 onMounted(async () => {
 	event.value = (await fetchEventsByStatus({ status: "STARTED" }))[0]
@@ -108,13 +108,13 @@ const getCirclePos = (index) => {
 }
 
 const handleStart = () => {
-	localStorage.isOnboardingShown = true
+	localStorage.isOnbShown = true
 
 	activeStepIndex.value = 1
 }
 
 const handleEnd = () => {
-	localStorage.isOnboardingShown = true
+	localStorage.isOnbShown = true
 
 	router.push("/?welcome=1")
 }

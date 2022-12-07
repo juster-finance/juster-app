@@ -83,7 +83,7 @@ const login = () => {
 		setupUser()
 
 		/** Onboarding redirect */
-		if (!localStorage.isOnboardingShown) {
+		if (!localStorage.isOnbShown) {
 			router.push("/welcome")
 
 			notificationsStore.create({
