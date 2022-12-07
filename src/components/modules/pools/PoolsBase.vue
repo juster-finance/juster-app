@@ -167,7 +167,10 @@ const setupSubToPositions = async () => {
 		})
 }
 
+const showAnimation = ref(false)
 onMounted(() => {
+	showAnimation.value = true
+
 	if (Object.keys(juster.pools).length) {
 		setupSubToEntries()
 		setupSubToPositions()
@@ -213,85 +216,88 @@ const { meta } = useMeta({
 </script>
 
 <template>
-	<div :class="$style.wrapper">
-		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
-		</metainfo>
+	<transition name="slide">
+		<div v-if="showAnimation" :class="$style.wrapper">
+			<metainfo>
+				<template v-slot:title="{ content }"
+					>{{ content }} • Juster</template
+				>
+			</metainfo>
 
-		<!-- Modals -->
-		<PoolsModal
-			v-if="pools.length"
-			:show="showPoolsModal"
-			:pools="pools"
-			:poolsStates="poolsStates"
-			@onSelectPool="handleSelectPool"
-			@onClose="showPoolsModal = false"
-		/>
-		<DepositModal
-			:show="showDepositModal"
-			:selectedPool="selectedPool"
-			:state="poolsStates[selectedPool.address]"
-			@onBack="handleBackFromDeposit"
-			@onClose="showDepositModal = false"
-		/>
+			<!-- Modals -->
+			<PoolsModal
+				v-if="pools.length"
+				:show="showPoolsModal"
+				:pools="pools"
+				:poolsStates="poolsStates"
+				@onSelectPool="handleSelectPool"
+				@onClose="showPoolsModal = false"
+			/>
+			<DepositModal
+				:show="showDepositModal"
+				:selectedPool="selectedPool"
+				:state="poolsStates[selectedPool.address]"
+				@onBack="handleBackFromDeposit"
+				@onClose="showDepositModal = false"
+			/>
 
-		<Flex align="center" :class="$style.head">
-			<h1 :class="$style.title">Liquidity Pools</h1>
-		</Flex>
-
-		<Flex justify="between" :class="$style.content">
-			<Flex direction="column" gap="24" :class="$style.side">
-				<MyFunds
-					:pools="pools"
-					:poolsStates="poolsStates"
-					:entries="entries"
-					:positions="positions"
-					@onDepositLiquidity="showPoolsModal = true"
-				/>
-
-				<MyStatistics :positions="positions" />
-
-				<BottomInfo
-					v-if="pools.length"
-					:pool="pools[0]"
-					:class="$style.bottom_left_block"
-				/>
+			<Flex align="center" :class="$style.head">
+				<h1 :class="$style.title">Liquidity Pools</h1>
 			</Flex>
 
-			<Flex direction="column" gap="24" wide :class="$style.base">
-				<PoolsStats :pools="pools" :poolsStates="poolsStates" />
-
-				<PoolsChart />
-
-				<Block
-					v-if="flags.showGeneralPoolsWarning"
-					@onClose="handleClosePoolsWarning"
-				>
-					<span>Current APYs is approximate.</span> Values may change
-					by ~5% over the next few months. Planning for long-term
-					income based on these values may differ from the actual.
-				</Block>
-
-				<transition name="fade">
-					<PoolsList
-						v-if="pools.length"
+			<Flex justify="between" :class="$style.content">
+				<Flex direction="column" gap="24" :class="$style.side">
+					<MyFunds
 						:pools="pools"
 						:poolsStates="poolsStates"
-						@onSelectPool="handleSelectPool"
-						:class="$style.list"
+						:entries="entries"
+						:positions="positions"
+						@onDepositLiquidity="showPoolsModal = true"
 					/>
-				</transition>
 
-				<BottomInfo
-					v-if="pools.length"
-					:pool="pools[0]"
-					:class="$style.bottom_right_block"
-				/>
+					<MyStatistics :positions="positions" />
+
+					<BottomInfo
+						v-if="pools.length"
+						:pool="pools[0]"
+						:class="$style.bottom_left_block"
+					/>
+				</Flex>
+
+				<Flex direction="column" gap="24" wide :class="$style.base">
+					<PoolsStats :pools="pools" :poolsStates="poolsStates" />
+
+					<PoolsChart />
+
+					<Block
+						v-if="flags.showGeneralPoolsWarning"
+						@onClose="handleClosePoolsWarning"
+					>
+						<span>Current APYs is approximate.</span> Values may
+						change by ~5% over the next few months. Planning for
+						long-term income based on these values may differ from
+						the actual.
+					</Block>
+
+					<transition name="fade">
+						<PoolsList
+							v-if="pools.length"
+							:pools="pools"
+							:poolsStates="poolsStates"
+							@onSelectPool="handleSelectPool"
+							:class="$style.list"
+						/>
+					</transition>
+
+					<BottomInfo
+						v-if="pools.length"
+						:pool="pools[0]"
+						:class="$style.bottom_right_block"
+					/>
+				</Flex>
 			</Flex>
-		</Flex>
-	</div>
+		</div>
+	</transition>
 </template>
 
 <style module>
