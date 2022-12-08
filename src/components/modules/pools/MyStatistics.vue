@@ -26,8 +26,7 @@ const selectedTab = ref(tabs[0].title)
 
 const valueLocked = computed(() =>
 	props.positions.reduce(
-		(acc, curr) =>
-			(acc = acc + curr.depositedAmount + curr.lockedEstimateAmount),
+		(acc, curr) => (acc = acc + curr.depositedAmount),
 		0,
 	),
 )
@@ -62,7 +61,7 @@ const sortedPositions = computed(() => {
 	const sPositions = props.positions.map((position) => {
 		return {
 			...position,
-			tvl: position.depositedAmount + position.lockedEstimateAmount,
+			tvl: position.depositedAmount,
 		}
 	})
 
@@ -87,7 +86,7 @@ const sortedPositions = computed(() => {
 					</Text>
 
 					<Text color="secondary" size="13" weight="600">
-						{{ valueLocked }}
+						{{ valueLocked.toFixed(2) }}
 					</Text>
 				</Flex>
 
@@ -123,7 +122,7 @@ const sortedPositions = computed(() => {
 
 						<Flex align="center" gap="8">
 							<Text color="tertiary" size="13" weight="600">
-								{{ position.tvl }}
+								{{ position.tvl.toFixed(2) }}
 							</Text>
 
 							<Text color="secondary" size="13" weight="600">

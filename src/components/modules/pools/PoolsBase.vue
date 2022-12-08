@@ -25,6 +25,7 @@ import Block from "@ui/Block.vue"
  */
 import PoolsModal from "@local/modals/pools/PoolsModal.vue"
 import DepositModal from "@local/modals/pools/DepositModal.vue"
+import RequestWithdrawModal from "@local/modals/pools/RequestWithdrawModal.vue"
 
 /**
  * Services
@@ -53,12 +54,19 @@ const marketStore = useMarketStore()
 
 const showPoolsModal = ref(false)
 const showDepositModal = ref(false)
+const showRequestWithdrawModal = ref(false)
 
 const handleSelectPool = (pool) => {
 	selectedPool.value = pool
 
 	showPoolsModal.value = false
 	showDepositModal.value = true
+}
+
+const handleRequestWithdraw = (pool) => {
+	selectedPool.value = pool
+
+	showRequestWithdrawModal.value = true
 }
 
 const handleBackFromDeposit = () => {
@@ -240,6 +248,14 @@ const { meta } = useMeta({
 				@onBack="handleBackFromDeposit"
 				@onClose="showDepositModal = false"
 			/>
+			<RequestWithdrawModal
+				:show="showRequestWithdrawModal"
+				:selectedPool="selectedPool"
+				:position="
+					positions.find((pos) => pos.poolId === selectedPool.address)
+				"
+				@onClose="showRequestWithdrawModal = false"
+			/>
 
 			<Flex align="center" :class="$style.head">
 				<h1 :class="$style.title">Liquidity Pools</h1>
@@ -286,6 +302,7 @@ const { meta } = useMeta({
 							:poolsStates="poolsStates"
 							:positions="positions"
 							@onSelectPool="handleSelectPool"
+							@onRequestWithdraw="handleRequestWithdraw"
 							:class="$style.list"
 						/>
 					</transition>

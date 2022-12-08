@@ -28,6 +28,11 @@ const togglePendingEntries = () => {
 	showEntries.value = !showEntries.value
 }
 
+const showClaims = ref(false)
+const togglePendingClaims = () => {
+	showClaims.value = !showClaims.value
+}
+
 const isDepositAvailable = computed(() => {
 	return (
 		props.pools.length > 1 &&
@@ -44,10 +49,19 @@ const pendingEntries = computed(() =>
 	props.entries.filter((entry) => entry.status === "PENDING"),
 )
 
+const pendingClaims = computed(() => {
+	let claims = []
+
+	props.positions.forEach((position) => {
+		claims = [...claims, ...position.claims]
+	})
+
+	return claims
+})
+
 const valueLocked = computed(() =>
 	props.positions.reduce(
-		(acc, curr) =>
-			(acc = acc + curr.depositedAmount + curr.lockedEstimateAmount),
+		(acc, curr) => (acc = acc + curr.depositedAmount),
 		0,
 	),
 )
@@ -70,7 +84,7 @@ const valueLocked = computed(() =>
 
 				<Flex direction="column" gap="8">
 					<Text color="primary" size="16" weight="600">
-						{{ valueLocked }}
+						{{ valueLocked.toFixed(2) }}
 					</Text>
 					<Text
 						color="tertiary"
@@ -194,7 +208,13 @@ const valueLocked = computed(() =>
 			</Flex>
 		</Flex>
 
-		<Flex direction="column" gap="12" :class="$style.progress">
+		<Flex
+			v-if="pendingClaims.length"
+			@click="togglePendingClaims"
+			direction="column"
+			gap="12"
+			:class="$style.progress"
+		>
 			<Flex align="center" justify="between" wide>
 				<Tooltip placement="bottom-start" text-align="left">
 					<Flex align="center" gap="6">
@@ -217,18 +237,62 @@ const valueLocked = computed(() =>
 
 				<Flex align="center" gap="4">
 					<Text size="14" color="tertiary" weight="600">
-						0 of 0,
+						{{ pendingClaims.length }} claims
 					</Text>
-
-					<Text size="14" color="secondary" weight="600">0%</Text>
 
 					<Icon name="arrow" size="14" color="tertiary" />
 				</Flex>
 			</Flex>
 
 			<div :class="$style.bar">
-				<div :class="$style.bar_progress" />
+				<div :class="[$style.bar_progress, $style.green]" />
+
+				<svg
+					width="200%"
+					height="12"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					:class="$style.bar_anim"
+				>
+					<defs>
+						<pattern
+							id="lines"
+							patternUnits="userSpaceOnUse"
+							width="20"
+							height="12"
+						>
+							<path
+								fill-rule="evenodd"
+								clip-rule="evenodd"
+								d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
+								fill="white"
+								fill-opacity="0.2"
+							/>
+						</pattern>
+					</defs>
+					<rect width="100%" height="100%" fill="url(#lines)" />
+				</svg>
 			</div>
+
+			<Flex v-if="showClaims" direction="column" gap="12">
+				<Flex
+					v-for="claim in pendingClaims"
+					justify="between"
+					align="center"
+				>
+					<Flex>
+						<Text size="14" weight="600" color="support">—</Text>
+						&nbsp;
+						<Text size="14" weight="600" color="secondary">
+							Claim #{{ claim.id }}
+						</Text>
+					</Flex>
+
+					<Text size="14" weight="600" color="secondary">
+						{{ numberWithSymbol(claim.amount, ",") }}
+					</Text>
+				</Flex>
+			</Flex>
 		</Flex>
 
 		<Flex direction="column" gap="12" :class="$style.buttons">
@@ -331,6 +395,10 @@ const valueLocked = computed(() =>
 
 .bar_progress.blue {
 	background: var(--blue);
+}
+
+.bar_progress.green {
+	background: var(--green);
 }
 
 @keyframes mig {

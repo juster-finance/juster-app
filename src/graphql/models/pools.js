@@ -12,6 +12,10 @@ export const poolPosition = {
 	lockedEstimateAmount: true,
 	shares: true,
 	entrySharePrice: true,
+	claims: {
+		amount: true,
+		id: true,
+	},
 	pool: {
 		name: true,
 	},

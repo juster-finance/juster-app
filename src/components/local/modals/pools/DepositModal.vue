@@ -226,7 +226,7 @@ watch(
 										color="green"
 									/>
 									<Text size="12" weight="700" color="green"
-										>Stable</Text
+										>Active</Text
 									>
 								</Flex>
 

@@ -45,7 +45,7 @@ const props = defineProps({
 		type: Object,
 	},
 })
-const emit = defineEmits(["onSelectPool"])
+const emit = defineEmits(["onSelectPool", "onRequestWithdraw"])
 
 onMounted(() => {
 	cardEl.value.addEventListener("contextmenu", contextMenuHandler)
@@ -472,7 +472,10 @@ const copy = (target) => {
 						</template>
 
 						<template #dropdown>
-							<DropdownItem>
+							<DropdownItem
+								@click="emit('onRequestWithdraw', pool)"
+								:disabled="!position"
+							>
 								<Icon name="money" size="16" /> Withdraw
 							</DropdownItem>
 

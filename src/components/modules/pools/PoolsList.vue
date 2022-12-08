@@ -27,7 +27,7 @@ const props = defineProps({
 		type: Array,
 	},
 })
-const emit = defineEmits(["onSelectPool"])
+const emit = defineEmits(["onSelectPool", "onRequestWithdraw"])
 
 const searchEl = ref(null)
 const searchText = ref("")
@@ -161,6 +161,7 @@ onMounted(() => {
 				v-for="(pool, index) in filteredPools"
 				:key="index"
 				@onSelectPool="(pool) => emit('onSelectPool', pool)"
+				@onRequestWithdraw="(pool) => emit('onRequestWithdraw', pool)"
 				:pool="pool"
 				:position="getPositionByPool(pool)"
 				:state="poolsStates[pool.address]"
