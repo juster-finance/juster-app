@@ -149,7 +149,7 @@ const copy = (target) => {
 			},
 		})
 
-		toClipboard(props.pool.address)
+		toClipboard(`https://ghostnet.tzkt.io/${props.pool.address}`)
 	}
 }
 </script>
