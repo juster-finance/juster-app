@@ -149,7 +149,7 @@ const buttonState = computed(() => {
 	}
 })
 
-const depositInShares = computed(() => amount.value * props.state.sharePrice)
+const depositInShares = computed(() => amount.value / props.state.sharePrice)
 
 const handleKeydown = (e) => {
 	sanitizeInput(e)

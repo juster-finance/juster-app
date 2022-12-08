@@ -10,6 +10,7 @@ export const poolPosition = {
 	poolId: true,
 	depositedAmount: true,
 	lockedEstimateAmount: true,
+	shares: true,
 	pool: {
 		name: true,
 	},
