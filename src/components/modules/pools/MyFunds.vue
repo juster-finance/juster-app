@@ -243,7 +243,7 @@ const valueLocked = computed(() =>
 				keybind="D+L"
 				block
 			>
-				<Icon name="plus_circle" size="16" />Deposit Liquidity
+				<Icon name="plus_circle" size="16" />Deposit
 			</Button>
 
 			<Button type="secondary" size="medium" block keybind="G+C">

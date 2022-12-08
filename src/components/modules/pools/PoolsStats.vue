@@ -62,7 +62,7 @@ const stats = computed(() => {
 				color="tertiary"
 				:class="$style.stat__subtitle"
 			>
-				Value of pools
+				Total Value Locked
 			</Text>
 		</Flex>
 
