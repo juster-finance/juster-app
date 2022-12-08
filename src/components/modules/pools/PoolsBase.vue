@@ -284,6 +284,7 @@ const { meta } = useMeta({
 							v-if="pools.length"
 							:pools="pools"
 							:poolsStates="poolsStates"
+							:positions="positions"
 							@onSelectPool="handleSelectPool"
 							:class="$style.list"
 						/>

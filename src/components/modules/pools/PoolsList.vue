@@ -23,6 +23,9 @@ const props = defineProps({
 	poolsStates: {
 		type: Object,
 	},
+	positions: {
+		type: Array,
+	},
 })
 const emit = defineEmits(["onSelectPool"])
 
@@ -68,6 +71,9 @@ const handleSearchKeydown = (e) => {
 	}
 }
 
+const getPositionByPool = (pool) => {
+	return props.positions.find((pos) => pos.poolId == pool.address)
+}
 onMounted(() => {
 	poolsSearcher.value = new Searcher(props.pools, {
 		keySelector: (item) => {
@@ -156,6 +162,7 @@ onMounted(() => {
 				:key="index"
 				@onSelectPool="(pool) => emit('onSelectPool', pool)"
 				:pool="pool"
+				:position="getPositionByPool(pool)"
 				:state="poolsStates[pool.address]"
 			/>
 		</Flex>

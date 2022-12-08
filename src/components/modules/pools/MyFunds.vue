@@ -57,8 +57,6 @@ const valueLocked = computed(() =>
 	<div :class="$style.wrapper">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Text color="primary" size="16" weight="600">My Funds</Text>
-
-			<Text color="blue" size="14" weight="600"> Request Funds </Text>
 		</Flex>
 
 		<Flex align="center" gap="32" :class="$style.funds">

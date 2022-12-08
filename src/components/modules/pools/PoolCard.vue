@@ -41,6 +41,9 @@ const props = defineProps({
 	state: {
 		type: Object,
 	},
+	position: {
+		type: Object,
+	},
 })
 const emit = defineEmits(["onSelectPool"])
 
@@ -94,6 +97,11 @@ const isDepositAvailable = computed(() => {
 	if (props.pool.isDepositPaused) return false
 	return true
 })
+
+const showUserData = ref(false)
+const handleSwitch = () => {
+	showUserData.value = !showUserData.value
+}
 
 const copy = (target) => {
 	if (target == "address") {
@@ -236,8 +244,9 @@ const copy = (target) => {
 							weight="600"
 							color="tertiary"
 							:class="$style.stat__title"
-							>TVL</Text
 						>
+							TVL
+						</Text>
 
 						<Flex align="center" gap="6">
 							<Icon name="coins" size="14" color="secondary" />
@@ -248,7 +257,11 @@ const copy = (target) => {
 								weight="600"
 								color="secondary"
 							>
-								{{ state.totalLiquidity.toFixed(2) }}
+								{{
+									showUserData
+										? position.depositedAmount
+										: state.totalLiquidity.toFixed(2)
+								}}
 							</Text>
 							<LoadingDots v-else />
 						</Flex>
@@ -259,8 +272,9 @@ const copy = (target) => {
 						weight="500"
 						color="tertiary"
 						:class="$style.star_icon"
-						>✦</Text
 					>
+						✦
+					</Text>
 
 					<!-- Share Price -->
 					<Flex direction="column" gap="8" :class="$style.stat">
@@ -270,7 +284,7 @@ const copy = (target) => {
 							color="tertiary"
 							:class="$style.stat__title"
 						>
-							Share Price
+							{{ showUserData ? "Entry Price" : "Share Price" }}
 						</Text>
 
 						<Flex align="center" gap="6">
@@ -282,7 +296,11 @@ const copy = (target) => {
 								weight="600"
 								color="secondary"
 							>
-								{{ state.sharePrice.toFixed(2) }}
+								{{
+									showUserData
+										? position.entrySharePrice.toFixed(2)
+										: state.sharePrice.toFixed(2)
+								}}
 							</Text>
 							<LoadingDots v-else />
 						</Flex>
@@ -303,36 +321,69 @@ const copy = (target) => {
 							weight="600"
 							color="tertiary"
 							:class="$style.stat__title"
-							>APY</Text
 						>
+							{{ showUserData ? "My Shares" : "APY" }}
+						</Text>
 
 						<Flex align="center" gap="6">
-							<Icon name="stars" size="14" color="green" />
+							<Icon
+								:name="showUserData ? 'money' : 'stars'"
+								size="14"
+								color="green"
+							/>
 							<Text size="15" weight="600" color="secondary">
-								0%
+								{{
+									showUserData
+										? position.shares.toFixed(2)
+										: "0%"
+								}}
 							</Text>
 						</Flex>
 					</Flex>
 
 					<!-- Switch Button -->
+
 					<Flex
-						v-if="accountStore.pkh"
+						v-if="accountStore.pkh && position"
+						@click="handleSwitch"
 						align="center"
 						gap="8"
 						:class="$style.switch_btn"
 					>
-						<Icon name="arrows" size="16" color="secondary" />
+						<Icon
+							name="arrows"
+							size="16"
+							color="secondary"
+							:class="$style.arrows_icon"
+							:style="{
+								transform: `rotate(${
+									showUserData ? '270' : '90'
+								}deg)`,
+							}"
+						/>
 						<Text
 							size="12"
 							weight="700"
 							color="secondary"
 							:class="$style.switch_btn__text"
 						>
-							Switch to my statistics
+							{{
+								showUserData
+									? "Switch to pool statistics"
+									: "Switch to my statistics"
+							}}
 						</Text>
+
 						<img
+							v-if="!showUserData"
 							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
 							alt="avatar"
+						/>
+						<Icon
+							v-else
+							name="server"
+							size="16"
+							color="secondary"
 						/>
 					</Flex>
 				</Flex>
@@ -422,8 +473,10 @@ const copy = (target) => {
 
 						<template #dropdown>
 							<DropdownItem>
-								<Icon name="money" size="16" /> Request claims
+								<Icon name="money" size="16" /> Withdraw
 							</DropdownItem>
+
+							<DropdownDivider />
 
 							<DropdownItem>
 								<Icon name="time" size="16" />Pool timeline
@@ -514,8 +567,8 @@ const copy = (target) => {
 	transform: translateY(1px);
 }
 
-.switch_btn svg {
-	transform: rotate(90deg);
+.arrows_icon {
+	transition: all 0.2s ease;
 }
 
 .switch_btn img {
