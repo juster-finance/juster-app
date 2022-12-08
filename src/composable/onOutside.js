@@ -7,8 +7,10 @@ export function useOnOutsidePress(el, onOutsidePressCallback) {
 		value: { $el: element },
 	} = isRef(el) ? el : ref(el)
 
+	const component = element ? element : el.value
+
 	const handler = (e) =>
-		element && !element.contains(e.target) && onOutsidePressCallback(e)
+		component && !component.contains(e.target) && onOutsidePressCallback(e)
 
 	const event = events.find((x) => `on${x}`)
 	return useEvent(document, event, handler, { passive: true })
