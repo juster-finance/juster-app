@@ -197,7 +197,7 @@ const handleCloseTestnetWarning = () => {
 			<Flex align="center" gap="8">
 				<Icon name="server" size="16" color="secondary" />
 				<Text size="14" weight="600" color="primary">
-					Pool Selection
+					Deposit Liquidity
 				</Text>
 			</Flex>
 

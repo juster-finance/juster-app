@@ -182,7 +182,7 @@ watch(
 					color="secondary"
 					:class="$style.head_btn"
 				>
-					Pool Selection
+					Deposit Liquidity
 				</Text>
 
 				<Icon
