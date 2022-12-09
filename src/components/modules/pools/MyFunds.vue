@@ -99,9 +99,20 @@ const isAllClaimsAvailable = computed(() =>
 )
 
 const getClaimReadyTime = (claim) => {
-	const { betsCloseTime } = claim.event.event
+	const { betsCloseTime, measurePeriod } = claim.event.event
 
-	console.log(DateTime.fromISO(betsCloseTime))
+	const endDt = DateTime.fromISO(betsCloseTime).plus(measurePeriod * 1000)
+	const diff = endDt
+		.setLocale("en")
+		.diff(DateTime.now(), ["hours", "minutes"])
+
+	return {
+		diff,
+		text:
+			diff.toObject().hours >= 1
+				? `${diff.toObject().hours.toFixed(0)}h`
+				: `${diff.toObject().minutes.toFixed(0)}m`,
+	}
 }
 
 const handleGetClaims = () => {
@@ -240,9 +251,8 @@ const handleGetClaims = () => {
 				>
 					<Flex>
 						<Text size="14" weight="600" color="support">—</Text>
-						&nbsp;
 						<Text size="14" weight="600" color="secondary">
-							Entry #{{ entry.entryId }}
+							&nbsp;Entry #{{ entry.entryId }}
 						</Text>
 					</Flex>
 
@@ -345,10 +355,16 @@ const handleGetClaims = () => {
 				>
 					<Flex>
 						<Text size="14" weight="600" color="support">—</Text>
-						&nbsp;
 						<Text size="14" weight="600" color="secondary">
-							Claim #{{ claim.id }}
-							{{ getClaimReadyTime(claim) }}
+							&nbsp;Claim #{{ claim.id }}
+						</Text>
+						<Text
+							v-if="!claim.event.result"
+							size="14"
+							weight="600"
+							color="support"
+						>
+							&nbsp;~{{ getClaimReadyTime(claim).text }}
 						</Text>
 					</Flex>
 
@@ -453,6 +469,8 @@ const handleGetClaims = () => {
 	width: 100%;
 	height: 100%;
 	border-radius: 3px;
+
+	transition: width 1s var(--bezier);
 }
 
 .bar_progress.blue {
@@ -469,7 +487,7 @@ const handleGetClaims = () => {
 	top: 0;
 	left: 0;
 
-	animation: mig 38s infinite linear;
+	animation: mig 36s infinite linear;
 }
 
 @keyframes mig {
@@ -477,7 +495,7 @@ const handleGetClaims = () => {
 		transform: translateX(0);
 	}
 	50% {
-		transform: translateX(-300px);
+		transform: translateX(-200px);
 	}
 	100% {
 		transform: translateX(0);
