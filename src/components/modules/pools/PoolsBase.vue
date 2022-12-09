@@ -175,6 +175,29 @@ const setupSubToPositions = async () => {
 		})
 }
 
+const handleGetClaims = async (claims) => {
+	const op = await juster.pools[
+		"KT1M6fueToCaYBTeG25XZEFCa7YXcNDMn12x"
+	].withdrawClaims(
+		claims.map((claim) => {
+			return {
+				eventId: claim.eventId,
+				provider: accountStore.pkh,
+			}
+		}),
+	)
+
+	console.log(op)
+
+	op.confirmation()
+		.then((data) => {
+			console.log(data)
+		})
+		.catch((error) => {
+			console.log(error)
+		})
+}
+
 const showAnimation = ref(false)
 onMounted(() => {
 	showAnimation.value = true
@@ -251,6 +274,7 @@ const { meta } = useMeta({
 			<RequestWithdrawModal
 				:show="showRequestWithdrawModal"
 				:selectedPool="selectedPool"
+				:state="poolsStates[selectedPool.address]"
 				:position="
 					positions.find((pos) => pos.poolId === selectedPool.address)
 				"
@@ -269,6 +293,7 @@ const { meta } = useMeta({
 						:entries="entries"
 						:positions="positions"
 						@onDepositLiquidity="showPoolsModal = true"
+						@onGetClaims="handleGetClaims"
 					/>
 
 					<MyStatistics :positions="positions" />

@@ -3,10 +3,12 @@
  * Vendor
  */
 import { ref, computed } from "vue"
+import { DateTime } from "luxon"
 
 /**
  * UI
  */
+import Spin from "@ui/Spin.vue"
 import Button from "@ui/Button.vue"
 import Tooltip from "@ui/Tooltip.vue"
 
@@ -15,7 +17,7 @@ import Tooltip from "@ui/Tooltip.vue"
  */
 import { numberWithSymbol } from "@utils/amounts"
 
-const emit = defineEmits(["onDepositLiquidity"])
+const emit = defineEmits(["onDepositLiquidity", "onGetClaims"])
 const props = defineProps({
 	pools: Array,
 	poolsStates: Object,
@@ -45,26 +47,69 @@ const handleDepositLiquidityClick = () => {
 	emit("onDepositLiquidity")
 }
 
-const pendingEntries = computed(() =>
-	props.entries.filter((entry) => entry.status === "PENDING"),
-)
-
-const pendingClaims = computed(() => {
-	let claims = []
-
-	props.positions.forEach((position) => {
-		claims = [...claims, ...position.claims]
-	})
-
-	return claims
-})
-
 const valueLocked = computed(() =>
 	props.positions.reduce(
 		(acc, curr) => (acc = acc + curr.depositedAmount),
 		0,
 	),
 )
+
+const pendingEntries = computed(() =>
+	props.entries.filter((entry) => entry.status === "PENDING"),
+)
+
+/**
+ * Claims
+ */
+const availableClaims = computed(() => {
+	let claims = []
+	props.positions.forEach((position) => {
+		claims = [
+			...claims,
+			...position.claims.filter(
+				(claim) => claim.event.result && !claim.withdrawn,
+			),
+		]
+	})
+	return claims
+})
+
+const pendingClaims = computed(() => {
+	let claims = []
+	props.positions.forEach((position) => {
+		claims = [
+			...claims,
+			...position.claims.filter((claim) => !claim.event.result),
+		]
+	})
+	return claims
+})
+
+const allClaims = computed(() => [
+	...availableClaims.value,
+	...pendingClaims.value,
+])
+
+const hasOneAvailableClaimToWithdraw = computed(() =>
+	allClaims.value.some((claim) => claim.event.result),
+)
+
+const isAllClaimsAvailable = computed(() =>
+	allClaims.value.every((claim) => claim.event.result),
+)
+
+const getClaimReadyTime = (claim) => {
+	const { betsCloseTime } = claim.event.event
+
+	console.log(DateTime.fromISO(betsCloseTime))
+}
+
+const handleGetClaims = () => {
+	emit(
+		"onGetClaims",
+		allClaims.value.filter((claim) => claim.event.result),
+	)
+}
 </script>
 
 <template>
@@ -158,33 +203,33 @@ const valueLocked = computed(() =>
 			</Flex>
 
 			<div :class="$style.bar">
-				<div :class="[$style.bar_progress, $style.blue]" />
-
-				<svg
-					width="200%"
-					height="12"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					:class="$style.bar_anim"
-				>
-					<defs>
-						<pattern
-							id="lines"
-							patternUnits="userSpaceOnUse"
-							width="20"
-							height="12"
-						>
-							<path
-								fill-rule="evenodd"
-								clip-rule="evenodd"
-								d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
-								fill="white"
-								fill-opacity="0.2"
-							/>
-						</pattern>
-					</defs>
-					<rect width="100%" height="100%" fill="url(#lines)" />
-				</svg>
+				<div :class="[$style.bar_progress, $style.blue]">
+					<svg
+						width="200%"
+						height="12"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						:class="$style.bar_anim"
+					>
+						<defs>
+							<pattern
+								id="lines"
+								patternUnits="userSpaceOnUse"
+								width="20"
+								height="12"
+							>
+								<path
+									fill-rule="evenodd"
+									clip-rule="evenodd"
+									d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
+									fill="white"
+									fill-opacity="0.2"
+								/>
+							</pattern>
+						</defs>
+						<rect width="100%" height="100%" fill="url(#lines)" />
+					</svg>
+				</div>
 			</div>
 
 			<Flex v-if="showEntries" direction="column" gap="12">
@@ -209,7 +254,7 @@ const valueLocked = computed(() =>
 		</Flex>
 
 		<Flex
-			v-if="pendingClaims.length"
+			v-if="allClaims.length"
 			@click="togglePendingClaims"
 			direction="column"
 			gap="12"
@@ -237,7 +282,17 @@ const valueLocked = computed(() =>
 
 				<Flex align="center" gap="4">
 					<Text size="14" color="tertiary" weight="600">
-						{{ pendingClaims.length }} claims
+						{{ allClaims.length - pendingClaims.length }} of
+						{{ allClaims.length }},
+					</Text>
+					<Text size="14" color="secondary" weight="600">
+						{{
+							(
+								((allClaims.length - pendingClaims.length) *
+									100) /
+								allClaims.length
+							).toFixed(0)
+						}}%
 					</Text>
 
 					<Icon name="arrow" size="14" color="tertiary" />
@@ -245,38 +300,46 @@ const valueLocked = computed(() =>
 			</Flex>
 
 			<div :class="$style.bar">
-				<div :class="[$style.bar_progress, $style.green]" />
-
-				<svg
-					width="200%"
-					height="12"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					:class="$style.bar_anim"
+				<div
+					:class="[$style.bar_progress, $style.green]"
+					:style="{
+						width: `${
+							((allClaims.length - pendingClaims.length) * 100) /
+							allClaims.length
+						}%`,
+					}"
 				>
-					<defs>
-						<pattern
-							id="lines"
-							patternUnits="userSpaceOnUse"
-							width="20"
-							height="12"
-						>
-							<path
-								fill-rule="evenodd"
-								clip-rule="evenodd"
-								d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
-								fill="white"
-								fill-opacity="0.2"
-							/>
-						</pattern>
-					</defs>
-					<rect width="100%" height="100%" fill="url(#lines)" />
-				</svg>
+					<svg
+						width="200%"
+						height="12"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						:class="$style.bar_anim"
+					>
+						<defs>
+							<pattern
+								id="lines"
+								patternUnits="userSpaceOnUse"
+								width="20"
+								height="12"
+							>
+								<path
+									fill-rule="evenodd"
+									clip-rule="evenodd"
+									d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
+									fill="white"
+									fill-opacity="0.2"
+								/>
+							</pattern>
+						</defs>
+						<rect width="100%" height="100%" fill="url(#lines)" />
+					</svg>
+				</div>
 			</div>
 
 			<Flex v-if="showClaims" direction="column" gap="12">
 				<Flex
-					v-for="claim in pendingClaims"
+					v-for="claim in allClaims"
 					justify="between"
 					align="center"
 				>
@@ -285,12 +348,23 @@ const valueLocked = computed(() =>
 						&nbsp;
 						<Text size="14" weight="600" color="secondary">
 							Claim #{{ claim.id }}
+							{{ getClaimReadyTime(claim) }}
 						</Text>
 					</Flex>
 
-					<Text size="14" weight="600" color="secondary">
-						{{ numberWithSymbol(claim.amount, ",") }}
-					</Text>
+					<Flex align="center" gap="6">
+						<Icon
+							v-if="claim.event.result"
+							name="check"
+							size="12"
+							color="green"
+						/>
+						<Spin v-else size="12" style="opacity: 0.5" />
+
+						<Text size="14" weight="600" color="secondary">
+							{{ numberWithSymbol(claim.amount, ",") }}
+						</Text>
+					</Flex>
 				</Flex>
 			</Flex>
 		</Flex>
@@ -308,22 +382,17 @@ const valueLocked = computed(() =>
 				<Icon name="plus_circle" size="16" />Deposit
 			</Button>
 
-			<Button type="secondary" size="medium" block keybind="G+C">
+			<Button
+				v-if="allClaims.length - pendingClaims.length"
+				@click="handleGetClaims"
+				type="secondary"
+				size="medium"
+				block
+				keybind="G+C"
+			>
 				<Icon name="credit_add" size="16" color="green" />
 				Get available claims
 			</Button>
-
-			<Text
-				size="12"
-				color="support"
-				weight="500"
-				height="16"
-				align="center"
-				:class="$style.hint"
-			>
-				You can pick up the claims without waiting for the unconfirmed
-				ones. Available claims will be formed in one batch request
-			</Text>
 		</Flex>
 	</div>
 </template>
@@ -370,13 +439,28 @@ const valueLocked = computed(() =>
 }
 
 .bar {
-	position: relative;
-
 	height: 12px;
 	border-radius: 3px;
 	background: rgba(255, 255, 255, 0.05);
 
 	overflow: hidden;
+}
+
+.bar_progress {
+	position: relative;
+	overflow: hidden;
+
+	width: 100%;
+	height: 100%;
+	border-radius: 3px;
+}
+
+.bar_progress.blue {
+	background: var(--blue);
+}
+
+.bar_progress.green {
+	background: var(--green);
 }
 
 .bar_anim {
@@ -386,19 +470,6 @@ const valueLocked = computed(() =>
 	left: 0;
 
 	animation: mig 38s infinite linear;
-}
-
-.bar_progress {
-	width: 100%;
-	height: 100%;
-}
-
-.bar_progress.blue {
-	background: var(--blue);
-}
-
-.bar_progress.green {
-	background: var(--green);
 }
 
 @keyframes mig {

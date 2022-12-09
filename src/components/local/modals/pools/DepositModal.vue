@@ -137,8 +137,8 @@ const buttonState = computed(() => {
 			disabled: true,
 			type: "secondary",
 		}
-	if (amount.value > 0 && amount.value < 0.01)
-		return { text: "Minimum 0.01 XTZ", disabled: true, type: "secondary" }
+	if (amount.value > 0 && amount.value < 1)
+		return { text: "Minimum 1 XTZ", disabled: true, type: "secondary" }
 	return {
 		text: `Deposit to ${props.selectedPool.name.replace(
 			"Juster Pool: ",
@@ -162,6 +162,8 @@ watch(
 			nextTick(() => {
 				inputEl.value.$el.querySelector("input").focus()
 			})
+		} else {
+			amount.value = 0
 		}
 	},
 )

@@ -15,9 +15,28 @@ export const poolPosition = {
 	claims: {
 		amount: true,
 		id: true,
+		withdrawn: true,
+		eventId: true,
+		event: {
+			result: true,
+			event: {
+				betsCloseTime: true,
+				measurePeriod: true,
+			},
+		},
 	},
 	pool: {
 		name: true,
+	},
+}
+
+export const claim = {
+	id: true,
+	amount: true,
+	withdrawn: true,
+	eventId: true,
+	event: {
+		result: true,
 	},
 }
 

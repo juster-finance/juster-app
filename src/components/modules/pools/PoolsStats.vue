@@ -50,7 +50,11 @@ const stats = computed(() => {
 				</Text>
 				<LoadingDots v-else />
 
-				<Flex align="center" gap="4" :class="$style.badge">
+				<Flex
+					align="center"
+					gap="4"
+					:class="[$style.badge, $style.green]"
+				>
 					<Icon name="arrow_circle_top" size="12" color="green" />
 					<Text size="12" color="green" weight="700"> 4.25% </Text>
 				</Flex>
@@ -73,7 +77,11 @@ const stats = computed(() => {
 				</Text>
 				<LoadingDots v-else />
 
-				<Flex align="center" gap="4" :class="$style.badge">
+				<Flex
+					align="center"
+					gap="4"
+					:class="[$style.badge, $style.green]"
+				>
 					<Icon name="arrow_circle_top" size="12" color="green" />
 					<Text size="12" color="green" weight="700"> 4.25% </Text>
 				</Flex>
@@ -97,8 +105,8 @@ const stats = computed(() => {
 				<LoadingDots v-else />
 
 				<Flex align="center" gap="4" :class="$style.badge">
-					<Icon name="arrow_circle_top" size="12" color="green" />
-					<Text size="12" color="green" weight="700"> 0% </Text>
+					<Icon name="arrow_circle_top" size="12" color="secondary" />
+					<Text size="12" color="secondary" weight="700"> 0% </Text>
 				</Flex>
 			</Flex>
 
@@ -120,8 +128,8 @@ const stats = computed(() => {
 				<LoadingDots v-else />
 
 				<Flex align="center" gap="4" :class="$style.badge">
-					<Icon name="arrow_circle_top" size="12" color="green" />
-					<Text size="12" color="green" weight="700"> 0% </Text>
+					<Icon name="arrow_circle_top" size="12" color="secondary" />
+					<Text size="12" color="secondary" weight="700"> 0% </Text>
 				</Flex>
 			</Flex>
 
@@ -154,7 +162,15 @@ const stats = computed(() => {
 .badge {
 	padding: 2px;
 	border-radius: 50px;
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.badge.green {
 	background: rgba(26, 161, 104, 0.15);
+}
+
+.badge.red {
+	background: rgba(224, 92, 67, 0.15);
 }
 
 .tooltip_card {

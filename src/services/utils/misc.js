@@ -35,5 +35,5 @@ export const shorten = (str, left = 6, right = 4) => {
 }
 
 export const sanitizeInput = (e) => {
-	if (["-", "e"].includes(e.key)) e.preventDefault()
+	if (["-", "e", "E"].includes(e.key)) e.preventDefault()
 }

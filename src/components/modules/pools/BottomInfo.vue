@@ -115,7 +115,7 @@ const props = defineProps({
 				<span>~30%</span>&nbsp;APY
 			</Text>
 			<Text size="13" weight="500" color="support" :class="$style.label">
-				Minimum&nbsp;<span>0.01 ꜩ</span>
+				Minimum&nbsp;<span>1 ꜩ</span>
 			</Text>
 			<Text size="13" weight="500" color="support" :class="$style.label">
 				Version&nbsp;<span>{{ pool.version }}</span>

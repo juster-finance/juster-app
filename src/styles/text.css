@@ -144,6 +144,10 @@
 	fill: var(--orange);
 }
 
+.fill--red {
+	fill: var(--red);
+}
+
 .fill--green {
 	fill: var(--green);
 }

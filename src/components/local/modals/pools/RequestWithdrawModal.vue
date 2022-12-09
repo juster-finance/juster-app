@@ -13,6 +13,7 @@ import Modal from "@ui/Modal.vue"
 import Input from "@ui/Input.vue"
 import Button from "@ui/Button.vue"
 import Block from "@ui/Block.vue"
+import Tooltip from "@ui/Tooltip.vue"
 
 /**
  * Services
@@ -35,6 +36,7 @@ const props = defineProps({
 	show: Boolean,
 	selectedPool: Object,
 	position: Object,
+	state: Object,
 })
 
 const emit = defineEmits(["onClose"])
@@ -150,6 +152,8 @@ watch(
 			nextTick(() => {
 				inputEl.value.$el.querySelector("input").focus()
 			})
+		} else {
+			amount.value = 0
 		}
 	},
 )
@@ -311,6 +315,55 @@ const handleCloseRequestFundsWarning = () => {
 				:class="$style.amount_input"
 			/>
 
+			<Flex align="center" justify="between" :class="$style.badge">
+				<Flex align="center" gap="8">
+					<Icon name="coins" size="14" color="tertiary" />
+
+					<Flex align="center">
+						<Text size="14" weight="600" color="primary">
+							{{
+								amount.value
+									? numberWithSymbol(amount.value, ",")
+									: 0
+							}} </Text
+						>&nbsp;
+						<Text size="14" weight="600" color="tertiary"
+							>shares</Text
+						>&nbsp;
+						<Text size="14" weight="600" color="support"> -> </Text
+						>&nbsp;
+						<Text size="14" weight="600" color="secondary">
+							~
+						</Text>
+						<Text size="14" weight="600" color="primary">
+							{{
+								amount.value
+									? numberWithSymbol(
+											amount.value * state.sharePrice,
+											",",
+									  )
+									: 0
+							}} </Text
+						>&nbsp;
+						<Text size="14" weight="600" color="tertiary"> ꜩ </Text>
+					</Flex>
+				</Flex>
+
+				<Tooltip placement="bottom-end" text-align="end">
+					<Flex align="center" gap="8">
+						<Icon name="banknote" size="14" color="tertiary" />
+						<Text size="14" weight="600" color="primary">
+							{{ state.sharePrice.toFixed(2) }}
+						</Text>
+					</Flex>
+
+					<template #content>
+						Share price<br />
+						<span> Used to calculate the amount of payment</span>
+					</template>
+				</Tooltip>
+			</Flex>
+
 			<Flex direction="column" gap="12" align="center">
 				<Button
 					@click="handleDeposit"
@@ -368,5 +421,14 @@ const handleCloseRequestFundsWarning = () => {
 	border-radius: 8px;
 
 	padding: 0 16px;
+}
+
+.badge {
+	height: 38px;
+
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.05);
+
+	padding: 0 12px;
 }
 </style>
