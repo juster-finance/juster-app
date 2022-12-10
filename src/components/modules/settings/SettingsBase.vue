@@ -41,7 +41,7 @@ const blocks = ref([
 			},
 			{
 				name: "Amounts",
-				icon: "calculator",
+				icon: "amounts",
 				path: "/amounts",
 			},
 			{
