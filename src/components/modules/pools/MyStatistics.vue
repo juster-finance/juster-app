@@ -122,16 +122,16 @@ const sortedPositions = computed(() => {
 
 						<Flex align="center" gap="8">
 							<Text color="tertiary" size="13" weight="600">
-								{{ position.tvl.toFixed(2) }}
-							</Text>
-
-							<Text color="secondary" size="13" weight="600">
 								{{
 									(
 										(position.tvl * 100) /
 										valueLocked
 									).toFixed(0)
 								}}%
+							</Text>
+
+							<Text color="secondary" size="13" weight="600">
+								{{ position.tvl.toFixed(2) }}
 							</Text>
 						</Flex>
 					</Flex>

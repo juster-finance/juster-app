@@ -111,7 +111,11 @@ const getClaimReadyTime = (claim) => {
 		text:
 			diff.toObject().hours >= 1
 				? `${diff.toObject().hours.toFixed(0)}h`
-				: `${diff.toObject().minutes.toFixed(0)}m`,
+				: `${
+						diff.toObject().minutes > 0
+							? diff.toObject().minutes.toFixed(0)
+							: 0
+				  }m`,
 	}
 }
 
@@ -320,6 +324,7 @@ const handleGetClaims = () => {
 					}"
 				>
 					<svg
+						v-if="allClaims.length !== availableClaims.length"
 						width="200%"
 						height="12"
 						fill="none"
@@ -353,8 +358,14 @@ const handleGetClaims = () => {
 					justify="between"
 					align="center"
 				>
-					<Flex>
-						<Text size="14" weight="600" color="support">—</Text>
+					<Flex align="center" gap="4">
+						<Icon
+							v-if="claim.event.result"
+							name="check"
+							size="12"
+							color="green"
+						/>
+						<Spin v-else size="12" style="opacity: 0.5" />
 						<Text size="14" weight="600" color="secondary">
 							&nbsp;Claim #{{ claim.id }}
 						</Text>
@@ -368,18 +379,11 @@ const handleGetClaims = () => {
 						</Text>
 					</Flex>
 
-					<Flex align="center" gap="6">
-						<Icon
-							v-if="claim.event.result"
-							name="check"
-							size="12"
-							color="green"
-						/>
-						<Spin v-else size="12" style="opacity: 0.5" />
-
+					<Flex align="center" gap="4">
 						<Text size="14" weight="600" color="secondary">
 							{{ numberWithSymbol(claim.amount, ",") }}
 						</Text>
+						<Text size="14" weight="600" color="tertiary">ꜩ</Text>
 					</Flex>
 				</Flex>
 			</Flex>
@@ -395,19 +399,20 @@ const handleGetClaims = () => {
 				keybind="D+L"
 				block
 			>
-				<Icon name="plus_circle" size="16" />Deposit
+				<Icon name="plus_circle" size="16" />Deposit Liquidity
 			</Button>
 
 			<Button
 				v-if="allClaims.length - pendingClaims.length"
 				@click="handleGetClaims"
+				@onKeybind="handleGetClaims"
 				type="secondary"
 				size="medium"
 				block
 				keybind="G+C"
 			>
 				<Icon name="credit_add" size="16" color="green" />
-				Get available claims
+				Withdraw Сlaims
 			</Button>
 		</Flex>
 	</div>

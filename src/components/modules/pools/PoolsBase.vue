@@ -26,6 +26,7 @@ import Block from "@ui/Block.vue"
 import PoolsModal from "@local/modals/pools/PoolsModal.vue"
 import DepositModal from "@local/modals/pools/DepositModal.vue"
 import RequestWithdrawModal from "@local/modals/pools/RequestWithdrawModal.vue"
+import WithdrawClaimsModal from "@local/modals/pools/WithdrawClaimsModal.vue"
 
 /**
  * Services
@@ -54,6 +55,7 @@ const marketStore = useMarketStore()
 
 const showPoolsModal = ref(false)
 const showDepositModal = ref(false)
+const showWithdrawClaimsModal = ref(false)
 const showRequestWithdrawModal = ref(false)
 
 const handleSelectPool = (pool) => {
@@ -175,29 +177,6 @@ const setupSubToPositions = async () => {
 		})
 }
 
-const handleGetClaims = async (claims) => {
-	const op = await juster.pools[
-		"KT1M6fueToCaYBTeG25XZEFCa7YXcNDMn12x"
-	].withdrawClaims(
-		claims.map((claim) => {
-			return {
-				eventId: claim.eventId,
-				provider: accountStore.pkh,
-			}
-		}),
-	)
-
-	console.log(op)
-
-	op.confirmation()
-		.then((data) => {
-			console.log(data)
-		})
-		.catch((error) => {
-			console.log(error)
-		})
-}
-
 const showAnimation = ref(false)
 onMounted(() => {
 	showAnimation.value = true
@@ -280,6 +259,11 @@ const { meta } = useMeta({
 				"
 				@onClose="showRequestWithdrawModal = false"
 			/>
+			<WithdrawClaimsModal
+				:show="showWithdrawClaimsModal"
+				:positions="positions"
+				@onClose="showWithdrawClaimsModal = false"
+			/>
 
 			<Flex align="center" :class="$style.head">
 				<h1 :class="$style.title">Liquidity Pools</h1>
@@ -293,7 +277,7 @@ const { meta } = useMeta({
 						:entries="entries"
 						:positions="positions"
 						@onDepositLiquidity="showPoolsModal = true"
-						@onGetClaims="handleGetClaims"
+						@onGetClaims="showWithdrawClaimsModal = true"
 					/>
 
 					<MyStatistics :positions="positions" />
