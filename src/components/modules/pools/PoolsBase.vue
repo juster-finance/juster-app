@@ -23,6 +23,7 @@ import Block from "@ui/Block.vue"
 /**
  * Modal
  */
+import SharePoolModal from "@local/modals/pools/SharePoolModal.vue"
 import PoolsModal from "@local/modals/pools/PoolsModal.vue"
 import DepositModal from "@local/modals/pools/DepositModal.vue"
 import RequestWithdrawModal from "@local/modals/pools/RequestWithdrawModal.vue"
@@ -53,6 +54,7 @@ const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 const marketStore = useMarketStore()
 
+const showSharePoolModal = ref(false)
 const showPoolsModal = ref(false)
 const showDepositModal = ref(false)
 const showWithdrawClaimsModal = ref(false)
@@ -63,6 +65,12 @@ const handleSelectPool = (pool) => {
 
 	showPoolsModal.value = false
 	showDepositModal.value = true
+}
+
+const handleShare = (pool) => {
+	selectedPool.value = pool
+
+	showSharePoolModal.value = true
 }
 
 const handleRequestWithdraw = (pool) => {
@@ -235,6 +243,11 @@ const { meta } = useMeta({
 			</metainfo>
 
 			<!-- Modals -->
+			<SharePoolModal
+				:show="showSharePoolModal"
+				:pool="selectedPool"
+				@onClose="showSharePoolModal = false"
+			/>
 			<PoolsModal
 				v-if="pools.length"
 				:show="showPoolsModal"
@@ -310,6 +323,7 @@ const { meta } = useMeta({
 							:pools="pools"
 							:poolsStates="poolsStates"
 							:positions="positions"
+							@onShare="(pool) => handleShare(pool)"
 							@onSelectPool="handleSelectPool"
 							@onRequestWithdraw="handleRequestWithdraw"
 							:class="$style.list"

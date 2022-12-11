@@ -324,7 +324,6 @@ const handleGetClaims = () => {
 					}"
 				>
 					<svg
-						v-if="allClaims.length !== availableClaims.length"
 						width="200%"
 						height="12"
 						fill="none"

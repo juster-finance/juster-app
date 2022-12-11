@@ -33,6 +33,7 @@ const notificationsStore = useNotificationsStore()
 
 const cardEl = ref(null)
 
+const emit = defineEmits(["onSelectPool", "onRequestWithdraw", "onShare"])
 const props = defineProps({
 	pool: {
 		type: Object,
@@ -45,7 +46,6 @@ const props = defineProps({
 		type: Object,
 	},
 })
-const emit = defineEmits(["onSelectPool", "onRequestWithdraw"])
 
 onMounted(() => {
 	cardEl.value.addEventListener("contextmenu", contextMenuHandler)
@@ -451,53 +451,48 @@ const copy = (target) => {
 					</Text>
 				</Flex>
 
-				<Flex align="center" gap="8">
-					<Button
-						type="secondary"
-						size="small"
-						:link="`https://ghostnet.tzkt.io/${pool.address}`"
-					>
-						<Icon name="database" size="12" />
-					</Button>
+				<Dropdown
+					:force-open="openContextMenu"
+					disable-autofocus
+					@onClose="openContextMenu = false"
+				>
+					<template #trigger>
+						<Button type="secondary" size="small">
+							<Icon name="dots" size="12" />
+						</Button>
+					</template>
 
-					<Dropdown
-						:force-open="openContextMenu"
-						disable-autofocus
-						@onClose="openContextMenu = false"
-					>
-						<template #trigger>
-							<Button type="secondary" size="small">
-								<Icon name="dots" size="12" />
-							</Button>
-						</template>
+					<template #dropdown>
+						<DropdownItem
+							@click="emit('onRequestWithdraw', pool)"
+							:disabled="!position"
+						>
+							<Icon name="money" size="16" /> Withdraw
+						</DropdownItem>
 
-						<template #dropdown>
-							<DropdownItem
-								@click="emit('onRequestWithdraw', pool)"
-								:disabled="!position"
-							>
-								<Icon name="money" size="16" /> Withdraw
-							</DropdownItem>
+						<DropdownDivider />
 
-							<DropdownDivider />
+						<DropdownItem>
+							<Icon name="time" size="16" />Pool timeline
+						</DropdownItem>
 
-							<DropdownItem>
-								<Icon name="time" size="16" />Pool timeline
-							</DropdownItem>
+						<DropdownDivider />
 
-							<DropdownDivider />
+						<DropdownTitle>Copy</DropdownTitle>
+						<DropdownItem @click="copy('address')">
+							<Icon name="copy" size="16" /> Pool address
+						</DropdownItem>
+						<DropdownItem @click="copy('url')">
+							<Icon name="copy" size="16" /> Pool explorer link
+						</DropdownItem>
 
-							<DropdownTitle>Copy</DropdownTitle>
-							<DropdownItem @click="copy('address')">
-								<Icon name="copy" size="16" /> Pool address
-							</DropdownItem>
-							<DropdownItem @click="copy('url')">
-								<Icon name="copy" size="16" /> Pool explorer
-								link
-							</DropdownItem>
-						</template>
-					</Dropdown>
-				</Flex>
+						<DropdownDivider />
+
+						<DropdownItem @click="emit('onShare', pool)">
+							<Icon name="share" size="16" />Share
+						</DropdownItem>
+					</template>
+				</Dropdown>
 			</Flex>
 		</Flex>
 	</div>

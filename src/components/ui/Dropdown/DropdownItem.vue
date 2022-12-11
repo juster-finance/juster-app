@@ -20,7 +20,7 @@ defineProps({ disabled: { type: Boolean } })
 	border-radius: 6px;
 
 	font-size: 13px;
-	line-height: 1.1;
+	line-height: 1;
 	font-weight: 500;
 	color: var(--text-primary);
 	white-space: nowrap;

@@ -46,6 +46,10 @@ const props = defineProps({
 		type: Boolean,
 		default: false,
 	},
+	disableTrap: {
+		type: Boolean,
+		default: false,
+	},
 
 	closeOutside: {
 		type: Boolean,
@@ -61,15 +65,17 @@ watch(
 	() => props.show,
 	() => {
 		if (!props.show) {
-			trap.value.deactivate()
+			if (!props.disableTrap) trap.value.deactivate()
 
 			if (removeOutside) {
 				removeOutside()
 			}
 		} else {
 			nextTick(() => {
-				trap.value = focusTrap.createFocusTrap(modal.value)
-				trap.value.activate()
+				if (!props.disableTrap) {
+					trap.value = focusTrap.createFocusTrap(modal.value)
+					trap.value.activate()
+				}
 
 				if (!props.closeOutside) return
 				removeOutside = useOnOutsidePress(modal, () => {
