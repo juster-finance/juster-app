@@ -159,12 +159,14 @@ const sortedPositions = computed(() => {
 				<Flex align="center" gap="6">
 					<div :class="$style.deposited_dot" />
 					<Text size="12" weight="600" color="secondary">
-						Deposited
+						Total Deposited
 					</Text>
 				</Flex>
 				<Flex align="center" gap="6">
 					<div :class="$style.locked_dot" />
-					<Text size="12" weight="600" color="secondary">Locked</Text>
+					<Text size="12" weight="600" color="secondary"
+						>Total Value Locked</Text
+					>
 				</Flex>
 			</Flex>
 		</Flex>

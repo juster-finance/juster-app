@@ -152,7 +152,7 @@ const handleGetClaims = () => {
 						weight="500"
 						:class="$style.badge__subtitle"
 					>
-						Total Value Used
+						Total Value Locked
 					</Text>
 				</Flex>
 			</Flex>
@@ -278,7 +278,7 @@ const handleGetClaims = () => {
 				<Tooltip placement="bottom-start" text-align="left">
 					<Flex align="center" gap="6">
 						<Text size="14" color="secondary" weight="600">
-							Progress of Claims
+							Pending Claims
 						</Text>
 						<Icon name="help" size="14" color="support" />
 					</Flex>
