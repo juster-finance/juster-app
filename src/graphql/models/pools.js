@@ -17,6 +17,7 @@ export const poolPosition = {
 		id: true,
 		withdrawn: true,
 		eventId: true,
+		poolId: true,
 		event: {
 			result: true,
 			event: {
@@ -35,6 +36,7 @@ export const claim = {
 	amount: true,
 	withdrawn: true,
 	eventId: true,
+	poolId: true,
 	event: {
 		result: true,
 	},

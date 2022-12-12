@@ -74,14 +74,6 @@ const props = defineProps({
 						<DropdownItem>
 							<Icon name="table" size="16" /> My Claims
 						</DropdownItem>
-
-						<DropdownDivider />
-
-						<DropdownTitle>Copy</DropdownTitle>
-						<DropdownItem>
-							<Icon name="copy" size="16" />
-							Contract address
-						</DropdownItem>
 					</template>
 				</Dropdown>
 			</Flex>

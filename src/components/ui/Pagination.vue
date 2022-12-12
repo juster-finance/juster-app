@@ -18,6 +18,10 @@ export default defineComponent({
 			type: Number,
 			required: true,
 		},
+		disableArrows: {
+			type: Boolean,
+			default: false,
+		},
 		modelValue: Number,
 	},
 
@@ -161,6 +165,7 @@ export default defineComponent({
 <template>
 	<div :class="$style.wrapper">
 		<Button
+			v-if="!disableArrows"
 			@click="prevPage"
 			type="secondary"
 			size="small"
@@ -215,6 +220,7 @@ export default defineComponent({
 		</template>
 
 		<Button
+			v-if="!disableArrows"
 			@click="nextPage"
 			type="secondary"
 			size="small"

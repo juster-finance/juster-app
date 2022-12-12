@@ -139,6 +139,12 @@ const buttonState = computed(() => {
 		}
 	if (amount.value > 0 && amount.value < 1)
 		return { text: "Minimum 1 XTZ", disabled: true, type: "secondary" }
+	if (amount.value > accountStore.balance)
+		return {
+			text: "Insufficient funds",
+			disabled: true,
+			type: "secondary",
+		}
 	return {
 		text: `Deposit to ${props.selectedPool.name.replace(
 			"Juster Pool: ",
@@ -426,9 +432,9 @@ watch(
 										: 0
 								}} </Text
 							>&nbsp;
-							<Text size="14" weight="600" color="tertiary"
-								>shares</Text
-							>
+							<Text size="14" weight="600" color="tertiary">
+								shares
+							</Text>
 						</Flex>
 					</Flex>
 

@@ -208,6 +208,19 @@ const handleCloseRequestFundsWarning = () => {
 		</Flex>
 
 		<Flex direction="column" gap="32" :class="$style.base">
+			<Block
+				v-if="flags.showRequestFundsWarning"
+				@onClose="handleCloseRequestFundsWarning"
+			>
+				<span>
+					This is a withdrawal request (not the withdrawal to the
+					wallet itself).
+				</span>
+				It is necessary to wait until the completion of events where
+				your funds are used and then they will be ready for the full
+				withdrawal.
+			</Block>
+
 			<Flex direction="column" gap="8">
 				<Flex align="center" justify="between" :class="$style.pool">
 					<Flex align="center" gap="20">
@@ -290,19 +303,6 @@ const handleCloseRequestFundsWarning = () => {
 					</Flex>
 				</Flex>
 			</Flex>
-
-			<Block
-				v-if="flags.showRequestFundsWarning"
-				@onClose="handleCloseRequestFundsWarning"
-			>
-				<span>
-					This is a withdrawal request (not the withdrawal to the
-					wallet itself).
-				</span>
-				It is necessary to wait until the completion of events where
-				your funds are used and then they will be ready for the full
-				withdrawal.
-			</Block>
 
 			<Input
 				ref="inputEl"

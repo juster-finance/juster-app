@@ -4,6 +4,7 @@
  */
 import { ref, computed } from "vue"
 import { DateTime } from "luxon"
+import cloneDeep from "lodash.clonedeep"
 
 /**
  * UI
@@ -11,6 +12,7 @@ import { DateTime } from "luxon"
 import Spin from "@ui/Spin.vue"
 import Modal from "@ui/Modal.vue"
 import Button from "@ui/Button.vue"
+import Pagination from "@ui/Pagination.vue"
 
 /**
  * Services
@@ -57,6 +59,17 @@ const availableClaims = computed(() => {
 	})
 	return claims
 })
+const affectedPools = computed(() => [
+	...new Set(availableClaims.value.map((claim) => claim.poolId)),
+])
+
+const paginationPage = ref(1)
+const paginatedClaims = computed(() =>
+	cloneDeep(availableClaims.value).slice(
+		(paginationPage.value - 1) * 5,
+		paginationPage.value * 5,
+	),
+)
 
 const nextClaim = computed(() => {
 	let closest
@@ -91,6 +104,33 @@ const nextClaim = computed(() => {
 	return closest
 })
 
+// const handleWithdrawClaims = async ({ eventIds, address }) => {
+// 	try {
+// 		const contract = await juster.sdk._tezos.contract.at(
+// 			contracts[
+// 				juster.sdk._network === "mainnet" ? "mainnet" : "testnet"
+// 			],
+// 		)
+
+// 		if (!eventIds.length || !address) return
+
+// 		const transactions = []
+// 		eventIds.forEach((id) => {
+// 			transactions.push({
+// 				kind: "transaction",
+// 				...contract.methods.withdraw(id, address).toTransferParams(),
+// 			})
+// 		})
+
+// 		const batch = await juster.sdk._tezos.wallet.batch(transactions)
+
+// 		const batchOp = await batch.send()
+
+// 		return { success: true, hash: batchOp.hash }
+// 	} catch (error) {
+// 		return { success: false, title: error.title, message: error.message }
+// 	}
+// }
 const opConfirmationInProgress = ref(false)
 const handleWithdraw = async () => {
 	if (buttonState.disabled) return
@@ -206,9 +246,15 @@ const buttonState = computed(() => {
 
 		<Flex direction="column" gap="32" :class="$style.base">
 			<Flex direction="column" gap="8">
-				<Text size="12" weight="600" color="secondary">
-					Withdrawal
-				</Text>
+				<Flex align="center" justify="between">
+					<Text size="12" weight="600" color="secondary">
+						Withdrawal
+					</Text>
+					<Text size="12" weight="600" color="tertiary">
+						{{ affectedPools.length }} affected
+						{{ affectedPools.length > 1 ? "pools" : "pool" }}
+					</Text>
+				</Flex>
 
 				<Flex align="center" justify="between" :class="$style.badge">
 					<Flex align="center" gap="8">
@@ -250,8 +296,8 @@ const buttonState = computed(() => {
 							</Text>
 						</Flex>
 					</Flex>
-				</Flex></Flex
-			>
+				</Flex>
+			</Flex>
 
 			<Flex direction="column" gap="16">
 				<Flex direction="column" gap="8">
@@ -271,7 +317,7 @@ const buttonState = computed(() => {
 					</Flex>
 
 					<Flex
-						v-for="claim in availableClaims"
+						v-for="claim in paginatedClaims"
 						align="center"
 						justify="between"
 						:class="$style.badge"
@@ -313,11 +359,13 @@ const buttonState = computed(() => {
 					</Flex>
 				</Flex>
 
-				<Text size="13" weight="500" color="tertiary" height="16">
-					This is the final step of withdrawal. You can wait for all
-					pending claims so you don't have to pay a fee for several
-					operations
-				</Text>
+				<Pagination
+					v-if="availableClaims.length > 5"
+					v-model="paginationPage"
+					:total="availableClaims.length"
+					:limit="5"
+					disable-arrows
+				/>
 			</Flex>
 
 			<Button
