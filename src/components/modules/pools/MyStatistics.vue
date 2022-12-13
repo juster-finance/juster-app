@@ -155,7 +155,7 @@ const sortedPositions = computed(() => {
 				</Flex>
 			</template>
 
-			<Flex align="center" gap="16">
+			<Flex v-if="valueLocked" align="center" gap="16">
 				<Flex align="center" gap="6">
 					<div :class="$style.deposited_dot" />
 					<Text size="12" weight="600" color="secondary">
