@@ -53,3 +53,19 @@ export const entryLiquidity = {
 		name: true,
 	},
 }
+
+export const poolState = {
+	id: true,
+	level: true,
+	action: true,
+	counter: true,
+	poolId: true,
+	activeLiquidity: true,
+	entryLiquidity: true,
+	opgHash: true,
+	sharePrice: true,
+	timestamp: true,
+	totalLiquidity: true,
+	totalShares: true,
+	withdrawableLiquidity: true,
+}

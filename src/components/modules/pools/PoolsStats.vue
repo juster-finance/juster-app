@@ -3,6 +3,7 @@
  * Vendor
  */
 import { computed } from "vue"
+import BN from "bignumber.js"
 
 /**
  * UI
@@ -30,8 +31,14 @@ const stats = computed(() => {
 	let avgSharePrice = 0
 
 	Object.keys(props.poolsStates).forEach((address) => {
-		valueOfPools += props.poolsStates[address].totalLiquidity.toNumber()
-		avgSharePrice += props.poolsStates[address].sharePrice.toNumber()
+		const { totalLiquidity, sharePrice } = props.poolsStates[address]
+
+		valueOfPools += BN.isBigNumber(totalLiquidity)
+			? totalLiquidity.toNumber()
+			: totalLiquidity
+		avgSharePrice += BN.isBigNumber(sharePrice)
+			? sharePrice.toNumber()
+			: sharePrice
 	})
 
 	return {

@@ -4,6 +4,8 @@
  */
 import { ref, onMounted, onUnmounted, computed, watch } from "vue"
 import { useMeta } from "vue-meta"
+import { DateTime } from "luxon"
+import { makeSummaryPosition } from "@juster-finance/sdk"
 
 /**
  * Local
@@ -41,6 +43,7 @@ import { juster } from "@sdk"
 import {
 	entryLiquidity as entryLiquidityModel,
 	poolPosition as poolPositionModel,
+	poolState as poolStateModel,
 } from "@/graphql/models"
 
 /**
@@ -127,6 +130,12 @@ const positions = ref([])
 const subEntries = ref({})
 const entries = ref([])
 
+/**
+ * States
+ */
+const subStates = ref({})
+const states = ref([])
+
 const populatePools = async () => {
 	for (const index in pools.value) {
 		if (!Object.hasOwnProperty.call(pools.value, index)) return
@@ -136,6 +145,41 @@ const populatePools = async () => {
 			pool.address
 		].getLastPoolState()
 	}
+
+	setupSubToStates()
+}
+
+const setupSubToStates = async () => {
+	subStates.value = await juster.gql
+		.subscription({
+			poolState: [
+				{
+					where: {
+						pool: {
+							address: {
+								_in: pools.value.map((pool) => pool.address),
+							},
+						},
+					},
+					limit: 1,
+					order_by: [{ timestamp: "desc" }],
+				},
+				poolStateModel,
+			],
+		})
+		.subscribe({
+			next: ({ poolState }) => {
+				const newPoolState = poolState[0]
+				const currentPoolState = poolsStates.value[newPoolState.poolId]
+
+				if (newPoolState.counter === currentPoolState.counter) return
+
+				if (newPoolState.counter > currentPoolState.counter) {
+					poolsStates.value[newPoolState.poolId] = newPoolState
+				}
+			},
+			error: console.error,
+		})
 }
 
 const setupSubToEntries = async () => {
@@ -194,8 +238,6 @@ onMounted(() => {
 		setupSubToPositions()
 		populatePools()
 	}
-
-	/** Test: entryLiquidity */
 })
 
 onUnmounted(() => {
@@ -211,6 +253,13 @@ onUnmounted(() => {
 		!subPositions.value?.closed
 	) {
 		subPositions.value.unsubscribe()
+	}
+
+	if (
+		Object.prototype.hasOwnProperty.call(subStates.value, "_state") &&
+		!subStates.value?.closed
+	) {
+		subStates.value.unsubscribe()
 	}
 })
 

@@ -3,6 +3,7 @@
  * Vendor
  */
 import { ref, computed, onMounted, onBeforeUnmount } from "vue"
+import { DateTime } from "luxon"
 
 /**
  * UI
@@ -45,6 +46,16 @@ const props = defineProps({
 	position: {
 		type: Object,
 	},
+})
+
+const updateTimeDiff = computed(() => {
+	let dt = DateTime.fromJSDate(props.state.timestamp)
+
+	if (dt.invalid) {
+		dt = DateTime.fromISO(props.state.timestamp)
+	}
+
+	return dt.setLocale("en").toRelative()
 })
 
 onMounted(() => {
@@ -444,8 +455,8 @@ const copy = (target) => {
 						</Text>
 					</Flex>
 
-					<Text size="12" color="support" weight="600">
-						Smart Contract&nbsp;&nbsp;•&nbsp;&nbsp;0 participants
+					<Text v-if="state" size="12" color="support" weight="600">
+						State updated {{ updateTimeDiff }}
 					</Text>
 				</Flex>
 
