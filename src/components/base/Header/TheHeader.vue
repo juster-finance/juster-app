@@ -166,6 +166,16 @@ const handleNetworkDblClick = () => {
 							Events with filtering
 						</div>
 					</router-link>
+					<router-link to="/pools" :class="$style.mobile_menu__link">
+						<div :class="$style.left">
+							<Icon name="server" size="14" />
+							<span>Liquidity Pools</span>
+						</div>
+
+						<div :class="$style.mobile_menu__description">
+							Provide liquidity for events
+						</div>
+					</router-link>
 					<router-link
 						to="/markets"
 						:class="$style.mobile_menu__link"
