@@ -125,7 +125,7 @@ html {
 .dropdown-enter-from,
 .dropdown-leave-to {
 	opacity: 0;
-	transform: scale(0.95);
+	transform: translateY(20px);
 }
 
 .popup-enter-active,
