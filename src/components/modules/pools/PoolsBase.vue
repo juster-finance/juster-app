@@ -312,9 +312,8 @@ const { meta } = useMeta({
 						@onClose="handleClosePoolsWarning"
 					>
 						<span>Current APYs is approximate.</span> Values may
-						change by ~5% over the next few months. Planning for
-						long-term income based on these values may differ from
-						the actual.
+						change over the next few months. Planning for long-term
+						income based on these values may differ from the actual.
 					</Block>
 
 					<transition name="fade">
