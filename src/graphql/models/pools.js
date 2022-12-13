@@ -3,6 +3,7 @@ export const pool = {
 	version: true,
 	address: true,
 	isDepositPaused: true,
+	entryLockPeriod: true,
 }
 
 export const poolPosition = {

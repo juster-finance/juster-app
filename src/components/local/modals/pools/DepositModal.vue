@@ -2,7 +2,16 @@
 /**
  * Vendor
  */
-import { ref, reactive, watch, computed, nextTick } from "vue"
+import {
+	ref,
+	reactive,
+	watch,
+	computed,
+	nextTick,
+	onMounted,
+	onBeforeUnmount,
+} from "vue"
+import { DateTime } from "luxon"
 import BN from "bignumber.js"
 
 /**
@@ -55,6 +64,8 @@ const balanceToAmountRatio = computed(() => {
 			(percent > 100 && "bad"),
 	}
 })
+
+const depositInShares = computed(() => amount.value / props.state.sharePrice)
 
 const opConfirmationInProgress = ref(false)
 const handleDeposit = async () => {
@@ -155,20 +166,54 @@ const buttonState = computed(() => {
 	}
 })
 
-const depositInShares = computed(() => amount.value / props.state.sharePrice)
-
 const handleKeydown = (e) => {
 	sanitizeInput(e)
+}
+
+let timingInterval = null
+const timing = reactive({
+	create: null,
+	accept: null,
+})
+const initTiming = () => {
+	timing.create = DateTime.now().setLocale("en")
+	timing.accept = DateTime.now().setLocale("en").plus({
+		seconds: props.selectedPool.entryLockPeriod,
+	})
+}
+
+const getEntryLockPeriodText = () => {
+	const diff = DateTime.now()
+		.plus({ seconds: props.selectedPool.entryLockPeriod })
+		.diff(DateTime.now(), ["days", "hours", "minutes"])
+		.toObject()
+
+	if (diff.days) {
+		return `${diff.days}d`
+	} else if (diff.hours) {
+		return `${diff.hours}h`
+	} else if (diff.minutes) {
+		return `${diff.minutes}m`
+	} else {
+		return `Instant`
+	}
 }
 
 watch(
 	() => props.show,
 	() => {
 		if (props.show) {
+			initTiming()
+			timingInterval = setInterval(() => {
+				initTiming()
+			}, 5_000)
+
 			nextTick(() => {
 				inputEl.value.$el.querySelector("input").focus()
 			})
 		} else {
+			clearInterval(timingInterval)
+
 			amount.value = 0
 		}
 	},
@@ -453,38 +498,46 @@ watch(
 
 						<Flex align="center">
 							<Text size="14" weight="600" color="primary">
-								Today</Text
-							>&nbsp;
+								{{
+									capitalizeFirstLetter(
+										timing.create.toRelativeCalendar(),
+									)
+								}}
+							</Text>
+							&nbsp;
 							<Text size="14" weight="600" color="tertiary">
-								at</Text
-							>&nbsp;
+								at
+							</Text>
+							&nbsp;
 							<Text size="14" weight="600" color="primary">
-								15:00</Text
-							>&nbsp;
-							<Text size="14" weight="600" color="secondary">
-								~</Text
-							>&nbsp;
-							<Text size="14" weight="600" color="primary"
-								>12,000</Text
-							>&nbsp;
-							<Text size="14" weight="600" color="tertiary"
-								>shares</Text
-							>
+								{{ timing.create.toFormat("HH:mm") }}
+							</Text>
 						</Flex>
 					</Flex>
+
+					<div v-for="i in 5" :class="$style.dot" />
+					<Text size="14" weight="600" color="tertiary">
+						{{ getEntryLockPeriodText() }}</Text
+					>
+					<div v-for="i in 5" :class="$style.dot" />
 
 					<Flex align="center" gap="8">
 						<Icon name="checkcircle" size="14" color="tertiary" />
 
 						<Flex align="center">
 							<Text size="14" weight="600" color="primary">
-								Sep 25 </Text
-							>&nbsp;
+								{{
+									capitalizeFirstLetter(
+										timing.accept.toRelativeCalendar(),
+									)
+								}}
+							</Text>
+							&nbsp;
 							<Text size="14" weight="600" color="tertiary"
 								>at</Text
 							>&nbsp;
 							<Text size="14" weight="600" color="primary">
-								15:00
+								{{ timing.accept.toFormat("HH:mm") }}
 							</Text>
 						</Flex>
 					</Flex>
@@ -561,5 +614,12 @@ watch(
 	background: rgba(255, 255, 255, 0.05);
 
 	padding: 0 12px;
+}
+
+.dot {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background: var(--text-support);
 }
 </style>
