@@ -73,7 +73,7 @@ const stats = computed(() => {
 		<Flex direction="column" gap="8" :class="$style.stat">
 			<Flex align="center" gap="6" :class="$style.stat__values">
 				<Text v-if="isReady" size="16" weight="600" color="primary">
-					{{ stats.avgSharePrice.toFixed(2) }}
+					500
 				</Text>
 				<LoadingDots v-else />
 
@@ -93,7 +93,7 @@ const stats = computed(() => {
 				color="tertiary"
 				:class="$style.stat__subtitle"
 			>
-				Avg Share Price
+				User's Income
 			</Text>
 		</Flex>
 
@@ -139,7 +139,7 @@ const stats = computed(() => {
 				color="tertiary"
 				:class="$style.stat__subtitle"
 			>
-				Stability
+				Utilization
 			</Text>
 		</Flex>
 	</Flex>

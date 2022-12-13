@@ -2,11 +2,9 @@
 	<Flex direction="column" gap="24" :class="$style.wrapper">
 		<Flex justify="between" wide>
 			<Flex direction="column" gap="8">
-				<Text size="16" weight="600" color="primary">
-					Pools Chart
-				</Text>
+				<Text size="16" weight="600" color="primary"> Chart </Text>
 				<Text size="14" weight="500" height="14" color="tertiary">
-					Aggregated visualization of pools
+					Aggregated data of pools
 				</Text>
 			</Flex>
 
