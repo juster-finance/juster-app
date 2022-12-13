@@ -287,8 +287,8 @@ const handleGetClaims = () => {
 						<Flex direction="column" gap="6">
 							Your funds are being prepared for withdrawal
 							<span>
-								You need to wait for their output from the<br />
-								pool, and then make a withdrawal of your funds
+								You have to wait until the events in which<br />
+								your funds are used are over
 							</span>
 						</Flex>
 					</template>
