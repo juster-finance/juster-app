@@ -2,7 +2,7 @@
 /**
  * Vendor
  */
-import { ref, computed, onMounted, onBeforeUnmount } from "vue"
+import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import { DateTime } from "luxon"
 
 /**
@@ -48,21 +48,35 @@ const props = defineProps({
 	},
 })
 
-const updateTimeDiff = computed(() => {
+let poolUpdInterval = null
+const poolUpdDiff = ref({})
+const updateTimeDiff = () => {
 	let dt = DateTime.fromJSDate(props.state.timestamp)
 
 	if (dt.invalid) {
 		dt = DateTime.fromISO(props.state.timestamp)
 	}
 
-	return dt.setLocale("en").toRelative()
-})
+	poolUpdDiff.value = dt.setLocale("en").toRelative()
+}
+watch(
+	() => props.state,
+	() => {
+		if (props.state) updateTimeDiff()
+	},
+)
 
 onMounted(() => {
+	poolUpdInterval = setInterval(() => {
+		updateTimeDiff()
+	}, 30_000)
+
 	cardEl.value.addEventListener("contextmenu", contextMenuHandler)
 })
 
 onBeforeUnmount(() => {
+	clearInterval(poolUpdInterval)
+
 	cardEl.value.removeEventListener("contextmenu", contextMenuHandler)
 })
 
@@ -456,7 +470,7 @@ const copy = (target) => {
 					</Flex>
 
 					<Text v-if="state" size="12" color="support" weight="600">
-						State updated {{ updateTimeDiff }}
+						State updated {{ poolUpdDiff }}
 					</Text>
 				</Flex>
 
