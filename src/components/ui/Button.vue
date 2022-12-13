@@ -288,6 +288,7 @@ onBeforeUnmount(() => {
 	height: 32px;
 	padding: 0 12px;
 	font-size: 13px;
+	gap: 8px;
 	border-radius: 6px;
 }
 .wrapper.small.icon {
@@ -318,6 +319,16 @@ onBeforeUnmount(() => {
 }
 .wrapper.success:hover {
 	background: var(--btn-success-bg-hover);
+	box-shadow: 0 0 0 0 transparent;
+}
+
+.wrapper.error {
+	background: var(--btn-error-bg);
+	fill: var(--text-black);
+	color: var(--text-black);
+}
+.wrapper.error:hover {
+	background: var(--btn-error-bg-hover);
 	box-shadow: 0 0 0 0 transparent;
 }
 

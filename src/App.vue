@@ -235,6 +235,9 @@ html {
 	--btn-success-bg: #1aa168;
 	--btn-success-bg-hover: #24af75;
 
+	--btn-error-bg: #e05c43;
+	--btn-error-bg-hover: #ce4f35;
+
 	--btn-white-bg: rgba(255, 255, 255, 0.9);
 	--btn-white-bg-hover: rgba(255, 255, 255, 0.8);
 

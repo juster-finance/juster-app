@@ -81,11 +81,6 @@ const blocks = ref([
 				path: "/advanced",
 			},
 			{
-				name: "Releases",
-				icon: "asterisk",
-				path: "/releases",
-			},
-			{
 				name: "Debugging",
 				icon: "console",
 				path: "/debugging",

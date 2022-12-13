@@ -179,14 +179,6 @@ const routes = [
 					),
 			},
 			{
-				name: "ReleasesSettings",
-				path: "releases",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/ReleasesSettings.vue"
-					),
-			},
-			{
 				name: "DebuggingSettings",
 				path: "debugging",
 				component: () =>

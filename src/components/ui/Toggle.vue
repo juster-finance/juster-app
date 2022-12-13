@@ -2,11 +2,12 @@
 const props = defineProps({
 	modelValue: { type: Boolean, default: false },
 	disabled: { type: Boolean, default: false },
+	protected: { type: Boolean, default: false },
 })
 const emit = defineEmits(["update:modelValue"])
 
 const toggle = () => {
-	if (props.disabled) return
+	if (props.disabled || props.protected) return
 
 	emit("update:modelValue", !props.modelValue)
 }

@@ -10,6 +10,19 @@ export const useAppStore = defineStore({
 			confirmation: {
 				title: "",
 				description: "",
+				metadata: {
+					buttons: {
+						cancel: {
+							title: null,
+							icon: null,
+						},
+						confirm: {
+							title: null,
+							icon: null,
+						},
+					},
+				},
+				badges: [],
 				callback: null,
 				show: false,
 			},
@@ -25,9 +38,6 @@ export const useAppStore = defineStore({
 			this.confirmation.show = true
 
 			this.confirmation.callback = callback
-		},
-		cancelConfirmation() {
-			this.confirmation.show = false
 		},
 	},
 })

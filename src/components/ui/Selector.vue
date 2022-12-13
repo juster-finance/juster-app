@@ -3,10 +3,10 @@ const props = defineProps({
 	name: {
 		type: String,
 	},
-	hint: {
-		type: String,
-	},
 	selected: {
+		type: Boolean,
+	},
+	disabled: {
 		type: Boolean,
 	},
 })
@@ -17,21 +17,22 @@ const props = defineProps({
 		align="center"
 		justify="between"
 		gap="8"
-		:class="$style.item"
+		:class="[$style.item, disabled && $style.disabled]"
 		tabindex="1"
 	>
 		<Flex align="center" gap="8">
 			<Icon
+				v-if="!disabled"
 				:name="selected ? 'event_active' : 'event_new'"
 				size="16"
 				:color="selected ? 'blue' : 'tertiary'"
 			/>
+			<Icon v-else name="lock" size="16" color="tertiary" />
+
 			<Text size="13" weight="600" color="primary">{{ name }}</Text>
 		</Flex>
 
-		<Text v-if="hint" size="11" weight="600" color="tertiary">
-			{{ hint }}
-		</Text>
+		<slot name="hint" />
 	</Flex>
 </template>
 
@@ -52,5 +53,10 @@ const props = defineProps({
 .item:focus {
 	outline: none;
 	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.item.disabled {
+	opacity: 0.5;
+	pointer-events: none;
 }
 </style>

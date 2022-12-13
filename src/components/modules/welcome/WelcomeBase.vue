@@ -931,9 +931,18 @@ const handleEnd = () => {
 								v-for="item in currencyItems"
 								@click="selectedCurrencyItem = item.name"
 								:name="item.name"
-								:hint="item.hint"
 								:selected="selectedCurrencyItem === item.name"
-							/>
+							>
+								<template v-if="item.hint" #hint>
+									<Text
+										size="11"
+										weight="600"
+										color="tertiary"
+									>
+										{{ item.hint }}
+									</Text>
+								</template>
+							</Selector>
 						</Flex>
 
 						<Text

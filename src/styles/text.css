@@ -3,6 +3,10 @@
 	font-size: 8px;
 }
 
+.fz--10 {
+	font-size: 10px;
+}
+
 .fz--11 {
 	font-size: 11px;
 }
@@ -136,8 +140,12 @@
 	fill: var(--text-support);
 }
 
-.fill--blue {
+.fill--textblue {
 	fill: var(--text-blue);
+}
+
+.fill--blue {
+	fill: var(--blue);
 }
 
 .fill--orange {
@@ -158,4 +166,8 @@
 
 .fill--yellow {
 	fill: var(--yellow);
+}
+
+.fill--purple {
+	fill: var(--purple);
 }

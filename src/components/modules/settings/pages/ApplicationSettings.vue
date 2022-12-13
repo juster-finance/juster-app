@@ -11,6 +11,7 @@ import Toggle from "@ui/Toggle.vue"
 import { Dropdown, DropdownItem, DropdownTrigger } from "@ui/Dropdown"
 
 const showTezosExplorersDropdown = ref(false)
+const showDefaultChartDropdown = ref(false)
 const showSlippageToleranceDropdown = ref(false)
 </script>
 
@@ -46,7 +47,7 @@ const showSlippageToleranceDropdown = ref(false)
 		<Flex direction="column" gap="24">
 			<!-- Tezos Explorer -->
 			<Flex justify="between" gap="24">
-				<Flex direction="column" gap="8">
+				<Flex direction="column" gap="6">
 					<Text size="13" weight="600" color="primary">
 						Tezos Explorer
 					</Text>
@@ -82,7 +83,7 @@ const showSlippageToleranceDropdown = ref(false)
 
 			<!-- Default Chart -->
 			<Flex justify="between" gap="24">
-				<Flex direction="column" gap="8">
+				<Flex direction="column" gap="6">
 					<Text size="13" weight="600" color="primary">
 						Default Chart
 					</Text>
@@ -91,12 +92,38 @@ const showSlippageToleranceDropdown = ref(false)
 					</Text>
 				</Flex>
 
-				<DropdownTrigger label="TradingView" />
+				<Dropdown :forceOpen="showDefaultChartDropdown">
+					<template #trigger>
+						<DropdownTrigger
+							label="TradingView"
+							@toggle="
+								showDefaultChartDropdown =
+									!showDefaultChartDropdown
+							"
+							@onClose="showDefaultChartDropdown = false"
+						/>
+					</template>
+
+					<template #dropdown>
+						<DropdownItem>
+							<Icon name="empty" size="16" />
+							Simple
+						</DropdownItem>
+						<DropdownItem data-active="true">
+							<Icon name="check" size="16" color="secondary" />
+							TradingView
+						</DropdownItem>
+						<DropdownItem>
+							<Icon name="empty" size="16" />
+							Cryptowatch
+						</DropdownItem>
+					</template>
+				</Dropdown>
 			</Flex>
 
 			<!-- Test Network Toggle -->
 			<Flex justify="between" gap="24">
-				<Flex direction="column" gap="8">
+				<Flex direction="column" gap="6">
 					<Text size="13" weight="600" color="primary">
 						Test Network
 					</Text>
@@ -115,7 +142,7 @@ const showSlippageToleranceDropdown = ref(false)
 
 			<!-- Slippage Tolerance -->
 			<Flex justify="between" gap="24">
-				<Flex direction="column" gap="8">
+				<Flex direction="column" gap="6">
 					<Text size="13" weight="600" color="primary">
 						Slippage Tolerance
 					</Text>
@@ -156,7 +183,7 @@ const showSlippageToleranceDropdown = ref(false)
 
 			<!-- Warning at large amount -->
 			<Flex justify="between" gap="24">
-				<Flex direction="column" gap="8">
+				<Flex direction="column" gap="6">
 					<Text size="13" weight="600" color="primary">
 						Warning at large amount
 					</Text>
@@ -171,7 +198,7 @@ const showSlippageToleranceDropdown = ref(false)
 
 			<!-- Events only by Juster Team -->
 			<Flex justify="between" gap="24">
-				<Flex direction="column" gap="8">
+				<Flex direction="column" gap="6">
 					<Text size="13" weight="600" color="primary">
 						Events only by Juster Team
 					</Text>
@@ -185,7 +212,7 @@ const showSlippageToleranceDropdown = ref(false)
 
 			<!-- Hide events with low liquidity -->
 			<Flex justify="between" gap="24">
-				<Flex direction="column" gap="8">
+				<Flex direction="column" gap="6">
 					<Text size="13" weight="600" color="primary">
 						Hide events with low liquidity
 					</Text>
