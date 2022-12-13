@@ -395,17 +395,14 @@ const copy = (target) => {
 							weight="600"
 							color="tertiary"
 							:class="$style.stat__title"
-							>Events</Text
 						>
+							Utilization
+						</Text>
 
 						<Flex align="center" gap="6">
-							<Icon
-								name="price_event"
-								size="14"
-								color="secondary"
-							/>
+							<Icon name="checkcircle" size="14" color="green" />
 							<Text size="15" weight="600" color="secondary">
-								2
+								100%
 							</Text>
 						</Flex>
 					</Flex>
@@ -424,8 +421,9 @@ const copy = (target) => {
 							weight="600"
 							color="tertiary"
 							:class="$style.stat__title"
-							>Stake Index</Text
 						>
+							Risk Index
+						</Text>
 
 						<Flex align="center" gap="6">
 							<Icon name="checkcircle" size="14" color="green" />
