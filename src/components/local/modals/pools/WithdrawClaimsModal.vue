@@ -228,7 +228,7 @@ const buttonState = computed(() => {
 					@click="emit('onBack')"
 					size="14"
 					weight="600"
-					color="secondary"
+					color="primary"
 					:class="$style.head_btn"
 				>
 					Withdraw claims
@@ -246,19 +246,37 @@ const buttonState = computed(() => {
 
 		<Flex direction="column" gap="32" :class="$style.base">
 			<Flex direction="column" gap="8">
+				<Flex>
+					<Text size="13" weight="500" color="tertiary" height="16">
+						Your withdrawal request contains&nbsp;
+					</Text>
+					<Text size="13" weight="500" color="secondary" height="16">
+						{{ availableClaims.length }} available claims.
+					</Text>
+				</Flex>
+
+				<Text size="13" weight="500" color="tertiary" height="16">
+					Funds will be available in your wallet as soon as all
+					transactions are accepted, and this depends on the number of
+					pools affected.
+				</Text>
+			</Flex>
+
+			<Flex direction="column" gap="8">
 				<Flex align="center" justify="between">
 					<Text size="12" weight="600" color="secondary">
 						Withdrawal
 					</Text>
 					<Text size="12" weight="600" color="tertiary">
-						{{ affectedPools.length }} affected
+						{{ affectedPools.length }}
+						affected
 						{{ affectedPools.length > 1 ? "pools" : "pool" }}
 					</Text>
 				</Flex>
 
 				<Flex align="center" justify="between" :class="$style.badge">
 					<Flex align="center" gap="8">
-						<Icon name="money" size="14" color="green" />
+						<Icon name="walletadd" size="14" color="green" />
 
 						<Flex>
 							<Text size="14" weight="600" color="primary">
@@ -402,7 +420,7 @@ const buttonState = computed(() => {
 }
 
 .base {
-	padding: 8px 20px 20px 20px;
+	padding: 0 20px 20px 20px;
 }
 
 .badge {
