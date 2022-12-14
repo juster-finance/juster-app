@@ -9,7 +9,7 @@ import cloneDeep from "lodash.clonedeep"
 /**
  * UI
  */
-import Spin from "@ui/Spin.vue"
+import LoadingBar from "@ui/LoadingBar.vue"
 import Modal from "@ui/Modal.vue"
 import Button from "@ui/Button.vue"
 import Pagination from "@ui/Pagination.vue"
@@ -376,9 +376,11 @@ const buttonState = computed(() => {
 				size="large"
 				block
 			>
-				<Spin v-if="opConfirmationInProgress" size="16" />
-				<Icon v-else name="login" size="16" color="white" />
-				{{ buttonState.text }}
+				<LoadingBar v-if="opConfirmationInProgress" size="16" />
+				<template v-else>
+					<Icon name="login" size="16" color="white" />
+					{{ buttonState.text }}
+				</template>
 			</Button>
 		</Flex>
 	</Modal>

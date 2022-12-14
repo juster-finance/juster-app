@@ -9,6 +9,7 @@ import BN from "bignumber.js"
  * UI
  */
 import Spin from "@ui/Spin.vue"
+import LoadingBar from "@ui/LoadingBar.vue"
 import Modal from "@ui/Modal.vue"
 import Input from "@ui/Input.vue"
 import Button from "@ui/Button.vue"
@@ -373,9 +374,11 @@ const handleCloseRequestFundsWarning = () => {
 					size="large"
 					block
 				>
-					<Spin v-if="opConfirmationInProgress" size="16" />
-					<Icon v-else name="money" size="16" color="white" />
-					{{ buttonState.text }}
+					<LoadingBar v-if="opConfirmationInProgress" size="16" />
+					<template v-else>
+						<Icon name="money" size="16" color="white" />
+						{{ buttonState.text }}
+					</template>
 				</Button>
 
 				<Text

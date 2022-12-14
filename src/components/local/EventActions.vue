@@ -140,8 +140,8 @@ const btnType = computed(() => {
 				{{ f(positionForWithdraw.value) }} ꜩ
 			</template>
 
-			<template v-else
-				><Spin size="12" />Awaiting confirmation..
+			<template v-else>
+				<Spin size="12" />Awaiting confirmation..
 			</template>
 		</Button>
 	</div>

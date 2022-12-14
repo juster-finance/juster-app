@@ -2,15 +2,7 @@
 /**
  * Vendor
  */
-import {
-	ref,
-	reactive,
-	watch,
-	computed,
-	nextTick,
-	onMounted,
-	onBeforeUnmount,
-} from "vue"
+import { ref, reactive, watch, computed, nextTick } from "vue"
 import { DateTime } from "luxon"
 import BN from "bignumber.js"
 
@@ -18,6 +10,7 @@ import BN from "bignumber.js"
  * UI
  */
 import Spin from "@ui/Spin.vue"
+import LoadingBar from "@ui/LoadingBar.vue"
 import Modal from "@ui/Modal.vue"
 import Input from "@ui/Input.vue"
 import Button from "@ui/Button.vue"
@@ -553,9 +546,11 @@ watch(
 					size="large"
 					block
 				>
-					<Spin v-if="opConfirmationInProgress" size="16" />
-					<Icon v-else name="plus_circle" size="16" color="white" />
-					{{ buttonState.text }}
+					<LoadingBar v-if="opConfirmationInProgress" size="16" />
+					<template v-else>
+						<Icon name="plus_circle" size="16" color="white" />
+						{{ buttonState.text }}
+					</template>
 				</Button>
 
 				<Text
