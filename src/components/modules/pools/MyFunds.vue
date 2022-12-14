@@ -10,6 +10,7 @@ import { DateTime } from "luxon"
  */
 import Spin from "@ui/Spin.vue"
 import Button from "@ui/Button.vue"
+import Banner from "@ui/Banner.vue"
 import Tooltip from "@ui/Tooltip.vue"
 
 /**
@@ -90,13 +91,41 @@ const allClaims = computed(() => [
 	...pendingClaims.value,
 ])
 
-const hasOneAvailableClaimToWithdraw = computed(() =>
-	allClaims.value.some((claim) => claim.event.result),
-)
+const oldestClaim = computed(() => {
+	if (!availableClaims.value.length) return
 
-const isAllClaimsAvailable = computed(() =>
-	allClaims.value.every((claim) => claim.event.result),
-)
+	const claim = availableClaims.value.sort((a, b) => {
+		const { betsCloseTime: aBetsCloseTime, measurePeriod: aMeasurePeriod } =
+			a.event.event
+		const { betsCloseTime: bBetsCloseTime, measurePeriod: bMeasurePeriod } =
+			b.event.event
+
+		const aDiff = DateTime.now()
+			.diff(
+				DateTime.fromISO(aBetsCloseTime).plus(aMeasurePeriod * 1000),
+				["days"],
+			)
+			.toObject()
+		const bDiff = DateTime.now()
+			.diff(
+				DateTime.fromISO(bBetsCloseTime).plus(bMeasurePeriod * 1000),
+				["days"],
+			)
+			.toObject()
+
+		return bDiff.days - aDiff.days
+	})[0]
+
+	let days = 0
+	const { betsCloseTime, measurePeriod } = claim.event.event
+	days = DateTime.now()
+		.diff(DateTime.fromISO(betsCloseTime).plus(measurePeriod * 1000), [
+			"days",
+		])
+		.toObject().days
+
+	return { data: claim, days }
+})
 
 const getClaimReadyTime = (claim) => {
 	const { betsCloseTime, measurePeriod } = claim.event.event
@@ -388,6 +417,25 @@ const handleGetClaims = () => {
 			</Flex>
 		</Flex>
 
+		<Flex
+			v-if="availableClaims.length && oldestClaim.days > 2"
+			gap="12"
+			:class="$style.warning_badge"
+		>
+			<Icon name="money" size="16" color="green" />
+
+			<Flex direction="column" gap="8">
+				<Text size="14" weight="600" color="primary">
+					Your funds are waiting to be withdrawn
+				</Text>
+				<Text size="13" weight="500" color="tertiary" height="16">
+					It looks like your funds are ready for more than
+					{{ oldestClaim.days.toFixed(0) }} days, but you still have
+					not made a manual withdrawal.
+				</Text>
+			</Flex>
+		</Flex>
+
 		<Flex direction="column" gap="12" :class="$style.buttons">
 			<Button
 				@click="handleDepositLiquidityClick"
@@ -510,8 +558,12 @@ const handleGetClaims = () => {
 	margin-top: 24px;
 }
 
-.hint {
-	padding: 0 16px;
+.warning_badge {
+	border-radius: 8px;
+	background: var(--app-bg);
+
+	margin-top: 24px;
+	padding: 16px;
 }
 
 @media (max-width: 500px) {
