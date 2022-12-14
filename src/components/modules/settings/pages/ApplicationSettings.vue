@@ -225,6 +225,90 @@ const showSlippageToleranceDropdown = ref(false)
 				<Toggle />
 			</Flex>
 		</Flex>
+
+		<Flex direction="column" gap="24">
+			<Text size="16" weight="600" color="primary">Other</Text>
+
+			<Flex justify="between" gap="24">
+				<Flex direction="column" gap="6">
+					<Text size="13" weight="600" color="primary">
+						Event Card
+					</Text>
+					<Text size="13" weight="500" color="tertiary" height="16">
+						Select the default display option for the event card
+						with different detail display options (chart, badges,
+						etc.)
+					</Text>
+				</Flex>
+
+				<Dropdown :forceOpen="showSlippageToleranceDropdown">
+					<template #trigger>
+						<DropdownTrigger
+							label="Card"
+							width="100"
+							@toggle="
+								showSlippageToleranceDropdown =
+									!showSlippageToleranceDropdown
+							"
+							@onClose="showSlippageToleranceDropdown = false"
+						/>
+					</template>
+
+					<template #dropdown>
+						<DropdownItem>
+							<Icon name="check" size="16" color="secondary" />
+							Simple
+						</DropdownItem>
+						<DropdownItem data-active="true">
+							<Icon name="empty" size="16" />
+							Card
+						</DropdownItem>
+						<DropdownItem>
+							<Icon name="empty" size="16" />
+							Extended
+						</DropdownItem>
+					</template>
+				</Dropdown>
+			</Flex>
+
+			<Flex justify="between" gap="24">
+				<Flex direction="column" gap="6">
+					<Text size="13" weight="600" color="primary">
+						Liquidity Pool Card
+					</Text>
+					<Text size="13" weight="500" color="tertiary" height="16">
+						Select the default display option for the liquidity pool
+						card with different detail display options (stats,
+						timing, etc.)
+					</Text>
+				</Flex>
+
+				<Dropdown :forceOpen="showSlippageToleranceDropdown">
+					<template #trigger>
+						<DropdownTrigger
+							label="Extended"
+							width="100"
+							@toggle="
+								showSlippageToleranceDropdown =
+									!showSlippageToleranceDropdown
+							"
+							@onClose="showSlippageToleranceDropdown = false"
+						/>
+					</template>
+
+					<template #dropdown>
+						<DropdownItem data-active="true">
+							<Icon name="check" size="16" />
+							Extended
+						</DropdownItem>
+						<DropdownItem>
+							<Icon name="empty" size="16" />
+							Simple
+						</DropdownItem>
+					</template>
+				</Dropdown>
+			</Flex>
+		</Flex>
 	</Flex>
 </template>
 
