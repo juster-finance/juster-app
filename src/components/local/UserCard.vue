@@ -145,9 +145,9 @@ const handleCopy = (target) => {
 					<DropdownItem>
 						<Icon name="user" size="16" />User profile
 					</DropdownItem>
-
-					<DropdownDivider />
 				</router-link>
+
+				<DropdownDivider />
 
 				<a
 					:href="`https://${

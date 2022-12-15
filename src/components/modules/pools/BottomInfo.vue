@@ -1,5 +1,10 @@
 <script setup>
 /**
+ * Vendor
+ */
+import { useRouter } from "vue-router"
+
+/**
  * UI
  */
 import Button from "@ui/Button.vue"
@@ -13,6 +18,8 @@ import {
 const props = defineProps({
 	pool: Object,
 })
+
+const router = useRouter()
 </script>
 
 <template>
@@ -46,8 +53,8 @@ const props = defineProps({
 
 					<template #dropdown>
 						<DropdownItem disabled>
-							<Icon name="notifications" size="16" />Setup
-							Notifications
+							<Icon name="notifications" size="16" />
+							Setup Notifications
 						</DropdownItem>
 
 						<DropdownDivider />
@@ -65,7 +72,7 @@ const props = defineProps({
 						<DropdownDivider />
 
 						<DropdownTitle>Raw Data</DropdownTitle>
-						<DropdownItem>
+						<DropdownItem @click="router.push('/pools/raw')">
 							<Icon name="table" size="16" /> Pools
 						</DropdownItem>
 						<DropdownItem>

@@ -194,37 +194,29 @@ const copy = (target) => {
 							{{ pool.name.replace("Juster Pool: ", "") }}
 						</Text>
 
-						<Flex align="center" gap="8">
-							<Flex align="center" gap="4">
-								<Icon
-									:name="
-										!pool.isDepositPaused
-											? 'zap_circle'
-											: 'pause'
-									"
-									size="12"
-									:color="
-										!pool.isDepositPaused
-											? 'green'
-											: 'yellow'
-									"
-								/>
-								<Text
-									size="12"
-									weight="600"
-									:color="
-										!pool.isDepositPaused
-											? 'green'
-											: 'yellow'
-									"
-								>
-									{{
-										!pool.isDepositPaused
-											? "Active"
-											: "Paused"
-									}}
-								</Text>
-							</Flex>
+						<Flex align="center" gap="4">
+							<Icon
+								:name="
+									!pool.isDepositPaused
+										? 'zap_circle'
+										: 'pause'
+								"
+								size="12"
+								:color="
+									!pool.isDepositPaused ? 'green' : 'yellow'
+								"
+							/>
+							<Text
+								size="12"
+								weight="600"
+								:color="
+									!pool.isDepositPaused ? 'green' : 'yellow'
+								"
+							>
+								{{
+									!pool.isDepositPaused ? "Active" : "Paused"
+								}}
+							</Text>
 						</Flex>
 					</Flex>
 				</Flex>

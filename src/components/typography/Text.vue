@@ -19,6 +19,9 @@ const props = defineProps({
 	color: {
 		type: String,
 	},
+	noWrap: {
+		type: Boolean,
+	},
 })
 
 const classes = computed(() => {
@@ -38,6 +41,9 @@ const classes = computed(() => {
 	}
 	if (props.color) {
 		flexClasses.push(`color--${props.color}`)
+	}
+	if (props.noWrap) {
+		flexClasses.push(`no-wrap`)
 	}
 
 	return flexClasses

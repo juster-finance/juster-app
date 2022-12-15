@@ -192,7 +192,7 @@ const handleCloseRequestFundsWarning = () => {
 					@click="emit('onBack')"
 					size="14"
 					weight="600"
-					color="secondary"
+					color="primary"
 					:class="$style.head_btn"
 				>
 					Request Withdraw

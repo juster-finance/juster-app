@@ -73,12 +73,19 @@ const routes = [
 		component: () => import("@views/MarketPage.vue"),
 	},
 
+	// Pools
 	{
 		path: "/pools",
 		name: "Liquidity Pools",
 		component: () => import("@views/PoolsPage.vue"),
 	},
+	{
+		path: "/pools/raw",
+		name: "Raw Pools",
+		component: () => import("@views/RawPoolsPage.vue"),
+	},
 
+	// Settings
 	{
 		path: "/settings",
 		name: "Settings",
