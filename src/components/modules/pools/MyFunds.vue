@@ -17,6 +17,13 @@ import Tooltip from "@ui/Tooltip.vue"
  */
 import { numberWithSymbol } from "@utils/amounts"
 
+/**
+ * Store
+ */
+import { useAccountStore } from "@store/account"
+
+const accountStore = useAccountStore()
+
 const emit = defineEmits(["onDepositLiquidity", "onGetClaims"])
 const props = defineProps({
 	pools: Array,
@@ -43,7 +50,7 @@ const isDepositAvailable = computed(() => {
 })
 
 const handleDepositLiquidityClick = () => {
-	if (!isDepositAvailable.value) return
+	if (!isDepositAvailable.value || !parseFloat(accountStore.balance)) return
 	emit("onDepositLiquidity")
 }
 
@@ -439,7 +446,9 @@ const handleGetClaims = () => {
 			<Button
 				@click="handleDepositLiquidityClick"
 				@onKeybind="handleDepositLiquidityClick"
-				:disabled="!isDepositAvailable"
+				:disabled="
+					!isDepositAvailable || !parseFloat(accountStore.balance)
+				"
 				type="primary"
 				size="medium"
 				keybind="D+L"

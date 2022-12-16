@@ -351,6 +351,10 @@ const handleNetworkDblClick = () => {
 	gap: 12px;
 }
 
+.logo:focus {
+	box-shadow: none;
+}
+
 .logo svg {
 	fill: var(--text-primary);
 

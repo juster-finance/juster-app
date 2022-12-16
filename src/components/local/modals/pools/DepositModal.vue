@@ -9,7 +9,6 @@ import BN from "bignumber.js"
 /**
  * UI
  */
-import Spin from "@ui/Spin.vue"
 import LoadingBar from "@ui/LoadingBar.vue"
 import Modal from "@ui/Modal.vue"
 import Input from "@ui/Input.vue"

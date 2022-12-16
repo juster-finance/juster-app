@@ -13,6 +13,7 @@ import Spin from "@ui/Spin.vue"
  * Store
  */
 import { useAccountStore } from "@store/account"
+
 const accountStore = useAccountStore()
 
 const props = defineProps({
@@ -64,7 +65,14 @@ const btnType = computed(() => {
 				large && !isWon && !positionForWithdraw && !successfulWithdrawal
 			"
 		>
-			<Flex gap="4" wide :class="disabled && $style.disabled_btns">
+			<Flex
+				gap="4"
+				wide
+				:class="[
+					disabled && $style.disabled_btns,
+					!parseFloat(accountStore.balance) && $style.disabled_btns,
+				]"
+			>
 				<Button
 					@click="emit('onBet', 'Rise')"
 					type="primary"
@@ -106,6 +114,7 @@ const btnType = computed(() => {
 					$style.action,
 					primary && $style.primary,
 					disabled && $style.disabled,
+					!parseFloat(accountStore.balance) && $style.disabled,
 				]"
 			>
 				<div :class="$style.left">
@@ -130,6 +139,7 @@ const btnType = computed(() => {
 					$style.action,
 					primary && $style.primary,
 					disabled && $style.disabled,
+					!parseFloat(accountStore.balance) && $style.disabled,
 				]"
 			>
 				<div :class="$style.ratio">

@@ -87,6 +87,7 @@ const contextMenuHandler = (e) => {
 }
 
 const handleDeposit = () => {
+	if (!parseFloat(accountStore.balance)) return
 	if (!isDepositAvailable.value) {
 		if (!accountStore.pkh)
 			notificationsStore.create({
@@ -228,6 +229,7 @@ const copy = (target) => {
 					>
 						<Button
 							@click="handleDeposit"
+							:disabled="!parseFloat(accountStore.balance)"
 							type="secondary"
 							size="small"
 						>
