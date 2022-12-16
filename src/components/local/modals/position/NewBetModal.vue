@@ -746,26 +746,6 @@ const handleUserTransactionConfirmation = () => {
 				</Flex>
 			</Flex>
 
-			<!-- 
-			<Input
-				type="number"
-				:limit="10000"
-				label="Amount"
-				placeholder="Bet amount"
-				subtext="ꜩ"
-				v-model="amount.value"
-				@input="handleInput"
-				@keydown="handleKeydown"
-				:class="$style.amount_input"
-			>
-				<template v-slot:rightText>
-					<div :class="$style.potential_reward">
-						Payout:
-						<span>{{ rewardText }}</span> ꜩ
-					</div>
-				</template>
-			</Input> -->
-
 			<Button
 				@click="handleStake"
 				size="large"

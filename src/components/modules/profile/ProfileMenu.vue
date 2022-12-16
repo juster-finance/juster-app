@@ -16,11 +16,9 @@ import { analytics } from "@sdk"
 /**
  * Store
  */
-import { useAppStore } from "@store/app"
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
 
-const appStore = useAppStore()
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 
@@ -47,6 +45,7 @@ const handleOpenReleases = () => {
 const handleLogout = () => {
 	/** confirmation.request -> onConfirm -> callback */
 	accountStore.logout()
+	location.reload()
 	notificationsStore.create({
 		notification: {
 			icon: "logout",

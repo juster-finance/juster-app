@@ -21,6 +21,7 @@ import Tooltip from "@ui/Tooltip.vue"
  * Local
  */
 import ParticipantsModal from "@local/modals/ParticipantsModal.vue"
+import ConfirmTransactionModal from "@local/modals/ConfirmTransactionModal.vue"
 import NotifyMeModal from "@local/modals/NotifyMeModal.vue"
 import LiquidityModal from "@local/modals/position/LiquidityModal.vue"
 import NewBetModal from "@local/modals/position/NewBetModal.vue"
@@ -29,11 +30,7 @@ import EventActions from "@local/EventActions.vue"
 /**
  * Services
  */
-import {
-	toClipboard,
-	getCurrencyIcon,
-	capitalizeFirstLetter,
-} from "@utils/misc"
+import { toClipboard, getCurrencyIcon } from "@utils/misc"
 import { juster, analytics, currentNetwork } from "@sdk"
 import { abbreviateNumber } from "@utils/amounts"
 import { supportedMarkets, verifiedMakers } from "@config"
@@ -48,6 +45,7 @@ import { useMarket } from "@/composable/market"
 /**
  * Store
  */
+import { useApplicationCacheStore } from "@store/cache"
 import { useMarketStore } from "@store/market"
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
@@ -59,6 +57,7 @@ const props = defineProps({
 })
 
 /** Stores */
+const cacheStore = useApplicationCacheStore()
 const notificationsStore = useNotificationsStore()
 const accountStore = useAccountStore()
 const marketStore = useMarketStore()
@@ -68,8 +67,9 @@ const { updateWithdrawals } = useMarket()
 const card = ref(null)
 const openContextMenu = ref(false)
 
-/** Bet modal */
+/** Modals */
 const showBetModal = ref(false)
+const showConfirmTransactionModal = ref(false)
 
 /** Modals */
 const showLiquidityModal = ref(false)
@@ -79,11 +79,6 @@ const showNotifyMeModal = ref(false)
 const subscription = ref({})
 
 const symbol = computed(() => props.event.currencyPair.symbol)
-
-const betModalCache = reactive({
-	side: "Rise",
-	amount: 0,
-})
 
 /** Countdown setup: Time to start */
 const startDt = computed(() => new Date(props.event?.betsCloseTime).getTime())
@@ -180,8 +175,6 @@ const positionForWithdraw = computed(() => {
 
 /** Join to the event & Liquidity */
 const handleJoin = (target) => {
-	betModalCache.side = capitalizeFirstLetter(target)
-
 	/** disable Bet / Liquidity right after betsCloseTime */
 	if (
 		startStatus.value == "Finished" ||
@@ -191,7 +184,24 @@ const handleJoin = (target) => {
 
 	analytics.log("showBetModal", { where: "event_card" })
 
+	cacheStore.submissions.side = target
+
 	showBetModal.value = true
+}
+
+const handleContinue = () => {
+	showBetModal.value = false
+	showConfirmTransactionModal.value = true
+}
+const handleCancelTransaction = () => {
+	showConfirmTransactionModal.value = false
+	showBetModal.value = true
+}
+const handleConfirmTransaction = () => {
+	showConfirmTransactionModal.value = false
+	showBetModal.value = true
+
+	cacheStore.submissions.isTransactionConfirmed = true
 }
 
 /** Withdraw */
@@ -405,9 +415,14 @@ onUnmounted(() => {
 			<NewBetModal
 				:show="showBetModal"
 				:event="event"
-				:cache="betModalCache"
-				@onBet="showBetModal = false"
+				@onContinue="handleContinue"
 				@onClose="showBetModal = false"
+			/>
+			<ConfirmTransactionModal
+				:show="showConfirmTransactionModal"
+				@onCancel="handleCancelTransaction"
+				@onConfirm="handleConfirmTransaction"
+				@onClose="showConfirmTransactionModal = false"
 			/>
 			<LiquidityModal
 				:show="showLiquidityModal"
@@ -638,12 +653,19 @@ onUnmounted(() => {
 					<Icon name="time" size="12" />
 
 					{{ timing.start.time }}
-					<span>{{
-						toReadableDuration({
-							seconds: event.measurePeriod,
-							asObject: true,
-						}).val
-					}}</span>
+					<span
+						>{{
+							toReadableDuration({
+								seconds: event.measurePeriod,
+								asObject: true,
+							}).val
+						}}{{
+							toReadableDuration({
+								seconds: event.measurePeriod,
+								asObject: true,
+							}).text[0].toUpperCase()
+						}}</span
+					>
 					{{ timing.end.time }}
 				</Badge>
 

@@ -58,6 +58,8 @@ const user = ref({})
 const subToMyPositions = ref({})
 const myPositions = ref([])
 
+const topEvents = ref([])
+
 /** Ranking */
 const isTopProvidersLoading = ref(true)
 const isTopBettorsLoading = ref(true)
@@ -100,10 +102,8 @@ const init = async () => {
 	/**
 	 * Block: Top Events & Providers
 	 */
-	const topEvents = await fetchTopEvents({ limit: 3 })
-	marketStore.events = cloneDeep(topEvents).sort(
-		(a, b) => b.bets.length - a.bets.length,
-	)
+	const rawTopEvents = await fetchTopEvents({ limit: 3 })
+	topEvents.value = rawTopEvents.sort((a, b) => b.bets.length - a.bets.length)
 
 	const rawTopProviders = await fetchTopLiquidityProviders()
 	const rawTopBettors = await fetchTopBettors()
@@ -125,6 +125,7 @@ watch(
 		subToMyPositions.value.unsubscribe()
 		myPositions.value = []
 		marketStore.events = []
+		topEvents.value = []
 		topProviders.value = []
 		isTopProvidersLoading.value = true
 		topBettors.value = []
@@ -148,7 +149,7 @@ onMounted(async () => {
 	init()
 })
 onBeforeUnmount(() => {
-	marketStore.events = []
+	topEvents.value = []
 })
 
 onUnmounted(() => {
@@ -256,9 +257,9 @@ useMeta({
 				</div>
 
 				<transition name="fastfade" mode="out-in">
-					<div v-if="marketStore.events.length" :class="$style.items">
+					<div v-if="topEvents.length" :class="$style.items">
 						<EventCard
-							v-for="event in marketStore.events"
+							v-for="event in topEvents"
 							:key="event.id"
 							:event="event"
 							data-cy="event-card"

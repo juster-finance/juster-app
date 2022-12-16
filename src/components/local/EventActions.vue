@@ -109,7 +109,7 @@ const btnType = computed(() => {
 			"
 		>
 			<div
-				@click.prevent="emit('onBet', 'rise')"
+				@click.prevent="emit('onBet', 'Rise')"
 				:class="[
 					$style.action,
 					primary && $style.primary,
@@ -134,7 +134,7 @@ const btnType = computed(() => {
 			<div :class="$style.divider" />
 
 			<div
-				@click.prevent="emit('onBet', 'fall')"
+				@click.prevent="emit('onBet', 'Fall')"
 				:class="[
 					$style.action,
 					primary && $style.primary,
