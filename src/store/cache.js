@@ -5,9 +5,13 @@ export const useApplicationCacheStore = defineStore({
 
 	state() {
 		return {
-			/** Memory cache for Stakes / Liquidity / ... */
 			submissions: {
-				amount: 0,
+				amount: 5,
+				event: null,
+				payout: null,
+				side: null,
+
+				isTransactionConfirmed: false,
 			},
 		}
 	},

@@ -196,6 +196,8 @@ watch(
 	() => props.show,
 	() => {
 		if (props.show) {
+			if (accountStore.isLoggined) accountStore.updateBalance()
+
 			initTiming()
 			timingInterval = setInterval(() => {
 				initTiming()
@@ -362,11 +364,7 @@ watch(
 			>
 				<template v-slot:rightText>
 					<Tooltip placement="bottom-end">
-						<Flex
-							align="center"
-							gap="4"
-							:class="$style.balance_check"
-						>
+						<Flex align="center" gap="4">
 							<Icon
 								:name="
 									balanceToAmountRatio.status !== 'bad'

@@ -35,9 +35,12 @@ import EventPersonalStats from "./EventPersonalStats.vue"
 import BetCard from "@modules/events/BetCard.vue"
 import DepositCard from "@modules/events/DepositCard.vue"
 
+/**
+ * Modals
+ */
 import ParticipantsModal from "@local/modals/ParticipantsModal.vue"
 import LiquidityModal from "@local/modals/position/LiquidityModal.vue"
-import BetModal from "@local/modals/position/BetModal.vue"
+import NewBetModal from "@local/modals/position/NewBetModal.vue"
 import ConfirmTransactionModal from "@local/modals/ConfirmTransactionModal.vue"
 import EventDetailsModal from "@local/modals/EventDetailsModal.vue"
 import NotifyMeModal from "@local/modals/NotifyMeModal.vue"
@@ -138,7 +141,7 @@ const getEvent = async () => {
 	} else {
 		/** breadcrumbs */
 		breadcrumbs.push({
-			name: `Event #${event.value.id}`,
+			name: `Event #${numberWithSymbol(event.value.id, ",")}`,
 			path: `/events/${event.value.id}`,
 		})
 	}
@@ -277,13 +280,7 @@ const paginatedBets = computed(() =>
 
 const pendingBet = ref(null)
 
-const betModalCache = reactive({
-	side: "Rise",
-	amount: 0,
-})
 const handleJoin = (target) => {
-	betModalCache.side = capitalizeFirstLetter(target)
-
 	/** disable Bet / Liquidity right after betsCloseTime */
 	if (
 		startStatus.value == "Finished" ||
@@ -292,6 +289,8 @@ const handleJoin = (target) => {
 		return
 
 	analytics.log("showBetModal", { where: "event_base" })
+
+	cacheStore.submissions.side = target
 
 	showBetModal.value = true
 }
@@ -312,18 +311,20 @@ const handleLiquidity = () => {
 const handleContinue = () => {
 	showBetModal.value = false
 	showConfirmTransactionModal.value = true
-
-	betModalCache.amount = cacheStore.submissions.amount
 }
 const handleCancelTransaction = () => {
 	showConfirmTransactionModal.value = false
 	showBetModal.value = true
 }
+const handleConfirmTransaction = () => {
+	showConfirmTransactionModal.value = false
+	showBetModal.value = true
+
+	cacheStore.submissions.isTransactionConfirmed = true
+}
+
 const handleBetModalClose = () => {
 	showBetModal.value = false
-
-	cacheStore.submissions.amount = 0
-	betModalCache.amount = 0
 }
 
 const isWithdrawing = ref(false)
@@ -551,11 +552,9 @@ onUnmounted(() => {
 			<template #title="{ content }"> {{ content }} • Juster </template>
 		</metainfo>
 
-		<BetModal
-			v-if="event"
+		<NewBetModal
 			:show="showBetModal"
 			:event="event"
-			:cache="betModalCache"
 			@onBet="handleBet"
 			@onContinue="handleContinue"
 			@onClose="handleBetModalClose"
@@ -569,6 +568,7 @@ onUnmounted(() => {
 		<ConfirmTransactionModal
 			:show="showConfirmTransactionModal"
 			@onCancel="handleCancelTransaction"
+			@onConfirm="handleConfirmTransaction"
 			@onClose="showConfirmTransactionModal = false"
 		/>
 		<ParticipantsModal

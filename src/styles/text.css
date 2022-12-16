@@ -30,6 +30,9 @@
 .fz--24 {
 	font-size: 24px;
 }
+.fz--26 {
+	font-size: 26px;
+}
 
 /* Font Weight */
 .fw--400 {
@@ -169,7 +172,7 @@
 }
 
 .fill--purple {
-	fill: var (--purple);
+	fill: var(--purple);
 }
 
 /* Other */

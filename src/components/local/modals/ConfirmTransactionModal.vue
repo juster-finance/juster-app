@@ -1,34 +1,34 @@
 <script setup>
 /** Vendor */
 import { ref, computed, watch } from "vue"
+import { DateTime } from "luxon"
 
 /**
  * UI
  */
 import Modal from "@ui/Modal.vue"
-import Banner from "@ui/Banner.vue"
 import Button from "@ui/Button.vue"
+
+/**
+ * Services
+ */
+import { shorten, capitalizeFirstLetter } from "@utils/misc"
+import { numberWithSymbol } from "@utils/amounts"
+import { toReadableDuration } from "@utils/date"
 
 /**
  * Store
  */
 import { useAccountStore } from "@store/account"
-import { useMarketStore } from "@store/market"
 import { useApplicationCacheStore } from "@store/cache"
 
 const props = defineProps({
 	show: Boolean,
 })
-const emit = defineEmits(["onCancel"])
+const emit = defineEmits(["onCancel", "onConfirm"])
 
 const accountStore = useAccountStore()
-const marketStore = useMarketStore()
 const cacheStore = useApplicationCacheStore()
-
-const amountInUsd = computed(() => {
-	const price = marketStore.markets["XTZ-USD"].quotes[0].price
-	return cacheStore.submissions.amount * price
-})
 
 const interestRateFromBalance = computed(() => {
 	const amount = cacheStore.submissions.amount
@@ -47,7 +47,7 @@ watch(
 			timerInterval.value = null
 			timer.value = 5
 		} else {
-			if (interestRateFromBalance.value >= 30) {
+			if (interestRateFromBalance.value >= 50) {
 				timerInterval.value = setInterval(() => {
 					timer.value -= 1
 
@@ -64,183 +64,333 @@ watch(
 </script>
 
 <template>
-	<Modal :show="show" width="500" required @onClose="$emit('onClose')">
-		<div :class="$style.title">Confirm Transaction</div>
-		<div :class="$style.description">
-			Carefully double-check the correctness of the entered data
-		</div>
+	<Modal :show="show" width="500" required new @onClose="$emit('onClose')">
+		<Flex align="center" justify="between" :class="$style.head">
+			<Flex align="center" gap="8">
+				<Icon name="checkcircle" size="16" color="secondary" />
 
-		<Flex direction="column" gap="32">
-			<Flex justify="between">
-				<div :class="$style.left">
-					<span>Amount</span>
-					<span>Your bet</span>
-				</div>
-
-				<div :class="$style.right">
-					<span>
-						<b>{{ cacheStore.submissions.amount }}</b> XTZ
-					</span>
-					<span>${{ amountInUsd.toFixed(2) }}</span>
-				</div>
-			</Flex>
-			<Flex justify="between">
-				<div :class="$style.left">
-					<span>Type</span>
-					<span>Selected event</span>
-				</div>
-
-				<div :class="$style.right">
-					<span><b>Price Event</b></span>
-					<span>Tezos (2.52), 6 hours</span>
-				</div>
-			</Flex>
-			<Flex justify="between">
-				<div :class="$style.left">
-					<span>Balance</span>
-				</div>
-
-				<div :class="$style.right">
-					<span
-						><b>{{ accountStore.balance.split(".")[0] }}</b
-						>.{{ accountStore.balance.split(".")[1] }} XTZ</span
-					>
-
-					<span
-						:class="
-							(interestRateFromBalance >= 80 && $style.red) ||
-							(interestRateFromBalance >= 50 && $style.yellow) ||
-							(interestRateFromBalance >= 30 && $style.yellow)
-						"
-					>
-						<Flex align="center" gap="4">
-							<Icon
-								v-if="interestRateFromBalance >= 30"
-								name="warning"
-								size="12"
-							/>
-							{{ cacheStore.submissions.amount }} XTZ =
-							{{ interestRateFromBalance.toFixed(2) }}% of balance
-						</Flex>
-					</span>
-				</div>
+				<Text
+					size="14"
+					weight="600"
+					color="primary"
+					:class="$style.head_btn"
+				>
+					Stake Confirmation
+				</Text>
 			</Flex>
 		</Flex>
 
-		<Banner v-if="interestRateFromBalance >= 30" :class="$style.banner">
-			{{
-				(interestRateFromBalance >= 80 &&
-					"Your stake is equal or close to the size of your entire balance") ||
-				(interestRateFromBalance >= 50 &&
-					"Your stake is half of your (or more) of the balance") ||
-				(interestRateFromBalance >= 30 &&
-					"Your stake is one-third (or more) of the balance")
-			}}
-		</Banner>
+		<Flex direction="column" gap="32" :class="$style.base">
+			<Flex direction="column" gap="16">
+				<Flex align="center">
+					<Text size="13" weight="500" color="tertiary" height="16">
+						After acceptance of your stake, it will appear in the
+						stakes list, as well as in the profile. The result will
+						be available depending on the duration.
+					</Text>
+				</Flex>
 
-		<Flex gap="16" :class="$style.buttons">
-			<Button
-				@click="emit('onCancel')"
-				type="secondary"
-				size="medium"
-				block
-			>
-				Cancel
-			</Button>
-			<Button
-				type="primary"
-				size="medium"
-				block
-				:disabled="!!timerInterval"
-			>
-				<Icon v-if="!timerInterval" name="check" size="16" />
-				{{ timerInterval ? timer : "Confirm" }}
-			</Button>
+				<Flex
+					v-if="interestRateFromBalance >= 80"
+					gap="12"
+					:class="$style.warning_badge"
+				>
+					<Icon name="warning" size="16" color="orange" />
+
+					<Flex direction="column" gap="8">
+						<Text size="14" weight="600" color="primary">
+							Dangerous stake volume
+						</Text>
+						<Text
+							size="13"
+							weight="500"
+							color="tertiary"
+							height="16"
+						>
+							Your stake is equal or close to the size of your
+							entire balance
+						</Text>
+					</Flex>
+				</Flex>
+				<Flex
+					v-else-if="interestRateFromBalance >= 50"
+					gap="12"
+					:class="$style.warning_badge"
+				>
+					<Icon name="warning" size="16" color="tertiary" />
+
+					<Flex direction="column" gap="8">
+						<Text size="14" weight="600" color="primary">
+							Dangerous stake volume
+						</Text>
+						<Text
+							size="13"
+							weight="500"
+							color="tertiary"
+							height="16"
+						>
+							Your stake is half of your (or more) of the balance
+						</Text>
+					</Flex>
+				</Flex>
+			</Flex>
+
+			<Flex direction="column" gap="8">
+				<Flex align="center" justify="between">
+					<Text size="12" weight="600" color="secondary">
+						Stake
+					</Text>
+				</Flex>
+
+				<Flex align="center" justify="between" :class="$style.badge">
+					<Flex align="center" gap="8">
+						<Icon
+							:name="
+								cacheStore.submissions.side === 'Rise'
+									? 'higher'
+									: 'lower'
+							"
+							size="14"
+							:color="
+								cacheStore.submissions.side === 'Rise'
+									? 'green'
+									: 'orange'
+							"
+						/>
+
+						<Flex>
+							<Text size="14" weight="600" color="primary">
+								{{
+									numberWithSymbol(
+										cacheStore.submissions.amount,
+										",",
+									)
+								}}
+							</Text>
+							<Text size="14" weight="600" color="tertiary">
+								&nbsp;XTZ
+							</Text>
+						</Flex>
+					</Flex>
+
+					<Text size="14" weight="600" color="tertiary">-></Text>
+
+					<Flex align="center" gap="6">
+						<Icon name="event_new" size="14" color="purple" />
+
+						<Flex align="center">
+							<Text size="14" weight="600" color="secondary">
+								{{
+									cacheStore.submissions.event.currencyPair.symbol.replace(
+										"-",
+										"/",
+									)
+								}}
+							</Text>
+							<Text size="14" weight="600" color="tertiary">
+								&nbsp;({{
+									toReadableDuration({
+										seconds:
+											cacheStore.submissions.event
+												.measurePeriod,
+										asObject: true,
+									}).val
+								}}{{
+									toReadableDuration({
+										seconds:
+											cacheStore.submissions.event
+												.measurePeriod,
+										asObject: true,
+									}).text[0].toUpperCase()
+								}})
+							</Text>
+						</Flex>
+					</Flex>
+				</Flex>
+			</Flex>
+
+			<Flex direction="column" gap="8">
+				<Flex align="center" justify="between">
+					<Text size="12" weight="600" color="tertiary">
+						Details
+					</Text>
+
+					<Flex align="center" gap="4">
+						<Icon name="bolt" size="12" color="support" />
+						<Text size="12" weight="600" color="support">
+							Quick Acceptance (~10s)
+						</Text>
+					</Flex>
+				</Flex>
+
+				<Flex align="center" justify="between" :class="$style.badge">
+					<Flex align="center" gap="8">
+						<Icon name="go" size="14" color="tertiary" />
+
+						<Text size="14" weight="600" color="primary">
+							{{
+								capitalizeFirstLetter(
+									DateTime.fromISO(
+										cacheStore.submissions.event
+											.betsCloseTime,
+									)
+										.setLocale("en")
+										.toRelative(),
+								)
+							}}
+						</Text>
+					</Flex>
+
+					<div v-for="i in 4" :class="$style.dot" />
+					<Text size="14" weight="600" color="tertiary">
+						{{
+							toReadableDuration({
+								seconds:
+									cacheStore.submissions.event.measurePeriod,
+								asObject: true,
+							}).val
+						}}{{
+							toReadableDuration({
+								seconds:
+									cacheStore.submissions.event.measurePeriod,
+								asObject: true,
+							}).text[0].toUpperCase()
+						}}
+					</Text>
+					<div v-for="i in 4" :class="$style.dot" />
+
+					<Flex align="center" gap="8">
+						<Icon name="flag" size="14" color="tertiary" />
+
+						<Flex align="center">
+							<Text size="14" weight="600" color="primary">
+								{{
+									DateTime.fromISO(
+										cacheStore.submissions.event
+											.betsCloseTime,
+									)
+										.plus(
+											cacheStore.submissions.event
+												.measurePeriod * 1000,
+										)
+										.toFormat("dd LLL")
+								}}
+							</Text>
+							&nbsp;
+							<Text size="14" weight="600" color="tertiary">
+								at
+							</Text>
+							&nbsp;
+							<Text size="14" weight="600" color="primary">
+								{{
+									DateTime.fromISO(
+										cacheStore.submissions.event
+											.betsCloseTime,
+									)
+										.plus(
+											cacheStore.submissions.event
+												.measurePeriod * 1000,
+										)
+										.toFormat("HH:mm")
+								}}
+							</Text>
+						</Flex>
+					</Flex>
+				</Flex>
+
+				<Flex align="center" justify="between" :class="$style.badge">
+					<Flex align="center" gap="8">
+						<Icon name="walletadd" size="14" color="tertiary" />
+
+						<Text size="14" weight="600" color="primary">
+							Payout
+						</Text>
+					</Flex>
+
+					<Flex>
+						<Text size="14" weight="600" color="primary">
+							{{ cacheStore.submissions.payout }}
+						</Text>
+						<Text size="14" weight="600" color="tertiary">
+							&nbsp;XTZ
+						</Text>
+					</Flex>
+				</Flex>
+
+				<Flex align="center" justify="between" :class="$style.badge">
+					<Flex align="center" gap="8">
+						<Icon name="wallet" size="14" color="tertiary" />
+
+						<Text size="14" weight="600" color="primary">
+							Wallet
+						</Text>
+					</Flex>
+
+					<Text size="14" weight="600" color="primary">{{
+						shorten(accountStore.pkh, 4, 4)
+					}}</Text>
+				</Flex>
+			</Flex>
+
+			<Flex gap="16" :class="$style.buttons">
+				<Button
+					@click="emit('onCancel')"
+					type="secondary"
+					size="medium"
+					block
+				>
+					Cancel
+				</Button>
+				<Button
+					@click="emit('onConfirm')"
+					type="primary"
+					size="medium"
+					block
+					:disabled="!!timerInterval"
+				>
+					<Icon v-if="!timerInterval" name="check" size="16" />
+					{{ timerInterval ? timer : "Confirm" }}
+				</Button>
+			</Flex>
 		</Flex>
 	</Modal>
 </template>
 
 <style module>
-.title {
-	font-size: 20px;
-	font-weight: 600;
-	line-height: 1.2;
-	color: var(--text-primary);
+.head {
+	height: 56px;
 
-	margin-bottom: 8px;
+	padding: 0 20px;
 }
 
-.description {
-	font-size: 14px;
-	line-height: 1.6;
-	font-weight: 500;
-	color: var(--text-tertiary);
-
-	margin-bottom: 40px;
+.head_btn {
+	cursor: pointer;
 }
 
-.left {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
+.base {
+	padding: 0 20px 20px 20px;
 }
 
-.left span:nth-child(1) {
-	font-size: 16px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-primary);
+.badge {
+	height: 38px;
+
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.05);
+
+	padding: 0 12px;
 }
 
-.left span:nth-child(2) {
-	font-size: 13px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-tertiary);
-	opacity: 0.5;
+.dot {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background: var(--text-support);
 }
 
-.right {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	align-items: flex-end;
-}
+.warning_badge {
+	border-radius: 8px;
+	background: var(--app-bg);
 
-.right span:nth-child(1) {
-	font-size: 16px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-tertiary);
-}
-
-.right span b {
-	font-weight: 600;
-	color: var(--text-primary);
-}
-
-.right span:nth-child(2) {
-	font-size: 13px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-tertiary);
-}
-
-.right span:nth-child(2).yellow {
-	fill: var(--yellow);
-	color: var(--yellow);
-}
-
-.right span:nth-child(2).red {
-	fill: var(--red);
-	color: var(--red);
-}
-
-.banner {
-	margin-top: 20px;
-}
-
-.buttons {
-	margin-top: 32px;
+	padding: 16px;
 }
 </style>

@@ -22,6 +22,10 @@ const props = defineProps({
 	positionForWithdraw: Object,
 	disabled: Boolean,
 	isWithdrawing: Boolean,
+	large: {
+		type: Boolean,
+		default: false,
+	},
 })
 const emit = defineEmits(["onBet", "onWithdraw"])
 
@@ -54,9 +58,47 @@ const btnType = computed(() => {
 </script>
 
 <template>
-	<div :class="$style.wrapper">
+	<Flex align="center" :class="$style.wrapper">
 		<template
-			v-if="!isWon && !positionForWithdraw && !successfulWithdrawal"
+			v-if="
+				large && !isWon && !positionForWithdraw && !successfulWithdrawal
+			"
+		>
+			<Flex gap="4" wide :class="disabled && $style.disabled_btns">
+				<Button
+					@click="emit('onBet', 'Rise')"
+					type="primary"
+					size="medium"
+					keybind="R"
+					@onKeybind="emit('onBet', 'Rise')"
+					block
+					style="border-radius: 7px 4px 4px 7px"
+				>
+					<Icon name="higher" size="16" />
+					Rise
+				</Button>
+				<Button
+					@click="emit('onBet', 'Fall')"
+					type="primary"
+					size="medium"
+					keybind="F"
+					@onKeybind="emit('onBet', 'Fall')"
+					block
+					style="border-radius: 4px 7px 7px 4px"
+				>
+					<Icon name="lower" size="16" />
+					Fall
+				</Button>
+			</Flex>
+		</template>
+
+		<template
+			v-else-if="
+				!large &&
+				!isWon &&
+				!positionForWithdraw &&
+				!successfulWithdrawal
+			"
 		>
 			<div
 				@click.prevent="emit('onBet', 'rise')"
@@ -67,11 +109,7 @@ const btnType = computed(() => {
 				]"
 			>
 				<div :class="$style.left">
-					<Icon
-						name="arrow_circle_top_right"
-						size="14"
-						:class="$style.higher_icon"
-					/>
+					<Icon name="higher" size="14" :class="$style.higher_icon" />
 
 					<span>Rise</span>
 				</div>
@@ -104,11 +142,7 @@ const btnType = computed(() => {
 				<div :class="$style.left">
 					<span>Fall</span>
 
-					<Icon
-						name="arrow_circle_bottom_right"
-						size="14"
-						:class="$style.lower_icon"
-					/>
+					<Icon name="lower" size="14" :class="$style.lower_icon" />
 				</div>
 			</div>
 		</template>
@@ -144,17 +178,15 @@ const btnType = computed(() => {
 				<Spin size="12" />Awaiting confirmation..
 			</template>
 		</Button>
-	</div>
+	</Flex>
 </template>
 
 <style module>
 .wrapper {
-	display: flex;
-	align-items: center;
 	width: 100%;
-	overflow: hidden;
 
 	border-radius: 6px;
+	overflow: hidden;
 }
 
 .action {
@@ -227,6 +259,11 @@ const btnType = computed(() => {
 	line-height: 1.1;
 	font-weight: 600;
 	color: var(--text-tertiary);
+}
+
+.disabled_btns {
+	opacity: 0.5;
+	pointer-events: none;
 }
 
 .divider {

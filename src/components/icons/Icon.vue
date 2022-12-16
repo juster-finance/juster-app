@@ -7,12 +7,14 @@ const props = defineProps({
 	size: { type: [String, Number], default: "16" },
 	fill: { type: Boolean, default: false },
 	color: { type: String, default: null },
+	rotate: { type: [String, Number], default: 0 },
 })
 
 const styles = computed(() => {
 	return {
 		minWidth: `${props.size}px`,
 		minHeight: `${props.size}px`,
+		transform: props.rotate ? `rotate(${props.rotate}deg)` : null,
 	}
 })
 

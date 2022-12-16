@@ -538,6 +538,7 @@ const endDiff = computed(() =>
 
 		<EventActions
 			primary
+			large
 			@onBet="(target) => emit('onBet', target)"
 			@onWithdraw="emit('onWithdraw')"
 			:event="event"

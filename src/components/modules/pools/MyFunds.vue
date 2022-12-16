@@ -10,7 +10,6 @@ import { DateTime } from "luxon"
  */
 import Spin from "@ui/Spin.vue"
 import Button from "@ui/Button.vue"
-import Banner from "@ui/Banner.vue"
 import Tooltip from "@ui/Tooltip.vue"
 
 /**

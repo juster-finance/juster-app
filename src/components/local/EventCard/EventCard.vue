@@ -23,7 +23,7 @@ import Tooltip from "@ui/Tooltip.vue"
 import ParticipantsModal from "@local/modals/ParticipantsModal.vue"
 import NotifyMeModal from "@local/modals/NotifyMeModal.vue"
 import LiquidityModal from "@local/modals/position/LiquidityModal.vue"
-import BetModal from "@local/modals/position/BetModal.vue"
+import NewBetModal from "@local/modals/position/NewBetModal.vue"
 import EventActions from "@local/EventActions.vue"
 
 /**
@@ -70,7 +70,6 @@ const openContextMenu = ref(false)
 
 /** Bet modal */
 const showBetModal = ref(false)
-const preselectedSide = ref("Rise")
 
 /** Modals */
 const showLiquidityModal = ref(false)
@@ -403,7 +402,7 @@ onUnmounted(() => {
 <template>
 	<router-link :to="`/events/${event.id}`" :class="$style.wrapper">
 		<div ref="card">
-			<BetModal
+			<NewBetModal
 				:show="showBetModal"
 				:event="event"
 				:cache="betModalCache"
