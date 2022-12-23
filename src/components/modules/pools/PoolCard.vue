@@ -560,7 +560,7 @@ const copy = (target) => {
 	background: rgba(0, 0, 0, 0.15);
 	border-radius: 8px;
 
-	padding: 14px 16px;
+	padding: 12px 14px;
 }
 
 .switch_btn {
