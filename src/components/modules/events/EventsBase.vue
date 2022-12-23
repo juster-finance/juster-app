@@ -467,15 +467,21 @@ useMeta({
 
 			<div :class="$style.events_base">
 				<transition name="fastfade" mode="out-in">
-					<div v-if="filteredEvents.length" :class="$style.events">
-						<EventCard
-							v-for="event in filteredEvents.slice(
-								(currentPage - 1) * 6,
-								currentPage * 6,
-							)"
-							:key="event.id"
-							:event="event"
-						/>
+					<Flex
+						v-if="filteredEvents.length"
+						direction="column"
+						gap="16"
+					>
+						<div :class="$style.events">
+							<EventCard
+								v-for="event in filteredEvents.slice(
+									(currentPage - 1) * 6,
+									currentPage * 6,
+								)"
+								:key="event.id"
+								:event="event"
+							/>
+						</div>
 
 						<Pagination
 							v-if="filteredEvents.length > 6"
@@ -484,7 +490,7 @@ useMeta({
 							:limit="6"
 							:class="$style.pagination"
 						/>
-					</div>
+					</Flex>
 
 					<div v-else-if="!isNewEventsLoaded" :class="$style.events">
 						<EventCardLoading />

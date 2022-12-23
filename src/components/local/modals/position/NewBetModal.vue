@@ -595,7 +595,7 @@ const handleUserTransactionConfirmation = () => {
 							color="tertiary"
 							:class="$style.ratio"
 						>
-							x2.00
+							x{{ (1 + ratioBeforeBet.rise).toFixed(2) }}
 						</Text>
 					</Flex>
 
@@ -616,7 +616,7 @@ const handleUserTransactionConfirmation = () => {
 							color="tertiary"
 							:class="$style.ratio"
 						>
-							x2.00
+							x{{ (1 + ratioBeforeBet.fall).toFixed(2) }}
 						</Text>
 
 						<Flex align="center" gap="6">

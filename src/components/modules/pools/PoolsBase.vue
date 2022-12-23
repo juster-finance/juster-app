@@ -406,6 +406,10 @@ const { meta } = useMeta({
 
 .side {
 	max-width: 450px;
+	height: fit-content;
+
+	position: sticky;
+	top: 100px;
 }
 
 .base {
@@ -439,6 +443,8 @@ const { meta } = useMeta({
 
 	.side {
 		max-width: initial;
+
+		position: initial;
 	}
 
 	.base {

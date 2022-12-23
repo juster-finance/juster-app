@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { onMounted, ref, reactive } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import Markdown from "markdown-it"
@@ -24,26 +27,31 @@ const anchors = ref([])
 
 const generalLinks = reactive([
 	{
+		code: "DocDiscover",
 		name: "Discover",
 		icon: "compass",
 		url: "/discover",
 	},
 	{
-		name: "Betting",
-		icon: "arrows",
+		code: "DocBetting",
+		name: "Staking",
+		icon: "price_event",
 		url: "/betting",
 	},
 	{
+		code: "DocLiquidity",
 		name: "Liquidity",
-		icon: "liquidity",
+		icon: "server",
 		url: "/liquidity",
 	},
 	{
+		code: "DocWithdraw",
 		name: "Withdraw",
-		icon: "money",
+		icon: "walletadd",
 		url: "/withdraw",
 	},
 	{
+		code: "DocRoadmap",
 		name: "Roadmap",
 		icon: "map",
 		url: "/roadmap",
@@ -136,7 +144,7 @@ const selectArticle = (article) => {
 					:to="`/docs${generalLink.url}`"
 					:class="[
 						$style.general_link,
-						route.name === generalLink.name && $style.active,
+						route.name === generalLink.code && $style.active,
 					]"
 				>
 					<div :class="$style.icon">
@@ -229,8 +237,12 @@ const selectArticle = (article) => {
 	transition: all 0.2s ease;
 }
 
-.general_link:hover {
+.general_link:focus {
 	color: var(--text-secondary);
+	box-shadow: none;
+}
+
+.general_link:hover {
 }
 
 .general_link:hover .icon {

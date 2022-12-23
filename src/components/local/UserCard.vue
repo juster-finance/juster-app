@@ -1,5 +1,10 @@
 <script setup>
 /**
+ * Vendor
+ */
+import { useRouter } from "vue-router"
+
+/**
  * UI
  */
 import Button from "@ui/Button.vue"
@@ -17,6 +22,8 @@ import { verifiedMakers } from "@config"
  */
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
+
+const router = useRouter()
 
 const props = defineProps({ user: { type: Object, default: () => {} } })
 
@@ -141,11 +148,9 @@ const handleCopy = (target) => {
 			</template>
 
 			<template #dropdown>
-				<router-link :to="`/profile/${user.userId}`">
-					<DropdownItem>
-						<Icon name="user" size="16" />User profile
-					</DropdownItem>
-				</router-link>
+				<DropdownItem @click="router.push(`/profile/${user.userId}`)">
+					<Icon name="user" size="16" />User profile
+				</DropdownItem>
 
 				<DropdownDivider />
 

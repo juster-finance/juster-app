@@ -288,11 +288,17 @@ const handleGetClaims = () => {
 					justify="between"
 					align="center"
 				>
-					<Flex>
-						<Text size="14" weight="600" color="support">—</Text>
-						<Text size="14" weight="600" color="secondary">
-							&nbsp;Entry #{{ entry.entryId }}
-						</Text>
+					<Flex align="center" gap="8">
+						<Spin size="12" style="opacity: 0.5" />
+
+						<Flex align="center">
+							<Text size="14" weight="600" color="secondary">
+								Entry&nbsp;
+							</Text>
+							<Text size="14" weight="600" color="tertiary">
+								#{{ entry.entryId }}
+							</Text>
+						</Flex>
 					</Flex>
 
 					<Text size="14" weight="600" color="secondary">
@@ -392,7 +398,7 @@ const handleGetClaims = () => {
 					justify="between"
 					align="center"
 				>
-					<Flex align="center" gap="4">
+					<Flex align="center" gap="8">
 						<Icon
 							v-if="claim.event.result"
 							name="check"
@@ -400,9 +406,15 @@ const handleGetClaims = () => {
 							color="green"
 						/>
 						<Spin v-else size="12" style="opacity: 0.5" />
-						<Text size="14" weight="600" color="secondary">
-							&nbsp;Claim #{{ claim.id }}
-						</Text>
+
+						<Flex align="center">
+							<Text size="14" weight="600" color="secondary">
+								Claim&nbsp;
+							</Text>
+							<Text size="14" weight="600" color="tertiary">
+								#{{ numberWithSymbol(claim.eventId, ",") }}
+							</Text>
+						</Flex>
 						<Text
 							v-if="!claim.event.result"
 							size="14"

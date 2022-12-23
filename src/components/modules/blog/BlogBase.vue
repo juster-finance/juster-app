@@ -206,7 +206,7 @@ useMeta({
 	aspect-ratio: 16/9;
 
 	border-radius: 12px;
-	background: #222222;
+	background: var(--card-bg);
 	box-shadow: 0px 30px 60px -30px rgba(0, 0, 0, 0.15),
 		0px 50px 100px -20px rgba(0, 0, 0, 0.15);
 

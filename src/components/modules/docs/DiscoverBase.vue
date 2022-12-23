@@ -15,7 +15,7 @@ import Banner from "@ui/Banner.vue"
 
 const cards = reactive([
 	{
-		name: "First Submission",
+		name: "First Stake",
 		description:
 			"Learn the basic principles of placing a bet and choosing the right event",
 		image: "firstsubmission.png",

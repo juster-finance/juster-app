@@ -686,7 +686,7 @@ onUnmounted(() => {
 				</Tooltip>
 
 				<!-- TVL Badge -->
-				<Tooltip placement="bottom-end">
+				<!-- <Tooltip placement="bottom-end">
 					<Badge v-if="userTVL" color="gray" :class="$style.badge">
 						<img
 							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
@@ -697,7 +697,7 @@ onUnmounted(() => {
 					</Badge>
 
 					<template #content>My TVL: Bets + Liquidity</template>
-				</Tooltip>
+				</Tooltip> -->
 			</div>
 
 			<div :class="$style.hints">
@@ -812,7 +812,7 @@ onUnmounted(() => {
 						<span>Stakes:</span>
 						{{ event.bets.length }} <br />
 						<span>Liquidity:</span>
-						{{ event.totalLiquidityProvided }} XTZ
+						{{ event.totalLiquidityProvided.toFixed(2) }} XTZ
 					</template>
 				</Tooltip>
 
@@ -1068,16 +1068,10 @@ onUnmounted(() => {
 .badges {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
 
 	margin-bottom: 24px;
-}
-
-.main_badge {
-	margin-right: 8px;
-}
-
-.badge {
-	margin-right: 4px;
 }
 
 .hints {
