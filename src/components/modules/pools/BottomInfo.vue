@@ -2,6 +2,7 @@
 /**
  * Vendor
  */
+import { ref } from "vue"
 import { useRouter } from "vue-router"
 
 /**
@@ -15,15 +16,27 @@ import {
 	DropdownDivider,
 } from "@ui/Dropdown"
 
+/**
+ * Modals
+ */
+import PoolsGuidesModal from "@modals/pools/PoolsGuidesModal.vue"
+
 const props = defineProps({
 	pool: Object,
 })
 
 const router = useRouter()
+
+const showPoolsGuidesModal = ref(false)
 </script>
 
 <template>
 	<Flex direction="column" gap="24">
+		<PoolsGuidesModal
+			:show="showPoolsGuidesModal"
+			@onClose="showPoolsGuidesModal = false"
+		/>
+
 		<Flex align="center" justify="between">
 			<Flex direction="column" gap="8">
 				<Flex align="center" gap="4">
@@ -32,22 +45,25 @@ const router = useRouter()
 					</Text>
 					<Icon name="warning" size="12" color="brand" />
 				</Flex>
+
 				<Text size="12" weight="600" color="tertiary">
 					Smart Contract&nbsp; •&nbsp; Liquidity Pools
 				</Text>
 			</Flex>
 
 			<Flex gap="8">
-				<a href="https://tzkt.io/" target="_blank">
-					<Button type="secondary" size="small">
-						<Icon name="database" size="12" />
-					</Button>
-				</a>
+				<Button
+					@click="showPoolsGuidesModal = true"
+					type="secondary"
+					size="small"
+				>
+					<Icon name="help" size="16" />
+				</Button>
 
 				<Dropdown side="top" disable-autofocus>
 					<template #trigger>
 						<Button type="secondary" size="small">
-							<Icon name="dots" size="12" />
+							<Icon name="dots" size="16" />
 						</Button>
 					</template>
 

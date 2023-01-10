@@ -24,7 +24,11 @@ import { useAccountStore } from "@store/account"
 
 const accountStore = useAccountStore()
 
-const emit = defineEmits(["onDepositLiquidity", "onGetClaims"])
+const emit = defineEmits([
+	"onDepositLiquidity",
+	"onGetClaims",
+	"onManualEntryApprove",
+])
 const props = defineProps({
 	pools: Array,
 	poolsStates: Object,
@@ -61,8 +65,24 @@ const valueLocked = computed(() =>
 	),
 )
 
+const isEntryReadyToManualApprove = (entry) => {
+	if (entry.status !== "PENDING") return
+	return (
+		entry.amount < 1 &&
+		DateTime.fromISO(entry.acceptTime).plus({
+			seconds: entry.pool.entryLockPeriod,
+		}).ts < DateTime.now().ts
+	)
+}
+
 const pendingEntries = computed(() =>
-	props.entries.filter((entry) => entry.status === "PENDING"),
+	props.entries.filter(
+		(entry) => entry.status === "PENDING" && entry.amount >= 1,
+	),
+)
+
+const manualEntries = computed(() =>
+	props.entries.filter((e) => isEntryReadyToManualApprove(e)),
 )
 
 /**
@@ -215,28 +235,48 @@ const handleGetClaims = () => {
 		</Flex>
 
 		<Flex
-			v-if="pendingEntries.length"
-			@click="togglePendingEntries()"
+			v-if="pendingEntries.length || manualEntries.length"
 			direction="column"
 			gap="12"
 			:class="$style.progress"
 		>
-			<Flex align="center" justify="between" wide>
+			<Flex
+				@click="togglePendingEntries()"
+				align="center"
+				justify="between"
+				wide
+				style="cursor: pointer"
+			>
 				<Tooltip placement="top-start" text-align="left">
 					<Flex align="center" gap="6">
 						<Text size="14" color="secondary" weight="600">
 							Pending Entries
 						</Text>
 
-						<Icon name="help" size="14" color="support" />
+						<Icon
+							:name="manualEntries.length ? 'warning' : 'help'"
+							size="14"
+							:color="manualEntries.length ? 'orange' : 'support'"
+						/>
 					</Flex>
 
 					<template #content>
-						<Flex direction="column" gap="6">
+						<Flex
+							v-if="!manualEntries.length"
+							direction="column"
+							gap="6"
+						>
 							Your deposits awaiting confirmation
 							<span>
 								This may take some time depending on<br />the
 								selected pool, or rather its period
+							</span>
+						</Flex>
+						<Flex v-else direction="column" gap="6">
+							One (or more) entries need manual confirmation
+							<span>
+								This is due to the fact that the amount<br />
+								of the deposit was less than one tezos
 							</span>
 						</Flex>
 					</template>
@@ -244,52 +284,92 @@ const handleGetClaims = () => {
 
 				<Flex align="center" gap="4">
 					<Text size="14" color="tertiary" weight="600">
-						{{ pendingEntries.length }}
-						{{ pendingEntries.length == 1 ? "entry" : "entries" }}
+						{{ pendingEntries.length + manualEntries.length }}
+						{{
+							pendingEntries.length + manualEntries.length == 1
+								? "entry"
+								: "entries"
+						}}
 					</Text>
 
-					<Icon name="arrow" size="14" color="tertiary" />
+					<Icon
+						name="arrow"
+						size="14"
+						color="tertiary"
+						:style="{
+							transform: showEntries ? `rotate(180deg)` : null,
+						}"
+					/>
 				</Flex>
 			</Flex>
 
-			<div :class="$style.bar">
-				<div :class="[$style.bar_progress, $style.blue]">
-					<svg
-						width="200%"
-						height="12"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						:class="$style.bar_anim"
-					>
-						<defs>
-							<pattern
-								id="lines"
-								patternUnits="userSpaceOnUse"
-								width="20"
-								height="12"
-							>
-								<path
-									fill-rule="evenodd"
-									clip-rule="evenodd"
-									d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
-									fill="white"
-									fill-opacity="0.2"
-								/>
-							</pattern>
-						</defs>
-						<rect width="100%" height="100%" fill="url(#lines)" />
-					</svg>
-				</div>
-			</div>
+			<Flex :class="$style.bar">
+				<div
+					:class="[$style.bar_progress, $style.blue]"
+					:style="{
+						width: `${
+							(pendingEntries.length * 100) /
+							(pendingEntries.length + manualEntries.length)
+						}%`,
+					}"
+				/>
 
-			<Flex v-if="showEntries" direction="column" gap="12">
+				<div
+					v-if="manualEntries.length"
+					:class="[$style.bar_progress, $style.orange]"
+					:style="{
+						width: `${
+							(manualEntries.length * 100) /
+							(manualEntries.length + pendingClaims.length)
+						}%`,
+					}"
+				/>
+
+				<svg
+					width="200%"
+					height="12"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					:class="$style.bar_anim"
+				>
+					<defs>
+						<pattern
+							id="lines"
+							patternUnits="userSpaceOnUse"
+							width="20"
+							height="12"
+						>
+							<path
+								fill-rule="evenodd"
+								clip-rule="evenodd"
+								d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
+								fill="white"
+								fill-opacity="0.2"
+							/>
+						</pattern>
+					</defs>
+					<rect width="100%" height="100%" fill="url(#lines)" />
+				</svg>
+			</Flex>
+
+			<Flex v-show="showEntries" direction="column" gap="12">
 				<Flex
-					v-for="entry in pendingEntries"
+					v-for="entry in [...pendingEntries, ...manualEntries]"
 					justify="between"
 					align="center"
 				>
 					<Flex align="center" gap="8">
-						<Spin size="12" style="opacity: 0.5" />
+						<Spin
+							v-if="!isEntryReadyToManualApprove(entry)"
+							size="12"
+							style="opacity: 0.5"
+						/>
+						<Icon
+							v-else
+							name="warning"
+							size="12"
+							color="tertiary"
+						/>
 
 						<Flex align="center">
 							<Text size="14" weight="600" color="secondary">
@@ -301,7 +381,24 @@ const handleGetClaims = () => {
 						</Flex>
 					</Flex>
 
-					<Text size="14" weight="600" color="secondary">
+					<Text
+						v-if="!isEntryReadyToManualApprove(entry)"
+						size="14"
+						weight="600"
+						color="secondary"
+					>
+						{{ numberWithSymbol(entry.amount, ",") }} ꜩ
+					</Text>
+
+					<Text
+						v-else
+						@click="emit('onManualEntryApprove', entry)"
+						size="14"
+						weight="600"
+						color="blue"
+						style="cursor: pointer"
+					>
+						Approve
 						{{ numberWithSymbol(entry.amount, ",") }} ꜩ
 					</Text>
 				</Flex>
@@ -310,12 +407,17 @@ const handleGetClaims = () => {
 
 		<Flex
 			v-if="allClaims.length"
-			@click="togglePendingClaims"
 			direction="column"
 			gap="12"
 			:class="$style.progress"
 		>
-			<Flex align="center" justify="between" wide>
+			<Flex
+				@click="togglePendingClaims"
+				align="center"
+				justify="between"
+				wide
+				style="cursor: pointer"
+			>
 				<Tooltip placement="bottom-start" text-align="left">
 					<Flex align="center" gap="6">
 						<Text size="14" color="secondary" weight="600">
@@ -350,11 +452,18 @@ const handleGetClaims = () => {
 						}}%
 					</Text>
 
-					<Icon name="arrow" size="14" color="tertiary" />
+					<Icon
+						name="arrow"
+						size="14"
+						color="tertiary"
+						:style="{
+							transform: showClaims ? `rotate(180deg)` : null,
+						}"
+					/>
 				</Flex>
 			</Flex>
 
-			<div :class="$style.bar">
+			<Flex :class="$style.bar">
 				<div
 					:class="[$style.bar_progress, $style.green]"
 					:style="{
@@ -390,9 +499,9 @@ const handleGetClaims = () => {
 						<rect width="100%" height="100%" fill="url(#lines)" />
 					</svg>
 				</div>
-			</div>
+			</Flex>
 
-			<Flex v-if="showClaims" direction="column" gap="12">
+			<Flex v-show="showClaims" direction="column" gap="12">
 				<Flex
 					v-for="claim in allClaims"
 					justify="between"
@@ -521,12 +630,12 @@ const handleGetClaims = () => {
 }
 
 .progress {
-	cursor: pointer;
-
 	margin-top: 24px;
 }
 
 .bar {
+	position: relative;
+
 	height: 12px;
 	border-radius: 3px;
 	background: rgba(255, 255, 255, 0.05);
@@ -540,7 +649,6 @@ const handleGetClaims = () => {
 
 	width: 100%;
 	height: 100%;
-	border-radius: 3px;
 
 	transition: width 1s var(--bezier);
 }
@@ -551,6 +659,10 @@ const handleGetClaims = () => {
 
 .bar_progress.green {
 	background: var(--green);
+}
+
+.bar_progress.orange {
+	background: var(--orange);
 }
 
 .bar_anim {

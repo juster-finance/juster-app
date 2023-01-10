@@ -52,6 +52,8 @@ export const entryLiquidity = {
 	status: true,
 	pool: {
 		name: true,
+		entryLockPeriod: true,
+		address: true,
 	},
 }
 

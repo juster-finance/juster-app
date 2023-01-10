@@ -4,8 +4,6 @@
  */
 import { ref, onMounted, onUnmounted, computed, watch } from "vue"
 import { useMeta } from "vue-meta"
-import { DateTime } from "luxon"
-import { makeSummaryPosition } from "@juster-finance/sdk"
 
 /**
  * Local
@@ -240,6 +238,35 @@ onMounted(() => {
 	}
 })
 
+/**
+ * Deposits with an amount <1 xtz need manual confirmation
+ */
+const handleManualEntryApprove = async (entry) => {
+	// const contract = await juster.sdk._tezos.contract.at(entry.pool.address)
+	// console.log(contract)
+	// const op = await contract.methods.approveEntry(entry.entryId).send()
+
+	// op.confirmation().then((data) => {
+	// 	console.log(data)
+	// })
+	const result = await juster.provider.client.requestOperation({
+		operationDetails: [
+			{
+				kind: "TRANSACTION",
+				amount: "0",
+				destination: entry.pool.address,
+				parameters: {
+					entrypoint: "approveEntry",
+					value: {
+						inta: entry.entryId,
+					},
+				},
+			},
+		],
+	})
+	console.log(result)
+}
+
 onUnmounted(() => {
 	if (
 		Object.prototype.hasOwnProperty.call(subEntries.value, "_state") &&
@@ -338,6 +365,7 @@ const { meta } = useMeta({
 						:poolsStates="poolsStates"
 						:entries="entries"
 						:positions="positions"
+						@onManualEntryApprove="handleManualEntryApprove"
 						@onDepositLiquidity="showPoolsModal = true"
 						@onGetClaims="showWithdrawClaimsModal = true"
 					/>
@@ -406,10 +434,6 @@ const { meta } = useMeta({
 
 .side {
 	max-width: 450px;
-	height: fit-content;
-
-	position: sticky;
-	top: 100px;
 }
 
 .base {

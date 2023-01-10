@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { onBeforeUnmount, onMounted, ref } from "vue"
 
 /**
@@ -26,13 +29,9 @@ onBeforeUnmount(() => {
 		<Flex align="center" justify="between" :class="$style.base">
 			<Tooltip placement="right">
 				<Flex align="center" gap="8">
-					<Flex align="center" justify="center" :class="$style.spin">
-						<Spin size="14" />
-					</Flex>
-
-					<Text size="13" height="11" weight="600" color="secondary"
-						>Pending operation</Text
-					>
+					<Text size="13" height="11" weight="600" color="secondary">
+						Pending operation
+					</Text>
 
 					<Icon name="help" size="14" color="tertiary" />
 				</Flex>
@@ -43,11 +42,15 @@ onBeforeUnmount(() => {
 				>
 			</Tooltip>
 
-			<Flex align="center">
-				<Text size="12" weight="600" color="secondary">{{
-					timer
-				}}</Text>
-				<Text size="12" weight="600" color="tertiary">s</Text>
+			<Flex align="center" justify="center" gap="8">
+				<Flex align="center">
+					<Text size="12" weight="600" color="secondary">{{
+						timer
+					}}</Text>
+					<Text size="12" weight="600" color="tertiary">s</Text>
+				</Flex>
+
+				<Spin size="14" />
 			</Flex>
 		</Flex>
 	</div>
@@ -71,13 +74,6 @@ onBeforeUnmount(() => {
 	max-width: 1250px;
 	margin: 0 32px;
 	height: 48px;
-}
-
-.spin {
-	width: 24px;
-	height: 24px;
-	border-radius: 5px;
-	background: var(--opacity-05);
 }
 
 @media (max-width: 700px) {

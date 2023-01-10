@@ -140,7 +140,7 @@ const buttonState = computed(() => {
 			disabled: true,
 			type: "secondary",
 		}
-	if (amount.value > 0 && amount.value < 1)
+	if (amount.value > 0 && amount.value < 0.1)
 		return { text: "Minimum 1 XTZ", disabled: true, type: "secondary" }
 	if (amount.value > accountStore.balance)
 		return {
