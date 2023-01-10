@@ -54,17 +54,20 @@ const btnType = computed(() => {
 
 const isFinished = computed(() => {
     return (
-        (props.event.status === "FINISHED")
-        || (props.event.status === "CANCELED")
+        props.event.status === "FINISHED" || props.event.status === "CANCELED"
     )
 })
-
 </script>
 
 <template>
     <div :class="$style.wrapper">
         <template
-            v-if="!isWon && !positionForWithdraw && !successfulWithdrawal && !isFinished"
+            v-if="
+                !isWon &&
+                !positionForWithdraw &&
+                !successfulWithdrawal &&
+                !isFinished
+            "
         >
             <div
                 @click.prevent="emit('onBet', 'rise')"
@@ -127,7 +130,6 @@ const isFinished = computed(() => {
                 (isWon && !positionForWithdraw) ||
                 !!successfulWithdrawal?.amount ||
                 accountStore.pendingTransaction.awaiting
-                || isFinished
             "
             block
         >
@@ -145,9 +147,7 @@ const isFinished = computed(() => {
                 {{ f(positionForWithdraw.value) }} ꜩ
             </template>
 
-            <template v-else-if="!isWon"
-                >No funds to withdraw</template
-            >
+            <template v-else-if="!isWon">No funds to withdraw</template>
 
             <template v-else
                 ><Spin size="12" />Awaiting confirmation..
