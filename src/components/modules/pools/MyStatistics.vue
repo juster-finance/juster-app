@@ -8,6 +8,8 @@ const props = defineProps({
 	positions: Array,
 })
 
+const expanded = ref(false)
+
 const tabs = reactive([
 	{
 		icon: "splitted_chart",
@@ -71,122 +73,158 @@ const sortedPositions = computed(() => {
 
 <template>
 	<div :class="$style.wrapper">
-		<Flex direction="column" gap="8" :class="$style.head">
-			<Text color="primary" size="16" weight="600">My Statistics</Text>
-			<Text color="tertiary" size="14" weight="500" height="14">
-				Splitted data by pools
-			</Text>
-		</Flex>
-
-		<Flex direction="column" gap="24">
+		<Flex
+			@click="expanded = !expanded"
+			justify="between"
+			:class="$style.head"
+		>
 			<Flex direction="column" gap="8">
-				<Flex align="center" justify="between">
-					<Text color="secondary" size="13" weight="600">
-						Total Value
-					</Text>
-
-					<Text color="secondary" size="13" weight="600">
-						{{ valueLocked.toFixed(2) }}
-					</Text>
-				</Flex>
-
-				<div :class="$style.progress_wrapper">
-					<div v-if="valueLocked" :class="$style.bar_progress" />
-				</div>
-
-				<!-- Hint for empty state -->
-				<Text
-					v-if="!valueLocked"
-					size="12"
-					color="support"
-					weight="500"
-					height="16"
+				<Text color="primary" size="16" weight="600"
+					>My Statistics</Text
 				>
-					After the first deposits here you will see what pools were
-					provided with liquidity and in what amount
+				<Text color="tertiary" size="14" weight="500" height="14">
+					Splitted data by pools
 				</Text>
 			</Flex>
 
-			<template v-if="valueLocked">
-				<Flex
-					v-for="position in sortedPositions"
-					direction="column"
-					gap="8"
-				>
-					<Flex align="center" justify="between">
-						<Text color="secondary" size="13" weight="600">
-							{{
-								position.pool.name.replace("Juster Pool: ", "")
-							}}
-						</Text>
+			<Icon
+				name="arrow"
+				size="20"
+				color="tertiary"
+				:class="[$style.arrow_icon, expanded && $style.toggle]"
+			/>
+		</Flex>
 
-						<Flex align="center" gap="8">
-							<Text color="tertiary" size="13" weight="600">
-								{{
-									(
-										(position.tvl * 100) /
-										valueLocked
-									).toFixed(0)
-								}}%
+		<div :class="[$style.toggleable, expanded && $style.expanded]">
+			<div :class="$style.toggleable_inside">
+				<Flex direction="column" gap="24" :class="$style.mgs">
+					<Flex direction="column" gap="8">
+						<Flex align="center" justify="between">
+							<Text color="secondary" size="13" weight="600">
+								Total Value
 							</Text>
 
 							<Text color="secondary" size="13" weight="600">
-								{{ position.tvl.toFixed(2) }}
+								{{ valueLocked.toFixed(2) }}
 							</Text>
 						</Flex>
+
+						<div :class="$style.progress_wrapper">
+							<div
+								v-if="valueLocked"
+								:class="$style.bar_progress"
+							/>
+						</div>
+
+						<!-- Hint for empty state -->
+						<Text
+							v-if="!valueLocked"
+							size="12"
+							color="support"
+							weight="500"
+							height="16"
+						>
+							After the first deposits here you will see what
+							pools were provided with liquidity and in what
+							amount
+						</Text>
 					</Flex>
 
-					<Flex :class="$style.progress_wrapper">
-						<div
-							:style="{
-								width: `${(position.tvl * 100) / valueLocked}%`,
-								borderRadius: '0 3px 3px 0',
-							}"
-							:class="$style.bar_deposited"
-						/>
-						<!-- <div
+					<template v-if="valueLocked">
+						<Flex
+							v-for="position in sortedPositions"
+							direction="column"
+							gap="8"
+						>
+							<Flex align="center" justify="between">
+								<Text color="secondary" size="13" weight="600">
+									{{
+										position.pool.name.replace(
+											"Juster Pool: ",
+											"",
+										)
+									}}
+								</Text>
+
+								<Flex align="center" gap="8">
+									<Text
+										color="tertiary"
+										size="13"
+										weight="600"
+									>
+										{{
+											(
+												(position.tvl * 100) /
+												valueLocked
+											).toFixed(0)
+										}}%
+									</Text>
+
+									<Text
+										color="secondary"
+										size="13"
+										weight="600"
+									>
+										{{ position.tvl.toFixed(2) }}
+									</Text>
+								</Flex>
+							</Flex>
+
+							<Flex :class="$style.progress_wrapper">
+								<div
+									:style="{
+										width: `${
+											(position.tvl * 100) / valueLocked
+										}%`,
+										borderRadius: '0 3px 3px 0',
+									}"
+									:class="$style.bar_deposited"
+								/>
+								<!-- <div
 							:style="{
 								width: `${30}%`,
 								borderRadius: '0 3px 3px 0',
 							}"
 							:class="$style.bar_locked"
 						/> -->
+							</Flex>
+						</Flex>
+					</template>
+
+					<Flex v-if="valueLocked" align="center" gap="16">
+						<Flex align="center" gap="6">
+							<div :class="$style.deposited_dot" />
+							<Text size="12" weight="600" color="secondary">
+								Total Deposited
+							</Text>
+						</Flex>
+						<Flex align="center" gap="6">
+							<div :class="$style.locked_dot" />
+							<Text size="12" weight="600" color="secondary"
+								>Total Value Locked</Text
+							>
+						</Flex>
 					</Flex>
 				</Flex>
-			</template>
 
-			<Flex v-if="valueLocked" align="center" gap="16">
-				<Flex align="center" gap="6">
-					<div :class="$style.deposited_dot" />
-					<Text size="12" weight="600" color="secondary">
-						Total Deposited
-					</Text>
-				</Flex>
-				<Flex align="center" gap="6">
-					<div :class="$style.locked_dot" />
-					<Text size="12" weight="600" color="secondary"
-						>Total Value Locked</Text
+				<Flex align="center" gap="6" :class="$style.tabs">
+					<Flex
+						v-for="(tab, i) in tabs"
+						:key="i"
+						@click="selectedTab = tab.title"
+						align="center"
+						gap="8"
+						:class="[
+							$style.tab,
+							selectedTab === tab.title && $style.active,
+						]"
 					>
+						<Icon :name="tab.icon" size="14" color="tertiary" />
+						<Text size="14" weight="600">{{ tab.title }}</Text>
+					</Flex>
 				</Flex>
-			</Flex>
-		</Flex>
-
-		<Flex align="center" gap="6" :class="$style.tabs">
-			<Flex
-				v-for="(tab, i) in tabs"
-				:key="i"
-				@click="selectedTab = tab.title"
-				align="center"
-				gap="8"
-				:class="[
-					$style.tab,
-					selectedTab === tab.title && $style.active,
-				]"
-			>
-				<Icon :name="tab.icon" size="14" color="tertiary" />
-				<Text size="14" weight="600">{{ tab.title }}</Text>
-			</Flex>
-		</Flex>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -202,10 +240,19 @@ const sortedPositions = computed(() => {
 }
 
 .head {
-	border-bottom: 1px solid var(--border);
+	cursor: pointer;
+}
 
-	padding-bottom: 20px;
-	margin-bottom: 24px;
+.head:hover .arrow_icon {
+	fill: var(--text-secondary);
+}
+
+.arrow_icon {
+	transition: all 0.2s ease;
+}
+
+.arrow_icon.toggle {
+	transform: rotate(180deg);
 }
 
 .progress_wrapper {
@@ -281,5 +328,28 @@ const sortedPositions = computed(() => {
 	height: 8px;
 	border-radius: 50%;
 	background: #3a568e;
+}
+
+.toggleable {
+	display: grid;
+	grid-template-rows: 0fr;
+	overflow: hidden;
+
+	transition: all 1s var(--bezier);
+}
+
+.mgs {
+	border-top: 1px solid var(--border);
+
+	padding-top: 20px;
+	margin-top: 24px;
+}
+
+.toggleable_inside {
+	min-height: 0;
+}
+
+.toggleable.expanded {
+	grid-template-rows: 1fr;
 }
 </style>
