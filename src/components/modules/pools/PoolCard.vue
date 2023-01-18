@@ -345,7 +345,9 @@ const copy = (target) => {
 								{{
 									showUserData
 										? position.shares.toFixed(2)
-										: `${(apy * 100).toFixed(2)}%`
+										: apy
+										? `${(apy * 100).toFixed(2)}%`
+										: `0%`
 								}}
 							</Text>
 						</Flex>
