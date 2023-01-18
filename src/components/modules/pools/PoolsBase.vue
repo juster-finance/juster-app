@@ -13,7 +13,6 @@ import MyStatistics from "./MyStatistics.vue"
 import BottomInfo from "./BottomInfo.vue"
 import PoolsStats from "./PoolsStats.vue"
 import PoolsList from "./PoolsList.vue"
-import PoolsChart from "./PoolsChart.vue"
 
 /**
  * UI
@@ -372,8 +371,6 @@ const { meta } = useMeta({
 
 				<Flex direction="column" gap="24" wide :class="$style.base">
 					<PoolsStats :pools="pools" :poolsStates="poolsStates" />
-
-					<PoolsChart />
 
 					<Block
 						v-if="flags.showGeneralPoolsWarning"
