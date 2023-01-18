@@ -88,14 +88,11 @@ const showPoolsGuidesModal = ref(false)
 						<DropdownDivider />
 
 						<DropdownTitle>Raw Data</DropdownTitle>
-						<DropdownItem @click="router.push('/pools/raw')">
+						<DropdownItem @click="router.push('/pools/list')">
 							<Icon name="table" size="16" /> Pools
 						</DropdownItem>
-						<DropdownItem>
+						<DropdownItem @click="router.push('/pools/positions')">
 							<Icon name="table" size="16" /> My Positions
-						</DropdownItem>
-						<DropdownItem>
-							<Icon name="table" size="16" /> My Claims
 						</DropdownItem>
 					</template>
 				</Dropdown>

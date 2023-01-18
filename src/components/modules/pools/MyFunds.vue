@@ -30,6 +30,7 @@ const emit = defineEmits([
 	"onManualEntryApprove",
 ])
 const props = defineProps({
+	title: { type: String, default: "My Funds" },
 	pools: Array,
 	poolsStates: Object,
 	entries: Array,
@@ -48,7 +49,7 @@ const togglePendingClaims = () => {
 
 const isDepositAvailable = computed(() => {
 	return (
-		props.pools.length > 1 &&
+		props.pools.length > 0 &&
 		props.pools.length === Object.keys(props.poolsStates).length
 	)
 })
@@ -185,7 +186,7 @@ const handleGetClaims = () => {
 <template>
 	<div :class="$style.wrapper">
 		<Flex align="center" justify="between" :class="$style.head">
-			<Text color="primary" size="16" weight="600">My Funds</Text>
+			<Text color="primary" size="16" weight="600">{{ title }}</Text>
 		</Flex>
 
 		<Flex align="center" gap="32" :class="$style.funds">

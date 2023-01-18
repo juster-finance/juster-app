@@ -80,9 +80,19 @@ const routes = [
 		component: () => import("@views/PoolsPage.vue"),
 	},
 	{
-		path: "/pools/raw",
+		path: "/pools/:address",
+		name: "Liquidity Pool",
+		component: () => import("@views/PoolPage.vue"),
+	},
+	{
+		path: "/pools/list",
 		name: "Raw Pools",
 		component: () => import("@views/RawPoolsPage.vue"),
+	},
+	{
+		path: "/pools/positions",
+		name: "Raw Positions",
+		component: () => import("@views/RawPositionsPage.vue"),
 	},
 
 	// Settings

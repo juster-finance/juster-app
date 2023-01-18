@@ -4,27 +4,23 @@
  */
 import { ref, onMounted, onUnmounted, computed, watch } from "vue"
 import { useMeta } from "vue-meta"
+import { useRoute } from "vue-router"
+import { makeSummaryPosition } from "@juster-finance/sdk"
+import BN from "bignumber.js"
 
 /**
  * Local
  */
 import MyFunds from "./MyFunds.vue"
-import MyStatistics from "./MyStatistics.vue"
 import BottomInfo from "./BottomInfo.vue"
 import PoolsStats from "./PoolsStats.vue"
-import PoolsList from "./PoolsList.vue"
 import PoolsChart from "./PoolsChart.vue"
-
-/**
- * UI
- */
-import Block from "@ui/Block.vue"
+import MySummary from "./MySummary.vue"
 
 /**
  * Modal
  */
 import SharePoolModal from "@local/modals/pools/SharePoolModal.vue"
-import PoolsModal from "@local/modals/pools/PoolsModal.vue"
 import DepositModal from "@local/modals/pools/DepositModal.vue"
 import RequestWithdrawModal from "@local/modals/pools/RequestWithdrawModal.vue"
 import WithdrawClaimsModal from "@local/modals/pools/WithdrawClaimsModal.vue"
@@ -32,7 +28,6 @@ import WithdrawClaimsModal from "@local/modals/pools/WithdrawClaimsModal.vue"
 /**
  * Services
  */
-import { flags, updateFlag } from "@/services/flags"
 import { juster } from "@sdk"
 
 /**
@@ -48,12 +43,12 @@ import {
  * Store
  */
 import { useAccountStore } from "@store/account"
-import { useNotificationsStore } from "@store/notifications"
 import { useMarketStore } from "@store/market"
 
 const accountStore = useAccountStore()
-const notificationsStore = useNotificationsStore()
 const marketStore = useMarketStore()
+
+const route = useRoute()
 
 const showSharePoolModal = ref(false)
 const showPoolsModal = ref(false)
@@ -61,23 +56,10 @@ const showDepositModal = ref(false)
 const showWithdrawClaimsModal = ref(false)
 const showRequestWithdrawModal = ref(false)
 
-const handleSelectPool = (pool) => {
-	selectedPool.value = pool
-
-	showPoolsModal.value = false
-	showDepositModal.value = true
-}
-
 const handleShare = (pool) => {
 	selectedPool.value = pool
 
 	showSharePoolModal.value = true
-}
-
-const handleRequestWithdraw = (pool) => {
-	selectedPool.value = pool
-
-	showRequestWithdrawModal.value = true
 }
 
 const handleBackFromDeposit = () => {
@@ -85,43 +67,23 @@ const handleBackFromDeposit = () => {
 	showPoolsModal.value = true
 }
 
-const handleClosePoolsWarning = () => {
-	updateFlag("showGeneralPoolsWarning", false)
-
-	notificationsStore.create({
-		notification: {
-			type: "success",
-			title: "Warning is now hidden",
-			autoDestroy: true,
-
-			actions: [
-				{
-					name: "Undo",
-					icon: "back",
-					callback: () => {
-						updateFlag("showGeneralPoolsWarning", true)
-					},
-				},
-			],
-		},
-	})
-}
-
 /**
  * Pools
  */
 
 const pools = computed(() => marketStore.pools)
+const pool = computed(() =>
+	marketStore.pools.find((p) => p.address === route.params.address),
+)
 const selectedPool = ref({})
-
-const poolsStates = ref({})
-const poolsAPY = ref({})
+const poolState = ref({})
+const summary = ref({})
 
 /**
  * Pool Position
  */
 const subPositions = ref({})
-const positions = ref([])
+const position = ref(null)
 
 /**
  * Entries
@@ -135,18 +97,9 @@ const entries = ref([])
 const subStates = ref({})
 
 const populatePools = async () => {
-	for (const index in pools.value) {
-		if (!Object.hasOwnProperty.call(pools.value, index)) return
-		const pool = pools.value[index]
-
-		poolsStates.value[pool.address] = await juster.pools[
-			pool.address
-		].getLastPoolState()
-
-		poolsAPY.value[pool.address] = (
-			await juster.pools[pool.address].getAPY()
-		).toNumber()
-	}
+	poolState.value = await juster.pools[
+		route.params.address
+	].getLastPoolState()
 
 	setupSubToStates()
 }
@@ -159,7 +112,7 @@ const setupSubToStates = async () => {
 					where: {
 						pool: {
 							address: {
-								_in: pools.value.map((pool) => pool.address),
+								_eq: route.params.address,
 							},
 						},
 					},
@@ -170,14 +123,13 @@ const setupSubToStates = async () => {
 			],
 		})
 		.subscribe({
-			next: ({ poolState }) => {
-				const newPoolState = poolState[0]
-				const currentPoolState = poolsStates.value[newPoolState.poolId]
+			next: ({ poolState: pState }) => {
+				const newPoolState = pState[0]
+				const currentPoolState = poolState.value
 
 				if (newPoolState.counter === currentPoolState.counter) return
-
 				if (newPoolState.counter > currentPoolState.counter) {
-					poolsStates.value[newPoolState.poolId] = newPoolState
+					poolState.value = newPoolState
 				}
 			},
 			error: console.error,
@@ -192,7 +144,7 @@ const setupSubToEntries = async () => {
 					where: {
 						pool: {
 							address: {
-								_in: pools.value.map((pool) => pool.address),
+								_eq: route.params.address,
 							},
 						},
 						user: { address: { _eq: accountStore.pkh } },
@@ -218,6 +170,9 @@ const setupSubToPositions = async () => {
 						userId: {
 							_eq: accountStore.pkh,
 						},
+						poolId: {
+							_eq: route.params.address,
+						},
 					},
 				},
 				poolPositionModel,
@@ -225,7 +180,7 @@ const setupSubToPositions = async () => {
 		})
 		.subscribe({
 			next: ({ poolPosition }) => {
-				positions.value = poolPosition
+				position.value = poolPosition[0]
 			},
 			error: console.error,
 		})
@@ -246,16 +201,29 @@ onMounted(() => {
  * Deposits with an amount <1 xtz need manual confirmation
  */
 const handleManualEntryApprove = async (entry) => {
-	const contract = await juster.sdk._tezos.contract.at(entry.pool.address)
-	const transactions = [
-		{
-			kind: "transaction",
-			...contract.methods.approveEntry(entry.entryId).toTransferParams(),
-		},
-	]
+	// const contract = await juster.sdk._tezos.contract.at(entry.pool.address)
+	// console.log(contract)
+	// const op = await contract.methods.approveEntry(entry.entryId).send()
 
-	const batch = await juster.sdk._tezos.wallet.batch(transactions)
-	const batchOp = await batch.send()
+	// op.confirmation().then((data) => {
+	// 	console.log(data)
+	// })
+	const result = await juster.provider.client.requestOperation({
+		operationDetails: [
+			{
+				kind: "TRANSACTION",
+				amount: "0",
+				destination: entry.pool.address,
+				parameters: {
+					entrypoint: "approveEntry",
+					value: {
+						inta: entry.entryId,
+					},
+				},
+			},
+		],
+	})
+	console.log(result)
 }
 
 onUnmounted(() => {
@@ -293,6 +261,14 @@ watch(
 	},
 )
 
+watch(
+	() => position.value,
+	() => {
+		position.value.shares = BN(position.value.shares)
+		summary.value = makeSummaryPosition(position.value, poolState.value)
+	},
+)
+
 /** Meta */
 const { meta } = useMeta({
 	title: `Liquidity Pools`,
@@ -302,7 +278,7 @@ const { meta } = useMeta({
 
 <template>
 	<transition name="slide">
-		<div v-if="showAnimation" :class="$style.wrapper">
+		<div v-if="showAnimation">
 			<metainfo>
 				<template v-slot:title="{ content }"
 					>{{ content }} • Juster</template
@@ -315,53 +291,61 @@ const { meta } = useMeta({
 				:pool="selectedPool"
 				@onClose="showSharePoolModal = false"
 			/>
-			<PoolsModal
-				v-if="pools.length"
-				:show="showPoolsModal"
-				:pools="pools"
-				:poolsStates="poolsStates"
-				@onSelectPool="handleSelectPool"
-				@onClose="showPoolsModal = false"
-			/>
 			<DepositModal
 				:show="showDepositModal"
-				:selectedPool="selectedPool"
-				:state="poolsStates[selectedPool.address]"
+				:selectedPool="pool"
+				:state="poolState"
 				@onBack="handleBackFromDeposit"
 				@onClose="showDepositModal = false"
 			/>
 			<RequestWithdrawModal
 				:show="showRequestWithdrawModal"
 				:selectedPool="selectedPool"
-				:state="poolsStates[selectedPool.address]"
-				:position="
-					positions.find((pos) => pos.poolId === selectedPool.address)
-				"
+				:state="poolState"
+				:position="position"
 				@onClose="showRequestWithdrawModal = false"
 			/>
 			<WithdrawClaimsModal
 				:show="showWithdrawClaimsModal"
-				:positions="positions"
+				:positions="[position]"
+				:pool="pool"
 				@onClose="showWithdrawClaimsModal = false"
 			/>
 
-			<Flex align="center" :class="$style.head">
-				<h1 :class="$style.title">Liquidity Pools</h1>
+			<Flex align="center" gap="8" :class="$style.head">
+				<Text size="16" weight="600" color="tertiary">
+					<router-link to="/pools" :class="$style.link">
+						Liquidity Pools
+					</router-link>
+				</Text>
+
+				<Icon
+					name="arrow"
+					size="16"
+					color="tertiary"
+					style="rotate: -90deg"
+				/>
+
+				<Text size="16" weight="600" color="primary">
+					{{ pool?.name.replace("Juster Pool: ", "") }}
+				</Text>
 			</Flex>
 
 			<Flex justify="between" :class="$style.content">
 				<Flex direction="column" gap="24" :class="$style.side">
 					<MyFunds
-						:pools="pools"
-						:poolsStates="poolsStates"
+						v-if="position"
+						title="My Pool Funds"
+						:pools="[pool]"
+						:poolsStates="[poolState]"
 						:entries="entries"
-						:positions="positions"
+						:positions="[position]"
 						@onManualEntryApprove="handleManualEntryApprove"
-						@onDepositLiquidity="showPoolsModal = true"
+						@onDepositLiquidity="showDepositModal = true"
 						@onGetClaims="showWithdrawClaimsModal = true"
 					/>
 
-					<MyStatistics :positions="positions" />
+					<MySummary v-if="summary" :summary="summary" />
 
 					<BottomInfo
 						v-if="pools.length"
@@ -371,32 +355,9 @@ const { meta } = useMeta({
 				</Flex>
 
 				<Flex direction="column" gap="24" wide :class="$style.base">
-					<PoolsStats :pools="pools" :poolsStates="poolsStates" />
+					<PoolsStats :pools="[pool]" :poolsStates="[poolState]" />
 
 					<PoolsChart />
-
-					<Block
-						v-if="flags.showGeneralPoolsWarning"
-						@onClose="handleClosePoolsWarning"
-					>
-						<span>Current APYs is approximate.</span> Values may
-						change over the next few months. Planning for long-term
-						income based on these values may differ from the actual.
-					</Block>
-
-					<transition name="fade">
-						<PoolsList
-							v-if="pools.length"
-							:pools="pools"
-							:poolsStates="poolsStates"
-							:poolsAPY="poolsAPY"
-							:positions="positions"
-							@onShare="(pool) => handleShare(pool)"
-							@onSelectPool="handleSelectPool"
-							@onRequestWithdraw="handleRequestWithdraw"
-							:class="$style.list"
-						/>
-					</transition>
 
 					<BottomInfo
 						v-if="pools.length"
@@ -410,9 +371,6 @@ const { meta } = useMeta({
 </template>
 
 <style module>
-.wrapper {
-}
-
 .title {
 	font-size: 16px;
 }
@@ -424,6 +382,19 @@ const { meta } = useMeta({
 	margin-bottom: 24px;
 }
 
+.link {
+	transition: color 0.2s ease;
+}
+
+.link:hover {
+	color: var(--text-primary);
+}
+
+.link:focus {
+	box-shadow: 0 0 0 transparent;
+	color: var(--text-primary);
+}
+
 .side {
 	max-width: 450px;
 }
@@ -432,10 +403,6 @@ const { meta } = useMeta({
 	max-width: 760px;
 
 	margin-left: 32px;
-}
-
-.list {
-	margin-top: 32px;
 }
 
 .bottom_right_block {

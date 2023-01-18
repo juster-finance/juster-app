@@ -136,8 +136,10 @@ watch(
 				</svg>
 			</div>
 
-			<div
+			<Flex
 				v-if="activeLink.length"
+				direction="column"
+				gap="16"
 				:class="[
 					$style.card,
 					activeLink === 'Browse' && $style.left,
@@ -146,275 +148,326 @@ watch(
 				]"
 			>
 				<template v-if="activeLink === 'Browse'">
-					<div :class="$style.column">
-						<div :class="$style.atlas_block">
-							<component
-								v-for="(link, i) in browseLinks"
-								:is="
-									link.url.startsWith('https://')
-										? 'a'
-										: 'router-link'
-								"
-								:key="i"
-								:to="link.url"
-								:href="link.url"
-								:target="
-									link.url.startsWith('https://') && _blank
-								"
-								:class="$style.item"
-							>
-								<div :class="$style.icon_wrapper">
-									<Icon :name="link.icon" size="20" />
-								</div>
-
-								<div :class="$style.text">
-									<span>{{ link.title }}</span>
-									<span>{{ link.description }}</span>
-								</div>
-							</component>
-						</div>
-					</div>
-
-					<div :class="$style.divider" />
-
-					<div :class="$style.column">
-						<div :class="$style.advanced_block">
-							<router-link to="/pools" :class="$style.item">
-								<div :class="$style.icon_wrapper">
-									<Icon name="server" size="20" />
-								</div>
-
-								<div :class="$style.text">
-									<span>Liquidity Pools</span>
-									<span>Provide liquidity to events</span>
-								</div>
-							</router-link>
-						</div>
-
-						<div :class="$style.guides_block">
-							<div :class="$style.label">featured guides</div>
-
-							<div :class="$style.guide">
-								<span>What are liquidity pools?</span>
-								<span>Advanced</span>
-							</div>
-
-							<div :class="$style.guide">
-								<span>Creating and managing events</span>
-								<span>Advanced</span>
-							</div>
-						</div>
-
-						<div :class="$style.buttons">
-							<router-link to="/releases">
-								<Button size="mini" type="secondary" block>
-									<Icon
-										name="asterisk"
-										size="14"
-										style="fill: var(--green)"
-									/>Release 1.1
-								</Button>
-							</router-link>
-
-							<div :class="$style.button_group">
-								<Button size="mini" type="secondary" block>
-									<Icon
-										name="layers"
-										size="14"
-										style="fill: var(--orange)"
-									/>All Features
-								</Button>
-
-								<Button
-									size="mini"
-									type="secondary"
-									block
-									as-link
-									link="https://discord.gg/FeGDCkHhnB"
+					<Flex :class="$style.base">
+						<Flex
+							direction="column"
+							gap="24"
+							:class="$style.column"
+						>
+							<div :class="$style.atlas_block">
+								<component
+									v-for="(link, i) in browseLinks"
+									:is="
+										link.url.startsWith('https://')
+											? 'a'
+											: 'router-link'
+									"
+									:key="i"
+									:to="link.url"
+									:href="link.url"
+									:target="
+										link.url.startsWith('https://') &&
+										_blank
+									"
+									:class="$style.item"
 								>
-									<Icon
-										name="chat"
-										size="14"
-										style="fill: var(--text-primary)"
-									/>Discussions
-								</Button>
+									<div :class="$style.icon_wrapper">
+										<Icon :name="link.icon" size="20" />
+									</div>
+
+									<div :class="$style.text">
+										<span>{{ link.title }}</span>
+										<span>{{ link.description }}</span>
+									</div>
+								</component>
 							</div>
-						</div>
-					</div>
+						</Flex>
+
+						<div :class="$style.divider" />
+
+						<Flex
+							direction="column"
+							gap="24"
+							:class="$style.column"
+						>
+							<div :class="$style.advanced_block">
+								<router-link to="/pools" :class="$style.item">
+									<div :class="$style.icon_wrapper">
+										<Icon
+											name="server"
+											size="20"
+											color="brand"
+										/>
+									</div>
+
+									<div :class="$style.text">
+										<span>Liquidity Pools</span>
+										<span>Provide liquidity to events</span>
+									</div>
+								</router-link>
+							</div>
+
+							<div :class="$style.guides_block">
+								<div :class="$style.label">featured guides</div>
+
+								<div :class="$style.guide">
+									<span>What are liquidity pools?</span>
+									<span>Advanced</span>
+								</div>
+
+								<div :class="$style.guide">
+									<span>Creating and managing events</span>
+									<span>Advanced</span>
+								</div>
+							</div>
+						</Flex>
+					</Flex>
+
+					<Flex
+						align="center"
+						justify="between"
+						:class="$style.bottom"
+					>
+						<router-link to="/releases">
+							<Button size="small" type="secondary" block>
+								<Icon
+									name="asterisk"
+									size="16"
+									style="fill: var(--green)"
+								/>What's New in 1.1
+							</Button>
+						</router-link>
+
+						<Flex gap="8">
+							<Button
+								size="small"
+								type="tertiary"
+								link="https://status.juster.fi"
+							>
+								<Icon
+									name="bolt"
+									size="16"
+									color="tertiary"
+								/>System Status
+							</Button>
+
+							<Button
+								size="small"
+								type="tertiary"
+								link="https://discord.gg/FeGDCkHhnB"
+							>
+								<Icon
+									name="help"
+									size="16"
+									color="tertiary"
+								/>Support
+							</Button>
+						</Flex>
+					</Flex>
 				</template>
 
 				<template v-if="activeLink === 'Resources'">
-					<div :class="$style.column">
-						<div :class="$style.atlas_block">
-							<component
-								:is="
-									link.url.startsWith('https://')
-										? 'a'
-										: 'router-link'
-								"
-								v-for="(link, i) in resourcesLinks"
-								:key="i"
-								:to="link.url"
-								:href="link.url"
-								:target="
-									link.url.startsWith('https://') && '_blank'
-								"
-								:class="$style.item"
-							>
-								<div :class="$style.icon_wrapper">
-									<Icon :name="link.icon" size="20" />
-								</div>
-
-								<div :class="$style.text">
-									<span>{{ link.title }}</span>
-									<span>{{ link.description }}</span>
-								</div>
-							</component>
-						</div>
-					</div>
-
-					<div :class="$style.divider" />
-
-					<div :class="$style.column">
-						<div :class="$style.guides_block">
-							<div :class="$style.label">GETTING STARTED</div>
-
-							<div :class="$style.guide">
-								<span>How to participate?</span>
-								<span>Basic</span>
-							</div>
-
-							<div :class="$style.guide">
-								<span>Liquidity & Payouts</span>
-								<span>Basic</span>
-							</div>
-						</div>
-
-						<div :class="$style.guides_block">
-							<div :class="$style.label">use cases</div>
-
-							<div :class="$style.guide">
-								<span>Betting: Symbols, Sports, etc</span>
-								<span>Guide</span>
-							</div>
-
-							<div :class="$style.guide">
-								<span>Binary Options Mode</span>
-								<span>Guide</span>
-							</div>
-
-							<div :class="$style.guide">
-								<span>Shared Liquidity Pool</span>
-								<span>Guide</span>
-							</div>
-						</div>
-
-						<div :class="$style.buttons">
-							<div :class="$style.button_group">
-								<Button size="mini" type="secondary" block>
-									<Icon
-										name="shield_tick"
-										size="14"
-										style="fill: var(--green)"
-									/>Security Audits
-								</Button>
-
-								<Button
-									size="mini"
-									type="secondary"
-									block
-									as-link
-									link="https://discord.gg/FeGDCkHhnB"
+					<Flex :class="$style.base">
+						<Flex
+							direction="column"
+							gap="24"
+							:class="$style.column"
+						>
+							<div :class="$style.atlas_block">
+								<component
+									:is="
+										link.url.startsWith('https://')
+											? 'a'
+											: 'router-link'
+									"
+									v-for="(link, i) in resourcesLinks"
+									:key="i"
+									:to="link.url"
+									:href="link.url"
+									:target="
+										link.url.startsWith('https://') &&
+										'_blank'
+									"
+									:class="$style.item"
 								>
-									<Icon
-										name="document"
-										size="14"
-										style="fill: var(--text-primary)"
-									/>White-Papper
-								</Button>
+									<div :class="$style.icon_wrapper">
+										<Icon :name="link.icon" size="20" />
+									</div>
+
+									<div :class="$style.text">
+										<span>{{ link.title }}</span>
+										<span>{{ link.description }}</span>
+									</div>
+								</component>
 							</div>
-						</div>
-					</div></template
-				>
+						</Flex>
+
+						<div :class="$style.divider" />
+
+						<Flex
+							direction="column"
+							gap="24"
+							:class="$style.column"
+						>
+							<div :class="$style.guides_block">
+								<div :class="$style.label">GETTING STARTED</div>
+
+								<div :class="$style.guide">
+									<span>How to participate?</span>
+									<span>Basic</span>
+								</div>
+
+								<div :class="$style.guide">
+									<span>Liquidity & Payouts</span>
+									<span>Basic</span>
+								</div>
+							</div>
+
+							<div :class="$style.guides_block">
+								<div :class="$style.label">use cases</div>
+
+								<div :class="$style.guide">
+									<span>Betting: Symbols, Sports, etc</span>
+									<span>Guide</span>
+								</div>
+
+								<div :class="$style.guide">
+									<span>Binary Options Mode</span>
+									<span>Guide</span>
+								</div>
+
+								<div :class="$style.guide">
+									<span>Shared Liquidity Pool</span>
+									<span>Guide</span>
+								</div>
+							</div>
+						</Flex>
+					</Flex>
+
+					<Flex
+						align="center"
+						justify="between"
+						:class="$style.bottom"
+					>
+						<Button size="small" type="secondary">
+							<Icon
+								name="shield_tick"
+								size="14"
+								color="green"
+							/>Security Audits
+						</Button>
+
+						<Button
+							size="small"
+							type="tertiary"
+							link="https://discord.gg/FeGDCkHhnB"
+						>
+							<Icon
+								name="document"
+								size="14"
+								color="primary"
+							/>White-Papper
+						</Button>
+					</Flex>
+				</template>
 
 				<template v-if="activeLink === 'Community'">
-					<div :class="$style.column">
-						<div :class="$style.atlas_block">
-							<component
-								:is="
-									link.url.startsWith('https://')
-										? 'a'
-										: 'router-link'
-								"
-								v-for="(link, i) in communityLinks"
-								:key="i"
-								:to="link.url"
-								:href="link.url"
-								:target="
-									link.url.startsWith('https://') && '_blank'
-								"
-								:class="$style.item"
-							>
-								<div :class="$style.icon_wrapper">
-									<Icon :name="link.icon" size="20" />
+					<Flex :class="$style.base">
+						<Flex
+							direction="column"
+							gap="24"
+							:class="$style.column"
+						>
+							<div :class="$style.atlas_block">
+								<component
+									:is="
+										link.url.startsWith('https://')
+											? 'a'
+											: 'router-link'
+									"
+									v-for="(link, i) in communityLinks"
+									:key="i"
+									:to="link.url"
+									:href="link.url"
+									:target="
+										link.url.startsWith('https://') &&
+										'_blank'
+									"
+									:class="$style.item"
+								>
+									<div :class="$style.icon_wrapper">
+										<Icon :name="link.icon" size="20" />
+									</div>
+
+									<div :class="$style.text">
+										<span>{{ link.title }}</span>
+										<span>{{ link.description }}</span>
+									</div>
+								</component>
+							</div>
+						</Flex>
+
+						<div :class="$style.divider" />
+
+						<Flex
+							direction="column"
+							gap="24"
+							:class="$style.column"
+						>
+							<div :class="$style.guides_block">
+								<div :class="$style.label">GETTING STARTED</div>
+
+								<div :class="$style.guide">
+									<span>How to participate?</span>
+									<span>Basic</span>
 								</div>
 
-								<div :class="$style.text">
-									<span>{{ link.title }}</span>
-									<span>{{ link.description }}</span>
+								<div :class="$style.guide">
+									<span>Liquidity & Payouts</span>
+									<span>Basic</span>
 								</div>
-							</component>
-						</div>
-					</div>
-
-					<div :class="$style.divider" />
-
-					<div :class="$style.column">
-						<div :class="$style.guides_block">
-							<div :class="$style.label">GETTING STARTED</div>
-
-							<div :class="$style.guide">
-								<span>How to participate?</span>
-								<span>Basic</span>
 							</div>
 
-							<div :class="$style.guide">
-								<span>Liquidity & Payouts</span>
-								<span>Basic</span>
+							<div :class="$style.guides_block">
+								<div :class="$style.label">use cases</div>
+
+								<div :class="$style.guide">
+									<span>Betting: Symbols, Sports, etc</span>
+									<span>Guide</span>
+								</div>
+
+								<div :class="$style.guide">
+									<span>Binary Options Mode</span>
+									<span>Guide</span>
+								</div>
+
+								<div :class="$style.guide">
+									<span>Shared Liquidity Pool</span>
+									<span>Guide</span>
+								</div>
 							</div>
-						</div>
+						</Flex>
+					</Flex>
 
-						<div :class="$style.guides_block">
-							<div :class="$style.label">use cases</div>
+					<Flex
+						align="center"
+						justify="between"
+						:class="$style.bottom"
+					>
+						<Button size="small" type="secondary">
+							<Icon
+								name="telegram"
+								size="14"
+								color="primary"
+							/>Telegram Channel
+						</Button>
 
-							<div :class="$style.guide">
-								<span>Betting: Symbols, Sports, etc</span>
-								<span>Guide</span>
-							</div>
-
-							<div :class="$style.guide">
-								<span>Binary Options Mode</span>
-								<span>Guide</span>
-							</div>
-
-							<div :class="$style.guide">
-								<span>Shared Liquidity Pool</span>
-								<span>Guide</span>
-							</div>
-						</div>
-
-						<div :class="$style.buttons">
-							<Button size="mini" type="secondary" block>
-								<Icon
-									name="telegram"
-									size="14"
-									style="fill: var(--text-primary)"
-								/>Telegram Channel: Notifications
-							</Button>
-						</div>
-					</div></template
-				>
-			</div>
+						<Button size="small" type="tertiary">
+							<Icon name="help" size="14" color="tertiary" />About
+						</Button>
+					</Flex>
+				</template>
+			</Flex>
 		</div>
 	</transition>
 </template>
@@ -443,15 +496,13 @@ watch(
 }
 
 .card {
-	display: flex;
-
 	min-width: 692px;
 	height: fit-content;
 
 	background: var(--card-bg);
 	border-radius: 8px;
+	overflow: hidden;
 
-	padding: 16px 16px 20px 16px;
 	box-shadow: rgb(0 0 0 / 30%) 0px 20px 40px;
 
 	transition: transform 0.2s ease;
@@ -469,16 +520,21 @@ watch(
 	transform: translateX(20px);
 }
 
-.content {
-	display: flex;
+.base {
+	padding: 16px 16px 0 16px;
+}
+
+.bottom {
+	height: 66px;
+
+	background: rgba(0, 0, 0, 0.1);
+	border-top: 1px solid var(--border);
+
+	padding: 0 24px;
 }
 
 .column {
 	flex: 1;
-
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
 }
 
 .divider {

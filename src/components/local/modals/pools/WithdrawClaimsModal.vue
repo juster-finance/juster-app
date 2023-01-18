@@ -33,6 +33,7 @@ const notificationsStore = useNotificationsStore()
 const props = defineProps({
 	show: Boolean,
 	positions: Object,
+	pool: Object,
 })
 
 const emit = defineEmits(["onClose"])
@@ -104,95 +105,129 @@ const nextClaim = computed(() => {
 	return closest
 })
 
-// const handleWithdrawClaims = async ({ eventIds, address }) => {
-// 	try {
-// 		const contract = await juster.sdk._tezos.contract.at(
-// 			contracts[
-// 				juster.sdk._network === "mainnet" ? "mainnet" : "testnet"
-// 			],
-// 		)
+const handleWithdrawClaims = async ({ eventIds, address }) => {
+	try {
+		const contract = await juster.sdk._tezos.contract.at(
+			contracts[
+				juster.sdk._network === "mainnet" ? "mainnet" : "testnet"
+			],
+		)
 
-// 		if (!eventIds.length || !address) return
+		if (!eventIds.length || !address) return
 
-// 		const transactions = []
-// 		eventIds.forEach((id) => {
-// 			transactions.push({
-// 				kind: "transaction",
-// 				...contract.methods.withdraw(id, address).toTransferParams(),
-// 			})
-// 		})
+		const transactions = []
+		eventIds.forEach((id) => {
+			transactions.push({
+				kind: "transaction",
+				...contract.methods.withdraw(id, address).toTransferParams(),
+			})
+		})
 
-// 		const batch = await juster.sdk._tezos.wallet.batch(transactions)
+		const batch = await juster.sdk._tezos.wallet.batch(transactions)
 
-// 		const batchOp = await batch.send()
+		const batchOp = await batch.send()
 
-// 		return { success: true, hash: batchOp.hash }
-// 	} catch (error) {
-// 		return { success: false, title: error.title, message: error.message }
-// 	}
-// }
+		return { success: true, hash: batchOp.hash }
+	} catch (error) {
+		return { success: false, title: error.title, message: error.message }
+	}
+}
 const opConfirmationInProgress = ref(false)
 const handleWithdraw = async () => {
 	if (buttonState.disabled) return
 
 	opConfirmationInProgress.value = true
 
-	try {
-		const op = await juster.pools[
-			"KT1M6fueToCaYBTeG25XZEFCa7YXcNDMn12x"
-		].withdrawClaims(
-			availableClaims.value.map((claim) => {
-				return {
-					eventId: claim.eventId,
-					provider: accountStore.pkh,
-				}
-			}),
-		)
+	if (!props.pool) {
+		const transactions = []
+		for (const pos of props.positions.filter((p) => p.claims.length)) {
+			const contract = await juster.sdk._tezos.contract.at(pos.poolId)
+			const claims = pos.claims.filter(
+				(c) => c.event.result && !c.withdrawn,
+			)
+
+			transactions.push({
+				kind: "transaction",
+				...contract.methods
+					.withdrawClaims(
+						claims.map((c) => {
+							return {
+								eventId: c.eventId,
+								provider: accountStore.pkh,
+							}
+						}),
+					)
+					.toTransferParams(),
+			})
+		}
+
+		const batch = await juster.sdk._tezos.wallet.batch(transactions)
+		const batchOp = await batch.send()
 
 		accountStore.pendingTransaction.awaiting = true
-		op.confirmation()
+		batchOp
+			.confirmation()
 			.then(() => {
 				accountStore.pendingTransaction.awaiting = false
 			})
 			.catch(() => {
 				accountStore.pendingTransaction.awaiting = false
 			})
+	} else {
+		try {
+			const op = await juster.pools[props.pool.address].withdrawClaims(
+				availableClaims.value.map((claim) => {
+					return {
+						eventId: claim.eventId,
+						provider: accountStore.pkh,
+					}
+				}),
+			)
 
-		notificationsStore.create({
-			notification: {
-				type: "success",
-				title: "Your withdraw has been accepted",
-				description:
-					"We need to process your request, it will take ~30 seconds",
-				autoDestroy: true,
-			},
-		})
+			accountStore.pendingTransaction.awaiting = true
+			op.confirmation()
+				.then(() => {
+					accountStore.pendingTransaction.awaiting = false
+				})
+				.catch(() => {
+					accountStore.pendingTransaction.awaiting = false
+				})
 
-		opConfirmationInProgress.value = false
-		emit("onClose")
-	} catch (error) {
-		if (error.title == "Aborted") {
 			notificationsStore.create({
 				notification: {
-					icon: "warning",
-					title: "The operation was rejected",
-					description: `The withdrawal request was not accepted`,
+					type: "success",
+					title: "Your withdraw has been accepted",
+					description:
+						"We need to process your request, it will take ~30 seconds",
 					autoDestroy: true,
 				},
 			})
-		} else {
-			console.log(error)
-			notificationsStore.create({
-				notification: {
-					icon: "warning",
-					title: "Something went wrong",
-					description: "Repeat the operation or wait for a while",
-					autoDestroy: true,
-				},
-			})
+
+			opConfirmationInProgress.value = false
+			emit("onClose")
+		} catch (error) {
+			if (error.title == "Aborted") {
+				notificationsStore.create({
+					notification: {
+						icon: "warning",
+						title: "The operation was rejected",
+						description: `The withdrawal request was not accepted`,
+						autoDestroy: true,
+					},
+				})
+			} else {
+				notificationsStore.create({
+					notification: {
+						icon: "warning",
+						title: "Something went wrong",
+						description: "Repeat the operation or wait for a while",
+						autoDestroy: true,
+					},
+				})
+			}
+
+			opConfirmationInProgress.value = false
 		}
-
-		opConfirmationInProgress.value = false
 	}
 }
 

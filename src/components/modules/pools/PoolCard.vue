@@ -32,8 +32,6 @@ import { useNotificationsStore } from "@store/notifications"
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 
-const cardEl = ref(null)
-
 const emit = defineEmits(["onSelectPool", "onRequestWithdraw", "onShare"])
 const props = defineProps({
 	pool: {
@@ -42,6 +40,9 @@ const props = defineProps({
 	},
 	state: {
 		type: Object,
+	},
+	apy: {
+		type: Number,
 	},
 	position: {
 		type: Object,
@@ -70,21 +71,11 @@ onMounted(() => {
 	poolUpdInterval = setInterval(() => {
 		updateTimeDiff()
 	}, 30_000)
-
-	cardEl.value.addEventListener("contextmenu", contextMenuHandler)
 })
 
 onBeforeUnmount(() => {
 	clearInterval(poolUpdInterval)
-
-	cardEl.value.removeEventListener("contextmenu", contextMenuHandler)
 })
-
-const openContextMenu = ref(false)
-const contextMenuHandler = (e) => {
-	e.preventDefault()
-	openContextMenu.value = true
-}
 
 const handleDeposit = () => {
 	if (!parseFloat(accountStore.balance)) return
@@ -181,7 +172,7 @@ const copy = (target) => {
 </script>
 
 <template>
-	<div ref="cardEl">
+	<router-link :to="`/pools/${pool.address}`">
 		<Flex direction="column" gap="32" :class="$style.wrapper">
 			<Flex justify="between">
 				<Flex align="center" gap="16">
@@ -228,7 +219,7 @@ const copy = (target) => {
 						:disabled="!!isDepositAvailable"
 					>
 						<Button
-							@click="handleDeposit"
+							@click.prevent="handleDeposit"
 							:disabled="!parseFloat(accountStore.balance)"
 							type="secondary"
 							size="small"
@@ -354,7 +345,7 @@ const copy = (target) => {
 								{{
 									showUserData
 										? position.shares.toFixed(2)
-										: "0%"
+										: `${(apy * 100).toFixed(2)}%`
 								}}
 							</Text>
 						</Flex>
@@ -364,7 +355,7 @@ const copy = (target) => {
 
 					<Flex
 						v-if="accountStore.pkh && position"
-						@click="handleSwitch"
+						@click.prevent="handleSwitch"
 						align="center"
 						gap="8"
 						:class="$style.switch_btn"
@@ -468,13 +459,9 @@ const copy = (target) => {
 					</Text>
 				</Flex>
 
-				<Dropdown
-					:force-open="openContextMenu"
-					disable-autofocus
-					@onClose="openContextMenu = false"
-				>
+				<Dropdown disable-autofocus>
 					<template #trigger>
-						<Button type="secondary" size="small">
+						<Button @click.prevent type="secondary" size="small">
 							<Icon name="dots" size="12" />
 						</Button>
 					</template>
@@ -512,7 +499,7 @@ const copy = (target) => {
 				</Dropdown>
 			</Flex>
 		</Flex>
-	</div>
+	</router-link>
 </template>
 
 <style module>

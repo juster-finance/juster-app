@@ -23,6 +23,9 @@ const props = defineProps({
 	poolsStates: {
 		type: Object,
 	},
+	poolsAPY: {
+		type: Object,
+	},
 	positions: {
 		type: Array,
 	},
@@ -166,6 +169,7 @@ onMounted(() => {
 				:pool="pool"
 				:position="getPositionByPool(pool)"
 				:state="poolsStates[pool.address]"
+				:apy="poolsAPY[pool.address]"
 			/>
 		</Flex>
 	</Flex>
