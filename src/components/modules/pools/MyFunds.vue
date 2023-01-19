@@ -334,8 +334,9 @@ const handleGetClaims = () => {
 					:class="[$style.bar_progress, $style.orange]"
 					:style="{
 						width: `${
-							(manualEntries.length * 100) /
-							(manualEntries.length + pendingClaims.length)
+							100 -
+							(pendingEntries.length * 100) /
+								(pendingEntries.length + manualEntries.length)
 						}%`,
 					}"
 				/>
