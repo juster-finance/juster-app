@@ -49,6 +49,7 @@ const stats = computed(() => {
 })
 
 const apy = computed(() => {
+	if (!props.poolsAPY) return { min: 0, max: 0 }
 	const apys = Object.keys(props.poolsAPY).map((p) => props.poolsAPY[p])
 	return { min: Math.min(...apys), max: Math.max(...apys) }
 })

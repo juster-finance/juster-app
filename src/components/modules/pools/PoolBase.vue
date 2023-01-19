@@ -96,7 +96,7 @@ const entries = ref([])
  */
 const subStates = ref({})
 
-const populatePools = async () => {
+const populatePool = async () => {
 	poolState.value = await juster.pools[
 		route.params.address
 	].getLastPoolState()
@@ -193,7 +193,7 @@ onMounted(() => {
 	if (Object.keys(juster.pools).length) {
 		setupSubToEntries()
 		setupSubToPositions()
-		populatePools()
+		populatePool()
 	}
 })
 
@@ -254,7 +254,7 @@ watch(
 	() => {
 		setupSubToEntries()
 		setupSubToPositions()
-		populatePools()
+		populatePool()
 	},
 	{
 		deep: true,
@@ -340,6 +340,7 @@ const { meta } = useMeta({
 						:poolsStates="[poolState]"
 						:entries="entries"
 						:positions="[position]"
+						:summaries="[summary]"
 						@onManualEntryApprove="handleManualEntryApprove"
 						@onDepositLiquidity="showDepositModal = true"
 						@onGetClaims="showWithdrawClaimsModal = true"

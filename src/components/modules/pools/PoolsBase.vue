@@ -150,8 +150,6 @@ const populatePools = async () => {
 		poolsAPY.value[pool.address] = (
 			await juster.pools[pool.address].getAPY()
 		).toNumber()
-
-		// summaries.value[pool.address] = makeSummaryPosition(position.value, poolState.value)
 	}
 
 	isPopulated.value = true
