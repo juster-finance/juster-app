@@ -21,6 +21,7 @@ import {
 /**
  * Services
  */
+import { juster } from "@sdk"
 import { toClipboard, getCurrencyIcon, shorten } from "@utils/misc"
 
 /**
@@ -49,6 +50,9 @@ const props = defineProps({
 	},
 })
 
+const riskIndex = ref(0)
+const utilization = ref(0)
+
 let poolUpdInterval = null
 const poolUpdDiff = ref({})
 const updateTimeDiff = () => {
@@ -71,10 +75,20 @@ onMounted(() => {
 	poolUpdInterval = setInterval(() => {
 		updateTimeDiff()
 	}, 30_000)
+
+	juster.pools[props.pool.address].subscribeToRiskIndex((data) => {
+		riskIndex.value = data.toNumber() * 100
+	})
+	juster.pools[props.pool.address].subscribeToUtilization((data) => {
+		utilization.value = data.toNumber() * 100
+	})
 })
 
 onBeforeUnmount(() => {
 	clearInterval(poolUpdInterval)
+
+	juster.pools[props.pool.address].unsubscribeFromRiskIndex()
+	juster.pools[props.pool.address].unsubscribeFromUtilization()
 })
 
 const handleDeposit = () => {
@@ -427,7 +441,7 @@ const copy = (target) => {
 						<Flex align="center" gap="6">
 							<Icon name="checkcircle" size="14" color="green" />
 							<Text size="15" weight="600" color="secondary">
-								100%
+								{{ utilization.toFixed(2) }}%
 							</Text>
 						</Flex>
 					</Flex>
@@ -453,7 +467,7 @@ const copy = (target) => {
 						<Flex align="center" gap="6">
 							<Icon name="checkcircle" size="14" color="green" />
 							<Text size="15" weight="600" color="secondary">
-								100%
+								{{ riskIndex.toFixed(2) }}%
 							</Text>
 						</Flex>
 					</Flex>
