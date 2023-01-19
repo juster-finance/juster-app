@@ -379,6 +379,7 @@ const { meta } = useMeta({
 						:poolsStates="poolsStates"
 						:entries="entries"
 						:positions="positions"
+						:summaries="summaries"
 						@onManualEntryApprove="handleManualEntryApprove"
 						@onDepositLiquidity="showPoolsModal = true"
 						@onGetClaims="showWithdrawClaimsModal = true"

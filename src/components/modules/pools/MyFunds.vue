@@ -33,6 +33,7 @@ const props = defineProps({
 	title: { type: String, default: "My Funds" },
 	pools: Array,
 	poolsStates: Object,
+	summaries: Object,
 	entries: Array,
 	positions: Array,
 })
@@ -85,6 +86,17 @@ const pendingEntries = computed(() =>
 const manualEntries = computed(() =>
 	props.entries.filter((e) => isEntryReadyToManualApprove(e)),
 )
+
+const unrealizedProfit = computed(() => {
+	let profit = 0
+
+	Object.keys(props.summaries).forEach((pool) => {
+		const summary = props.summaries[pool]
+		profit += summary.unrealizedProfit.toNumber()
+	})
+
+	return profit
+})
 
 /**
  * Claims
@@ -222,14 +234,16 @@ const handleGetClaims = () => {
 				/>
 
 				<Flex direction="column" gap="8">
-					<Text color="primary" size="16" weight="600">0.00</Text>
+					<Text color="primary" size="16" weight="600">
+						{{ unrealizedProfit.toFixed(2) }}
+					</Text>
 					<Text
 						color="tertiary"
 						size="13"
 						weight="500"
 						:class="$style.badge__subtitle"
 					>
-						Available Income
+						Unrealized Profit
 					</Text>
 				</Flex>
 			</Flex>
