@@ -18,6 +18,7 @@ import { numberWithSymbol } from "@utils/amounts"
 const props = defineProps({
 	poolsStates: Object,
 	pools: Array,
+	poolsAPY: Object,
 })
 
 const isReady = computed(
@@ -46,11 +47,16 @@ const stats = computed(() => {
 		avgSharePrice: avgSharePrice / Object.keys(props.poolsStates).length,
 	}
 })
+
+const apy = computed(() => {
+	const apys = Object.keys(props.poolsAPY).map((p) => props.poolsAPY[p])
+	return { min: Math.min(...apys), max: Math.max(...apys) }
+})
 </script>
 
 <template>
 	<Flex align="center" justify="between" gap="16" :class="$style.stats">
-		<Flex direction="column" gap="8" :class="$style.stat">
+		<Flex direction="column" justify="center" gap="8" :class="$style.stat">
 			<Flex align="center" gap="6" :class="$style.stat__values">
 				<Text v-if="isReady" size="16" weight="600" color="primary">
 					{{ numberWithSymbol(stats.valueOfPools.toFixed(0), ",") }}
@@ -77,44 +83,21 @@ const stats = computed(() => {
 			</Text>
 		</Flex>
 
-		<Flex direction="column" gap="8" :class="$style.stat">
+		<Flex direction="column" justify="center" gap="8" :class="$style.stat">
 			<Flex align="center" gap="6" :class="$style.stat__values">
 				<Text v-if="isReady" size="16" weight="600" color="primary">
-					500
+					{{ (apy.max * 100).toFixed(2) }}%
 				</Text>
 				<LoadingDots v-else />
 
-				<Flex
+				<!-- <Flex
 					align="center"
 					gap="4"
 					:class="[$style.badge, $style.green]"
 				>
 					<Icon name="arrow_circle_top" size="12" color="green" />
 					<Text size="12" color="green" weight="700"> 4.25% </Text>
-				</Flex>
-			</Flex>
-
-			<Text
-				size="14"
-				weight="500"
-				color="tertiary"
-				:class="$style.stat__subtitle"
-			>
-				User's Income
-			</Text>
-		</Flex>
-
-		<Flex direction="column" gap="8" :class="$style.stat">
-			<Flex align="center" gap="6" :class="$style.stat__values">
-				<Text v-if="isReady" size="16" weight="600" color="primary">
-					0%
-				</Text>
-				<LoadingDots v-else />
-
-				<Flex align="center" gap="4" :class="$style.badge">
-					<Icon name="arrow_circle_top" size="12" color="secondary" />
-					<Text size="12" color="secondary" weight="700"> 0% </Text>
-				</Flex>
+				</Flex> -->
 			</Flex>
 
 			<Text
@@ -127,7 +110,30 @@ const stats = computed(() => {
 			</Text>
 		</Flex>
 
-		<Flex direction="column" gap="8" :class="$style.stat">
+		<Flex direction="column" justify="center" gap="8" :class="$style.stat">
+			<Flex align="center" gap="6" :class="$style.stat__values">
+				<Text v-if="isReady" size="16" weight="600" color="primary">
+					{{ (apy.min * 100).toFixed(2) }}%
+				</Text>
+				<LoadingDots v-else />
+
+				<!-- <Flex align="center" gap="4" :class="$style.badge">
+					<Icon name="arrow_circle_top" size="12" color="secondary" />
+					<Text size="12" color="secondary" weight="700"> 0% </Text>
+				</Flex> -->
+			</Flex>
+
+			<Text
+				size="14"
+				weight="500"
+				color="tertiary"
+				:class="$style.stat__subtitle"
+			>
+				Min APY
+			</Text>
+		</Flex>
+
+		<Flex direction="column" justify="center" gap="8" :class="$style.stat">
 			<Flex align="center" gap="6" :class="$style.stat__values">
 				<Text v-if="isReady" size="16" weight="600" color="primary">
 					0%
@@ -156,10 +162,12 @@ const stats = computed(() => {
 .stat {
 	flex: 1;
 
+	height: 78px;
+
 	border-radius: 8px;
 	background: var(--card-bg);
 
-	padding: 20px 24px;
+	padding: 0 24px;
 }
 
 .stat__subtitle {

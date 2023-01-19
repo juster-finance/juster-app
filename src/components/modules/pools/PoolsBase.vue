@@ -399,7 +399,11 @@ const { meta } = useMeta({
 				</Flex>
 
 				<Flex direction="column" gap="24" wide :class="$style.base">
-					<PoolsStats :pools="pools" :poolsStates="poolsStates" />
+					<PoolsStats
+						:pools="pools"
+						:poolsStates="poolsStates"
+						:poolsAPY="poolsAPY"
+					/>
 
 					<Block
 						v-if="flags.showGeneralPoolsWarning"
