@@ -176,61 +176,74 @@ const { meta } = useMeta({
 									ADDRESS
 								</Text>
 							</td>
-							<td
-								@click="handleSort('tvl')"
-								:class="$style.sort_btn"
-							>
-								<Text
-									size="11"
-									color="tertiary"
-									weight="700"
-									style="line-height: 14px"
-								>
-									TVL
-								</Text>
-								<Icon name="arrow_down" size="14" />
+							<td :class="$style.sort_btn">
+								<Flex align="center" gap="8">
+									<Text
+										size="11"
+										color="tertiary"
+										weight="700"
+										style="line-height: 14px"
+									>
+										TVL
+									</Text>
+									<Icon
+										v-if="sortBy?.startsWith('tvl')"
+										name="arrow_down"
+										size="14"
+										color="blue"
+									/>
+								</Flex>
 							</td>
-							<td
-								@click="handleSort('shares')"
-								:class="$style.sort_btn"
-							>
-								<Text
-									size="11"
-									color="tertiary"
-									weight="700"
-									style="line-height: 14px"
-								>
-									SHARES
-								</Text>
-								<Icon name="arrow_down" size="14" />
+							<td :class="$style.sort_btn">
+								<Flex align="center" gap="8">
+									<Text
+										size="11"
+										color="tertiary"
+										weight="700"
+										style="line-height: 14px"
+									>
+										SHARES
+									</Text>
+									<Icon
+										name="arrow_down"
+										size="14"
+										v-if="sortBy?.startsWith('shares')"
+									/>
+								</Flex>
 							</td>
-							<td
-								@click="handleSort('claims')"
-								:class="$style.sort_btn"
-							>
-								<Text
-									size="11"
-									color="tertiary"
-									weight="700"
-									style="line-height: 14px"
-								>
-									CLAIMS
-								</Text>
-								<Icon name="arrow_down" size="14" />
+							<td :class="$style.sort_btn">
+								<Flex align="center" gap="8">
+									<Text
+										size="11"
+										color="tertiary"
+										weight="700"
+										style="line-height: 14px"
+									>
+										CLAIMS
+									</Text>
+									<Icon
+										name="arrow_down"
+										size="14"
+										v-if="sortBy?.startsWith('claims')"
+									/>
+								</Flex>
 							</td>
-							<td
-								@click="handleSort('price')"
-								:class="$style.sort_btn"
-							>
-								<Text
-									size="11"
-									color="tertiary"
-									weight="700"
-									style="line-height: 14px"
-								>
-									ENTRY PRICE
-								</Text>
-								<Icon name="arrow_down" size="14" />
+							<td :class="$style.sort_btn">
+								<Flex align="center" gap="8">
+									<Text
+										size="11"
+										color="tertiary"
+										weight="700"
+										style="line-height: 14px"
+									>
+										ENTRY PRICE
+									</Text>
+									<Icon
+										name="arrow_down"
+										size="14"
+										v-if="sortBy?.startsWith('price')"
+									/>
+								</Flex>
 							</td>
 						</tr>
 					</thead>
