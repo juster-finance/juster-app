@@ -337,9 +337,22 @@ const copy = (target) => {
 
 						<Flex align="center" gap="6">
 							<Icon
-								:name="showUserData ? 'money' : 'stars'"
+								v-if="!showUserData"
+								name="stars"
 								size="14"
-								color="green"
+								:color="
+									(apy < 0 && 'red') ||
+									(apy < 40 && 'tertiary') ||
+									(apy < 80 && 'yellow') ||
+									(apy <= 100 && 'green') ||
+									'tertiary'
+								"
+							/>
+							<Icon
+								v-else
+								name="money"
+								size="14"
+								color="secondary"
 							/>
 							<Text size="15" weight="600" color="secondary">
 								{{
