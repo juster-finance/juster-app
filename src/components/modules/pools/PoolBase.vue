@@ -16,6 +16,7 @@ import BottomInfo from "./BottomInfo.vue"
 import PoolsStats from "./PoolsStats.vue"
 import PoolsChart from "./PoolsChart.vue"
 import MySummary from "./MySummary.vue"
+import { EventCard, EventCardLoading } from "@local/EventCard"
 
 /**
  * Modal
@@ -37,6 +38,7 @@ import {
 	entryLiquidity as entryLiquidityModel,
 	poolPosition as poolPositionModel,
 	poolState as poolStateModel,
+	poolEvent as poolEventModel,
 } from "@/graphql/models"
 
 /**
@@ -95,6 +97,12 @@ const entries = ref([])
  * States
  */
 const subStates = ref({})
+
+/**
+ * Events
+ */
+const subEvents = ref({})
+const events = ref([])
 
 const populatePool = async () => {
 	poolState.value = await juster.pools[
@@ -186,6 +194,35 @@ const setupSubToPositions = async () => {
 		})
 }
 
+const setupSubToEvents = async () => {
+	subEvents.value = await juster.gql
+		.subscription({
+			poolEvent: [
+				{
+					where: {
+						event: {
+							status: {
+								_in: ["NEW", "STARTED"],
+							},
+						},
+						poolId: {
+							_eq: pool.value.address,
+						},
+					},
+				},
+				poolEventModel,
+			],
+		})
+		.subscribe({
+			next: ({ poolEvent }) => {
+				poolEvent.forEach((e) => {
+					events.value.push(e.event)
+				})
+			},
+			error: console.error,
+		})
+}
+
 const showAnimation = ref(false)
 onMounted(() => {
 	showAnimation.value = true
@@ -194,6 +231,7 @@ onMounted(() => {
 		setupSubToEntries()
 		setupSubToPositions()
 		populatePool()
+		setupSubToEvents()
 	}
 })
 
@@ -255,6 +293,7 @@ watch(
 		setupSubToEntries()
 		setupSubToPositions()
 		populatePool()
+		setupSubToEvents()
 	},
 	{
 		deep: true,
@@ -364,6 +403,31 @@ const { meta } = useMeta({
 
 					<PoolsChart />
 
+					<Flex direction="column" gap="24" :class="$style.events">
+						<Flex direction="column" gap="8">
+							<Text size="16" weight="600" color="primary">
+								Events
+							</Text>
+							<Text size="14" weight="500" color="tertiary">
+								New and running events
+							</Text>
+						</Flex>
+
+						<Flex :class="$style.items">
+							<EventCardLoading
+								v-if="!events.length"
+								v-for="i in 2"
+								:key="i"
+							/>
+							<EventCard
+								v-else
+								v-for="event in events"
+								:key="event.id"
+								:event="event"
+							/>
+						</Flex>
+					</Flex>
+
 					<BottomInfo
 						v-if="pools.length"
 						:pool="pools[0]"
@@ -408,6 +472,16 @@ const { meta } = useMeta({
 	max-width: 760px;
 
 	margin-left: 32px;
+}
+
+.events {
+	margin-top: 32px;
+}
+
+.items {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-gap: 16px;
 }
 
 .bottom_right_block {

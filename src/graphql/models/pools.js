@@ -1,9 +1,18 @@
+import { event } from "./events"
+
 export const pool = {
 	name: true,
 	version: true,
 	address: true,
 	isDepositPaused: true,
 	entryLockPeriod: true,
+}
+
+export const poolEvent = {
+	poolId: true,
+	event: {
+		...event,
+	},
 }
 
 export const poolPosition = {
