@@ -2,13 +2,19 @@
 /**
  * Vendor
  */
-import { ref, computed, onMounted, nextTick } from "vue"
-import { search, Searcher } from "fast-fuzzy"
+import { ref, reactive, computed, onMounted, nextTick } from "vue"
+import { Searcher } from "fast-fuzzy"
 
 /**
  * UI
  */
 import Button from "@ui/Button.vue"
+import {
+	Dropdown,
+	DropdownItem,
+	DropdownTitle,
+	DropdownDivider,
+} from "@ui/Dropdown"
 
 /**
  * Local
@@ -45,6 +51,29 @@ const toggleSearch = () => {
 	})
 }
 
+const sorts = ref([
+	{
+		title: "Pool TVL",
+		key: "pool_tvl",
+	},
+	{
+		title: "My TVL",
+		key: "my_tvl",
+	},
+	{
+		title: "Share Price",
+		key: "share_price",
+	},
+	{
+		title: "APY",
+		key: "apy",
+	},
+])
+const sort = reactive({
+	by: "pool_tvl",
+	dir: "desc",
+})
+
 const filteredPools = computed(() => {
 	if (searchText.value) {
 		let findedPools = poolsSearcher.value
@@ -58,6 +87,86 @@ const filteredPools = computed(() => {
 		let allPools = [...props.pools]
 
 		return allPools
+	}
+})
+
+const sortedPools = computed(() => {
+	switch (sort.by) {
+		case "pool_tvl":
+			if (sort.dir === "desc") {
+				return filteredPools.value.sort(
+					(a, b) =>
+						props.poolsStates[
+							b.address
+						]?.totalLiquidity.toNumber() -
+						props.poolsStates[a.address]?.totalLiquidity.toNumber(),
+				)
+			} else {
+				return filteredPools.value.sort(
+					(a, b) =>
+						props.poolsStates[
+							a.address
+						]?.totalLiquidity.toNumber() -
+						props.poolsStates[b.address]?.totalLiquidity.toNumber(),
+				)
+			}
+			break
+		case "my_tvl":
+			const positions = {}
+			props.positions.forEach((pos) => {
+				positions[pos.poolId] = pos
+			})
+
+			if (sort.dir === "desc") {
+				return filteredPools.value.sort(
+					(a, b) =>
+						(positions[b.address]
+							? positions[b.address].depositedAmount
+							: 0) -
+						(positions[a.address]
+							? positions[a.address].depositedAmount
+							: 0),
+				)
+			} else {
+				return filteredPools.value.sort(
+					(a, b) =>
+						(positions[a.address]
+							? positions[a.address].depositedAmount
+							: 0) -
+						(positions[b.address]
+							? positions[b.address].depositedAmount
+							: 0),
+				)
+			}
+			break
+		case "share_price":
+			if (sort.dir === "desc") {
+				return filteredPools.value.sort(
+					(a, b) =>
+						props.poolsStates[b.address]?.sharePrice.toNumber() -
+						props.poolsStates[a.address]?.sharePrice.toNumber(),
+				)
+			} else {
+				return filteredPools.value.sort(
+					(a, b) =>
+						props.poolsStates[a.address]?.sharePrice.toNumber() -
+						props.poolsStates[b.address]?.sharePrice.toNumber(),
+				)
+			}
+			break
+		case "apy":
+			if (sort.dir === "desc") {
+				return filteredPools.value.sort(
+					(a, b) =>
+						props.poolsAPY[b.address] - props.poolsAPY[a.address],
+				)
+			} else {
+				return filteredPools.value.sort(
+					(a, b) =>
+						props.poolsAPY[a.address] - props.poolsAPY[b.address],
+				)
+			}
+			break
 	}
 })
 
@@ -149,19 +258,63 @@ onMounted(() => {
 					</Button>
 				</Flex>
 
-				<Button type="secondary" size="small" disabled>
-					<Icon name="sort_desc" size="16" />
-				</Button>
+				<Flex align="center" gap="2">
+					<Button
+						@click="
+							sort.dir == 'desc'
+								? (sort.dir = 'asc')
+								: (sort.dir = 'desc')
+						"
+						type="secondary"
+						size="small"
+						style="border-radius: 6px 2px 2px 6px"
+					>
+						<Icon
+							name="sort_desc"
+							size="16"
+							:style="{
+								transform: `rotate(${
+									sort.dir == 'asc' ? '180' : '0'
+								}deg)`,
+							}"
+						/>
+					</Button>
 
-				<Button type="secondary" size="small" disabled>
-					<Icon name="filter" size="16" />
-				</Button>
+					<Dropdown>
+						<template #trigger>
+							<Button
+								type="secondary"
+								size="small"
+								style="border-radius: 2px 6px 6px 2px"
+							>
+								<Flex>
+									<Text height="1" color="tertiary">
+										Sort by&nbsp;
+									</Text>
+									{{
+										sorts.find((s) => sort.by === s.key)
+											.title
+									}}
+								</Flex>
+							</Button>
+						</template>
+
+						<template #dropdown>
+							<DropdownItem
+								v-for="s in sorts"
+								@click="sort.by = s.key"
+							>
+								{{ s.title }}
+							</DropdownItem>
+						</template>
+					</Dropdown>
+				</Flex>
 			</Flex>
 		</Flex>
 
 		<Flex direction="column" gap="16">
 			<PoolCard
-				v-for="(pool, index) in filteredPools"
+				v-for="(pool, index) in sortedPools"
 				:key="index"
 				@onShare="(pool) => emit('onShare', pool)"
 				@onSelectPool="(pool) => emit('onSelectPool', pool)"
