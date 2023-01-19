@@ -3,7 +3,9 @@
  * Vendor
  */
 import { ref, onMounted, onUnmounted, computed, watch } from "vue"
+import { makeSummaryPosition } from "@juster-finance/sdk"
 import { useMeta } from "vue-meta"
+import BN from "bignumber.js"
 
 /**
  * Local
@@ -113,8 +115,11 @@ const handleClosePoolsWarning = () => {
 const pools = computed(() => marketStore.pools)
 const selectedPool = ref({})
 
+const isPopulated = ref(false)
 const poolsStates = ref({})
 const poolsAPY = ref({})
+
+const summaries = ref({})
 
 /**
  * Pool Position
@@ -145,7 +150,11 @@ const populatePools = async () => {
 		poolsAPY.value[pool.address] = (
 			await juster.pools[pool.address].getAPY()
 		).toNumber()
+
+		// summaries.value[pool.address] = makeSummaryPosition(position.value, poolState.value)
 	}
+
+	isPopulated.value = true
 
 	setupSubToStates()
 }
@@ -292,6 +301,21 @@ watch(
 	},
 )
 
+watch(
+	() => isPopulated.value,
+	() => {
+		positions.value.forEach((pos) => {
+			const position = pos
+			position.shares = BN(pos.shares)
+
+			summaries.value[pos.poolId] = makeSummaryPosition(
+				position,
+				poolsStates.value[pos.poolId],
+			)
+		})
+	},
+)
+
 /** Meta */
 const { meta } = useMeta({
 	title: `Liquidity Pools`,
@@ -360,7 +384,11 @@ const { meta } = useMeta({
 						@onGetClaims="showWithdrawClaimsModal = true"
 					/>
 
-					<MyStatistics :positions="positions" />
+					<MyStatistics
+						:positions="positions"
+						:poolsAPY="poolsAPY"
+						:summaries="summaries"
+					/>
 
 					<BottomInfo
 						v-if="pools.length"
