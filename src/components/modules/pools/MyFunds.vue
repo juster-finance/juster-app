@@ -60,12 +60,13 @@ const handleDepositLiquidityClick = () => {
 	emit("onDepositLiquidity")
 }
 
-const valueLocked = computed(() =>
-	props.positions.reduce(
+const valueLocked = computed(() => {
+	if (!props.positions.length) return 0
+	return props.positions.reduce(
 		(acc, curr) => (acc = acc + curr.depositedAmount),
 		0,
-	),
-)
+	)
+})
 
 const isEntryReadyToManualApprove = (entry) => {
 	if (entry.status !== "PENDING") return
@@ -103,6 +104,9 @@ const unrealizedProfit = computed(() => {
  */
 const availableClaims = computed(() => {
 	let claims = []
+
+	if (!props.positions.length) return []
+
 	props.positions.forEach((position) => {
 		claims = [
 			...claims,

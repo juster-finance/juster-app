@@ -264,6 +264,8 @@ watch(
 watch(
 	() => position.value,
 	() => {
+		if (!position.value) return
+
 		position.value.shares = BN(position.value.shares)
 		summary.value = makeSummaryPosition(position.value, poolState.value)
 	},
@@ -334,19 +336,21 @@ const { meta } = useMeta({
 			<Flex justify="between" :class="$style.content">
 				<Flex direction="column" gap="24" :class="$style.side">
 					<MyFunds
-						v-if="position"
 						title="My Pool Funds"
 						:pools="[pool]"
 						:poolsStates="[poolState]"
 						:entries="entries"
-						:positions="[position]"
-						:summaries="[summary]"
+						:positions="position ? [position] : []"
+						:summaries="summary.totalDeposited ? [summary] : []"
 						@onManualEntryApprove="handleManualEntryApprove"
 						@onDepositLiquidity="showDepositModal = true"
 						@onGetClaims="showWithdrawClaimsModal = true"
 					/>
 
-					<MySummary v-if="summary" :summary="summary" />
+					<MySummary
+						v-if="summary.totalDeposited"
+						:summary="summary"
+					/>
 
 					<BottomInfo
 						v-if="pools.length"
