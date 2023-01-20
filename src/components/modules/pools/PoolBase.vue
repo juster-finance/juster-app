@@ -401,7 +401,7 @@ const { meta } = useMeta({
 				<Flex direction="column" gap="24" wide :class="$style.base">
 					<PoolsStats :pools="[pool]" :poolsStates="[poolState]" />
 
-					<PoolsChart />
+					<PoolsChart :pool="pool" />
 
 					<Flex direction="column" gap="24" :class="$style.events">
 						<Flex direction="column" gap="8">
