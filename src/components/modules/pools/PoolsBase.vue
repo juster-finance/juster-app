@@ -112,6 +112,7 @@ const handleClosePoolsWarning = () => {
  * Pools
  */
 
+const contracts = computed(() => Object.keys(juster.pools))
 const pools = computed(() => marketStore.pools)
 const selectedPool = ref({})
 
@@ -249,11 +250,18 @@ onMounted(() => {
 	showAnimation.value = true
 
 	if (Object.keys(juster.pools).length) {
-		setupSubToEntries()
-		setupSubToPositions()
-		populatePools()
+		init()
 	}
 })
+
+const isInited = ref(false)
+const init = () => {
+	isInited.value = true
+
+	setupSubToEntries()
+	setupSubToPositions()
+	populatePools()
+}
 
 /**
  * Deposits with an amount <1 xtz need manual confirmation
@@ -306,6 +314,16 @@ watch(
 				poolsStates.value[pos.poolId],
 			)
 		})
+	},
+)
+
+/** Wait for a long initialisation of the pools */
+watch(
+	() => contracts.value,
+	() => {
+		if (contracts.value.length > 1 && !isInited.value) {
+			init()
+		}
 	},
 )
 

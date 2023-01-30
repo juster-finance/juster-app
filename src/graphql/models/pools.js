@@ -6,11 +6,17 @@ export const pool = {
 	address: true,
 	isDepositPaused: true,
 	entryLockPeriod: true,
+	poolLines: {
+		currencyPairId: true,
+		measurePeriod: true,
+		maxEvents: true,
+	},
 }
 
 export const poolLine = {
 	currencyPairId: true,
 	measurePeriod: true,
+	maxEvents: true,
 	poolId: true,
 }
 

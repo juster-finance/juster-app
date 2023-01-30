@@ -8,6 +8,7 @@ import { ref, reactive, computed } from "vue"
  * UI
  */
 import Tooltip from "@ui/Tooltip.vue"
+import Toggleable from "@ui/Toggleable.vue"
 
 /**
  * Services
@@ -143,136 +144,241 @@ const sortedSummaries = computed(() => {
 			/>
 		</Flex>
 
-		<div :class="[$style.toggleable, expanded && $style.expanded]">
-			<div :class="$style.toggleable_inside">
-				<Flex
-					v-if="selectedTab === 'TVL'"
-					direction="column"
-					gap="24"
-					:class="$style.mgs"
-				>
-					<Flex direction="column" gap="8">
-						<Flex align="center" justify="between">
-							<Text color="secondary" size="13" weight="600">
-								Total Value
-							</Text>
+		<Toggleable :expanded="expanded">
+			<Flex
+				v-if="selectedTab === 'TVL'"
+				direction="column"
+				gap="24"
+				:class="$style.mgs"
+			>
+				<Flex direction="column" gap="8">
+					<Flex align="center" justify="between">
+						<Text color="secondary" size="13" weight="600">
+							Total Value
+						</Text>
 
-							<Text color="secondary" size="13" weight="600">
-								{{ valueLocked.toFixed(2) }}
-							</Text>
-						</Flex>
-
-						<div :class="$style.progress_wrapper">
-							<div
-								v-if="valueLocked"
-								:class="$style.bar_progress"
-							/>
-						</div>
-
-						<!-- Hint for empty state -->
-						<Text
-							v-if="!valueLocked"
-							size="12"
-							color="support"
-							weight="500"
-							height="16"
-						>
-							After the first deposits here you will see what
-							pools were provided with liquidity and in what
-							amount
+						<Text color="secondary" size="13" weight="600">
+							{{ valueLocked.toFixed(2) }}
 						</Text>
 					</Flex>
 
-					<template v-if="valueLocked">
-						<Flex
-							v-for="position in sortedPositions"
-							direction="column"
-							gap="8"
-						>
-							<Flex align="center" justify="between">
-								<Text color="secondary" size="13" weight="600">
+					<div :class="$style.progress_wrapper">
+						<div v-if="valueLocked" :class="$style.bar_progress" />
+					</div>
+
+					<!-- Hint for empty state -->
+					<Text
+						v-if="!valueLocked"
+						size="12"
+						color="support"
+						weight="500"
+						height="16"
+					>
+						After the first deposits here you will see what pools
+						were provided with liquidity and in what amount
+					</Text>
+				</Flex>
+
+				<template v-if="valueLocked">
+					<Flex
+						v-for="position in sortedPositions"
+						direction="column"
+						gap="8"
+					>
+						<Flex align="center" justify="between">
+							<Text color="secondary" size="13" weight="600">
+								{{
+									parsePoolName(
+										position.pool.name.replace(
+											"Juster Pool: ",
+											"",
+										),
+									)
+								}}
+							</Text>
+
+							<Flex align="center" gap="8">
+								<Text color="tertiary" size="13" weight="600">
 									{{
-										parsePoolName(
-											position.pool.name.replace(
-												"Juster Pool: ",
-												"",
-											),
-										)
-									}}
+										(
+											(position.tvl * 100) /
+											valueLocked
+										).toFixed(0)
+									}}%
 								</Text>
 
-								<Flex align="center" gap="8">
-									<Text
-										color="tertiary"
-										size="13"
-										weight="600"
-									>
-										{{
-											(
-												(position.tvl * 100) /
-												valueLocked
-											).toFixed(0)
-										}}%
-									</Text>
-
-									<Text
-										color="secondary"
-										size="13"
-										weight="600"
-									>
-										{{ position.tvl.toFixed(2) }}
-									</Text>
-								</Flex>
+								<Text color="secondary" size="13" weight="600">
+									{{ position.tvl.toFixed(2) }}
+								</Text>
 							</Flex>
+						</Flex>
 
-							<Flex :class="$style.progress_wrapper">
-								<div
-									:style="{
-										width: `${
-											(position.tvl * 100) / valueLocked
-										}%`,
-										borderRadius: '0 3px 3px 0',
-									}"
-									:class="$style.bar_deposited"
-								/>
-								<!-- <div
+						<Flex :class="$style.progress_wrapper">
+							<div
+								:style="{
+									width: `${
+										(position.tvl * 100) / valueLocked
+									}%`,
+									borderRadius: '0 3px 3px 0',
+								}"
+								:class="$style.bar_deposited"
+							/>
+							<!-- <div
 							:style="{
 								width: `${30}%`,
 								borderRadius: '0 3px 3px 0',
 							}"
 							:class="$style.bar_locked"
 						/> -->
-							</Flex>
-						</Flex>
-					</template>
-
-					<Flex v-if="valueLocked" align="center" gap="16">
-						<Flex align="center" gap="6">
-							<div :class="$style.deposited_dot" />
-							<Text size="12" weight="600" color="secondary">
-								Total Value Locked
-							</Text>
 						</Flex>
 					</Flex>
+				</template>
+
+				<Flex v-if="valueLocked" align="center" gap="16">
+					<Flex align="center" gap="6">
+						<div :class="$style.deposited_dot" />
+						<Text size="12" weight="600" color="secondary">
+							Total Value Locked
+						</Text>
+					</Flex>
 				</Flex>
+			</Flex>
+
+			<Flex
+				v-else-if="selectedTab === 'Profit'"
+				direction="column"
+				gap="24"
+				:class="$style.mgs"
+			>
+				<Tooltip placement="bottom" isWide>
+					<Flex direction="column" gap="8" wide>
+						<Flex align="center" justify="between">
+							<Text color="secondary" size="13" weight="600">
+								Total Profit
+							</Text>
+
+							<Text color="secondary" size="13" weight="600">
+								{{
+									(
+										profit.realized + profit.unrealized
+									).toFixed(2)
+								}}
+							</Text>
+						</Flex>
+
+						<Flex :class="$style.progress_wrapper">
+							<Flex
+								justify="end"
+								:class="$style.left_wrapper"
+								:style="{
+									opacity: profit.total < 0 ? 1 : 0,
+								}"
+							>
+								<Flex
+									:style="{
+										width: '100%',
+									}"
+									:class="$style.left"
+								>
+									<div
+										:style="{
+											width: `${
+												(100 * profit.unrealized) /
+												profit.total
+											}%`,
+											opacity: '0.5',
+										}"
+										:class="$style.bar_orange"
+									/>
+									<div
+										:style="{
+											width: `${
+												100 -
+												(100 * profit.unrealized) /
+													profit.total
+											}%`,
+										}"
+										:class="$style.bar_orange"
+									/>
+								</Flex>
+							</Flex>
+
+							<Flex
+								justify="start"
+								:class="$style.right_wrapper"
+								:style="{
+									opacity: profit.total > 0 ? 1 : 0,
+								}"
+							>
+								<Flex
+									:style="{
+										width: '100%',
+									}"
+									:class="$style.right"
+								>
+									<div
+										:style="{
+											width: `${
+												100 -
+												(100 * profit.unrealized) /
+													profit.total
+											}%`,
+										}"
+										:class="$style.bar_green"
+									/>
+									<div
+										:style="{
+											width: `${
+												(100 * profit.unrealized) /
+												profit.total
+											}%`,
+											opacity: '0.5',
+										}"
+										:class="$style.bar_green"
+									/>
+								</Flex>
+							</Flex>
+						</Flex>
+					</Flex>
+
+					<template #content>
+						Realized
+						<span>{{ profit.realized.toFixed(2) }}</span
+						>, Unrealized
+						<span>{{ profit.unrealized.toFixed(2) }}</span>
+					</template>
+				</Tooltip>
 
 				<Flex
-					v-else-if="selectedTab === 'Profit'"
+					v-for="summary in sortedSummaries"
 					direction="column"
-					gap="24"
-					:class="$style.mgs"
+					gap="8"
 				>
 					<Tooltip placement="bottom" isWide>
 						<Flex direction="column" gap="8" wide>
 							<Flex align="center" justify="between">
 								<Text color="secondary" size="13" weight="600">
-									Total Profit
+									{{
+										parsePoolName(
+											pools
+												.find(
+													(p) =>
+														p.address ==
+														summary.poolId,
+												)
+												.name.replace(
+													"Juster Pool: ",
+													"",
+												),
+										)
+									}}
 								</Text>
 
 								<Text color="secondary" size="13" weight="600">
 									{{
 										(
-											profit.realized + profit.unrealized
+											summary.realizedProfit +
+											summary.unrealizedProfit.toNumber()
 										).toFixed(2)
 									}}
 								</Text>
@@ -283,20 +389,32 @@ const sortedSummaries = computed(() => {
 									justify="end"
 									:class="$style.left_wrapper"
 									:style="{
-										opacity: profit.total < 0 ? 1 : 0,
+										opacity:
+											summary.realizedProfit +
+												summary.unrealizedProfit.toNumber() <
+											0
+												? 1
+												: 0,
 									}"
 								>
 									<Flex
 										:style="{
-											width: '100%',
+											width: `${
+												(100 *
+													(summary.realizedProfit +
+														summary.unrealizedProfit.toNumber())) /
+												profit.total
+											}%`,
 										}"
 										:class="$style.left"
 									>
 										<div
 											:style="{
 												width: `${
-													(100 * profit.unrealized) /
-													profit.total
+													(100 *
+														summary.unrealizedProfit.toNumber()) /
+													(summary.realizedProfit +
+														summary.unrealizedProfit.toNumber())
 												}%`,
 												opacity: '0.5',
 											}"
@@ -306,8 +424,10 @@ const sortedSummaries = computed(() => {
 											:style="{
 												width: `${
 													100 -
-													(100 * profit.unrealized) /
-														profit.total
+													(100 *
+														summary.unrealizedProfit.toNumber()) /
+														(summary.realizedProfit +
+															summary.unrealizedProfit.toNumber())
 												}%`,
 											}"
 											:class="$style.bar_orange"
@@ -319,7 +439,12 @@ const sortedSummaries = computed(() => {
 									justify="start"
 									:class="$style.right_wrapper"
 									:style="{
-										opacity: profit.total > 0 ? 1 : 0,
+										opacity:
+											summary.realizedProfit +
+												summary.unrealizedProfit.toNumber() >
+											0
+												? 1
+												: 0,
 									}"
 								>
 									<Flex
@@ -355,217 +480,61 @@ const sortedSummaries = computed(() => {
 
 						<template #content>
 							Realized
-							<span>{{ profit.realized.toFixed(2) }}</span
+							<span>{{ summary.realizedProfit.toFixed(2) }}</span
 							>, Unrealized
-							<span>{{ profit.unrealized.toFixed(2) }}</span>
+							<span>{{
+								summary.unrealizedProfit.toFixed(2)
+							}}</span>
 						</template>
 					</Tooltip>
-
-					<Flex
-						v-for="summary in sortedSummaries"
-						direction="column"
-						gap="8"
-					>
-						<Tooltip placement="bottom" isWide>
-							<Flex direction="column" gap="8" wide>
-								<Flex align="center" justify="between">
-									<Text
-										color="secondary"
-										size="13"
-										weight="600"
-									>
-										{{
-											parsePoolName(
-												pools
-													.find(
-														(p) =>
-															p.address ==
-															summary.poolId,
-													)
-													.name.replace(
-														"Juster Pool: ",
-														"",
-													),
-											)
-										}}
-									</Text>
-
-									<Text
-										color="secondary"
-										size="13"
-										weight="600"
-									>
-										{{
-											(
-												summary.realizedProfit +
-												summary.unrealizedProfit.toNumber()
-											).toFixed(2)
-										}}
-									</Text>
-								</Flex>
-
-								<Flex :class="$style.progress_wrapper">
-									<Flex
-										justify="end"
-										:class="$style.left_wrapper"
-										:style="{
-											opacity:
-												summary.realizedProfit +
-													summary.unrealizedProfit.toNumber() <
-												0
-													? 1
-													: 0,
-										}"
-									>
-										<Flex
-											:style="{
-												width: `${
-													(100 *
-														(summary.realizedProfit +
-															summary.unrealizedProfit.toNumber())) /
-													profit.total
-												}%`,
-											}"
-											:class="$style.left"
-										>
-											<div
-												:style="{
-													width: `${
-														(100 *
-															summary.unrealizedProfit.toNumber()) /
-														(summary.realizedProfit +
-															summary.unrealizedProfit.toNumber())
-													}%`,
-													opacity: '0.5',
-												}"
-												:class="$style.bar_orange"
-											/>
-											<div
-												:style="{
-													width: `${
-														100 -
-														(100 *
-															summary.unrealizedProfit.toNumber()) /
-															(summary.realizedProfit +
-																summary.unrealizedProfit.toNumber())
-													}%`,
-												}"
-												:class="$style.bar_orange"
-											/>
-										</Flex>
-									</Flex>
-
-									<Flex
-										justify="start"
-										:class="$style.right_wrapper"
-										:style="{
-											opacity:
-												summary.realizedProfit +
-													summary.unrealizedProfit.toNumber() >
-												0
-													? 1
-													: 0,
-										}"
-									>
-										<Flex
-											:style="{
-												width: '100%',
-											}"
-											:class="$style.right"
-										>
-											<div
-												:style="{
-													width: `${
-														100 -
-														(100 *
-															profit.unrealized) /
-															profit.total
-													}%`,
-												}"
-												:class="$style.bar_green"
-											/>
-											<div
-												:style="{
-													width: `${
-														(100 *
-															profit.unrealized) /
-														profit.total
-													}%`,
-													opacity: '0.5',
-												}"
-												:class="$style.bar_green"
-											/>
-										</Flex>
-									</Flex>
-								</Flex>
-							</Flex>
-
-							<template #content>
-								Realized
-								<span>{{
-									summary.realizedProfit.toFixed(2)
-								}}</span
-								>, Unrealized
-								<span>{{
-									summary.unrealizedProfit.toFixed(2)
-								}}</span>
-							</template>
-						</Tooltip>
-					</Flex>
-
-					<Flex align="center" gap="16">
-						<Flex align="center" gap="6">
-							<div :class="$style.orange_dot" />
-							<Text size="12" weight="600" color="secondary">
-								Realized Loss
-							</Text>
-						</Flex>
-						<Flex align="center" gap="6">
-							<div
-								:class="$style.orange_dot"
-								style="opacity: 0.5"
-							/>
-							<Text size="12" weight="600" color="secondary">
-								Unrealized
-							</Text>
-						</Flex>
-
-						<Flex align="center" gap="6">
-							<div :class="$style.green_dot" />
-							<Text size="12" weight="600" color="secondary">
-								Realized Profit
-							</Text>
-						</Flex>
-						<Flex align="center" gap="6">
-							<div
-								:class="$style.green_dot"
-								style="opacity: 0.5"
-							/>
-							<Text size="12" weight="600" color="secondary">
-								Unrealized
-							</Text>
-						</Flex>
-					</Flex>
 				</Flex>
 
-				<Flex align="center" gap="6" :class="$style.tabs">
-					<Flex
-						v-for="(tab, i) in tabs"
-						:key="i"
-						@click="selectedTab = tab.title"
-						align="center"
-						gap="8"
-						:class="[
-							$style.tab,
-							selectedTab === tab.title && $style.active,
-						]"
-					>
-						<Icon :name="tab.icon" size="14" color="tertiary" />
-						<Text size="14" weight="600">{{ tab.title }}</Text>
+				<Flex align="center" gap="16">
+					<Flex align="center" gap="6">
+						<div :class="$style.orange_dot" />
+						<Text size="12" weight="600" color="secondary">
+							Realized Loss
+						</Text>
+					</Flex>
+					<Flex align="center" gap="6">
+						<div :class="$style.orange_dot" style="opacity: 0.5" />
+						<Text size="12" weight="600" color="secondary">
+							Unrealized
+						</Text>
+					</Flex>
+
+					<Flex align="center" gap="6">
+						<div :class="$style.green_dot" />
+						<Text size="12" weight="600" color="secondary">
+							Realized Profit
+						</Text>
+					</Flex>
+					<Flex align="center" gap="6">
+						<div :class="$style.green_dot" style="opacity: 0.5" />
+						<Text size="12" weight="600" color="secondary">
+							Unrealized
+						</Text>
 					</Flex>
 				</Flex>
-			</div>
-		</div>
+			</Flex>
+
+			<Flex align="center" gap="6" :class="$style.tabs">
+				<Flex
+					v-for="(tab, i) in tabs"
+					:key="i"
+					@click="selectedTab = tab.title"
+					align="center"
+					gap="8"
+					:class="[
+						$style.tab,
+						selectedTab === tab.title && $style.active,
+					]"
+				>
+					<Icon :name="tab.icon" size="14" color="tertiary" />
+					<Text size="14" weight="600">{{ tab.title }}</Text>
+				</Flex>
+			</Flex>
+		</Toggleable>
 	</div>
 </template>
 
@@ -719,26 +688,10 @@ const sortedSummaries = computed(() => {
 	background: var(--green);
 }
 
-.toggleable {
-	display: grid;
-	grid-template-rows: 0fr;
-	overflow: hidden;
-
-	transition: all 1s var(--bezier);
-}
-
 .mgs {
 	border-top: 1px solid var(--border);
 
 	padding-top: 20px;
 	margin-top: 24px;
-}
-
-.toggleable_inside {
-	min-height: 0;
-}
-
-.toggleable.expanded {
-	grid-template-rows: 1fr;
 }
 </style>

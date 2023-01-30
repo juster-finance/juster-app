@@ -2,8 +2,8 @@
 /**
  * Vendor
  */
-import { ref, computed } from "vue"
-import { DateTime } from "luxon"
+import { ref, onMounted, watch, computed } from "vue"
+import { DateTime, Duration } from "luxon"
 
 /**
  * UI
@@ -15,14 +15,19 @@ import Tooltip from "@ui/Tooltip.vue"
 /**
  * Services
  */
+import { juster } from "@sdk"
+import { getCurrencyIcon } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
+import { supportedMarkets } from "@config"
 
 /**
  * Store
  */
 import { useAccountStore } from "@store/account"
+import { useMarketStore } from "@store/market"
 
 const accountStore = useAccountStore()
+const marketStore = useMarketStore()
 
 const emit = defineEmits([
 	"onDepositLiquidity",
@@ -37,6 +42,11 @@ const props = defineProps({
 	summaries: Object,
 	entries: Array,
 	positions: Array,
+	poolDuration: Number,
+})
+
+onMounted(async () => {
+	if (line.value && props.pools.length === 1) getCurrencyPair()
 })
 
 const showEntries = ref(false)
@@ -173,6 +183,30 @@ const oldestClaim = computed(() => {
 	return { data: claim, days }
 })
 
+const line = computed(() => {
+	return props.pools[0]?.poolLines[0]
+})
+
+const currencyPair = ref({})
+const isCurrencyPairFetched = ref(false)
+const getCurrencyPair = async () => {
+	isCurrencyPairFetched.value = true
+	const { currencyPairByPk } = await juster.gql.query({
+		currencyPairByPk: [
+			{
+				id: line.value.currencyPairId,
+			},
+			{
+				id: true,
+				totalEvents: true,
+				symbol: true,
+			},
+		],
+	})
+
+	currencyPair.value = currencyPairByPk
+}
+
 const getClaimReadyTime = (claim) => {
 	const { betsCloseTime, measurePeriod } = claim.event.event
 
@@ -200,12 +234,72 @@ const handleGetClaims = () => {
 		allClaims.value.filter((claim) => claim.event.result),
 	)
 }
+
+watch(
+	() => line.value,
+	() => {
+		if (
+			!isCurrencyPairFetched.value &&
+			line.value &&
+			props.pools.length === 1
+		) {
+			getCurrencyPair()
+		}
+	},
+)
 </script>
 
 <template>
 	<div :class="$style.wrapper">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Text color="primary" size="16" weight="600">{{ title }}</Text>
+		</Flex>
+
+		<Flex v-if="currencyPair.symbol" :class="$style.pool_line">
+			<Flex align="center" gap="14" :class="$style.badge">
+				<div :class="$style.currency">
+					<img
+						:src="
+							getCurrencyIcon(currencyPair.symbol.split('-')[0])
+						"
+						alt="symbol"
+					/>
+				</div>
+
+				<Flex direction="column" gap="8">
+					<Text color="primary" size="16" weight="600">
+						{{ supportedMarkets[currencyPair.symbol].description }}
+					</Text>
+
+					<Flex align="center" gap="12">
+						<Flex align="center" gap="6">
+							<Icon
+								name="price_event"
+								size="12"
+								color="support"
+							/>
+							<Text size="13" weight="600" color="tertiary">
+								{{ line.maxEvents }} events
+							</Text>
+						</Flex>
+
+						<Flex v-if="poolDuration" align="center" gap="6">
+							<Icon name="time" size="12" color="support" />
+
+							<Text size="13" weight="600" color="tertiary">
+								{{
+									Duration.fromObject({
+										seconds: poolDuration,
+									})
+										.reconfigure({ locale: "en" })
+										.rescale()
+										.toHuman({ unitDisplay: "long" })
+								}}
+							</Text>
+						</Flex>
+					</Flex>
+				</Flex>
+			</Flex>
 		</Flex>
 
 		<Flex align="center" gap="32" :class="$style.funds">
@@ -242,7 +336,11 @@ const handleGetClaims = () => {
 
 				<Flex direction="column" gap="8">
 					<Text color="primary" size="16" weight="600">
-						{{ unrealizedProfit.toFixed(2) }}
+						{{
+							unrealizedProfit < 0.01 && unrealizedProfit !== 0
+								? `< 0.01`
+								: unrealizedProfit.toFixed(2)
+						}}
 					</Text>
 					<Text
 						color="tertiary"
@@ -653,6 +751,12 @@ const handleGetClaims = () => {
 	padding-bottom: 20px;
 }
 
+.pool_line {
+	border-bottom: 1px solid var(--border);
+
+	padding: 24px 0;
+}
+
 .funds {
 	border-bottom: 1px solid var(--border);
 
@@ -665,6 +769,22 @@ const handleGetClaims = () => {
 	background: rgba(255, 255, 255, 0.05);
 
 	padding: 12px;
+}
+
+.badge .currency {
+	box-sizing: content-box;
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.05);
+
+	padding: 12px;
+}
+
+.badge .currency img {
+	display: flex;
+	width: 20px;
+	height: 20px;
+
+	border-radius: 50%;
 }
 
 .badge__subtitle {

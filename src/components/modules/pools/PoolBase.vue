@@ -78,6 +78,7 @@ const pools = computed(() => marketStore.pools)
 const pool = computed(() =>
 	marketStore.pools.find((p) => p.address === route.params.address),
 )
+const poolDuration = ref(0)
 const selectedPool = ref({})
 const poolState = ref({})
 const isPoolStateReady = ref(false)
@@ -224,6 +225,7 @@ const setupSubToEvents = async () => {
 		.subscribe({
 			next: ({ poolEvent }) => {
 				events.value = poolEvent.map((e) => e.event)
+				poolDuration.value = events.value[0].measurePeriod
 			},
 			error: console.error,
 		})
@@ -233,13 +235,20 @@ const showAnimation = ref(false)
 onMounted(() => {
 	showAnimation.value = true
 
-	if (Object.keys(juster.pools).length) {
-		setupSubToEntries()
-		setupSubToPositions()
-		populatePool()
-		setupSubToEvents()
+	if (Object.keys(juster.pools).length && pool.value) {
+		init()
 	}
 })
+
+const isInited = ref(false)
+const init = () => {
+	isInited.value = true
+
+	setupSubToEntries()
+	setupSubToPositions()
+	populatePool()
+	setupSubToEvents()
+}
 
 /**
  * Deposits with an amount <1 xtz need manual confirmation
@@ -321,6 +330,16 @@ watch(
 	},
 )
 
+/** Wait for a long initialisation of the pool */
+watch(
+	() => pool.value,
+	() => {
+		if (!isInited.value) {
+			init()
+		}
+	},
+)
+
 /** Meta */
 const { meta } = useMeta({
 	title: `Liquidity Pools`,
@@ -379,7 +398,10 @@ const { meta } = useMeta({
 				/>
 
 				<Text size="16" weight="600" color="primary">
-					{{ parsePoolName(pool.name.replace("Juster Pool: ", "")) }}
+					{{
+						pool &&
+						parsePoolName(pool.name.replace("Juster Pool: ", ""))
+					}}
 				</Text>
 			</Flex>
 
@@ -392,6 +414,7 @@ const { meta } = useMeta({
 						:entries="entries"
 						:positions="position ? [position] : []"
 						:summaries="summary.totalDeposited ? [summary] : []"
+						:poolDuration="poolDuration"
 						@onManualEntryApprove="handleManualEntryApprove"
 						@onDepositLiquidity="showDepositModal = true"
 						@onRequestWithdraw="handleRequestWithdraw"
@@ -413,7 +436,7 @@ const { meta } = useMeta({
 				<Flex direction="column" gap="24" wide :class="$style.base">
 					<PoolsStats :pools="[pool]" :poolsStates="[poolState]" />
 
-					<PoolsChart :pool="pool" />
+					<PoolsChart v-if="pool" :pool="pool" />
 
 					<Flex direction="column" gap="24" :class="$style.events">
 						<Flex direction="column" gap="8">
@@ -478,6 +501,7 @@ const { meta } = useMeta({
 
 .side {
 	max-width: 450px;
+	width: 100%;
 }
 
 .base {

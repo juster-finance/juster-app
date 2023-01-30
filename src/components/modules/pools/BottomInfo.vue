@@ -167,10 +167,6 @@ const showPoolsGuidesModal = ref(false)
 	border-right: 2px solid rgba(255, 255, 255, 0.05);
 }
 
-.label:nth-child(2) {
-	border-right: 2px solid rgba(255, 255, 255, 0.05);
-}
-
 .label span {
 	color: var(--text-tertiary);
 }

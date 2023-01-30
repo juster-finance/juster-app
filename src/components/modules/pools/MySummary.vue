@@ -1,7 +1,19 @@
 <script setup>
+/**
+ * Vendor
+ */
+import { ref } from "vue"
+
+/**
+ * UI
+ */
+import Toggleable from "@ui/Toggleable.vue"
+
 const props = defineProps({
 	summary: Object,
 })
+
+const expanded = ref(false)
 
 const summaryDictionary = {
 	totalDeposited: "Total Deposited",
@@ -19,28 +31,43 @@ const summaryDictionary = {
 
 <template>
 	<div :class="$style.wrapper">
-		<Flex direction="column" gap="8" :class="$style.head">
-			<Text color="primary" size="16" weight="600">My Summary</Text>
-			<Text color="tertiary" size="14" weight="500" height="14">
-				Summary Description
-			</Text>
-		</Flex>
-
-		<Flex direction="column" gap="24">
-			<Flex
-				v-for="(value, key) in summary"
-				gap="8"
-				wide
-				justify="between"
-			>
-				<Text size="14" weight="600" color="tertiary">
-					{{ summaryDictionary[key] }}
-				</Text>
-				<Text size="14" weight="600" color="primary">
-					{{ value ? value.toFixed(2) : 0 }}
+		<Flex
+			@click="expanded = !expanded"
+			justify="between"
+			:class="$style.head"
+		>
+			<Flex direction="column" gap="8">
+				<Text color="primary" size="16" weight="600">My Summary</Text>
+				<Text color="tertiary" size="14" weight="500" height="14">
+					Summary Description
 				</Text>
 			</Flex>
+
+			<Icon
+				name="arrow"
+				size="20"
+				color="tertiary"
+				:class="[$style.arrow_icon, expanded && $style.toggle]"
+			/>
 		</Flex>
+
+		<Toggleable :expanded="expanded">
+			<Flex direction="column" gap="24" :class="$style.mgs">
+				<Flex
+					v-for="(value, key) in summary"
+					gap="8"
+					wide
+					justify="between"
+				>
+					<Text size="14" weight="600" color="tertiary">
+						{{ summaryDictionary[key] }}
+					</Text>
+					<Text size="14" weight="600" color="primary">
+						{{ value ? value.toFixed(2) : 0 }}
+					</Text>
+				</Flex>
+			</Flex>
+		</Toggleable>
 	</div>
 </template>
 
@@ -56,9 +83,25 @@ const summaryDictionary = {
 }
 
 .head {
-	border-bottom: 1px solid var(--border);
+	cursor: pointer;
+}
 
-	padding-bottom: 20px;
-	margin-bottom: 24px;
+.head:hover .arrow_icon {
+	fill: var(--text-secondary);
+}
+
+.arrow_icon {
+	transition: all 0.2s ease;
+}
+
+.arrow_icon.toggle {
+	transform: rotate(180deg);
+}
+
+.mgs {
+	border-top: 1px solid var(--border);
+
+	padding-top: 20px;
+	margin-top: 24px;
 }
 </style>

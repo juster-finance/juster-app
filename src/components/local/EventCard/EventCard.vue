@@ -658,8 +658,8 @@ onUnmounted(() => {
 					<Icon name="time" size="12" />
 
 					{{ timing.start.time }}
-					<span
-						>{{
+					<span>
+						{{
 							toReadableDuration({
 								seconds: event.measurePeriod,
 								asObject: true,
@@ -669,8 +669,8 @@ onUnmounted(() => {
 								seconds: event.measurePeriod,
 								asObject: true,
 							}).text[0].toUpperCase()
-						}}</span
-					>
+						}}
+					</span>
 					{{ timing.end.time }}
 
 					<div
