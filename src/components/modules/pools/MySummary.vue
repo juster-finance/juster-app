@@ -39,7 +39,7 @@ const summaryDictionary = {
 			<Flex direction="column" gap="8">
 				<Text color="primary" size="16" weight="600">My Summary</Text>
 				<Text color="tertiary" size="14" weight="500" height="14">
-					Summary Description
+					Your data for the selected pool
 				</Text>
 			</Flex>
 
