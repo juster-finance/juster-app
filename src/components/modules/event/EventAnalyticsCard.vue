@@ -216,7 +216,7 @@ const distributionOfBets = computed(() => {
 				<Icon name="users" size="16" />
 
 				<div :class="$style.text">
-					<p>The bets are 50/50</p>
+					<p>The stakes are 50/50</p>
 					<p>
 						For rise {{ distributionOfBets[0].toFixed(2) }} ꜩ and
 						{{ distributionOfBets[1].toFixed(2) }} ꜩ for fall
@@ -255,7 +255,7 @@ const distributionOfBets = computed(() => {
 				<Icon name="users" size="16" />
 
 				<div :class="$style.text">
-					<p>No bets so far</p>
+					<p>No stakes so far</p>
 					<p>At least one bid is needed</p>
 				</div>
 			</div>

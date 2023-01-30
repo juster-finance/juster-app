@@ -30,6 +30,7 @@ import WithdrawClaimsModal from "@local/modals/pools/WithdrawClaimsModal.vue"
  * Services
  */
 import { juster } from "@sdk"
+import { parsePoolName } from "@utils/misc"
 
 /**
  * Models
@@ -215,9 +216,7 @@ const setupSubToEvents = async () => {
 		})
 		.subscribe({
 			next: ({ poolEvent }) => {
-				poolEvent.forEach((e) => {
-					events.value.push(e.event)
-				})
+				events.value = poolEvent.map((e) => e.event)
 			},
 			error: console.error,
 		})
@@ -264,6 +263,11 @@ const handleManualEntryApprove = async (entry) => {
 	console.log(result)
 }
 
+const handleRequestWithdraw = () => {
+	if (!position.value) return
+	showRequestWithdrawModal.value = true
+}
+
 onUnmounted(() => {
 	if (
 		Object.prototype.hasOwnProperty.call(subEntries.value, "_state") &&
@@ -286,19 +290,6 @@ onUnmounted(() => {
 		subStates.value.unsubscribe()
 	}
 })
-
-watch(
-	() => juster.pools,
-	() => {
-		setupSubToEntries()
-		setupSubToPositions()
-		populatePool()
-		setupSubToEvents()
-	},
-	{
-		deep: true,
-	},
-)
 
 watch(
 	() => position.value,
@@ -341,7 +332,7 @@ const { meta } = useMeta({
 			/>
 			<RequestWithdrawModal
 				:show="showRequestWithdrawModal"
-				:selectedPool="selectedPool"
+				:selectedPool="pool"
 				:state="poolState"
 				:position="position"
 				@onClose="showRequestWithdrawModal = false"
@@ -368,7 +359,7 @@ const { meta } = useMeta({
 				/>
 
 				<Text size="16" weight="600" color="primary">
-					{{ pool?.name.replace("Juster Pool: ", "") }}
+					{{ parsePoolName(pool.name.replace("Juster Pool: ", "")) }}
 				</Text>
 			</Flex>
 
@@ -383,6 +374,7 @@ const { meta } = useMeta({
 						:summaries="summary.totalDeposited ? [summary] : []"
 						@onManualEntryApprove="handleManualEntryApprove"
 						@onDepositLiquidity="showDepositModal = true"
+						@onRequestWithdraw="handleRequestWithdraw"
 						@onGetClaims="showWithdrawClaimsModal = true"
 					/>
 

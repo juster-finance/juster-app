@@ -224,6 +224,15 @@ const routes = [
 		path: "/welcome",
 		name: "Welcome",
 		component: () => import("@views/WelcomePage.vue"),
+		beforeEnter: (to, from, next) => {
+			const accountStore = useAccountStore()
+
+			if (!accountStore.pkh.length) {
+				next({ name: "Explore" })
+			} else {
+				next()
+			}
+		},
 	},
 	{
 		path: "/profile",

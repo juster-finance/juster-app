@@ -109,6 +109,7 @@ onMounted(() => {
 })
 
 const handleContinue = () => {
+	if (!selectedNode.value.name) return
 	emit("onSelectCustomNode", selectedNode)
 }
 
@@ -136,121 +137,160 @@ const handleCloseCustomRpcInfo = () => {
 </script>
 
 <template>
-	<Modal :show="show" width="650" closable @onClose="$emit('onClose')">
-		<div :class="$style.title">Connection with custom RPC</div>
+	<Modal :show="show" width="650" closable new @onClose="$emit('onClose')">
+		<Flex align="center" justify="between" :class="$style.head">
+			<Flex align="center" gap="8">
+				<Icon name="login" size="16" color="secondary" />
 
-		<div :class="$style.description">
-			Select an RPC node from the ready-made list based on the selected
-			network
-		</div>
-
-		<Block
-			v-if="flags.showCustomRpcInfo"
-			icon="help"
-			color="gray"
-			@onClose="handleCloseCustomRpcInfo"
-			:class="$style.banner"
-		>
-			<span>Verify that the RPC node is working properly.</span>
-			Selecting and continuing to use a custom RPC can affect the
-			functionality of the app.
-		</Block>
-
-		<div :class="$style.subtitle">Select RPC</div>
-
-		<div :class="$style.nodes">
-			<Flex
-				v-for="node in rpcNodes[currentNetwork]"
-				:key="node.name"
-				@click="handleSelectNode(node)"
-				justify="between"
-				align="center"
-				:class="$style.node"
-			>
-				<Flex gap="12">
-					<div
-						:class="[
-							$style.radio,
-							selectedNode.name == node.name && $style.selected,
-						]"
-					>
-						<div :class="$style.dot" />
-					</div>
-
-					<div :class="$style.base">
-						<div>{{ node.name }}</div>
-						<div>{{ node.url }}</div>
-					</div>
-				</Flex>
-
-				<Spin
-					v-if="rpcStates[node.code].status === RpcStatuses.LOADING"
-					size="16"
-				/>
-				<Tooltip v-else placement="bottom">
-					<Icon
-						:name="
-							([
-								RpcStatuses.AVAILABLE,
-								RpcStatuses.DELAYED,
-							].includes(rpcStates[node.code].status) &&
-								'checkcircle') ||
-							(rpcStates[node.code].status ===
-								RpcStatuses.UNAVAILABLE &&
-								'warning')
-						"
-						size="16"
-						:style="{
-							fill:
-								(rpcStates[node.code].isDelayed &&
-									'var(--yellow)') ||
-								(rpcStates[node.code].status ===
-									RpcStatuses.AVAILABLE &&
-									'var(--green)') ||
-								(rpcStates[node.code].status ===
-									RpcStatuses.UNAVAILABLE &&
-									'var(--red)'),
-						}"
-					/>
-
-					<template #content>{{
-						rpcStates[node.code].message
-					}}</template>
-				</Tooltip>
+				<Text
+					size="14"
+					weight="600"
+					color="primary"
+					:class="$style.head_btn"
+				>
+					Custom Login
+				</Text>
 			</Flex>
 
-			<Flex @click="handleCustomRPC" gap="12" :class="$style.node">
-				<div
-					:class="[
-						$style.radio,
-						selectedNode.name == 'Custom RPC Node' &&
-							$style.selected,
-					]"
-				/>
+			<Icon
+				@click="$emit('onClose')"
+				name="close"
+				size="16"
+				color="tertiary"
+				:class="$style.close_icon"
+			/>
+		</Flex>
 
-				<div :class="$style.base">
-					<div>Custom RPC Node</div>
+		<Flex direction="column" gap="32" :class="$style.base">
+			<Text size="13" weight="500" color="tertiary" height="16">
+				Select an RPC node from the ready-made list based on the
+				selected network
+			</Text>
 
-					<div>
-						<Icon name="edit" size="12" />{{
-							customRPC ? customRPC : "Enter RPC base URL"
-						}}
-					</div>
+			<Block
+				v-if="flags.showCustomRpcInfo"
+				icon="help"
+				color="gray"
+				@onClose="handleCloseCustomRpcInfo"
+				:class="$style.banner"
+			>
+				<span>Verify that the RPC node is working properly.</span>
+				Selecting and continuing to use a custom RPC can affect the
+				functionality of the app.
+			</Block>
+
+			<Flex direction="column" gap="16">
+				<Text size="14" weight="600" color="secondary">Select RPC</Text>
+
+				<div :class="$style.nodes">
+					<Flex
+						v-for="node in rpcNodes[currentNetwork]"
+						:key="node.name"
+						@click="handleSelectNode(node)"
+						justify="between"
+						align="center"
+						:class="$style.node"
+					>
+						<Flex gap="12">
+							<div
+								:class="[
+									$style.radio,
+									selectedNode.name == node.name &&
+										$style.selected,
+								]"
+							>
+								<div :class="$style.dot" />
+							</div>
+
+							<Flex direction="column" gap="8">
+								<Text size="14" weight="600" color="primary">{{
+									node.name
+								}}</Text>
+								<Text size="13" weight="500" color="tertiary">{{
+									node.url
+								}}</Text>
+							</Flex>
+						</Flex>
+
+						<Spin
+							v-if="
+								rpcStates[node.code].status ===
+								RpcStatuses.LOADING
+							"
+							size="16"
+						/>
+						<Tooltip v-else placement="bottom">
+							<Icon
+								:name="
+									([
+										RpcStatuses.AVAILABLE,
+										RpcStatuses.DELAYED,
+									].includes(rpcStates[node.code].status) &&
+										'checkcircle') ||
+									(rpcStates[node.code].status ===
+										RpcStatuses.UNAVAILABLE &&
+										'warning')
+								"
+								size="16"
+								:style="{
+									fill:
+										(rpcStates[node.code].isDelayed &&
+											'var(--yellow)') ||
+										(rpcStates[node.code].status ===
+											RpcStatuses.AVAILABLE &&
+											'var(--green)') ||
+										(rpcStates[node.code].status ===
+											RpcStatuses.UNAVAILABLE &&
+											'var(--red)'),
+								}"
+							/>
+
+							<template #content>{{
+								rpcStates[node.code].message
+							}}</template>
+						</Tooltip>
+					</Flex>
+
+					<Flex
+						@click="handleCustomRPC"
+						gap="12"
+						:class="$style.node"
+					>
+						<div
+							:class="[
+								$style.radio,
+								selectedNode.name == 'Custom RPC Node' &&
+									$style.selected,
+							]"
+						/>
+
+						<Flex direction="column" gap="8">
+							<Text size="14" weight="600" color="primary">
+								Custom RPC Node
+							</Text>
+
+							<Text size="13" weight="500" color="tertiary">
+								{{
+									customRPC ? customRPC : "Enter RPC base URL"
+								}}
+							</Text>
+						</Flex>
+					</Flex>
 				</div>
 			</Flex>
-		</div>
 
-		<Button
-			@click="handleContinue"
-			@onKeybind="handleContinue"
-			:type="selectedNode.name ? 'primary' : 'secondary'"
-			size="large"
-			:disabled="!selectedNode.name"
-			block
-			keybind="C"
-		>
-			<Icon name="login" size="16" />Continue to Beacon</Button
-		>
+			<Button
+				@click="handleContinue"
+				@onKeybind="handleContinue"
+				:type="selectedNode.name ? 'primary' : 'secondary'"
+				size="large"
+				:disabled="!selectedNode.name"
+				block
+				keybind="C"
+			>
+				<Icon name="login" size="16" />Continue to Beacon</Button
+			>
+		</Flex>
 	</Modal>
 </template>
 
@@ -258,43 +298,20 @@ const handleCloseCustomRpcInfo = () => {
 .wrapper {
 }
 
-.title {
-	font-size: 20px;
-	font-weight: 600;
-	line-height: 1.2;
-	color: var(--text-primary);
+.head {
+	height: 56px;
 
-	margin-bottom: 16px;
+	padding: 0 20px;
 }
 
-.description {
-	font-size: 14px;
-	line-height: 1.6;
-	font-weight: 600;
-	color: var(--text-tertiary);
-
-	margin-bottom: 32px;
-}
-
-.banner {
-	margin-bottom: 32px;
-}
-
-.subtitle {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-secondary);
-
-	margin-bottom: 16px;
+.base {
+	padding: 0px 20px 20px 20px;
 }
 
 .nodes {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 	grid-gap: 16px;
-
-	margin-bottom: 32px;
 }
 
 .node {
@@ -336,36 +353,5 @@ const handleCloseCustomRpcInfo = () => {
 
 .node:hover .radio {
 	border: 2px solid var(--opacity-20);
-}
-
-.base {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-
-	width: 100%;
-}
-
-.base div:nth-child(1) {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-primary);
-}
-
-.base div:nth-child(2) {
-	display: flex;
-
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-tertiary);
-	fill: var(--text-secondary);
-	user-select: text;
-	cursor: text;
-}
-
-.base div:nth-child(2) svg {
-	margin-right: 6px;
 }
 </style>

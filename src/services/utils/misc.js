@@ -1,3 +1,5 @@
+import { supportedMarkets } from "@/services/config"
+
 export const toClipboard = (value) => {
 	navigator.clipboard.writeText(value)
 }
@@ -36,4 +38,10 @@ export const shorten = (str, left = 6, right = 4) => {
 
 export const sanitizeInput = (e) => {
 	if (["-", "e", "E"].includes(e.key)) e.preventDefault()
+}
+
+export const parsePoolName = (name) => {
+	if (name.split("-").length !== 3) return name
+	const [base, quote, duration] = name.split("-")
+	return `${supportedMarkets[`${base}-${quote}`].target} ${duration}`
 }

@@ -20,7 +20,11 @@ import LoadingDots from "@ui/LoadingDots.vue"
  * Services
  */
 import { juster, analytics } from "@sdk"
-import { sanitizeInput, capitalizeFirstLetter } from "@utils/misc"
+import {
+	sanitizeInput,
+	capitalizeFirstLetter,
+	parsePoolName,
+} from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
 
 /**
@@ -140,8 +144,8 @@ const buttonState = computed(() => {
 			disabled: true,
 			type: "secondary",
 		}
-	if (amount.value > 0 && amount.value < 0.1)
-		return { text: "Minimum 1 XTZ", disabled: true, type: "secondary" }
+	if (amount.value > 0 && amount.value < 0.01)
+		return { text: "Minimum 0.01 XTZ", disabled: true, type: "secondary" }
 	if (amount.value > accountStore.balance)
 		return {
 			text: "Insufficient funds",
@@ -149,9 +153,8 @@ const buttonState = computed(() => {
 			type: "secondary",
 		}
 	return {
-		text: `Deposit to ${props.selectedPool.name.replace(
-			"Juster Pool: ",
-			"",
+		text: `Deposit to ${parsePoolName(
+			props.selectedPool.name.replace("Juster Pool: ", ""),
 		)}`,
 		disabled: false,
 		type: "primary",
@@ -238,7 +241,11 @@ watch(
 				/>
 
 				<Text size="14" weight="600" color="primary">
-					{{ selectedPool.name.replace("Juster Pool: ", "") }}
+					{{
+						parsePoolName(
+							selectedPool.name.replace("Juster Pool: ", ""),
+						)
+					}}
 				</Text>
 			</Flex>
 
@@ -355,7 +362,7 @@ watch(
 				type="number"
 				:limit="1000000"
 				label="Amount"
-				placeholder="Bet amount"
+				placeholder="Deposit amount"
 				subtext="ꜩ"
 				v-model="amount.value"
 				@keydown="handleKeydown"
@@ -434,7 +441,7 @@ watch(
 						Deposit Details
 					</Text>
 					<Text size="12" weight="600" color="support">
-						Refresh every event
+						Approximate calculation
 					</Text>
 				</Flex>
 

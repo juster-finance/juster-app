@@ -1,4 +1,4 @@
-import { ref, watch, reactive } from "vue"
+import { ref, reactive } from "vue"
 
 /**
  * Services
@@ -58,8 +58,5 @@ export const useCountdown = (target) => {
 		clearInterval(countdownInterval)
 	}
 
-	watch(target, () => start())
-	if (target.value) start()
-
-	return { countdownText, status, time, stop }
+	return { countdownText, status, time, stop, start }
 }

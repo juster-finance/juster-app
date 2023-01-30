@@ -12,13 +12,12 @@ import DocsBase from "@modules/docs/DocsBase.vue"
 
 <template>
 	<Page style="padding: 0">
-		<DocsBase />
+		<DocsBase :class="$style.wrapper" />
 	</Page>
 </template>
 
 <style module>
 .wrapper {
-	max-width: 1250px;
-	min-height: 100vh;
+	user-select: text;
 }
 </style>

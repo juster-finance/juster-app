@@ -8,6 +8,12 @@ export const pool = {
 	entryLockPeriod: true,
 }
 
+export const poolLine = {
+	currencyPairId: true,
+	measurePeriod: true,
+	poolId: true,
+}
+
 export const poolEvent = {
 	poolId: true,
 	event: {

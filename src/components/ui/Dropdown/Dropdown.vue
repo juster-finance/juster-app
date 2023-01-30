@@ -57,7 +57,9 @@ const dropdownStyles = ref({})
 
 let removeOutside
 const handleOutside = (e) => {
-	if (e.path.find((el) => el.id === "trigger")) {
+	const path = e.path ? e.path : e.composedPath()
+	if (path.find((el) => el.id === "trigger")) {
+		console.log("trig")
 		return
 	} else {
 		close()

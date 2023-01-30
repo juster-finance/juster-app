@@ -285,7 +285,7 @@ onMounted(async () => {
 				<div :class="$style.label">
 					<Icon name="users" size="14" />
 					<span>
-						Trusted by <b>{{ allUsersCounter.length }}</b> Users
+						Used by <b>{{ allUsersCounter.length }}</b> Users
 						{{ currentNetwork !== "mainnet" ? "(Testnet)" : "" }}
 					</span>
 				</div>
@@ -383,5 +383,17 @@ onMounted(async () => {
 .label span b {
 	color: var(--text-secondary);
 	font-weight: 600;
+}
+
+@media (max-height: 1200px) {
+	.wrapper {
+		margin-top: 80px;
+	}
+}
+
+@media (max-height: 1000px) {
+	.wrapper {
+		margin-top: 40px;
+	}
 }
 </style>

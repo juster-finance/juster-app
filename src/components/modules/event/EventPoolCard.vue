@@ -2,6 +2,7 @@
 /**
  * Vendor
  */
+import { computed } from "vue"
 import { useRouter } from "vue-router"
 
 /**
@@ -14,10 +15,25 @@ import Button from "@ui/Button.vue"
  */
 import Pool from "@local/Pool.vue"
 
-defineProps({ event: { type: Object } })
+/**
+ * Store
+ */
+import { useMarketStore } from "@store/market"
+
+const marketStore = useMarketStore()
+
+const props = defineProps({ event: { type: Object } })
 const emit = defineEmits(["onLiquidity"])
 
 const router = useRouter()
+
+const pool = computed(() =>
+	marketStore.lines.find(
+		(l) =>
+			l.currencyPairId === props.event.currencyPair.id &&
+			l.measurePeriod === props.event.measurePeriod,
+	),
+)
 </script>
 
 <template>
@@ -33,7 +49,10 @@ const router = useRouter()
 
 		<Pool :event="event" />
 
-		<router-link to="/pools">
+		<router-link
+			v-if="marketStore.lines.length"
+			:to="`/pools/${pool.poolId}`"
+		>
 			<Button
 				type="secondary"
 				size="medium"

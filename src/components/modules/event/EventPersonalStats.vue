@@ -111,7 +111,7 @@ const hasHedge = computed(() => {
 					<Icon name="wallet" size="20" />
 				</div>
 
-				<template #content> Your Bets + Liquidity </template>
+				<template #content> Your Stakes + Liquidity </template>
 			</Tooltip>
 		</div>
 
@@ -196,7 +196,7 @@ const hasHedge = computed(() => {
 				</div>
 
 				<template #content
-					>Your bets are aimed both ways.<br /><span
+					>Your stakes are aimed both ways.<br /><span
 						>The final profit will be calculated at the end of the
 						event</span
 					></template

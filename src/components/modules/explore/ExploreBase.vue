@@ -240,10 +240,9 @@ useMeta({
 			<div :class="$style.block">
 				<div :class="$style.head">
 					<div :class="$style.left">
-						<h2>Notable Events</h2>
+						<h2>Starting Soon</h2>
 						<div :class="$style.description">
-							Events that have not yet begun, but are attracting
-							the interest of participants
+							Join the events that are about to start
 						</div>
 					</div>
 

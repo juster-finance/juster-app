@@ -82,8 +82,11 @@ const symbol = computed(() => props.event.currencyPair.symbol)
 
 /** Countdown setup: Time to start */
 const startDt = computed(() => new Date(props.event?.betsCloseTime).getTime())
-const { status: startStatus, stop: destroyStartCountdown } =
-	useCountdown(startDt)
+const {
+	status: startStatus,
+	stop: destroyStartCountdown,
+	start,
+} = useCountdown(startDt)
 
 /** Countdown setup: Time to finish */
 const finishDt = computed(() =>
@@ -333,6 +336,8 @@ const contextMenuHandler = (e) => {
 }
 
 onMounted(async () => {
+	start()
+
 	if (card.value)
 		card.value.addEventListener("contextmenu", contextMenuHandler)
 
@@ -667,6 +672,11 @@ onUnmounted(() => {
 						}}</span
 					>
 					{{ timing.end.time }}
+
+					<div
+						v-if="event.status === 'STARTED'"
+						:class="$style.badge_fill"
+					/>
 				</Badge>
 
 				<!-- Custom Badge -->
@@ -877,7 +887,6 @@ onUnmounted(() => {
 <style module>
 .wrapper {
 	position: relative;
-	max-width: 617px;
 
 	background: var(--card-bg);
 	border-radius: 8px;
@@ -1072,6 +1081,21 @@ onUnmounted(() => {
 	gap: 8px;
 
 	margin-bottom: 24px;
+}
+
+.badge {
+	position: relative;
+	overflow: hidden;
+}
+
+.badge_fill {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+
+	background: rgba(255, 255, 255, 0.05);
 }
 
 .hints {

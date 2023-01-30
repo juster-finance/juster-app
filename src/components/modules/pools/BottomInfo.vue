@@ -41,9 +41,9 @@ const showPoolsGuidesModal = ref(false)
 			<Flex direction="column" gap="8">
 				<Flex align="center" gap="4">
 					<Text size="13" weight="600" color="secondary">
-						Temporarily unaudited level of security
+						Contracts have not yet been audited
 					</Text>
-					<Icon name="warning" size="12" color="brand" />
+					<Icon name="warning" size="12" color="yellow" />
 				</Flex>
 
 				<Text size="12" weight="600" color="tertiary">
@@ -124,10 +124,7 @@ const showPoolsGuidesModal = ref(false)
 
 		<Flex align="center" :class="$style.labels">
 			<Text size="13" weight="500" color="support" :class="$style.label">
-				<span>~30%</span>&nbsp;APY
-			</Text>
-			<Text size="13" weight="500" color="support" :class="$style.label">
-				Minimum&nbsp;<span>1 ꜩ</span>
+				Minimum&nbsp;<span>0.01 ꜩ</span>
 			</Text>
 			<Text size="13" weight="500" color="support" :class="$style.label">
 				Version&nbsp;<span>{{ pool.version }}</span>

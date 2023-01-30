@@ -10,6 +10,11 @@ import { ref, reactive, computed } from "vue"
 import Tooltip from "@ui/Tooltip.vue"
 
 /**
+ * Services
+ */
+import { parsePoolName } from "@utils/misc"
+
+/**
  * Store
  */
 import { useMarketStore } from "@store/market"
@@ -191,9 +196,11 @@ const sortedSummaries = computed(() => {
 							<Flex align="center" justify="between">
 								<Text color="secondary" size="13" weight="600">
 									{{
-										position.pool.name.replace(
-											"Juster Pool: ",
-											"",
+										parsePoolName(
+											position.pool.name.replace(
+												"Juster Pool: ",
+												"",
+											),
 										)
 									}}
 								</Text>
@@ -247,14 +254,8 @@ const sortedSummaries = computed(() => {
 						<Flex align="center" gap="6">
 							<div :class="$style.deposited_dot" />
 							<Text size="12" weight="600" color="secondary">
-								Total Deposited
+								Total Value Locked
 							</Text>
-						</Flex>
-						<Flex align="center" gap="6">
-							<div :class="$style.locked_dot" />
-							<Text size="12" weight="600" color="secondary"
-								>Total Value Locked</Text
-							>
 						</Flex>
 					</Flex>
 				</Flex>
@@ -265,95 +266,104 @@ const sortedSummaries = computed(() => {
 					gap="24"
 					:class="$style.mgs"
 				>
-					<Flex direction="column" gap="8">
-						<Flex align="center" justify="between">
-							<Text color="secondary" size="13" weight="600">
-								Total Profit
-							</Text>
+					<Tooltip placement="bottom" isWide>
+						<Flex direction="column" gap="8" wide>
+							<Flex align="center" justify="between">
+								<Text color="secondary" size="13" weight="600">
+									Total Profit
+								</Text>
 
-							<Text color="secondary" size="13" weight="600">
-								{{
-									(
-										profit.realized + profit.unrealized
-									).toFixed(2)
-								}}
-							</Text>
-						</Flex>
-
-						<Flex :class="$style.progress_wrapper">
-							<Flex
-								justify="end"
-								:class="$style.left_wrapper"
-								:style="{
-									opacity: profit.total < 0 ? 1 : 0,
-								}"
-							>
-								<Flex
-									:style="{
-										width: '100%',
-									}"
-									:class="$style.left"
-								>
-									<div
-										:style="{
-											width: `${
-												(100 * profit.unrealized) /
-												profit.total
-											}%`,
-											opacity: '0.5',
-										}"
-										:class="$style.bar_orange"
-									/>
-									<div
-										:style="{
-											width: `${
-												100 -
-												(100 * profit.unrealized) /
-													profit.total
-											}%`,
-										}"
-										:class="$style.bar_orange"
-									/>
-								</Flex>
+								<Text color="secondary" size="13" weight="600">
+									{{
+										(
+											profit.realized + profit.unrealized
+										).toFixed(2)
+									}}
+								</Text>
 							</Flex>
 
-							<Flex
-								justify="start"
-								:class="$style.right_wrapper"
-								:style="{
-									opacity: profit.total > 0 ? 1 : 0,
-								}"
-							>
+							<Flex :class="$style.progress_wrapper">
 								<Flex
+									justify="end"
+									:class="$style.left_wrapper"
 									:style="{
-										width: '100%',
+										opacity: profit.total < 0 ? 1 : 0,
 									}"
-									:class="$style.right"
 								>
-									<div
+									<Flex
 										:style="{
-											width: `${
-												100 -
-												(100 * profit.unrealized) /
+											width: '100%',
+										}"
+										:class="$style.left"
+									>
+										<div
+											:style="{
+												width: `${
+													(100 * profit.unrealized) /
 													profit.total
-											}%`,
-										}"
-										:class="$style.bar_green"
-									/>
-									<div
+												}%`,
+												opacity: '0.5',
+											}"
+											:class="$style.bar_orange"
+										/>
+										<div
+											:style="{
+												width: `${
+													100 -
+													(100 * profit.unrealized) /
+														profit.total
+												}%`,
+											}"
+											:class="$style.bar_orange"
+										/>
+									</Flex>
+								</Flex>
+
+								<Flex
+									justify="start"
+									:class="$style.right_wrapper"
+									:style="{
+										opacity: profit.total > 0 ? 1 : 0,
+									}"
+								>
+									<Flex
 										:style="{
-											width: `${
-												(100 * profit.unrealized) /
-												profit.total
-											}%`,
-											opacity: '0.5',
+											width: '100%',
 										}"
-										:class="$style.bar_green"
-									/>
+										:class="$style.right"
+									>
+										<div
+											:style="{
+												width: `${
+													100 -
+													(100 * profit.unrealized) /
+														profit.total
+												}%`,
+											}"
+											:class="$style.bar_green"
+										/>
+										<div
+											:style="{
+												width: `${
+													(100 * profit.unrealized) /
+													profit.total
+												}%`,
+												opacity: '0.5',
+											}"
+											:class="$style.bar_green"
+										/>
+									</Flex>
 								</Flex>
 							</Flex>
 						</Flex>
-					</Flex>
+
+						<template #content>
+							Realized
+							<span>{{ profit.realized.toFixed(2) }}</span
+							>, Unrealized
+							<span>{{ profit.unrealized.toFixed(2) }}</span>
+						</template>
+					</Tooltip>
 
 					<Flex
 						v-for="summary in sortedSummaries"
@@ -369,16 +379,18 @@ const sortedSummaries = computed(() => {
 										weight="600"
 									>
 										{{
-											pools
-												.find(
-													(p) =>
-														p.address ==
-														summary.poolId,
-												)
-												.name.replace(
-													"Juster Pool: ",
-													"",
-												)
+											parsePoolName(
+												pools
+													.find(
+														(p) =>
+															p.address ==
+															summary.poolId,
+													)
+													.name.replace(
+														"Juster Pool: ",
+														"",
+													),
+											)
 										}}
 									</Text>
 

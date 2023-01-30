@@ -71,6 +71,7 @@ const {
 	countdownText,
 	status: countdownStatus,
 	stop,
+	start,
 } = useCountdown(eventStartTime)
 
 /** User inputs */
@@ -178,6 +179,8 @@ watch(
 
 			showHint.confirmationDelay = false
 		} else {
+			start()
+
 			side.value = props.cache.side
 			amount.value = props.cache.amount
 
@@ -211,7 +214,7 @@ const buttonState = computed(() => {
 	}
 
 	if (countdownStatus.value !== "In progress")
-		return { text: "Acceptance of bets is closed", disabled: true }
+		return { text: "Acceptance of stakes is closed", disabled: true }
 	if (sendingBet.value)
 		return { text: "Awaiting confirmation..", disabled: true }
 

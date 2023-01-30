@@ -255,10 +255,10 @@ export default defineComponent({
 				<div v-if="currentStep == 4" :class="$style.step">
 					<div :class="$style.step_title">Track the price</div>
 					<div :class="$style.step_description">
-						The time for accepting bets ends and the starting price
-						is fixed. After that you can watch as the event tilts to
-						one or the other outcome until the final price is
-						settled. <br />Note that the price measurement may
+						The time for accepting stakes ends and the starting
+						price is fixed. After that you can watch as the event
+						tilts to one or the other outcome until the final price
+						is settled. <br />Note that the price measurement may
 						happen with 1-2 blocks delay due to how price oracles
 						work.
 					</div>

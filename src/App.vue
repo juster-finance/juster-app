@@ -30,7 +30,7 @@ import ConfirmationModal from "@local/modals/ConfirmationModal.vue"
  * Services
  */
 import { juster, initPools } from "@sdk"
-import { fetchAllPools } from "@/api/pools"
+import { fetchAllPools, fetchPoolsLines } from "@/api/pools"
 
 /**
  * Store
@@ -78,6 +78,9 @@ onMounted(async () => {
 			activeElement.click()
 		}
 	})
+
+	const lines = await fetchPoolsLines()
+	marketStore.lines = lines
 })
 
 /**
@@ -396,6 +399,10 @@ input {
 	border: none;
 	outline: none;
 	background: transparent;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
 }
 
 a {

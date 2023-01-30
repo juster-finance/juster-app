@@ -81,7 +81,7 @@ import { event as eventModel } from "@/graphql/models"
 const meta = useMeta({
 	title: `Event`,
 	description:
-		"Available markets for events, for providing liquidity and accepting bets from users",
+		"Available markets for events, for providing liquidity and accepting stakes from users",
 })
 
 const marketStore = useMarketStore()
@@ -166,6 +166,7 @@ const {
 	countdownText: startCountdownText,
 	status: startStatus,
 	stop: destroyStartCountdown,
+	start: startStartCountdown,
 } = useCountdown(startDt)
 
 /** Countdown setup: Time to finish */
@@ -180,6 +181,7 @@ const {
 	status: finishStatus,
 	time: finishTime,
 	stop: destroyFinishCountdown,
+	start: startFinishCountdown,
 } = useCountdown(finishDt)
 
 const price = computed(() => {
@@ -240,11 +242,11 @@ const userBets = computed(() =>
 
 const wonText = computed(() => {
 	if (userBets.value.every((bet) => bet.side == event.value.winnerBets)) {
-		return "All of your bets won were in the winning direction"
+		return "All of your stakes won were in the winning direction"
 	} else if (
 		userBets.value.some((bet) => bet.side == event.value.winnerBets)
 	) {
-		return "One or more (not all) of your bets were in the winning direction"
+		return "One or more (not all) of your stakes were in the winning direction"
 	} else {
 		return ""
 	}
@@ -460,6 +462,9 @@ const subToDeposits = ref({})
 onMounted(async () => {
 	await getEvent()
 
+	startStartCountdown()
+	startFinishCountdown()
+
 	/** Subscribe to event, TODO: refactor */
 	subToEvent.value = await juster.gql
 		.subscription({
@@ -669,14 +674,18 @@ onUnmounted(() => {
 							</template>
 
 							<template #dropdown>
-								<DropdownItem @click="showNotifyMeModal = true">
+								<!-- <DropdownItem @click="showNotifyMeModal = true">
 									<Icon name="notifications" size="16" />
 									Notify Me
+								</DropdownItem> -->
+								<DropdownItem @click="handleLiquidity">
+									<Icon name="liquidity" size="16" />
+									Direct Deposit
 								</DropdownItem>
 
 								<DropdownDivider />
 
-								<DropdownTitle>Customization</DropdownTitle>
+								<!-- <DropdownTitle>Customization</DropdownTitle>
 								<DropdownItem @click="handleSwitch('mainnet')">
 									<Icon name="collection" size="16" />
 									Presets
@@ -692,7 +701,7 @@ onUnmounted(() => {
 									Configure Blocks
 								</DropdownItem>
 
-								<DropdownDivider />
+								<DropdownDivider /> -->
 
 								<DropdownItem @click="copy('id')">
 									<Icon name="copy" size="16" />
@@ -705,6 +714,8 @@ onUnmounted(() => {
 								</DropdownItem>
 
 								<DropdownDivider />
+
+								<DropdownTitle>Other</DropdownTitle>
 
 								<DropdownItem
 									@click="showEventDetailsModal = true"

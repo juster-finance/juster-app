@@ -26,6 +26,11 @@ import { fetchEventsByStatus } from "@api/events"
  */
 import { useAccountStore } from "@store/account"
 
+/**
+ * Services
+ */
+import { currentNetwork } from "@sdk"
+
 const accountStore = useAccountStore()
 
 const router = useRouter()
@@ -90,7 +95,7 @@ const selectedCurrencyItem = ref(currencyItems[0].name)
 const isViewed = localStorage.isOnbShown
 
 onMounted(async () => {
-	event.value = (await fetchEventsByStatus({ status: "STARTED" }))[0]
+	event.value = (await fetchEventsByStatus({ status: "NEW" }))[0]
 })
 
 const getCirclePos = (index) => {
@@ -260,6 +265,7 @@ const handleEnd = () => {
 						<Text size="24" weight="600" color="primary">
 							Welcome to Juster Finance
 						</Text>
+
 						<Text
 							size="16"
 							weight="500"
@@ -267,13 +273,65 @@ const handleEnd = () => {
 							height="16"
 							align="center"
 						>
-							Selected account ends with "{{
-								accountStore.pkh.slice(
-									accountStore.pkh.length - 4,
-									accountStore.pkh.length,
-								)
-							}}". Now we'll help you dive into the Juster app.
+							Now we'll help you dive into the application. Check
+							that the correct account is selected.
 						</Text>
+
+						<Flex align="center" gap="32" :class="$style.sa_badge">
+							<Flex align="center" gap="8">
+								<img
+									:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
+									alt="avatar"
+								/>
+
+								<Flex direction="column" gap="8">
+									<Text
+										size="14"
+										weight="600"
+										color="primary"
+									>
+										{{ accountStore.pkh.slice(0, 8) }}...{{
+											accountStore.pkh.slice(
+												accountStore.pkh.length - 8,
+												accountStore.pkh.length,
+											)
+										}}
+									</Text>
+									<Flex align="center">
+										<Text
+											size="14"
+											weight="600"
+											color="tertiary"
+										>
+											Balance&nbsp;
+										</Text>
+										<Text
+											size="14"
+											weight="600"
+											color="secondary"
+										>
+											{{ accountStore.balance }}
+										</Text>
+									</Flex>
+								</Flex>
+							</Flex>
+
+							<a
+								:href="`https://${
+									currentNetwork === 'mainnet'
+										? ''
+										: 'ghostnet.'
+								}tzkt.io/${accountStore.pkh}`"
+								target="_blank"
+							>
+								<Icon
+									name="explorer"
+									size="16"
+									color="tertiary"
+									:class="$style.sa_badge__btn"
+								/>
+							</a>
+						</Flex>
 					</Flex>
 
 					<Flex direction="column" gap="60" align="center">
@@ -363,7 +421,7 @@ const handleEnd = () => {
 					>
 						<Flex direction="column" gap="20">
 							<Text size="24" weight="600" color="primary">
-								Price Event Example
+								Price Event
 							</Text>
 							<Text
 								size="16"
@@ -371,10 +429,9 @@ const handleEnd = () => {
 								color="tertiary"
 								height="16"
 							>
-								This event has already begun. Users have placed
-								their stakes and are waiting for the outcome of
-								the event. This card provides the minimum
-								necessary data for tracking
+								On the right side you can see the event card. It
+								is still accepting stakes from those wishing to
+								participate and liquidity deposits.
 							</Text>
 
 							<Flex direction="column" gap="16">
@@ -388,9 +445,10 @@ const handleEnd = () => {
 										size="14"
 										weight="600"
 										color="tertiary"
-										>The duration of the event varies, from
-										6 hours to 7 days</Text
 									>
+										The duration of the event varies, from 6
+										hours to 7 days
+									</Text>
 								</Flex>
 								<Flex align="center" gap="6">
 									<Icon
@@ -451,10 +509,11 @@ const handleEnd = () => {
 								color="tertiary"
 								height="16"
 							>
-								Choose a currency pair, then a time interval,
-								select the anticipated price direction during
-								the selected interval, get the payout in case of
-								a correct outcome
+								First, select a currency pair. Next, choose a
+								time interval. Then, select the anticipated
+								price direction during the selected interval. If
+								your prediction is correct, you will receive a
+								payout
 							</Text>
 
 							<Flex align="center" gap="6">
@@ -552,7 +611,7 @@ const handleEnd = () => {
 				>
 					<Flex direction="column" gap="16" align="center">
 						<Text size="24" weight="600" color="primary">
-							Almost Done
+							Done!
 						</Text>
 						<Text
 							size="16"
@@ -561,11 +620,11 @@ const handleEnd = () => {
 							height="16"
 							align="center"
 						>
-							Now you can adjust a few settings to suit you.<br />
-							You can change these thigns later in the settings
+							You can learn more about the application in the<br />
+							docs or ask a question on our discord server
 						</Text>
 					</Flex>
-
+					<!-- 
 					<Flex direction="column" gap="16" wide>
 						<Text size="13" weight="600" color="primary"
 							>Interface Theme</Text
@@ -953,7 +1012,7 @@ const handleEnd = () => {
 						>
 							Prices by Binance API
 						</Text>
-					</Flex>
+					</Flex> -->
 
 					<Button @click="handleEnd" type="primary" size="small">
 						Alright, let's start
@@ -962,17 +1021,6 @@ const handleEnd = () => {
 				</Flex>
 			</transition>
 		</Flex>
-
-		<Text
-			v-if="activeStepIndex == 0"
-			size="12"
-			weight="500"
-			color="support"
-		>
-			<router-link to="/explore">
-				I've seen it somewhere before, press to skip the onboarding
-			</router-link>
-		</Text>
 	</Flex>
 </template>
 
@@ -1084,5 +1132,29 @@ const handleEnd = () => {
 .theme_card.midnight {
 	background: #1b1b1b;
 	border: 2px solid var(--border);
+}
+
+.sa_badge {
+	height: 60px;
+	background: rgba(255, 255, 255, 0.05);
+
+	border-radius: 8px;
+
+	padding: 0 24px 0 8px;
+}
+
+.sa_badge img {
+	width: 40px;
+	height: 40px;
+}
+
+.sa_badge__btn {
+	cursor: pointer;
+
+	transition: fill 0.2s ease;
+}
+
+.sa_badge__btn:hover {
+	fill: var(--text-secondary);
 }
 </style>

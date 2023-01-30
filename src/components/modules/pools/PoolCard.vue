@@ -22,7 +22,13 @@ import {
  * Services
  */
 import { juster } from "@sdk"
-import { toClipboard, getCurrencyIcon, shorten } from "@utils/misc"
+import {
+	toClipboard,
+	getCurrencyIcon,
+	shorten,
+	parsePoolName,
+} from "@utils/misc"
+import { numberWithSymbol } from "@utils/amounts"
 
 /**
  * Store
@@ -197,7 +203,11 @@ const copy = (target) => {
 
 					<Flex direction="column" gap="8">
 						<Text size="14" color="primary" weight="600">
-							{{ pool.name.replace("Juster Pool: ", "") }}
+							{{
+								parsePoolName(
+									pool?.name.replace("Juster Pool: ", ""),
+								)
+							}}
 						</Text>
 
 						<Flex align="center" gap="4">
@@ -355,10 +365,10 @@ const copy = (target) => {
 								name="stars"
 								size="14"
 								:color="
-									(apy < 0 && 'red') ||
-									(apy < 40 && 'tertiary') ||
-									(apy < 80 && 'yellow') ||
-									(apy <= 100 && 'green') ||
+									(apy * 100 < 0 && 'red') ||
+									(apy * 100 < 40 && 'tertiary') ||
+									(apy * 100 < 80 && 'yellow') ||
+									(apy * 100 >= 100 && 'green') ||
 									'tertiary'
 								"
 							/>
@@ -373,7 +383,7 @@ const copy = (target) => {
 									showUserData
 										? position.shares.toFixed(2)
 										: apy
-										? `${(apy * 100).toFixed(2)}%`
+										? `${numberWithSymbol(apy * 100, ",")}%`
 										: `0%`
 								}}
 							</Text>
@@ -439,7 +449,20 @@ const copy = (target) => {
 						</Text>
 
 						<Flex align="center" gap="6">
-							<Icon name="checkcircle" size="14" color="green" />
+							<Icon
+								:name="
+									(utilization < 0.01 && 'warning') ||
+									'checkcircle'
+								"
+								size="14"
+								:color="
+									(utilization <= 0.01 && 'red') ||
+									(utilization > 0.01 &&
+										utilization < 0.1 &&
+										'tertiary') ||
+									(utilization >= 0.1 && 'green')
+								"
+							/>
 							<Text size="15" weight="600" color="secondary">
 								{{ utilization.toFixed(2) }}%
 							</Text>
@@ -465,7 +488,14 @@ const copy = (target) => {
 						</Text>
 
 						<Flex align="center" gap="6">
-							<Icon name="checkcircle" size="14" color="green" />
+							<Icon
+								:name="
+									(riskIndex > 1 && 'warning') ||
+									'checkcircle'
+								"
+								size="14"
+								:color="(riskIndex > 1 && 'red') || 'tertiary'"
+							/>
 							<Text size="15" weight="600" color="secondary">
 								{{ riskIndex.toFixed(2) }}%
 							</Text>

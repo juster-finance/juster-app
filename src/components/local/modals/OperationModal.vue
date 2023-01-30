@@ -86,133 +86,160 @@ const getTypeOfOperation = () => {
 </script>
 
 <template>
-	<Modal :show="show" width="500" closable @onClose="$emit('onClose')">
+	<Modal :show="show" width="500" new closable @onClose="$emit('onClose')">
 		<div :class="$style.wrapper">
-			<div :class="$style.title">Operation</div>
+			<Flex align="center" justify="between" :class="$style.head">
+				<Flex align="center" gap="8">
+					<Icon name="explorer" size="16" color="secondary" />
 
-			<div
-				@mouseenter="isPriceHovered = true"
-				@mouseleave="isPriceHovered = false"
-				:class="$style.content"
-			>
-				<div :class="$style.center_icon">
-					<Icon name="check_circle_right" size="32" />
-				</div>
-
-				<router-link
-					:to="`/profile/${data.userId}`"
-					target="_blank"
-					:class="$style.type"
-				>
-					<Icon
-						:name="
-							(getTypeOfOperation() == 'Bid' && 'money') ||
-							(getTypeOfOperation() == 'Deposit' &&
-								'liquidity') ||
-							(getTypeOfOperation() == 'Withdraw' && 'walletadd')
-						"
+					<Text
 						size="14"
-					/>
-					{{ getTypeOfOperation() }} <span>by</span>
-					{{ shorten(data.userId, 4, 4) }}
-				</router-link>
+						weight="600"
+						color="primary"
+						:class="$style.head_btn"
+					>
+						Operation
+					</Text>
+				</Flex>
 
-				<div :class="$style.amount">
-					{{
-						disaggregate(
-							data.amount ? data.amount : data.amountBelow,
-						)[0]
-					}}<span>
-						<template
-							v-if="
+				<Icon
+					@click="$emit('onClose')"
+					name="close"
+					size="16"
+					color="tertiary"
+					:class="$style.close_icon"
+				/>
+			</Flex>
+
+			<Flex direction="column" gap="32" :class="$style.base">
+				<div
+					@mouseenter="isPriceHovered = true"
+					@mouseleave="isPriceHovered = false"
+					:class="$style.content"
+				>
+					<div :class="$style.center_icon">
+						<Icon name="check_circle_right" size="32" />
+					</div>
+
+					<router-link
+						:to="`/profile/${data.userId}`"
+						target="_blank"
+						:class="$style.type"
+					>
+						<Icon
+							:name="
+								(getTypeOfOperation() == 'Bid' && 'money') ||
+								(getTypeOfOperation() == 'Deposit' &&
+									'liquidity') ||
+								(getTypeOfOperation() == 'Withdraw' &&
+									'walletadd')
+							"
+							size="14"
+						/>
+						{{ getTypeOfOperation() }} <span>by</span>
+						{{ shorten(data.userId, 4, 4) }}
+					</router-link>
+
+					<div :class="$style.amount">
+						{{
+							disaggregate(
+								data.amount ? data.amount : data.amountBelow,
+							)[0]
+						}}<span>
+							<template
+								v-if="
+									disaggregate(
+										data.amount
+											? data.amount
+											: data.amountBelow,
+									)[1]
+								"
+								>.</template
+							>{{
 								disaggregate(
 									data.amount
 										? data.amount
 										: data.amountBelow,
 								)[1]
-							"
-							>.</template
-						>{{
-							disaggregate(
-								data.amount ? data.amount : data.amountBelow,
-							)[1]
-						}}
-						ꜩ
-					</span>
-				</div>
-
-				<div :class="$style.usd">
-					<template v-if="!isPriceHovered">
-						~ ${{
-							numberWithSymbol(
-								(data.amount
-									? data.amount *
-									  marketStore.markets["XTZ-USD"].quotes[0]
-											.price
-									: data.amountBelow *
-									  marketStore.markets["XTZ-USD"].quotes[0]
-											.price
-								).toFixed(2),
-								",",
-							)
-						}}
-					</template>
-					<template v-else>
-						1 XTZ = ${{
-							marketStore.markets[
-								"XTZ-USD"
-							].quotes[0].price.toFixed(2)
-						}}
-					</template>
-				</div>
-			</div>
-
-			<div :class="$style.details">
-				<div :class="$style.subtitle">Details</div>
-
-				<!-- Hash -->
-				<div :class="$style.detail">
-					<div :class="$style.key">
-						<Icon name="hash" size="12" />Hash
+							}}
+							ꜩ
+						</span>
 					</div>
-					<div
-						@click="handleCopy(data.opgHash, 'hash')"
-						:class="$style.value"
-					>
-						{{ shorten(data.opgHash, 6, 6) }}
+
+					<div :class="$style.usd">
+						<template v-if="!isPriceHovered">
+							~ ${{
+								numberWithSymbol(
+									(data.amount
+										? data.amount *
+										  marketStore.markets["XTZ-USD"]
+												.quotes[0].price
+										: data.amountBelow *
+										  marketStore.markets["XTZ-USD"]
+												.quotes[0].price
+									).toFixed(2),
+									",",
+								)
+							}}
+						</template>
+						<template v-else>
+							1 XTZ = ${{
+								marketStore.markets[
+									"XTZ-USD"
+								].quotes[0].price.toFixed(2)
+							}}
+						</template>
 					</div>
 				</div>
 
-				<!-- Date -->
-				<div :class="$style.detail">
-					<div :class="$style.key">
-						<Icon name="calendar" size="12" />When
+				<div :class="$style.details">
+					<div :class="$style.subtitle">Details</div>
+
+					<!-- Hash -->
+					<div :class="$style.detail">
+						<div :class="$style.key">
+							<Icon name="hash" size="12" />Hash
+						</div>
+						<div
+							@click="handleCopy(data.opgHash, 'hash')"
+							:class="$style.value"
+						>
+							{{ shorten(data.opgHash, 6, 6) }}
+						</div>
 					</div>
-					<div
-						@click="handleCopy(data.createdTime)"
-						:class="$style.value"
-					>
-						{{
-							DateTime.fromISO(data.createdTime, "calendar")
-								.setLocale("en")
-								.toFormat("T, dd LLLL yyyy")
-						}}
+
+					<!-- Date -->
+					<div :class="$style.detail">
+						<div :class="$style.key">
+							<Icon name="calendar" size="12" />When
+						</div>
+						<div
+							@click="handleCopy(data.createdTime)"
+							:class="$style.value"
+						>
+							{{
+								DateTime.fromISO(data.createdTime, "calendar")
+									.setLocale("en")
+									.toFormat("T, dd LLLL yyyy")
+							}}
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<a
-				:href="`https://${
-					currentNetwork === 'mainnet' ? '' : 'ghostnet.'
-				}tzkt.io/${data.opgHash}`"
-				target="_blank"
-			>
-				<Button type="secondary" size="small" block>
-					<Icon name="database" size="12" /> View operation on TzKT
-				</Button>
-			</a>
+				<a
+					:href="`https://${
+						currentNetwork === 'mainnet' ? '' : 'ghostnet.'
+					}tzkt.io/${data.opgHash}`"
+					target="_blank"
+				>
+					<Button type="secondary" size="small" block>
+						<Icon name="arrowrighttop" size="12" color="tertiary" />
+						View operation on TzKT
+					</Button>
+				</a>
 
-			<div :class="[$style.bg, showRadialBg && $style.visible]" />
+				<div :class="[$style.bg, showRadialBg && $style.visible]" />
+			</Flex>
 		</div>
 	</Modal>
 </template>
@@ -220,6 +247,24 @@ const getTypeOfOperation = () => {
 <style module>
 .wrapper {
 	position: relative;
+}
+
+.head {
+	height: 56px;
+
+	padding: 0 20px;
+}
+
+.base {
+	padding: 8px 20px 20px 20px;
+}
+
+.head_btn {
+	cursor: pointer;
+}
+
+.close_icon {
+	cursor: pointer;
 }
 
 .bg {
@@ -256,8 +301,6 @@ const getTypeOfOperation = () => {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-
-	margin: 40px 0 60px;
 }
 
 .center_icon {
@@ -330,8 +373,6 @@ const getTypeOfOperation = () => {
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
-
-	margin-bottom: 32px;
 }
 
 .detail {

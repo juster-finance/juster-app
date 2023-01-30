@@ -60,7 +60,7 @@ onMounted(async () => {
 		</div>
 
 		<div :class="$style.hint">
-			The list of participants displays users who made bets or provided
+			The list of participants displays users who made stakes or provided
 			liquidity for this event
 		</div>
 	</Modal>

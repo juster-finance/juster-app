@@ -28,6 +28,7 @@ const emit = defineEmits([
 	"onDepositLiquidity",
 	"onGetClaims",
 	"onManualEntryApprove",
+	"onRequestWithdraw",
 ])
 const props = defineProps({
 	title: { type: String, default: "My Funds" },
@@ -255,17 +256,12 @@ const handleGetClaims = () => {
 
 		<Flex
 			v-if="pendingEntries.length || manualEntries.length"
+			@click="togglePendingEntries()"
 			direction="column"
 			gap="12"
 			:class="$style.progress"
 		>
-			<Flex
-				@click="togglePendingEntries()"
-				align="center"
-				justify="between"
-				wide
-				style="cursor: pointer"
-			>
+			<Flex align="center" justify="between" wide>
 				<Tooltip placement="top-start" text-align="left">
 					<Flex align="center" gap="6">
 						<Text size="14" color="secondary" weight="600">
@@ -427,17 +423,12 @@ const handleGetClaims = () => {
 
 		<Flex
 			v-if="allClaims.length"
+			@click="togglePendingClaims"
 			direction="column"
 			gap="12"
 			:class="$style.progress"
 		>
-			<Flex
-				@click="togglePendingClaims"
-				align="center"
-				justify="between"
-				wide
-				style="cursor: pointer"
-			>
+			<Flex align="center" justify="between" wide>
 				<Tooltip placement="bottom-start" text-align="left">
 					<Flex align="center" gap="6">
 						<Text size="14" color="secondary" weight="600">
@@ -562,6 +553,19 @@ const handleGetClaims = () => {
 					</Flex>
 				</Flex>
 			</Flex>
+
+			<Button
+				v-if="allClaims.length - pendingClaims.length"
+				@click="handleGetClaims"
+				@onKeybind="handleGetClaims"
+				type="secondary"
+				size="medium"
+				block
+				keybind="G+C"
+			>
+				<Icon name="credit_add" size="16" color="green" />
+				Withdraw Сlaims
+			</Button>
 		</Flex>
 
 		<Flex
@@ -599,16 +603,16 @@ const handleGetClaims = () => {
 			</Button>
 
 			<Button
-				v-if="allClaims.length - pendingClaims.length"
-				@click="handleGetClaims"
-				@onKeybind="handleGetClaims"
+				v-if="pools.length === 1"
+				@click="emit('onRequestWithdraw')"
+				@onKeybind="emit('onRequestWithdraw')"
+				:disabled="!positions.length"
 				type="secondary"
 				size="medium"
+				keybind="R+W"
 				block
-				keybind="G+C"
 			>
-				<Icon name="credit_add" size="16" color="green" />
-				Withdraw Сlaims
+				<Icon name="money" size="16" />Request Withdraw
 			</Button>
 		</Flex>
 	</div>
@@ -650,6 +654,8 @@ const handleGetClaims = () => {
 }
 
 .progress {
+	cursor: pointer;
+
 	margin-top: 24px;
 }
 

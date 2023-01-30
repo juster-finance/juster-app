@@ -84,9 +84,9 @@ watch(
 			<Flex direction="column" gap="16">
 				<Flex align="center">
 					<Text size="13" weight="500" color="tertiary" height="16">
-						After acceptance of your stake, it will appear in the
-						stakes list, as well as in the profile. The result will
-						be available depending on the duration.
+						Once your stake is accepted, it will be listed in the
+						event stakes list and in your profile. You can retrieve
+						your winnings once the event concludes.
 					</Text>
 				</Flex>
 
@@ -99,7 +99,7 @@ watch(
 
 					<Flex direction="column" gap="8">
 						<Text size="14" weight="600" color="primary">
-							Dangerous stake volume
+							Dangerously large stake size
 						</Text>
 						<Text
 							size="13"
@@ -121,7 +121,7 @@ watch(
 
 					<Flex direction="column" gap="8">
 						<Text size="14" weight="600" color="primary">
-							Dangerous stake volume
+							Dangerously large stake size
 						</Text>
 						<Text
 							size="13"
@@ -129,7 +129,8 @@ watch(
 							color="tertiary"
 							height="16"
 						>
-							Your stake is half of your (or more) of the balance
+							Your stake size is more than half of your account
+							balance
 						</Text>
 					</Flex>
 				</Flex>
@@ -303,7 +304,7 @@ watch(
 						<Icon name="walletadd" size="14" color="tertiary" />
 
 						<Text size="14" weight="600" color="primary">
-							Payout
+							Success Payout
 						</Text>
 					</Flex>
 
@@ -322,13 +323,13 @@ watch(
 						<Icon name="wallet" size="14" color="tertiary" />
 
 						<Text size="14" weight="600" color="primary">
-							Wallet
+							Wallet in use
 						</Text>
 					</Flex>
 
-					<Text size="14" weight="600" color="primary">{{
-						shorten(accountStore.pkh, 4, 4)
-					}}</Text>
+					<Text size="14" weight="600" color="primary">
+						{{ shorten(accountStore.pkh, 4, 4) }}
+					</Text>
 				</Flex>
 			</Flex>
 

@@ -10,6 +10,7 @@ import { Searcher } from "fast-fuzzy"
  */
 import { currentNetwork } from "@sdk"
 import { flags, updateFlag } from "@/services/flags"
+import { parsePoolName } from "@utils/misc"
 
 /**
  * Constants
@@ -20,7 +21,6 @@ import { Networks } from "@/services/constants"
  * UI
  */
 import Modal from "@ui/Modal.vue"
-import Button from "@ui/Button.vue"
 import Input from "@ui/Input.vue"
 import Block from "@ui/Block.vue"
 import LoadingDots from "@ui/LoadingDots.vue"
@@ -289,7 +289,14 @@ const handleCloseTestnetWarning = () => {
 						<Flex align="center" gap="20">
 							<Flex direction="column" gap="8">
 								<Text size="14" weight="600" color="primary">
-									{{ pool.name.replace("Juster Pool: ", "") }}
+									{{
+										parsePoolName(
+											pool.name.replace(
+												"Juster Pool: ",
+												"",
+											),
+										)
+									}}
 								</Text>
 
 								<Flex align="center" gap="8">

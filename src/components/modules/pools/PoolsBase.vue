@@ -183,7 +183,14 @@ const setupSubToStates = async () => {
 				if (newPoolState.counter === currentPoolState.counter) return
 
 				if (newPoolState.counter > currentPoolState.counter) {
-					poolsStates.value[newPoolState.poolId] = newPoolState
+					poolsStates.value[newPoolState.poolId] = {
+						...newPoolState,
+						totalLiquidity: BN(newPoolState.totalLiquidity),
+						totalShares: BN(newPoolState.totalShares),
+						withdrawableLiquidity: BN(
+							newPoolState.withdrawableLiquidity,
+						),
+					}
 				}
 			},
 			error: console.error,
@@ -286,18 +293,6 @@ onUnmounted(() => {
 		subStates.value.unsubscribe()
 	}
 })
-
-watch(
-	() => juster.pools,
-	() => {
-		setupSubToEntries()
-		setupSubToPositions()
-		populatePools()
-	},
-	{
-		deep: true,
-	},
-)
 
 watch(
 	() => isPopulated.value,

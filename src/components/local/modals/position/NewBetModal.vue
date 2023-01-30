@@ -3,7 +3,7 @@
  * Vendor
  */
 import { ref, reactive, computed, watch } from "vue"
-import { estimateFeeMultiplier } from "@juster-finance/sdk"
+import { estimateFeeMultiplier, calculateRatio } from "@juster-finance/sdk"
 import { DateTime } from "luxon"
 import BN from "bignumber.js"
 
@@ -58,6 +58,7 @@ const eventStartTime = computed(() =>
 const {
 	countdownText,
 	status: countdownStatus,
+	start,
 	stop,
 } = useCountdown(eventStartTime)
 
@@ -153,15 +154,17 @@ const ratioBeforeBet = computed(() => {
 		fall: props.event.poolAboveEq / props.event.poolBelow,
 	}
 })
-const ratioAfterBet = computed(
-	() =>
-		(side.value == "Rise" &&
-			(props.event.poolBelow - winDelta.value) /
-				(props.event.poolAboveEq + parseFloat(amount.value))) ||
-		(side.value == "Fall" &&
-			(props.event.poolAboveEq - winDelta.value) /
-				(props.event.poolBelow + parseFloat(amount.value))),
-)
+const ratioAfterBet = computed(() => {
+	return calculateRatio(
+		{
+			poolAboveEq: BN(props.event.poolAboveEq),
+			poolBelow: BN(props.event.poolBelow),
+		},
+		"aboveEq",
+		BN(parseFloat(amount.value)),
+		BN(winDelta.value),
+	).toNumber()
+})
 
 const fee = computed(() =>
 	estimateFeeMultiplier(
@@ -232,6 +235,8 @@ watch(
 
 			document.removeEventListener("keydown", onKeydown)
 		} else {
+			start()
+
 			if (cacheStore.submissions.amount)
 				amount.value = cacheStore.submissions.amount
 			side.value = cacheStore.submissions.side
@@ -289,7 +294,7 @@ const buttonState = computed(() => {
 	}
 
 	if (countdownStatus.value !== "In progress")
-		return { text: "Acceptance of bets is closed", disabled: true }
+		return { text: "Acceptance of stakes is closed", disabled: true }
 	if (sendingBet.value)
 		return { text: "Awaiting confirmation..", disabled: true }
 
@@ -688,7 +693,9 @@ const handleUserTransactionConfirmation = () => {
 				</Flex>
 
 				<Flex direction="column" gap="16" :class="$style.payout_block">
-					<Text size="14" weight="600" color="secondary">Payout</Text>
+					<Text size="14" weight="600" color="secondary">
+						Success Payout
+					</Text>
 
 					<Flex>
 						<Text size="26" weight="600" color="secondary">
@@ -737,7 +744,7 @@ const handleUserTransactionConfirmation = () => {
 				</Flex>
 				<Flex align="center" justify="between">
 					<Text size="14" weight="600" color="tertiary">
-						Event start
+						Time to start
 					</Text>
 
 					<Text size="14" weight="600" color="secondary">

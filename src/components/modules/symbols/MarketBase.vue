@@ -114,10 +114,6 @@ const handleScrollToEvents = () => {
 	})
 }
 
-if (price.value) {
-	meta.title = `${market.value.symbol} • ${price.value.toFixed(2)}`
-}
-
 watch(market, () => {
 	if (!market.value) return
 	meta.title = `${market.value.symbol}`
@@ -133,6 +129,10 @@ watch(
 
 onMounted(() => {
 	analytics.log("onPage", { name: "Market" })
+
+	if (price.value) {
+		meta.title = `${market.value.symbol} • ${price.value.toFixed(2)}`
+	}
 })
 
 onBeforeUnmount(() => {
@@ -143,7 +143,7 @@ onBeforeUnmount(() => {
 const { meta } = useMeta({
 	title: `Market`,
 	description:
-		"Available markets for events, for providing liquidity and accepting bets from users",
+		"Available markets for events, for providing liquidity and accepting stakes from users",
 })
 </script>
 

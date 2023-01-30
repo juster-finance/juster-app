@@ -283,18 +283,12 @@ const buttonState = computed(() => {
 			<Flex direction="column" gap="8">
 				<Flex>
 					<Text size="13" weight="500" color="tertiary" height="16">
-						Your withdrawal request contains&nbsp;
-					</Text>
-					<Text size="13" weight="500" color="secondary" height="16">
-						{{ availableClaims.length }} available claims.
+						Your withdrawal request contains
+						{{ availableClaims.length }} available claims. Funds
+						will be available in your wallet as soon as all
+						transactions are accepted.
 					</Text>
 				</Flex>
-
-				<Text size="13" weight="500" color="tertiary" height="16">
-					Funds will be available in your wallet as soon as all
-					transactions are accepted, and this depends on the number of
-					pools affected.
-				</Text>
 			</Flex>
 
 			<Flex direction="column" gap="8">

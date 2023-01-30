@@ -67,6 +67,7 @@ export default defineComponent({
 			countdownText,
 			status: countdownStatus,
 			stop,
+			start,
 		} = useCountdown(eventStartTime)
 
 		/** User inputs */
@@ -116,6 +117,8 @@ export default defineComponent({
 				showHint.confirmationDelay = false
 				showHint.aborted = false
 			} else {
+				start()
+
 				accountStore.updateBalance()
 
 				document.addEventListener("keydown", onKeydown)
@@ -142,7 +145,10 @@ export default defineComponent({
 			}
 
 			if (countdownStatus.value !== "In progress")
-				return { text: "Acceptance of bets is closed", disabled: true }
+				return {
+					text: "Acceptance of stakes is closed",
+					disabled: true,
+				}
 			if (sendingLiquidity.value)
 				return { text: "Awaiting confirmation..", disabled: true }
 

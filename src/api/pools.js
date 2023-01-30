@@ -9,6 +9,7 @@ import { juster } from "@sdk"
 import {
 	pool as poolModel,
 	poolState as poolStateModel,
+	poolLine as poolLineModel,
 } from "@/graphql/models"
 
 export const fetchAllPools = async () => {
@@ -20,6 +21,20 @@ export const fetchAllPools = async () => {
 	} catch (error) {
 		console.error(
 			`Error during fetching pools \n\n ${error.name}: ${error.message}`,
+		)
+		return {}
+	}
+}
+
+export const fetchPoolsLines = async () => {
+	try {
+		const { poolLine } = await juster.gql.query({
+			poolLine: poolLineModel,
+		})
+		return poolLine
+	} catch (error) {
+		console.error(
+			`Error during fetching pools lines \n\n ${error.name}: ${error.message}`,
 		)
 		return {}
 	}

@@ -18,7 +18,7 @@ import Tooltip from "@ui/Tooltip.vue"
 				height="14"
 				:class="$style.title"
 			>
-				Your fresh account ready for first stake or liquidity deposit
+				Your account is ready for your first stake or liquidity deposit
 			</Text>
 			<Text
 				size="14"
@@ -27,9 +27,9 @@ import Tooltip from "@ui/Tooltip.vue"
 				height="16"
 				:class="$style.description"
 			>
-				At the moment you have an empty account and will not be able to
-				use all the features of your profile, but you can already
-				interact with the basic features of the Juster.
+				Even though your account is currently empty, you can still
+				access some basic features of Juster, such as placing your first
+				stake or deposit liquidity:
 			</Text>
 
 			<Flex direction="column" gap="20" :class="$style.tasks">
