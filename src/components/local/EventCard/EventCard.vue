@@ -16,6 +16,7 @@ import { DateTime } from "luxon"
 import { Dropdown, DropdownItem, DropdownDivider } from "@ui/Dropdown"
 import Badge from "@ui/Badge.vue"
 import Tooltip from "@ui/Tooltip.vue"
+import Spin from "@ui/Spin.vue"
 
 /**
  * Local
@@ -623,7 +624,8 @@ onUnmounted(() => {
 					text-align="left"
 				>
 					<Badge color="yellow" :class="$style.main_badge">
-						<Icon name="event_active" size="12" />Running
+						<Icon name="event_active" size="12" />
+						Running
 					</Badge>
 					<template #content>
 						Submissions is closed.<br />

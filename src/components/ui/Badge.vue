@@ -51,22 +51,22 @@ defineProps({
 .wrapper.green {
 	color: var(--text-secondary);
 	fill: var(--green);
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(26, 161, 104, 0.5);
+	background: rgba(26, 161, 104, 0.08);
+	border: 2px solid rgba(26, 161, 104, 0.3);
 }
 
 .wrapper.yellow {
 	color: var(--text-secondary);
 	fill: var(--yellow);
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(245, 183, 43, 0.5);
+	background: rgba(245, 183, 43, 0.08);
+	border: 2px solid rgba(245, 183, 43, 0.2);
 }
 
 .wrapper.red {
 	color: var(--text-secondary);
 	fill: var(--red);
 	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(224, 92, 67, 0.5);
+	border: 2px solid rgba(224, 92, 67, 0.5);
 }
 
 .wrapper.gray {
@@ -78,14 +78,14 @@ defineProps({
 .wrapper.orange {
 	color: var(--text-secondary);
 	fill: var(--orange);
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(239, 132, 86, 0.5);
+	background: rgba(239, 132, 86, 0.08);
+	border: 2px solid rgba(239, 132, 86, 0.3);
 }
 
 .wrapper.purple {
 	color: var(--text-secondary);
 	fill: var(--purple);
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(133, 90, 209, 0.5);
+	background: rgba(133, 90, 209, 0.08);
+	border: 2px solid rgba(133, 90, 209, 0.3);
 }
 </style>
