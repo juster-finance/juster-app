@@ -60,7 +60,11 @@ const apy = computed(() => {
 		<Flex direction="column" justify="center" gap="8" :class="$style.stat">
 			<Flex align="center" gap="6" :class="$style.stat__values">
 				<Text v-if="isReady" size="16" weight="600" color="primary">
-					{{ numberWithSymbol(stats.valueOfPools.toFixed(0), ",") }}
+					{{
+						stats.valueOfPools
+							? numberWithSymbol(stats.valueOfPools, ",")
+							: 0
+					}}
 				</Text>
 				<LoadingDots v-else />
 
@@ -127,7 +131,11 @@ const apy = computed(() => {
 		>
 			<Flex align="center" gap="6" :class="$style.stat__values">
 				<Text v-if="isReady" size="16" weight="600" color="primary">
-					{{ numberWithSymbol(poolsStates[0].totalShares, ",") }}
+					{{
+						poolsStates[0].totalShares
+							? numberWithSymbol(poolsStates[0].totalShares, ",")
+							: 0
+					}}
 				</Text>
 				<LoadingDots v-else />
 			</Flex>
@@ -179,7 +187,11 @@ const apy = computed(() => {
 		>
 			<Flex align="center" gap="6" :class="$style.stat__values">
 				<Text v-if="isReady" size="16" weight="600" color="primary">
-					{{ poolsStates[0].sharePrice?.toFixed(2) }}
+					{{
+						poolsStates[0].sharePrice
+							? poolsStates[0].sharePrice.toFixed(2)
+							: 0
+					}}
 				</Text>
 				<LoadingDots v-else />
 
