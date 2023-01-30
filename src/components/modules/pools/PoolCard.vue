@@ -298,8 +298,14 @@ const copy = (target) => {
 							>
 								{{
 									showUserData
-										? position.depositedAmount
-										: state.totalLiquidity.toFixed(2)
+										? numberWithSymbol(
+												position.depositedAmount,
+												",",
+										  )
+										: numberWithSymbol(
+												state.totalLiquidity,
+												",",
+										  )
 								}}
 							</Text>
 							<LoadingDots v-else />

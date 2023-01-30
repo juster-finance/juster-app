@@ -14,6 +14,7 @@ import Toggleable from "@ui/Toggleable.vue"
  * Services
  */
 import { parsePoolName } from "@utils/misc"
+import { numberWithSymbol } from "@utils/amounts"
 
 /**
  * Store
@@ -158,7 +159,7 @@ const sortedSummaries = computed(() => {
 						</Text>
 
 						<Text color="secondary" size="13" weight="600">
-							{{ valueLocked.toFixed(2) }}
+							{{ numberWithSymbol(valueLocked, ",") }}
 						</Text>
 					</Flex>
 
@@ -208,7 +209,7 @@ const sortedSummaries = computed(() => {
 								</Text>
 
 								<Text color="secondary" size="13" weight="600">
-									{{ position.tvl.toFixed(2) }}
+									{{ numberWithSymbol(position.tvl, ",") }}
 								</Text>
 							</Flex>
 						</Flex>

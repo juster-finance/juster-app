@@ -11,6 +11,7 @@ import { Dropdown } from "@ui/Dropdown"
  * Services
  */
 import { shorten } from "@utils/misc"
+import { numberWithSymbol } from "@utils/amounts"
 import { analytics } from "@sdk"
 
 /**
@@ -107,7 +108,12 @@ const handleLogout = () => {
 						<Flex direction="column" gap="6">
 							<Text size="13" weight="600" color="primary">
 								<Flex>
-									{{ accountStore.balance }}&nbsp;
+									{{
+										numberWithSymbol(
+											accountStore.balance,
+											",",
+										)
+									}}&nbsp;
 									<Text color="tertiary">XTZ</Text>
 								</Flex>
 							</Text>

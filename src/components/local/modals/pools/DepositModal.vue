@@ -304,7 +304,12 @@ watch(
 									weight="600"
 									color="primary"
 								>
-									{{ state.totalLiquidity.toFixed(2) }}
+									{{
+										numberWithSymbol(
+											state.totalLiquidity,
+											",",
+										)
+									}}
 								</Text>
 								<LoadingDots v-else />
 
