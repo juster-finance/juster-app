@@ -35,10 +35,6 @@ const tabs = reactive([
 		title: "TVL",
 	},
 	{
-		icon: "splitted_chart",
-		title: "APY",
-	},
-	{
 		icon: "money",
 		title: "Profit",
 	},
