@@ -80,6 +80,8 @@ const pool = computed(() =>
 )
 const selectedPool = ref({})
 const poolState = ref({})
+const isPoolStateReady = ref(false)
+
 const summary = ref({})
 
 /**
@@ -87,6 +89,7 @@ const summary = ref({})
  */
 const subPositions = ref({})
 const position = ref(null)
+const isPositionReady = ref(false)
 
 /**
  * Entries
@@ -112,6 +115,10 @@ const populatePool = async () => {
 
 	setupSubToStates()
 }
+
+const isFullReady = computed(
+	() => isPoolStateReady.value && isPositionReady.value,
+)
 
 const setupSubToStates = async () => {
 	subStates.value = await juster.gql
@@ -295,8 +302,21 @@ watch(
 	() => position.value,
 	() => {
 		if (!position.value) return
+		isPositionReady.value = true
 
 		position.value.shares = BN(position.value.shares)
+	},
+)
+watch(
+	() => poolState.value,
+	() => {
+		if (!poolState.value) return
+		isPoolStateReady.value = true
+	},
+)
+watch(
+	() => isFullReady.value,
+	() => {
 		summary.value = makeSummaryPosition(position.value, poolState.value)
 	},
 )
