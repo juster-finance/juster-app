@@ -53,6 +53,10 @@ const toggleSearch = () => {
 
 const sorts = ref([
 	{
+		title: "Default",
+		key: "default",
+	},
+	{
 		title: "Pool TVL",
 		key: "pool_tvl",
 	},
@@ -70,7 +74,7 @@ const sorts = ref([
 	},
 ])
 const sort = reactive({
-	by: "pool_tvl",
+	by: "default",
 	dir: "desc",
 })
 
@@ -92,6 +96,8 @@ const filteredPools = computed(() => {
 
 const sortedPools = computed(() => {
 	switch (sort.by) {
+		case "default":
+			return filteredPools.value
 		case "pool_tvl":
 			if (sort.dir === "desc") {
 				return filteredPools.value.sort(
@@ -265,6 +271,7 @@ onMounted(() => {
 								? (sort.dir = 'asc')
 								: (sort.dir = 'desc')
 						"
+						:disabled="sort.by === 'default'"
 						type="secondary"
 						size="small"
 						style="border-radius: 6px 2px 2px 6px"
