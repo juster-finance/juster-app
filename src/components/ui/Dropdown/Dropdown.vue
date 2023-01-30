@@ -59,7 +59,6 @@ let removeOutside
 const handleOutside = (e) => {
 	const path = e.path ? e.path : e.composedPath()
 	if (path.find((el) => el.id === "trigger")) {
-		console.log("trig")
 		return
 	} else {
 		close()

@@ -106,6 +106,7 @@ onMounted(async () => {
 			}).toISO(),
 		})
 
+		if (!states.length) continue
 		data.value.push({
 			value:
 				states.reduce(

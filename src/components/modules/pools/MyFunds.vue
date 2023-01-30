@@ -236,7 +236,7 @@ const handleGetClaims = () => {
 				<Icon
 					name="coins_plus"
 					size="20"
-					color="green"
+					:color="unrealizedProfit > 0 ? 'green' : 'secondary'"
 					:class="$style.icon"
 				/>
 
