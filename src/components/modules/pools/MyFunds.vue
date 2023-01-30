@@ -50,6 +50,8 @@ const togglePendingClaims = () => {
 }
 
 const isDepositAvailable = computed(() => {
+	if (!accountStore.pkh) return false
+
 	return (
 		props.pools.length > 0 &&
 		props.pools.length === Object.keys(props.poolsStates).length

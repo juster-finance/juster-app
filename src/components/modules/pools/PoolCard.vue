@@ -130,8 +130,10 @@ const handleDeposit = () => {
 }
 
 const isDepositAvailable = computed(() => {
+	if (!props.state) return false
 	if (!accountStore.pkh) return false
 	if (props.pool.isDepositPaused) return false
+
 	return true
 })
 
@@ -244,7 +246,10 @@ const copy = (target) => {
 					>
 						<Button
 							@click.prevent="handleDeposit"
-							:disabled="!parseFloat(accountStore.balance)"
+							:disabled="
+								!isDepositAvailable ||
+								!parseFloat(accountStore.balance)
+							"
 							type="secondary"
 							size="small"
 						>
