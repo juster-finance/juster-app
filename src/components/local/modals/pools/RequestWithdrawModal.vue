@@ -262,7 +262,7 @@ const handleCloseRequestFundsWarning = () => {
 								<Icon name="coins" size="12" color="tertiary" />
 
 								<Text size="14" weight="600" color="primary">
-									{{ position.shares.toFixed(2) }}
+									{{ numberWithSymbol(position.shares, ",") }}
 								</Text>
 
 								<template
