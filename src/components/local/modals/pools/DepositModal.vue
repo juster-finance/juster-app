@@ -183,11 +183,11 @@ const getEntryLockPeriodText = () => {
 		.diff(DateTime.now(), ["days", "hours", "minutes"])
 		.toObject()
 
-	if (diff.days) {
+	if (diff.days && diff.days >= 1) {
 		return `${diff.days}d`
-	} else if (diff.hours) {
+	} else if (diff.hours && diff.hours >= 1) {
 		return `${diff.hours}h`
-	} else if (diff.minutes) {
+	} else if (diff.minutes && diff.minutes >= 1) {
 		return `${diff.minutes}m`
 	} else {
 		return `Instant`
