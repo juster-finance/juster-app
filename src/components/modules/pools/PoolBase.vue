@@ -81,6 +81,7 @@ const pool = computed(() =>
 const poolDuration = ref(0)
 const selectedPool = ref({})
 const poolState = ref({})
+const poolAPY = ref(0)
 const isPoolStateReady = ref(false)
 
 const summary = ref({})
@@ -113,6 +114,10 @@ const populatePool = async () => {
 	poolState.value = await juster.pools[
 		route.params.address
 	].getLastPoolState()
+
+	poolAPY.value = (
+		await juster.pools[route.params.address].getAPY()
+	).toNumber()
 
 	setupSubToStates()
 }
@@ -366,6 +371,7 @@ const { meta } = useMeta({
 				:show="showDepositModal"
 				:selectedPool="pool"
 				:state="poolState"
+				:apy="poolAPY"
 				@onBack="handleBackFromDeposit"
 				@onClose="showDepositModal = false"
 			/>
