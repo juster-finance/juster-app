@@ -40,6 +40,7 @@ const props = defineProps({
 	show: Boolean,
 	selectedPool: Object,
 	state: Object,
+	apy: Number,
 })
 
 const emit = defineEmits(["onClose", "onBack"])
@@ -362,9 +363,19 @@ const onKeydown = (e) => {
 
 						<Flex direction="column" gap="8" align="end">
 							<Flex align="center" gap="6">
-								<Icon name="stars" size="12" color="green" />
+								<Icon
+									name="stars"
+									size="14"
+									:color="
+										(apy * 100 < 0 && 'red') ||
+										(apy * 100 < 40 && 'tertiary') ||
+										(apy * 100 < 80 && 'yellow') ||
+										(apy * 100 >= 100 && 'green') ||
+										'tertiary'
+									"
+								/>
 								<Text size="14" weight="600" color="primary">
-									0%
+									{{ numberWithSymbol(apy * 100, ",") }}%
 								</Text>
 							</Flex>
 

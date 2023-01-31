@@ -361,6 +361,7 @@ const { meta } = useMeta({
 				:show="showDepositModal"
 				:selectedPool="selectedPool"
 				:state="poolsStates[selectedPool.address]"
+				:apy="poolsAPY[selectedPool.address]"
 				@onBack="handleBackFromDeposit"
 				@onClose="showDepositModal = false"
 			/>

@@ -91,8 +91,6 @@ const handleClick = () => {
 
 const handleFocus = () => {
 	isFocused.value = true
-
-	emit("clearError")
 }
 
 const handleBlur = () => {

@@ -310,8 +310,6 @@ export default defineComponent({
 				placeholder="Liquidity amount"
 				subtext="ꜩ"
 				v-model="amount.value"
-				:error="amount.error"
-				@clearError="amount.error = ''"
 				:class="$style.amount_input"
 			/>
 
