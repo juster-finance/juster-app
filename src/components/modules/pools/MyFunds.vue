@@ -313,7 +313,7 @@ watch(
 
 				<Flex direction="column" gap="8">
 					<Text color="primary" size="16" weight="600">
-						{{ valueLocked.toFixed(2) }}
+						{{ numberWithSymbol(valueLocked, ",") }}
 					</Text>
 					<Text
 						color="tertiary"
