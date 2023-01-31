@@ -39,6 +39,7 @@ const browseLinks = ref([
 		title: "Ranking",
 		description: "Compete with other users",
 		url: "/rank",
+		disabled: true,
 	},
 ])
 
@@ -169,7 +170,10 @@ watch(
 										link.url.startsWith('https://') &&
 										_blank
 									"
-									:class="$style.item"
+									:class="[
+										$style.item,
+										link.disabled && $style.disabled,
+									]"
 								>
 									<div :class="$style.icon_wrapper">
 										<Icon :name="link.icon" size="20" />
