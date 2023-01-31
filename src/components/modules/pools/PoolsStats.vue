@@ -240,7 +240,7 @@ const apy = computed(() => {
 .stat {
 	flex: 1;
 
-	height: 78px;
+	min-height: 78px;
 
 	border-radius: 8px;
 	background: var(--card-bg);
@@ -277,6 +277,7 @@ const apy = computed(() => {
 
 	.stat {
 		width: 100%;
+		min-height: 60px;
 
 		flex-direction: row-reverse;
 		justify-content: space-between;
@@ -284,6 +285,11 @@ const apy = computed(() => {
 
 	.stat__values {
 		flex-direction: row-reverse;
+	}
+
+	.stat__subtitle {
+		display: flex;
+		align-items: center;
 	}
 }
 </style>
