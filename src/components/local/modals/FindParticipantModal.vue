@@ -48,39 +48,57 @@ watch(
 </script>
 
 <template>
-	<Modal :show="show" width="500" closable @onClose="$emit('onClose')">
-		<div :class="$style.title">Add participant</div>
+	<Modal :show="show" width="500" new closable @onClose="$emit('onClose')">
+		<Flex align="center" justify="between" :class="$style.head">
+			<Flex align="center" gap="8">
+				<Icon name="search" size="16" color="secondary" />
 
-		<Input
-			type="text"
-			v-model="address"
-			label="Address"
-			placeholder="Type user address"
-			:class="$style.input"
-		/>
+				<Text size="14" weight="600" color="primary"> Find user </Text>
+			</Flex>
 
-		<Button
-			@click="handleAdd"
-			:type="buttonState.isDisabled ? 'secondary' : 'primary'"
-			size="large"
-			:disabled="buttonState.isDisabled"
-			block
-			>{{ buttonState.text }}</Button
-		>
+			<Icon
+				@click="$emit('onClose')"
+				name="close"
+				size="16"
+				color="tertiary"
+				:class="$style.close_icon"
+			/>
+		</Flex>
+
+		<Flex direction="column" gap="24" :class="$style.base">
+			<Input
+				type="text"
+				v-model="address"
+				label="Address"
+				placeholder="Type user address"
+				:class="$style.input"
+			/>
+
+			<Button
+				@click="handleAdd"
+				:type="buttonState.isDisabled ? 'secondary' : 'primary'"
+				size="large"
+				:disabled="buttonState.isDisabled"
+				block
+			>
+				{{ buttonState.text }}
+			</Button>
+		</Flex>
 	</Modal>
 </template>
 
 <style module>
-.title {
-	font-size: 20px;
-	font-weight: 600;
-	line-height: 1.2;
-	color: var(--text-primary);
+.head {
+	height: 56px;
 
-	margin-bottom: 24px;
+	padding: 0 20px;
 }
 
-.input {
-	margin-bottom: 24px;
+.base {
+	padding: 8px 20px 20px 20px;
+}
+
+.close_icon {
+	cursor: pointer;
 }
 </style>
