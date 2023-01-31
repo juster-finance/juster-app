@@ -3,7 +3,7 @@ export const formatQuote = (amount) => {
 }
 
 export const numberWithSymbol = (target, symbol) => {
-	if (!target) return
+	if (!target) return 0
 
 	let num = parseFloat(target)
 

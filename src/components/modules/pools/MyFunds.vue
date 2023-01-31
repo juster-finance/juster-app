@@ -339,7 +339,7 @@ watch(
 						{{
 							unrealizedProfit < 0.01 && unrealizedProfit !== 0
 								? `< 0.01`
-								: unrealizedProfit.toFixed(2)
+								: numberWithSymbol(unrealizedProfit, ",")
 						}}
 					</Text>
 					<Text
