@@ -15,6 +15,7 @@ import Button from "@ui/Button.vue"
  * Services
  */
 import { toClipboard, shorten } from "@utils/misc"
+import { currentNetwork } from "@sdk"
 
 /**
  * Store
@@ -40,16 +41,18 @@ const handleCopy = () => {
 			badges: [
 				{
 					icon: "user",
-					secondaryText: `ghostnet.tzkt.io/${shorten(
-						props.pool.address,
-						4,
-						4,
-					)}`,
+					secondaryText: `${
+						currentNetwork === "mainnet" ? "" : "ghostnet."
+					}tzkt.io/${shorten(props.pool.address, 4, 4)}`,
 				},
 			],
 		},
 	})
-	toClipboard(`https://ghostnet.tzkt.io/${props.pool.address}`)
+	toClipboard(
+		`https://${currentNetwork === "mainnet" ? "" : "ghostnet."}tzkt.io/${
+			props.pool.address
+		}`,
+	)
 }
 
 const canvasEl = ref(null)
@@ -61,7 +64,9 @@ watch(
 			nextTick(() => {
 				qrcode.toCanvas(
 					canvasEl.value,
-					`https://ghostnet.tzkt.io/${props.pool.address}`,
+					`https://${
+						currentNetwork === "mainnet" ? "" : "ghostnet."
+					}tzkt.io/${props.pool.address}`,
 					{
 						width: 200,
 						color: { light: "#0000", dark: "#F0F0F0" },
@@ -136,10 +141,13 @@ watch(
 					<Button
 						type="secondary"
 						size="small"
-						:link="`https://ghostnet.tzkt.io/${props.pool.address}`"
+						:link="`https://${
+							currentNetwork === 'mainnet' ? '' : 'ghostnet.'
+						}tzkt.io/${props.pool.address}`"
 						block
 					>
-						<Icon name="database" size="12" /> View contract on TzKT
+						<Icon name="arrowrighttop" size="12" color="tertiary" />
+						View contract on TzKT
 					</Button>
 					<Button
 						@click="handleCopy"

@@ -184,7 +184,7 @@ export default defineComponent({
 	<Modal :show="show" width="500" new closable @onClose="$emit('onClose')">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
-				<Icon name="explorer" size="16" color="secondary" />
+				<Icon name="coins" size="16" color="secondary" />
 
 				<Text
 					size="14"
