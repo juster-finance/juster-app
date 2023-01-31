@@ -892,7 +892,7 @@ onUnmounted(() => {
 
 	background: var(--card-bg);
 	border-radius: 8px;
-	outline: 2px solid transparent;
+	box-shadow: 0 0 0 0 transparent;
 
 	padding: 20px;
 
@@ -900,7 +900,11 @@ onUnmounted(() => {
 }
 
 .wrapper:hover {
-	outline: 2px solid var(--border);
+	box-shadow: 0 0 0 2px var(--border);
+}
+
+.wrapper:focus {
+	box-shadow: 0 0 0 2px var(--border);
 }
 
 .dropdown {
