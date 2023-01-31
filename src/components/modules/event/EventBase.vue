@@ -650,7 +650,7 @@ onUnmounted(() => {
 									"
 									name="verified"
 									size="13"
-									color="brand"
+									color="green"
 							/></span>
 
 							<span
