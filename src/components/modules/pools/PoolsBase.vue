@@ -399,6 +399,7 @@ const { meta } = useMeta({
 					/>
 
 					<MyStatistics
+						v-if="positions.length"
 						:positions="positions"
 						:poolsAPY="poolsAPY"
 						:summaries="summaries"
