@@ -57,7 +57,7 @@ export default defineComponent({
 	min-width: 16px;
 	min-height: 16px;
 	border-radius: 4px;
-	fill: var(--text-primary);
+	fill: var(--text-black);
 
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid var(--border);
