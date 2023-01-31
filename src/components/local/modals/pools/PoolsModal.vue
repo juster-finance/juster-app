@@ -48,35 +48,57 @@ const searchEl = ref(null)
 const searchText = ref("")
 const poolsSearcher = ref({})
 
-const sort = ref("desc")
+const sort = ref("tvl-desc")
+const sortTarget = computed(() => sort.value.split("-")[0])
+const sortDirection = computed(() => sort.value.split("-")[1])
 const sortPools = (pools) => {
-	if (sort.value === "def") {
+	const [target, direction] = sort.value.split("-")
+
+	if (direction === "def") {
 		return pools
-	} else {
+	}
+
+	if (target === "tvl") {
 		return pools.sort((a, b) => {
 			const aState = props.poolsStates[a.address]
 			const bState = props.poolsStates[b.address]
 
-			if (sort.value === "desc")
+			if (direction === "desc")
 				return (
 					bState.totalLiquidity.toNumber() -
 					aState.totalLiquidity.toNumber()
 				)
-			if (sort.value === "asc")
+			if (direction === "asc")
 				return (
 					aState.totalLiquidity.toNumber() -
 					bState.totalLiquidity.toNumber()
 				)
 		})
 	}
+
+	if (target === "apy") {
+		return pools.sort((a, b) => {
+			if (direction === "desc")
+				return props.poolsAPY[b.address] - props.poolsAPY[a.address]
+			if (direction === "asc")
+				return props.poolsAPY[a.address] - props.poolsAPY[b.address]
+		})
+	}
 }
-const handleSort = () => {
-	if (sort.value === "desc") {
-		sort.value = "asc"
-	} else if (sort.value === "asc") {
-		sort.value = "def"
-	} else if (sort.value === "def") {
-		sort.value = "desc"
+const handleSort = (prop) => {
+	const [target, direction] = sort.value.split("-")
+
+	if (prop !== target) {
+		sort.value = `${prop}-desc`
+		return
+	}
+
+	if (direction === "desc") {
+		sort.value = `${target}-asc`
+	} else if (direction === "asc") {
+		sort.value = `${target}-def`
+	} else if (direction === "def") {
+		sort.value = `${target}-desc`
 	}
 }
 
@@ -240,40 +262,70 @@ const handleCloseTestnetWarning = () => {
 
 			<Flex direction="column" gap="8">
 				<Flex align="center" justify="between">
-					<Text size="12" weight="600" color="primary"
-						>Select a pool</Text
-					>
+					<Text size="13" weight="600" color="primary">
+						Select a pool
+					</Text>
 
 					<Flex align="center" gap="16">
 						<Flex
-							@click="handleSort"
+							@click="handleSort('tvl')"
 							align="center"
 							gap="4"
 							:class="$style.sort_btn"
 						>
 							<Icon
+								v-if="
+									sortTarget === 'tvl' &&
+									sortDirection !== 'def'
+								"
 								:name="
-									(sort === 'def' && 'layers') ||
-									(sort === 'desc' && 'arrow_down') ||
-									(sort === 'asc' && 'arrow_up')
+									(sortDirection === 'desc' &&
+										'arrow_down') ||
+									(sortDirection === 'asc' && 'arrow_up')
 								"
 								size="12"
 								color="blue"
 							/>
-							<Text size="12" weight="600" color="primary">
+							<Text
+								size="12"
+								weight="600"
+								:color="
+									sortDirection === 'def' ||
+									sortTarget !== 'tvl'
+										? 'tertiary'
+										: 'primary'
+								"
+							>
 								TVL
 							</Text>
 						</Flex>
-						<!-- <Flex align="center" gap="4">
+						<Flex @click="handleSort('apy')" align="center" gap="4">
 							<Icon
-								name="arrow_down"
+								v-if="
+									sortTarget === 'apy' &&
+									sortDirection !== 'def'
+								"
+								:name="
+									(sortDirection === 'desc' &&
+										'arrow_down') ||
+									(sortDirection === 'asc' && 'arrow_up')
+								"
 								size="12"
-								color="tertiary"
+								color="blue"
 							/>
-							<Text size="12" weight="600" color="tertiary">
+							<Text
+								size="12"
+								weight="600"
+								:color="
+									sortDirection === 'def' ||
+									sortTarget !== 'apy'
+										? 'tertiary'
+										: 'primary'
+								"
+							>
 								APY
 							</Text>
-						</Flex> -->
+						</Flex>
 					</Flex>
 				</Flex>
 
@@ -352,9 +404,11 @@ const handleCloseTestnetWarning = () => {
 										color="primary"
 									>
 										{{
-											poolsStates[
-												pool.address
-											].totalLiquidity.toFixed(0)
+											numberWithSymbol(
+												poolsStates[pool.address]
+													.totalLiquidity,
+												",",
+											)
 										}}
 									</Text>
 									<LoadingDots v-else />
