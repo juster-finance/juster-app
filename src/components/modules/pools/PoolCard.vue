@@ -3,6 +3,7 @@
  * Vendor
  */
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
+import { useRouter } from "vue-router"
 import { DateTime } from "luxon"
 
 /**
@@ -38,6 +39,8 @@ import { useNotificationsStore } from "@store/notifications"
 
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
+
+const router = useRouter()
 
 const emit = defineEmits(["onSelectPool", "onRequestWithdraw", "onShare"])
 const props = defineProps({
@@ -194,398 +197,383 @@ const copy = (target) => {
 </script>
 
 <template>
-	<router-link :to="`/pools/${pool.address}`">
-		<Flex direction="column" gap="32" :class="$style.wrapper">
-			<Flex justify="between">
-				<Flex align="center" gap="16">
-					<div :class="$style.symbols">
-						<img :src="getCurrencyIcon('XTZ')" alt="symbol" />
-						<img :src="getCurrencyIcon('USD')" alt="symbol" />
-					</div>
+	<Flex
+		@click="router.push(`/pools/${pool.address}`)"
+		direction="column"
+		gap="32"
+		tabindex="0"
+		:class="$style.wrapper"
+	>
+		<Flex justify="between">
+			<Flex align="center" gap="16">
+				<div :class="$style.symbols">
+					<img :src="getCurrencyIcon('XTZ')" alt="symbol" />
+					<img :src="getCurrencyIcon('USD')" alt="symbol" />
+				</div>
 
-					<Flex direction="column" gap="8">
-						<Text size="14" color="primary" weight="600">
-							{{
-								parsePoolName(
-									pool?.name.replace("Juster Pool: ", ""),
-								)
-							}}
-						</Text>
-
-						<Flex align="center" gap="4">
-							<Icon
-								:name="
-									!pool.isDepositPaused
-										? 'zap_circle'
-										: 'pause'
-								"
-								size="12"
-								:color="
-									!pool.isDepositPaused ? 'green' : 'yellow'
-								"
-							/>
-							<Text
-								size="12"
-								weight="600"
-								:color="
-									!pool.isDepositPaused ? 'green' : 'yellow'
-								"
-							>
-								{{
-									!pool.isDepositPaused ? "Active" : "Paused"
-								}}
-							</Text>
-						</Flex>
-					</Flex>
-				</Flex>
-
-				<Flex gap="8">
-					<Tooltip
-						placement="bottom-end"
-						:disabled="!!isDepositAvailable"
-					>
-						<Button
-							@click.prevent="handleDeposit"
-							:disabled="
-								!isDepositAvailable ||
-								!parseFloat(accountStore.balance)
-							"
-							type="secondary"
-							size="small"
-						>
-							<Icon name="plus_circle" size="16" color="blue" />
-							Deposit
-						</Button>
-
-						<template #content>
-							{{
-								(pool.isDepositPaused &&
-									"The pool has been paused") ||
-								(!accountStore.pkh &&
-									"Connect a wallet to make a deposit")
-							}}
-						</template>
-					</Tooltip>
-				</Flex>
-			</Flex>
-
-			<Flex
-				align="center"
-				justify="between"
-				gap="16"
-				:class="$style.bottom"
-			>
-				<Flex align="center" gap="24" :class="$style.stats">
-					<!-- TVL -->
-					<Flex direction="column" gap="8" :class="$style.stat">
-						<Text
-							size="13"
-							weight="600"
-							color="tertiary"
-							:class="$style.stat__title"
-						>
-							TVL
-						</Text>
-
-						<Flex align="center" gap="6">
-							<Icon name="coins" size="14" color="secondary" />
-
-							<Text
-								v-if="state"
-								size="15"
-								weight="600"
-								color="secondary"
-							>
-								{{
-									showUserData
-										? numberWithSymbol(
-												position.depositedAmount,
-												",",
-										  )
-										: numberWithSymbol(
-												state.totalLiquidity,
-												",",
-										  )
-								}}
-							</Text>
-							<LoadingDots v-else />
-						</Flex>
-					</Flex>
-
-					<Text
-						size="12"
-						weight="500"
-						color="tertiary"
-						:class="$style.star_icon"
-					>
-						✦
+				<Flex direction="column" gap="8">
+					<Text size="14" color="primary" weight="600">
+						{{
+							parsePoolName(
+								pool?.name.replace("Juster Pool: ", ""),
+							)
+						}}
 					</Text>
 
-					<!-- Share Price -->
-					<Flex direction="column" gap="8" :class="$style.stat">
-						<Text
-							size="13"
-							weight="600"
-							color="tertiary"
-							:class="$style.stat__title"
-						>
-							{{ showUserData ? "Entry Price" : "Share Price" }}
-						</Text>
-
-						<Flex align="center" gap="6">
-							<Icon name="banknote" size="14" color="secondary" />
-
-							<Text
-								v-if="state"
-								size="15"
-								weight="600"
-								color="secondary"
-							>
-								{{
-									showUserData
-										? position.entrySharePrice.toFixed(2)
-										: state.sharePrice.toFixed(2)
-								}}
-							</Text>
-							<LoadingDots v-else />
-						</Flex>
-					</Flex>
-
-					<Text
-						size="12"
-						weight="500"
-						color="tertiary"
-						:class="$style.star_icon"
-						>✦</Text
-					>
-
-					<!-- APY -->
-					<Flex direction="column" gap="8" :class="$style.stat">
-						<Text
-							size="13"
-							weight="600"
-							color="tertiary"
-							:class="$style.stat__title"
-						>
-							{{ showUserData ? "My Shares" : "APY" }}
-						</Text>
-
-						<Flex align="center" gap="6">
-							<Icon
-								v-if="!showUserData"
-								name="stars"
-								size="14"
-								:color="
-									(apy * 100 < 0 && 'red') ||
-									(apy * 100 < 40 && 'tertiary') ||
-									(apy * 100 < 80 && 'yellow') ||
-									(apy * 100 >= 100 && 'green') ||
-									'tertiary'
-								"
-							/>
-							<Icon
-								v-else
-								name="money"
-								size="14"
-								color="secondary"
-							/>
-							<Text size="15" weight="600" color="secondary">
-								{{
-									showUserData
-										? position.shares.toFixed(2)
-										: apy
-										? `${numberWithSymbol(apy * 100, ",")}%`
-										: `0%`
-								}}
-							</Text>
-						</Flex>
-					</Flex>
-
-					<!-- Switch Button -->
-
-					<Flex
-						v-if="accountStore.pkh && position"
-						@click.prevent="handleSwitch"
-						align="center"
-						gap="8"
-						:class="$style.switch_btn"
-					>
+					<Flex align="center" gap="4">
 						<Icon
-							name="arrows"
-							size="16"
-							color="secondary"
-							:class="$style.arrows_icon"
-							:style="{
-								transform: `rotate(${
-									showUserData ? '270' : '90'
-								}deg)`,
-							}"
+							:name="
+								!pool.isDepositPaused ? 'zap_circle' : 'pause'
+							"
+							size="12"
+							:color="!pool.isDepositPaused ? 'green' : 'yellow'"
 						/>
 						<Text
 							size="12"
-							weight="700"
+							weight="600"
+							:color="!pool.isDepositPaused ? 'green' : 'yellow'"
+						>
+							{{ !pool.isDepositPaused ? "Active" : "Paused" }}
+						</Text>
+					</Flex>
+				</Flex>
+			</Flex>
+
+			<Flex gap="8">
+				<Tooltip
+					placement="bottom-end"
+					:disabled="!!isDepositAvailable"
+				>
+					<Button
+						@click.prevent="handleDeposit"
+						:disabled="
+							!isDepositAvailable ||
+							!parseFloat(accountStore.balance)
+						"
+						type="secondary"
+						size="small"
+					>
+						<Icon name="plus_circle" size="16" color="blue" />
+						Deposit
+					</Button>
+
+					<template #content>
+						{{
+							(pool.isDepositPaused &&
+								"The pool has been paused") ||
+							(!accountStore.pkh &&
+								"Connect a wallet to make a deposit")
+						}}
+					</template>
+				</Tooltip>
+			</Flex>
+		</Flex>
+
+		<Flex align="center" justify="between" gap="16" :class="$style.bottom">
+			<Flex align="center" gap="24" :class="$style.stats">
+				<!-- TVL -->
+				<Flex direction="column" gap="8" :class="$style.stat">
+					<Text
+						size="13"
+						weight="600"
+						color="tertiary"
+						:class="$style.stat__title"
+					>
+						TVL
+					</Text>
+
+					<Flex align="center" gap="6">
+						<Icon name="coins" size="14" color="secondary" />
+
+						<Text
+							v-if="state"
+							size="15"
+							weight="600"
 							color="secondary"
-							:class="$style.switch_btn__text"
 						>
 							{{
 								showUserData
-									? "Switch to pool statistics"
-									: "Switch to my statistics"
+									? numberWithSymbol(
+											position.depositedAmount,
+											",",
+									  )
+									: numberWithSymbol(
+											state.totalLiquidity,
+											",",
+									  )
 							}}
 						</Text>
-
-						<img
-							v-if="!showUserData"
-							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-							alt="avatar"
-						/>
-						<Icon
-							v-else
-							name="server"
-							size="16"
-							color="secondary"
-						/>
+						<LoadingDots v-else />
 					</Flex>
 				</Flex>
 
-				<Flex align="center" gap="24" :class="$style.stats">
-					<Flex direction="column" gap="8" :class="$style.stat">
+				<Text
+					size="12"
+					weight="500"
+					color="tertiary"
+					:class="$style.star_icon"
+				>
+					✦
+				</Text>
+
+				<!-- Share Price -->
+				<Flex direction="column" gap="8" :class="$style.stat">
+					<Text
+						size="13"
+						weight="600"
+						color="tertiary"
+						:class="$style.stat__title"
+					>
+						{{ showUserData ? "Entry Price" : "Share Price" }}
+					</Text>
+
+					<Flex align="center" gap="6">
+						<Icon name="banknote" size="14" color="secondary" />
+
 						<Text
-							size="13"
+							v-if="state"
+							size="15"
 							weight="600"
-							color="tertiary"
-							:class="$style.stat__title"
+							color="secondary"
 						>
-							Utilization
+							{{
+								showUserData
+									? position.entrySharePrice.toFixed(2)
+									: state.sharePrice.toFixed(2)
+							}}
 						</Text>
-
-						<Flex align="center" gap="6">
-							<Icon
-								:name="
-									(utilization < 0.01 && 'warning') ||
-									'checkcircle'
-								"
-								size="14"
-								:color="
-									(utilization <= 0.01 && 'red') ||
-									(utilization > 0.01 &&
-										utilization < 0.1 &&
-										'tertiary') ||
-									(utilization >= 0.1 && 'green')
-								"
-							/>
-							<Text size="15" weight="600" color="secondary">
-								{{ utilization.toFixed(2) }}%
-							</Text>
-						</Flex>
+						<LoadingDots v-else />
 					</Flex>
+				</Flex>
 
+				<Text
+					size="12"
+					weight="500"
+					color="tertiary"
+					:class="$style.star_icon"
+					>✦</Text
+				>
+
+				<!-- APY -->
+				<Flex direction="column" gap="8" :class="$style.stat">
+					<Text
+						size="13"
+						weight="600"
+						color="tertiary"
+						:class="$style.stat__title"
+					>
+						{{ showUserData ? "My Shares" : "APY" }}
+					</Text>
+
+					<Flex align="center" gap="6">
+						<Icon
+							v-if="!showUserData"
+							name="stars"
+							size="14"
+							:color="
+								(apy * 100 < 0 && 'red') ||
+								(apy * 100 < 40 && 'tertiary') ||
+								(apy * 100 < 80 && 'yellow') ||
+								(apy * 100 >= 100 && 'green') ||
+								'tertiary'
+							"
+						/>
+						<Icon v-else name="money" size="14" color="secondary" />
+						<Text size="15" weight="600" color="secondary">
+							{{
+								showUserData
+									? position.shares.toFixed(2)
+									: apy
+									? `${numberWithSymbol(apy * 100, ",")}%`
+									: `0%`
+							}}
+						</Text>
+					</Flex>
+				</Flex>
+
+				<!-- Switch Button -->
+
+				<Flex
+					v-if="accountStore.pkh && position"
+					@click.prevent="handleSwitch"
+					align="center"
+					gap="8"
+					:class="$style.switch_btn"
+				>
+					<Icon
+						name="arrows"
+						size="16"
+						color="secondary"
+						:class="$style.arrows_icon"
+						:style="{
+							transform: `rotate(${
+								showUserData ? '270' : '90'
+							}deg)`,
+						}"
+					/>
 					<Text
 						size="12"
-						weight="500"
-						color="tertiary"
-						:class="$style.star_icon"
-						>✦</Text
+						weight="700"
+						color="secondary"
+						:class="$style.switch_btn__text"
 					>
+						{{
+							showUserData
+								? "Switch to pool statistics"
+								: "Switch to my statistics"
+						}}
+					</Text>
 
-					<Flex direction="column" gap="8" :class="$style.stat">
-						<Text
-							size="13"
-							weight="600"
-							color="tertiary"
-							:class="$style.stat__title"
-						>
-							Risk Index
-						</Text>
-
-						<Flex align="center" gap="6">
-							<Icon
-								:name="
-									(riskIndex > 1 && 'warning') ||
-									'checkcircle'
-								"
-								size="14"
-								:color="(riskIndex > 1 && 'red') || 'tertiary'"
-							/>
-							<Text size="15" weight="600" color="secondary">
-								{{ riskIndex.toFixed(2) }}%
-							</Text>
-						</Flex>
-					</Flex>
+					<img
+						v-if="!showUserData"
+						:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
+						alt="avatar"
+					/>
+					<Icon v-else name="server" size="16" color="secondary" />
 				</Flex>
 			</Flex>
 
-			<Flex justify="between">
-				<Flex direction="column" gap="8">
+			<Flex align="center" gap="24" :class="$style.stats">
+				<Flex direction="column" gap="8" :class="$style.stat">
+					<Text
+						size="13"
+						weight="600"
+						color="tertiary"
+						:class="$style.stat__title"
+					>
+						Utilization
+					</Text>
+
 					<Flex align="center" gap="6">
-						<Icon name="server" size="12" color="tertiary" />
-						<Text size="13" weight="600" color="tertiary">
-							Liquidity Pool
+						<Icon
+							:name="
+								(utilization < 0.01 && 'warning') ||
+								'checkcircle'
+							"
+							size="14"
+							:color="
+								(utilization <= 0.01 && 'red') ||
+								(utilization > 0.01 &&
+									utilization < 0.1 &&
+									'tertiary') ||
+								(utilization >= 0.1 && 'green')
+							"
+						/>
+						<Text size="15" weight="600" color="secondary">
+							{{ utilization.toFixed(2) }}%
 						</Text>
 					</Flex>
+				</Flex>
 
-					<Text v-if="state" size="12" color="support" weight="600">
-						State updated {{ poolUpdDiff }}
+				<Text
+					size="12"
+					weight="500"
+					color="tertiary"
+					:class="$style.star_icon"
+					>✦</Text
+				>
+
+				<Flex direction="column" gap="8" :class="$style.stat">
+					<Text
+						size="13"
+						weight="600"
+						color="tertiary"
+						:class="$style.stat__title"
+					>
+						Risk Index
+					</Text>
+
+					<Flex align="center" gap="6">
+						<Icon
+							:name="
+								(riskIndex > 1 && 'warning') || 'checkcircle'
+							"
+							size="14"
+							:color="(riskIndex > 1 && 'red') || 'tertiary'"
+						/>
+						<Text size="15" weight="600" color="secondary">
+							{{ riskIndex.toFixed(2) }}%
+						</Text>
+					</Flex>
+				</Flex>
+			</Flex>
+		</Flex>
+
+		<Flex justify="between">
+			<Flex direction="column" gap="8">
+				<Flex align="center" gap="6">
+					<Icon name="server" size="12" color="tertiary" />
+					<Text size="13" weight="600" color="tertiary">
+						Liquidity Pool
 					</Text>
 				</Flex>
 
-				<Dropdown disable-autofocus>
-					<template #trigger>
-						<Button @click.prevent type="secondary" size="small">
-							<Icon name="dots" size="12" />
-						</Button>
-					</template>
-
-					<template #dropdown>
-						<DropdownItem
-							@click="emit('onRequestWithdraw', pool)"
-							:disabled="!position"
-						>
-							<Icon name="money" size="16" /> Withdraw
-						</DropdownItem>
-
-						<DropdownDivider />
-
-						<DropdownItem>
-							<Icon name="time" size="16" />Pool timeline
-						</DropdownItem>
-
-						<DropdownDivider />
-
-						<DropdownTitle>Copy</DropdownTitle>
-						<DropdownItem @click="copy('address')">
-							<Icon name="copy" size="16" /> Pool address
-						</DropdownItem>
-						<DropdownItem @click="copy('url')">
-							<Icon name="copy" size="16" /> Pool explorer link
-						</DropdownItem>
-
-						<DropdownDivider />
-
-						<DropdownItem @click="emit('onShare', pool)">
-							<Icon name="share" size="16" />Share
-						</DropdownItem>
-					</template>
-				</Dropdown>
+				<Text v-if="state" size="12" color="support" weight="600">
+					State updated {{ poolUpdDiff }}
+				</Text>
 			</Flex>
+
+			<Dropdown disable-autofocus>
+				<template #trigger>
+					<Button @click.prevent type="secondary" size="small">
+						<Icon name="dots" size="12" />
+					</Button>
+				</template>
+
+				<template #dropdown>
+					<DropdownItem
+						@click="emit('onRequestWithdraw', pool)"
+						:disabled="!position"
+					>
+						<Icon name="money" size="16" /> Withdraw
+					</DropdownItem>
+
+					<DropdownDivider />
+
+					<DropdownItem>
+						<Icon name="time" size="16" />Pool timeline
+					</DropdownItem>
+
+					<DropdownDivider />
+
+					<DropdownTitle>Copy</DropdownTitle>
+					<DropdownItem @click="copy('address')">
+						<Icon name="copy" size="16" /> Pool address
+					</DropdownItem>
+					<DropdownItem @click="copy('url')">
+						<Icon name="copy" size="16" /> Pool explorer link
+					</DropdownItem>
+
+					<DropdownDivider />
+
+					<DropdownItem @click="emit('onShare', pool)">
+						<Icon name="share" size="16" />Share
+					</DropdownItem>
+				</template>
+			</Dropdown>
 		</Flex>
-	</router-link>
+	</Flex>
 </template>
 
 <style module>
 .wrapper {
 	border-radius: 8px;
 	background: var(--card-bg);
-	outline: 2px solid transparent;
+	box-shadow: 0 0 0 0 transparent;
 	cursor: pointer;
 
 	padding: 24px;
 
-	transition: outline 0.2s ease;
+	transition: box-shadow 0.2s ease;
 }
 
 .wrapper:hover {
-	outline: 2px solid var(--border);
+	box-shadow: 0 0 0 2px var(--border);
+}
+
+.wrapper:focus {
+	box-shadow: 0 0 0 2px var(--border);
+	outline: none;
 }
 
 .symbols {
