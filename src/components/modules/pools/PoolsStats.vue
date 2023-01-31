@@ -66,7 +66,7 @@ const apy = computed(() => {
 							: 0
 					}}
 				</Text>
-				<LoadingDots v-else />
+				<LoadingDots v-else :class="$style.dots_anim" />
 
 				<!-- <Flex
 					align="center"
@@ -101,7 +101,7 @@ const apy = computed(() => {
 				<Text v-if="isReady" size="16" weight="600" color="primary">
 					{{ numberWithSymbol(apy.max * 100, ",") }}%
 				</Text>
-				<LoadingDots v-else />
+				<LoadingDots v-else :class="$style.dots_anim" />
 
 				<!-- <Flex
 					align="center"
@@ -137,7 +137,7 @@ const apy = computed(() => {
 							: 0
 					}}
 				</Text>
-				<LoadingDots v-else />
+				<LoadingDots v-else :class="$style.dots_anim" />
 			</Flex>
 
 			<Text
@@ -161,7 +161,7 @@ const apy = computed(() => {
 				<Text v-if="isReady" size="16" weight="600" color="primary">
 					{{ (apy.min * 100).toFixed(2) }}%
 				</Text>
-				<LoadingDots v-else />
+				<LoadingDots v-else :class="$style.dots_anim" />
 
 				<!-- <Flex align="center" gap="4" :class="$style.badge">
 					<Icon name="arrow_circle_top" size="12" color="secondary" />
@@ -193,7 +193,7 @@ const apy = computed(() => {
 							: 0
 					}}
 				</Text>
-				<LoadingDots v-else />
+				<LoadingDots v-else :class="$style.dots_anim" />
 
 				<!-- <Flex align="center" gap="4" :class="$style.badge">
 					<Icon name="arrow_circle_top" size="12" color="secondary" />
@@ -216,7 +216,7 @@ const apy = computed(() => {
 				<Text v-if="isReady" size="16" weight="600" color="primary">
 					0%
 				</Text>
-				<LoadingDots v-else />
+				<LoadingDots v-else :class="$style.dots_anim" />
 
 				<!-- <Flex align="center" gap="4" :class="$style.badge">
 					<Icon name="arrow_circle_top" size="12" color="secondary" />
@@ -268,6 +268,10 @@ const apy = computed(() => {
 
 .tooltip_card {
 	width: 250px;
+}
+
+.dots_anim {
+	height: 16px;
 }
 
 @media (max-width: 1200px) {
