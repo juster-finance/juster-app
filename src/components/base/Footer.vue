@@ -170,6 +170,9 @@ onBeforeUnmount(() => {
 						<router-link to="/markets" :class="$style.link"
 							>Markets</router-link
 						>
+						<router-link to="/pools" :class="$style.link">
+							Liquidity Pools
+						</router-link>
 					</div>
 
 					<div :class="$style.column">
