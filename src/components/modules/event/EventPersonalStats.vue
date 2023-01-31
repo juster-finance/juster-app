@@ -251,7 +251,7 @@ const hasHedge = computed(() => {
 
 .sector:nth-child(1),
 .sector:nth-child(2) {
-	border-right: 1px solid var(--border);
+	border-right: 2px solid rgba(0, 0, 0, 0.15);
 	padding-right: 18px;
 }
 
