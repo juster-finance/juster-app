@@ -11,6 +11,7 @@ import { DateTime, Duration } from "luxon"
 import Spin from "@ui/Spin.vue"
 import Button from "@ui/Button.vue"
 import Tooltip from "@ui/Tooltip.vue"
+import LargeBanner from "@ui/LargeBanner.vue"
 
 /**
  * Services
@@ -24,10 +25,8 @@ import { supportedMarkets } from "@config"
  * Store
  */
 import { useAccountStore } from "@store/account"
-import { useMarketStore } from "@store/market"
 
 const accountStore = useAccountStore()
-const marketStore = useMarketStore()
 
 const emit = defineEmits([
 	"onDepositLiquidity",
@@ -361,271 +360,132 @@ watch(
 			</Flex>
 		</Flex>
 
-		<Flex gap="12" :class="$style.warning_badge">
-			<Icon name="book" size="16" color="orange" />
-
-			<Flex direction="column" gap="16">
-				<Flex direction="column" gap="8">
-					<Text size="14" weight="600" color="primary">
-						Start using Liquidity Pools today
-					</Text>
-					<Text size="13" weight="500" color="tertiary" height="16">
-						It only takes a few minutes to learn this feature with
-						the help of detailed documentation and guides.
-					</Text>
-				</Flex>
-
-				<Flex align="center" gap="16">
+		<Flex direction="column" gap="24">
+			<LargeBanner
+				v-if="!valueLocked && !unrealizedProfit"
+				title="Start using Liquidity Pools today"
+				description="It only takes a few minutes to learn this feature with
+						the help of detailed documentation and guides."
+				:icon="{ name: 'Book', color: 'orange' }"
+			>
+				<template #buttons>
 					<router-link to="/docs/pools">
 						<Text size="13" weight="600" color="blue">
 							Getting Started
 						</Text>
 					</router-link>
-				</Flex>
-			</Flex>
-		</Flex>
+				</template>
+			</LargeBanner>
 
-		<Flex
-			v-if="pendingEntries.length || manualEntries.length"
-			direction="column"
-			gap="12"
-			:class="$style.progress"
-		>
-			<Flex @click="togglePendingEntries()" direction="column" gap="12">
-				<Flex align="center" justify="between" wide>
-					<Tooltip placement="top-start" text-align="left">
-						<Flex align="center" gap="6">
-							<Text size="14" color="secondary" weight="600">
-								Pending Entries
+			<Flex
+				v-if="pendingEntries.length || manualEntries.length"
+				direction="column"
+				gap="12"
+				:class="$style.progress"
+			>
+				<Flex
+					@click="togglePendingEntries()"
+					direction="column"
+					gap="12"
+				>
+					<Flex align="center" justify="between" wide>
+						<Tooltip placement="top-start" text-align="left">
+							<Flex align="center" gap="6">
+								<Text size="14" color="secondary" weight="600">
+									Pending Entries
+								</Text>
+
+								<Icon
+									:name="
+										manualEntries.length
+											? 'warning'
+											: 'help'
+									"
+									size="14"
+									:color="
+										manualEntries.length
+											? 'orange'
+											: 'support'
+									"
+								/>
+							</Flex>
+
+							<template #content>
+								<Flex
+									v-if="!manualEntries.length"
+									direction="column"
+									gap="6"
+								>
+									Your deposits awaiting confirmation
+									<span>
+										This may take some time depending on<br />the
+										selected pool, or rather its period
+									</span>
+								</Flex>
+								<Flex v-else direction="column" gap="6">
+									One (or more) entries need manual
+									confirmation
+									<span>
+										This is due to the fact that the
+										amount<br />
+										of the deposit was less than one tezos
+									</span>
+								</Flex>
+							</template>
+						</Tooltip>
+
+						<Flex align="center" gap="4">
+							<Text size="14" color="tertiary" weight="600">
+								{{
+									pendingEntries.length + manualEntries.length
+								}}
+								{{
+									pendingEntries.length +
+										manualEntries.length ==
+									1
+										? "entry"
+										: "entries"
+								}}
 							</Text>
 
 							<Icon
-								:name="
-									manualEntries.length ? 'warning' : 'help'
-								"
+								name="arrow"
 								size="14"
-								:color="
-									manualEntries.length ? 'orange' : 'support'
-								"
+								color="tertiary"
+								:style="{
+									transform: showEntries
+										? `rotate(180deg)`
+										: null,
+								}"
 							/>
 						</Flex>
-
-						<template #content>
-							<Flex
-								v-if="!manualEntries.length"
-								direction="column"
-								gap="6"
-							>
-								Your deposits awaiting confirmation
-								<span>
-									This may take some time depending on<br />the
-									selected pool, or rather its period
-								</span>
-							</Flex>
-							<Flex v-else direction="column" gap="6">
-								One (or more) entries need manual confirmation
-								<span>
-									This is due to the fact that the amount<br />
-									of the deposit was less than one tezos
-								</span>
-							</Flex>
-						</template>
-					</Tooltip>
-
-					<Flex align="center" gap="4">
-						<Text size="14" color="tertiary" weight="600">
-							{{ pendingEntries.length + manualEntries.length }}
-							{{
-								pendingEntries.length + manualEntries.length ==
-								1
-									? "entry"
-									: "entries"
-							}}
-						</Text>
-
-						<Icon
-							name="arrow"
-							size="14"
-							color="tertiary"
-							:style="{
-								transform: showEntries
-									? `rotate(180deg)`
-									: null,
-							}"
-						/>
 					</Flex>
-				</Flex>
 
-				<Flex :class="$style.bar">
-					<div
-						:class="[$style.bar_progress, $style.blue]"
-						:style="{
-							width: `${
-								(pendingEntries.length * 100) /
-								(pendingEntries.length + manualEntries.length)
-							}%`,
-						}"
-					/>
-
-					<div
-						v-if="manualEntries.length"
-						:class="[$style.bar_progress, $style.orange]"
-						:style="{
-							width: `${
-								100 -
-								(pendingEntries.length * 100) /
+					<Flex :class="$style.bar">
+						<div
+							:class="[$style.bar_progress, $style.blue]"
+							:style="{
+								width: `${
+									(pendingEntries.length * 100) /
 									(pendingEntries.length +
 										manualEntries.length)
-							}%`,
-						}"
-					/>
-
-					<svg
-						width="200%"
-						height="12"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						:class="$style.bar_anim"
-					>
-						<defs>
-							<pattern
-								id="lines"
-								patternUnits="userSpaceOnUse"
-								width="20"
-								height="12"
-							>
-								<path
-									fill-rule="evenodd"
-									clip-rule="evenodd"
-									d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
-									fill="white"
-									fill-opacity="0.2"
-								/>
-							</pattern>
-						</defs>
-						<rect width="100%" height="100%" fill="url(#lines)" />
-					</svg>
-				</Flex>
-			</Flex>
-
-			<Flex v-show="showEntries" direction="column" gap="12">
-				<Flex
-					v-for="entry in [...pendingEntries, ...manualEntries]"
-					justify="between"
-					align="center"
-				>
-					<Flex align="center" gap="8">
-						<Spin
-							v-if="!isEntryReadyToManualApprove(entry)"
-							size="12"
-							style="opacity: 0.5"
-						/>
-						<Icon
-							v-else
-							name="warning"
-							size="12"
-							color="tertiary"
-						/>
-
-						<Flex align="center">
-							<Text size="14" weight="600" color="secondary">
-								Entry&nbsp;
-							</Text>
-							<Text size="14" weight="600" color="tertiary">
-								#{{ entry.entryId }}
-							</Text>
-						</Flex>
-					</Flex>
-
-					<Text
-						v-if="!isEntryReadyToManualApprove(entry)"
-						size="14"
-						weight="600"
-						color="secondary"
-					>
-						{{ numberWithSymbol(entry.amount, ",") }} ꜩ
-					</Text>
-
-					<Text
-						v-else
-						@click="emit('onManualEntryApprove', entry)"
-						size="14"
-						weight="600"
-						color="blue"
-						style="cursor: pointer"
-					>
-						Approve
-						{{ numberWithSymbol(entry.amount, ",") }} ꜩ
-					</Text>
-				</Flex>
-			</Flex>
-		</Flex>
-
-		<Flex
-			v-if="allClaims.length"
-			direction="column"
-			gap="12"
-			:class="$style.progress"
-		>
-			<Flex @click="togglePendingClaims" direction="column" gap="12">
-				<Flex align="center" justify="between" wide>
-					<Tooltip placement="bottom-start" text-align="left">
-						<Flex align="center" gap="6">
-							<Text size="14" color="secondary" weight="600">
-								Pending Claims
-							</Text>
-							<Icon name="help" size="14" color="support" />
-						</Flex>
-
-						<template #content>
-							<Flex direction="column" gap="6">
-								Your funds are being prepared for withdrawal
-								<span>
-									You have to wait until the events in
-									which<br />
-									your funds are used are over
-								</span>
-							</Flex>
-						</template>
-					</Tooltip>
-
-					<Flex align="center" gap="4">
-						<Text size="14" color="tertiary" weight="600">
-							{{ allClaims.length - pendingClaims.length }} of
-							{{ allClaims.length }},
-						</Text>
-						<Text size="14" color="secondary" weight="600">
-							{{
-								(
-									((allClaims.length - pendingClaims.length) *
-										100) /
-									allClaims.length
-								).toFixed(0)
-							}}%
-						</Text>
-
-						<Icon
-							name="arrow"
-							size="14"
-							color="tertiary"
-							:style="{
-								transform: showClaims ? `rotate(180deg)` : null,
+								}%`,
 							}"
 						/>
-					</Flex>
-				</Flex>
 
-				<Flex :class="$style.bar">
-					<div
-						:class="[$style.bar_progress, $style.green]"
-						:style="{
-							width: `${
-								((allClaims.length - pendingClaims.length) *
-									100) /
-								allClaims.length
-							}%`,
-						}"
-					>
+						<div
+							v-if="manualEntries.length"
+							:class="[$style.bar_progress, $style.orange]"
+							:style="{
+								width: `${
+									100 -
+									(pendingEntries.length * 100) /
+										(pendingEntries.length +
+											manualEntries.length)
+								}%`,
+							}"
+						/>
+
 						<svg
 							width="200%"
 							height="12"
@@ -655,112 +515,259 @@ watch(
 								fill="url(#lines)"
 							/>
 						</svg>
-					</div>
+					</Flex>
 				</Flex>
-			</Flex>
 
-			<Flex v-show="showClaims" direction="column" gap="12">
-				<Flex
-					v-for="claim in allClaims"
-					justify="between"
-					align="center"
-				>
-					<Flex align="center" gap="8">
-						<Icon
-							v-if="claim.event.result"
-							name="check"
-							size="12"
-							color="green"
-						/>
-						<Spin v-else size="12" style="opacity: 0.5" />
+				<Flex v-show="showEntries" direction="column" gap="12">
+					<Flex
+						v-for="entry in [...pendingEntries, ...manualEntries]"
+						justify="between"
+						align="center"
+					>
+						<Flex align="center" gap="8">
+							<Spin
+								v-if="!isEntryReadyToManualApprove(entry)"
+								size="12"
+								style="opacity: 0.5"
+							/>
+							<Icon
+								v-else
+								name="warning"
+								size="12"
+								color="tertiary"
+							/>
 
-						<Flex align="center">
-							<Text size="14" weight="600" color="secondary">
-								Claim&nbsp;
-							</Text>
-							<Text size="14" weight="600" color="tertiary">
-								#{{ numberWithSymbol(claim.eventId, ",") }}
-							</Text>
+							<Flex align="center">
+								<Text size="14" weight="600" color="secondary">
+									Entry&nbsp;
+								</Text>
+								<Text size="14" weight="600" color="tertiary">
+									#{{ entry.entryId }}
+								</Text>
+							</Flex>
 						</Flex>
+
 						<Text
-							v-if="!claim.event.result"
+							v-if="!isEntryReadyToManualApprove(entry)"
 							size="14"
 							weight="600"
-							color="support"
+							color="secondary"
 						>
-							&nbsp;~{{ getClaimReadyTime(claim).text }}
+							{{ numberWithSymbol(entry.amount, ",") }} ꜩ
 						</Text>
-					</Flex>
 
-					<Flex align="center" gap="4">
-						<Text size="14" weight="600" color="secondary">
-							{{ numberWithSymbol(claim.amount, ",") }}
+						<Text
+							v-else
+							@click="emit('onManualEntryApprove', entry)"
+							size="14"
+							weight="600"
+							color="blue"
+							style="cursor: pointer"
+						>
+							Approve
+							{{ numberWithSymbol(entry.amount, ",") }} ꜩ
 						</Text>
-						<Text size="14" weight="600" color="tertiary">ꜩ</Text>
 					</Flex>
 				</Flex>
 			</Flex>
 
-			<Button
-				v-if="allClaims.length - pendingClaims.length"
-				@click="handleGetClaims"
-				@onKeybind="handleGetClaims"
-				type="secondary"
-				size="medium"
-				block
-				keybind="G+C"
+			<Flex
+				v-if="allClaims.length"
+				direction="column"
+				gap="12"
+				:class="$style.progress"
 			>
-				<Icon name="credit_add" size="16" color="green" />
-				Withdraw Сlaims
-			</Button>
-		</Flex>
+				<Flex @click="togglePendingClaims" direction="column" gap="12">
+					<Flex align="center" justify="between" wide>
+						<Tooltip placement="bottom-start" text-align="left">
+							<Flex align="center" gap="6">
+								<Text size="14" color="secondary" weight="600">
+									Pending Claims
+								</Text>
+								<Icon name="help" size="14" color="support" />
+							</Flex>
 
-		<Flex
-			v-if="availableClaims.length && oldestClaim.days > 2"
-			gap="12"
-			:class="$style.warning_badge"
-		>
-			<Icon name="money" size="16" color="green" />
+							<template #content>
+								<Flex direction="column" gap="6">
+									Your funds are being prepared for withdrawal
+									<span>
+										You have to wait until the events in
+										which<br />
+										your funds are used are over
+									</span>
+								</Flex>
+							</template>
+						</Tooltip>
 
-			<Flex direction="column" gap="8">
-				<Text size="14" weight="600" color="primary">
-					Your funds are waiting to be withdrawn
-				</Text>
-				<Text size="13" weight="500" color="tertiary" height="16">
-					It looks like your funds are ready for more than
-					{{ oldestClaim.days.toFixed(0) }} days, but you still have
-					not made a manual withdrawal.
-				</Text>
+						<Flex align="center" gap="4">
+							<Text size="14" color="tertiary" weight="600">
+								{{ allClaims.length - pendingClaims.length }} of
+								{{ allClaims.length }},
+							</Text>
+							<Text size="14" color="secondary" weight="600">
+								{{
+									(
+										((allClaims.length -
+											pendingClaims.length) *
+											100) /
+										allClaims.length
+									).toFixed(0)
+								}}%
+							</Text>
+
+							<Icon
+								name="arrow"
+								size="14"
+								color="tertiary"
+								:style="{
+									transform: showClaims
+										? `rotate(180deg)`
+										: null,
+								}"
+							/>
+						</Flex>
+					</Flex>
+
+					<Flex :class="$style.bar">
+						<div
+							:class="[$style.bar_progress, $style.green]"
+							:style="{
+								width: `${
+									((allClaims.length - pendingClaims.length) *
+										100) /
+									allClaims.length
+								}%`,
+							}"
+						>
+							<svg
+								width="200%"
+								height="12"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+								:class="$style.bar_anim"
+							>
+								<defs>
+									<pattern
+										id="lines"
+										patternUnits="userSpaceOnUse"
+										width="20"
+										height="12"
+									>
+										<path
+											fill-rule="evenodd"
+											clip-rule="evenodd"
+											d="M0.240234 12.0001L12.2402 6.10352e-05H20.7255L8.72552 12.0001H0.240234Z"
+											fill="white"
+											fill-opacity="0.2"
+										/>
+									</pattern>
+								</defs>
+								<rect
+									width="100%"
+									height="100%"
+									fill="url(#lines)"
+								/>
+							</svg>
+						</div>
+					</Flex>
+				</Flex>
+
+				<Flex v-show="showClaims" direction="column" gap="12">
+					<Flex
+						v-for="claim in allClaims"
+						justify="between"
+						align="center"
+					>
+						<Flex align="center" gap="8">
+							<Icon
+								v-if="claim.event.result"
+								name="check"
+								size="12"
+								color="green"
+							/>
+							<Spin v-else size="12" style="opacity: 0.5" />
+
+							<Flex align="center">
+								<Text size="14" weight="600" color="secondary">
+									Claim&nbsp;
+								</Text>
+								<Text size="14" weight="600" color="tertiary">
+									#{{ numberWithSymbol(claim.eventId, ",") }}
+								</Text>
+							</Flex>
+							<Text
+								v-if="!claim.event.result"
+								size="14"
+								weight="600"
+								color="support"
+							>
+								&nbsp;~{{ getClaimReadyTime(claim).text }}
+							</Text>
+						</Flex>
+
+						<Flex align="center" gap="4">
+							<Text size="14" weight="600" color="secondary">
+								{{ numberWithSymbol(claim.amount, ",") }}
+							</Text>
+							<Text size="14" weight="600" color="tertiary"
+								>ꜩ</Text
+							>
+						</Flex>
+					</Flex>
+				</Flex>
+
+				<Button
+					v-if="allClaims.length - pendingClaims.length"
+					@click="handleGetClaims"
+					@onKeybind="handleGetClaims"
+					type="secondary"
+					size="medium"
+					block
+					keybind="G+C"
+				>
+					<Icon name="credit_add" size="16" color="green" />
+					Withdraw Сlaims
+				</Button>
 			</Flex>
-		</Flex>
 
-		<Flex direction="column" gap="12" :class="$style.buttons">
-			<Button
-				@click="handleDepositLiquidityClick"
-				@onKeybind="handleDepositLiquidityClick"
-				:disabled="
-					!isDepositAvailable || !parseFloat(accountStore.balance)
-				"
-				type="primary"
-				size="medium"
-				keybind="D+L"
-				block
-			>
-				<Icon name="plus_circle" size="16" />Deposit Liquidity
-			</Button>
+			<LargeBanner
+				v-if="availableClaims.length && oldestClaim.days > 2"
+				title="Your funds are waiting to be withdrawn"
+				:description="`It looks like your funds are ready for more than
+					${oldestClaim.days.toFixed(0)} days, but you still have
+					not made a withdrawal.`"
+				:icon="{ name: 'money', color: 'green' }"
+				:class="$style.large_banner"
+			/>
 
-			<Button
-				v-if="pools.length === 1"
-				@click="emit('onRequestWithdraw')"
-				@onKeybind="emit('onRequestWithdraw')"
-				:disabled="!positions.length"
-				type="secondary"
-				size="medium"
-				keybind="R+W"
-				block
-			>
-				<Icon name="money" size="16" />Request Withdraw
-			</Button>
+			<Flex direction="column" gap="12">
+				<Button
+					@click="handleDepositLiquidityClick"
+					@onKeybind="handleDepositLiquidityClick"
+					:disabled="
+						!isDepositAvailable || !parseFloat(accountStore.balance)
+					"
+					type="primary"
+					size="medium"
+					keybind="D+L"
+					block
+				>
+					<Icon name="plus_circle" size="16" />Deposit Liquidity
+				</Button>
+
+				<Button
+					v-if="pools.length === 1"
+					@click="emit('onRequestWithdraw')"
+					@onKeybind="emit('onRequestWithdraw')"
+					:disabled="!positions.length"
+					type="secondary"
+					size="medium"
+					keybind="R+W"
+					block
+				>
+					<Icon name="money" size="16" />Request Withdraw
+				</Button>
+			</Flex>
 		</Flex>
 	</div>
 </template>
@@ -792,6 +799,7 @@ watch(
 	border-bottom: 1px solid var(--border);
 
 	padding: 24px 0;
+	margin-bottom: 24px;
 
 	transition: opacity 0.2s ease;
 }
@@ -834,8 +842,6 @@ watch(
 
 .progress {
 	cursor: pointer;
-
-	margin-top: 24px;
 }
 
 .bar {
@@ -889,18 +895,6 @@ watch(
 	100% {
 		transform: translateX(0);
 	}
-}
-
-.buttons {
-	margin-top: 24px;
-}
-
-.warning_badge {
-	border-radius: 8px;
-	background: var(--app-bg);
-
-	margin-top: 24px;
-	padding: 16px;
 }
 
 @media (max-width: 500px) {
