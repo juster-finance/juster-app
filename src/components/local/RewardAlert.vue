@@ -4,7 +4,7 @@ import { computed } from "vue"
 /**
  * Utils
  */
-import { f } from "@utils/amounts"
+import { numberWithSymbol } from "@utils/amounts"
 
 /**
  * Store
@@ -23,25 +23,23 @@ const reward = computed(() => {
 		(acc, curr) => (acc += curr.value),
 		0,
 	)
-
-	return f(total)
+	return total
 })
 </script>
 
 <template>
 	<router-link v-if="accountStore.wonPositions.length" to="/withdrawals">
 		<Tooltip placement="left">
-			<div :class="$style.wrapper">
-				<Icon name="crown" size="14" />
+			<Flex align="center" gap="8" :class="$style.wrapper">
+				<Icon name="coins" size="14" color="green" />
 
-				<div v-if="reward % 1 == 0" :class="$style.reward">
-					<span>{{ reward[0] }}</span> ꜩ
-				</div>
-				<div v-else :class="$style.reward">
-					<span>{{ reward.split(".")[0] }}</span
-					>.{{ reward.split(".")[1] }} ꜩ
-				</div>
-			</div>
+				<Flex>
+					<Text size="12" weight="700" color="primary">
+						{{ numberWithSymbol(reward, ",") }}&nbsp;
+					</Text>
+					<Text size="12" weight="700" color="tertiary"> XTZ </Text>
+				</Flex>
+			</Flex>
 
 			<template #content>Available funds for withdrawal</template>
 		</Tooltip>
@@ -50,12 +48,8 @@ const reward = computed(() => {
 
 <style module>
 .wrapper {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-
 	height: 32px;
-	border-radius: 8px;
+	border-radius: 6px;
 	background: var(--btn-secondary-bg);
 
 	padding: 0 12px 0 10px;
@@ -69,20 +63,5 @@ const reward = computed(() => {
 
 .wrapper:active {
 	transform: translateY(1px);
-}
-
-.wrapper svg {
-	fill: var(--green);
-}
-
-.reward {
-	font-size: 12px;
-	font-weight: 700;
-	color: var(--text-tertiary);
-	white-space: nowrap;
-}
-
-.reward span {
-	color: var(--text-primary);
 }
 </style>

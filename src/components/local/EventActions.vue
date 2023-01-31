@@ -8,6 +8,7 @@ import { f } from "@utils/amounts"
  */
 import Button from "@ui/Button.vue"
 import Spin from "@ui/Spin.vue"
+import LoadingBar from "@ui/LoadingBar.vue"
 
 /**
  * Store
@@ -172,7 +173,7 @@ const btnType = computed(() => {
 		>
 			<template v-if="successfulWithdrawal"
 				>Successfully withdrawn
-				{{ successfulWithdrawal?.amount.toFixed(2) }} ꜩ</template
+				{{ successfulWithdrawal?.amount.toFixed(2) }} XTZ</template
 			>
 
 			<template v-else-if="accountStore.pendingTransaction.awaiting">
@@ -180,13 +181,11 @@ const btnType = computed(() => {
 			</template>
 
 			<template v-else-if="!isWithdrawing && positionForWithdraw">
-				<Icon name="crown" size="16" />Withdraw
-				{{ f(positionForWithdraw.value) }} ꜩ
+				<Icon name="coins" size="16" />Withdraw
+				{{ f(positionForWithdraw.value) }} XTZ
 			</template>
 
-			<template v-else>
-				<Spin size="12" />Awaiting confirmation..
-			</template>
+			<template v-else> <LoadingBar /></template>
 		</Button>
 	</Flex>
 </template>

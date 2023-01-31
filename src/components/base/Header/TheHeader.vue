@@ -419,7 +419,7 @@ const handleNetworkDblClick = () => {
 	box-sizing: content-box;
 
 	background: var(--btn-secondary-bg);
-	border-radius: 8px;
+	border-radius: 6px;
 
 	transition: all 0.2s ease;
 }
