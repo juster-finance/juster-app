@@ -152,28 +152,21 @@ const sortedSummaries = computed(() => {
 				gap="24"
 				:class="$style.mgs"
 			>
-				<Flex direction="column" gap="8">
-					<Flex align="center" justify="between">
-						<Text color="secondary" size="13" weight="600">
-							Total Value
-						</Text>
+				<Flex
+					v-if="!valueLocked"
+					direction="column"
+					gap="16"
+					align="center"
+					:class="$style.empty_warn"
+				>
+					<Icon name="bar_chart" size="24" color="support" />
 
-						<Text color="secondary" size="13" weight="600">
-							{{ numberWithSymbol(valueLocked, ",") }}
-						</Text>
-					</Flex>
-
-					<div :class="$style.progress_wrapper">
-						<div v-if="valueLocked" :class="$style.bar_progress" />
-					</div>
-
-					<!-- Hint for empty state -->
 					<Text
-						v-if="!valueLocked"
-						size="12"
+						size="13"
 						color="support"
 						weight="500"
 						height="16"
+						align="center"
 					>
 						After the first deposits here you will see what pools
 						were provided with liquidity and in what amount
@@ -694,5 +687,9 @@ const sortedSummaries = computed(() => {
 
 	padding-top: 20px;
 	margin-top: 24px;
+}
+
+.empty_warn {
+	padding: 32px 0;
 }
 </style>
