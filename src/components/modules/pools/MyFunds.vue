@@ -302,7 +302,14 @@ watch(
 			</Flex>
 		</Flex>
 
-		<Flex align="center" gap="32" :class="$style.funds">
+		<Flex
+			align="center"
+			gap="32"
+			:class="[
+				$style.funds,
+				!valueLocked && !unrealizedProfit && $style.opacity,
+			]"
+		>
 			<Flex align="center" gap="14" :class="$style.badge">
 				<Icon
 					name="coins"
@@ -350,6 +357,30 @@ watch(
 					>
 						Unrealized Profit
 					</Text>
+				</Flex>
+			</Flex>
+		</Flex>
+
+		<Flex gap="12" :class="$style.warning_badge">
+			<Icon name="book" size="16" color="orange" />
+
+			<Flex direction="column" gap="16">
+				<Flex direction="column" gap="8">
+					<Text size="14" weight="600" color="primary">
+						Start using Liquidity Pools today
+					</Text>
+					<Text size="13" weight="500" color="tertiary" height="16">
+						It only takes a few minutes to learn this feature with
+						the help of detailed documentation and guides.
+					</Text>
+				</Flex>
+
+				<Flex align="center" gap="16">
+					<router-link to="/docs/pools">
+						<Text size="13" weight="600" color="blue">
+							Getting Started
+						</Text>
+					</router-link>
 				</Flex>
 			</Flex>
 		</Flex>
@@ -761,6 +792,16 @@ watch(
 	border-bottom: 1px solid var(--border);
 
 	padding: 24px 0;
+
+	transition: opacity 0.2s ease;
+}
+
+.funds.opacity {
+	opacity: 0.5;
+}
+
+.funds:hover {
+	opacity: 1;
 }
 
 .badge .icon {

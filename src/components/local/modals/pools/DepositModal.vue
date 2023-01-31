@@ -65,7 +65,7 @@ const depositInShares = computed(() => amount.value / props.state.sharePrice)
 
 const opConfirmationInProgress = ref(false)
 const handleDeposit = async () => {
-	if (buttonState.disabled) return
+	if (buttonState.value.disabled) return
 
 	opConfirmationInProgress.value = true
 
@@ -205,6 +205,11 @@ watch(
 				initTiming()
 			}, 5_000)
 
+			/** Delay to avoid accidental triggering */
+			setTimeout(() => {
+				document.addEventListener("keydown", onKeydown)
+			}, 500)
+
 			nextTick(() => {
 				inputEl.value.$el.querySelector("input").focus()
 			})
@@ -212,9 +217,18 @@ watch(
 			clearInterval(timingInterval)
 
 			amount.value = 0
+
+			document.removeEventListener("keydown", onKeydown)
 		}
 	},
 )
+
+const onKeydown = (e) => {
+	if (e.code == "Enter") {
+		e.preventDefault()
+		handleDeposit()
+	}
+}
 </script>
 
 <template>
