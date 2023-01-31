@@ -354,6 +354,7 @@ const { meta } = useMeta({
 				:show="showPoolsModal"
 				:pools="pools"
 				:poolsStates="poolsStates"
+				:poolsAPY="poolsAPY"
 				@onSelectPool="handleSelectPool"
 				@onClose="showPoolsModal = false"
 			/>

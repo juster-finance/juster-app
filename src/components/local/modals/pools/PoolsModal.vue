@@ -11,6 +11,7 @@ import { Searcher } from "fast-fuzzy"
 import { currentNetwork } from "@sdk"
 import { flags, updateFlag } from "@/services/flags"
 import { parsePoolName } from "@utils/misc"
+import { numberWithSymbol } from "@utils/amounts"
 
 /**
  * Constants
@@ -38,6 +39,7 @@ const props = defineProps({
 	show: Boolean,
 	pools: Array,
 	poolsStates: Object,
+	poolsAPY: Object,
 })
 
 const emit = defineEmits(["onClose", "onSelectPool"])
@@ -367,15 +369,33 @@ const handleCloseTestnetWarning = () => {
 								<Flex align="center" gap="6">
 									<Icon
 										name="stars"
-										size="12"
-										color="green"
+										size="14"
+										:color="
+											(poolsAPY[pool.address] * 100 < 0 &&
+												'red') ||
+											(poolsAPY[pool.address] * 100 <
+												40 &&
+												'tertiary') ||
+											(poolsAPY[pool.address] * 100 <
+												80 &&
+												'yellow') ||
+											(poolsAPY[pool.address] * 100 >=
+												100 &&
+												'green') ||
+											'tertiary'
+										"
 									/>
 									<Text
 										size="14"
 										weight="600"
 										color="primary"
 									>
-										0%
+										{{
+											numberWithSymbol(
+												poolsAPY[pool.address] * 100,
+												",",
+											)
+										}}%
 									</Text>
 								</Flex>
 
@@ -477,8 +497,8 @@ const handleCloseTestnetWarning = () => {
 
 	background: rgba(255, 255, 255, 0.05);
 	border-radius: 8px;
-	outline: 2px solid transparent;
 	cursor: pointer;
+	box-shadow: 0 0 0 0 transparent;
 
 	padding: 0 16px;
 
@@ -491,7 +511,7 @@ const handleCloseTestnetWarning = () => {
 }
 
 .pool:hover {
-	outline: 2px solid var(--border);
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .nothing_found_warning {
