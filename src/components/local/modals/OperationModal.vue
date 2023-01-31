@@ -92,12 +92,7 @@ const getTypeOfOperation = () => {
 				<Flex align="center" gap="8">
 					<Icon name="explorer" size="16" color="secondary" />
 
-					<Text
-						size="14"
-						weight="600"
-						color="primary"
-						:class="$style.head_btn"
-					>
+					<Text size="14" weight="600" color="primary">
 						Operation
 					</Text>
 				</Flex>
@@ -257,10 +252,6 @@ const getTypeOfOperation = () => {
 
 .base {
 	padding: 8px 20px 20px 20px;
-}
-
-.head_btn {
-	cursor: pointer;
 }
 
 .close_icon {
