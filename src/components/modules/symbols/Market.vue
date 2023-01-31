@@ -1,5 +1,9 @@
-<script>
-import { defineComponent, ref, toRefs, computed } from "vue"
+<script setup>
+/**
+ * Vendor
+ */
+import { ref, computed } from "vue"
+import { useRouter } from "vue-router"
 
 /**
  * UI
@@ -17,68 +21,56 @@ import { supportedMarkets } from "@config"
  */
 import { useMarketStore } from "@store/market"
 
-export default defineComponent({
-	name: "Market",
-	props: { market: Object },
+const router = useRouter()
 
-	setup(props, context) {
-		const { market } = toRefs(props)
-
-		const marketStore = useMarketStore()
-		const quotes = computed(() => {
-			return marketStore.markets[market.value.symbol].quotes
-		})
-
-		const price = computed(() => {
-			return {
-				integer: numberWithSymbol(
-					quotes.value[0].price.toString().split(".")[0],
-					",",
-				),
-				fraction: quotes.value[0].price.toString().split(".")[1],
-			}
-		})
-
-		const color = ref("grey")
-		const change = computed(() => {
-			if (!quotes.value) return
-
-			if (!market.value.historyPrice) return "Loading"
-
-			const { diff, percent, isIncreased } = calcChange(
-				quotes.value[0].price,
-				market.value.historyPrice,
-			)
-			color.value = isIncreased ? "green" : "red"
-
-			return `${numberWithSymbol(
-				diff.toFixed(2),
-				" ",
-			)}, ${percent.toFixed(2)}%, 1W`
-		})
-
-		const handleJoin = () => {
-			context.emit("onJoin")
-		}
-
-		return {
-			market,
-			quotes,
-			change,
-			color,
-			price,
-			supportedMarkets,
-			handleJoin,
-			abbreviateNumber,
-		}
-	},
-
-	components: { Button },
+const props = defineProps({
+	market: Object,
 })
+
+const emit = defineEmits(["onJoin"])
+
+const marketStore = useMarketStore()
+const quotes = computed(() => {
+	return marketStore.markets[props.market.symbol].quotes
+})
+
+const price = computed(() => {
+	return {
+		integer: numberWithSymbol(
+			quotes.value[0].price.toString().split(".")[0],
+			",",
+		),
+		fraction: quotes.value[0].price.toString().split(".")[1],
+	}
+})
+
+const color = ref("grey")
+const change = computed(() => {
+	if (!quotes.value) return
+
+	if (!props.market.historyPrice) return "Loading"
+
+	const { diff, percent, isIncreased } = calcChange(
+		quotes.value[0].price,
+		props.market.historyPrice,
+	)
+	color.value = isIncreased ? "green" : "red"
+
+	return `${numberWithSymbol(diff.toFixed(2), " ")}, ${percent.toFixed(
+		2,
+	)}%, 1W`
+})
+
+const handleJoin = () => {
+	emit("onJoin")
+}
 </script>
 
 <template>
-	<router-link :to="`/markets/${market.symbol}`" :class="$style.wrapper">
+	<div
+		@click="router.push(`/markets/${market.symbol}`)"
+		:class="$style.wrapper"
+	>
 		<Flex align="center" justify="between">
 			<div :class="$style.base">
 				<div :class="$style.name">
@@ -144,7 +136,7 @@ export default defineComponent({
 				</div>
 			</div>
 		</Flex>
-	</router-link>
+	</div>
 </template>
 
 <style module>
@@ -155,6 +147,7 @@ export default defineComponent({
 	outline: 2px solid transparent;
 	background: var(--card-bg);
 
+	cursor: pointer;
 	padding: 24px;
 
 	transition: outline 0.2s ease;

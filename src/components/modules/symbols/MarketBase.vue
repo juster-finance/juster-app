@@ -189,7 +189,7 @@ const { meta } = useMeta({
 							selectedTab == 'Closed' && $style.active,
 						]"
 					>
-						<Icon name="event_active" size="12" />Active
+						<Icon name="event_active" size="12" />Running
 					</div>
 					<div :class="$style.dot" />
 					<div
