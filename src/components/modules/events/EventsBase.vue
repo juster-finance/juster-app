@@ -435,80 +435,89 @@ useMeta({
 
 		<Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-		<h1>All events</h1>
-		<div :class="$style.description">
-			List of all new, running, and past events with customizable
-			filtering
-		</div>
+		<Flex direction="column" gap="32">
+			<Flex direction="column" gap="8">
+				<h1>All events</h1>
+				<Text size="14" height="16" weight="500" color="tertiary">
+					List of all new, running, and past events with customizable
+					filtering
+				</Text>
+			</Flex>
 
-		<Button
-			@click="showFilters = !showFilters"
-			type="secondary"
-			size="small"
-			block
-			:class="$style.show_filters_btn"
-			><Icon name="filter" size="14" />
-			{{ showFilters ? "Hide" : "Show" }} Filters</Button
-		>
+			<Button
+				@click="showFilters = !showFilters"
+				type="secondary"
+				size="small"
+				block
+				:class="$style.show_filters_btn"
+				><Icon name="filter" size="14" />
+				{{ showFilters ? "Hide" : "Show" }} Filters</Button
+			>
 
-		<div :class="$style.container">
-			<EventsFilters
-				:filters="filters"
-				:liquidity-filters="liquidityFilters"
-				:events="marketStore.events"
-				:filtered-events-count="filteredEvents.length"
-				@onNewMin="handleNewMin"
-				@onNewMax="handleNewMax"
-				@onSelect="handleSelect"
-				@onReset="handleResetFilters"
-				@onManageParticipant="handleManageParticipant"
-				:class="[$style.filters_block, showFilters && $style.show]"
-			/>
+			<Flex gap="40" :class="$style.container">
+				<EventsFilters
+					:filters="filters"
+					:liquidity-filters="liquidityFilters"
+					:events="marketStore.events"
+					:filtered-events-count="filteredEvents.length"
+					@onNewMin="handleNewMin"
+					@onNewMax="handleNewMax"
+					@onSelect="handleSelect"
+					@onReset="handleResetFilters"
+					@onManageParticipant="handleManageParticipant"
+					:class="[$style.filters_block, showFilters && $style.show]"
+				/>
 
-			<div :class="$style.events_base">
-				<transition name="fastfade" mode="out-in">
-					<Flex
-						v-if="filteredEvents.length"
-						direction="column"
-						gap="16"
-					>
-						<div :class="$style.events">
-							<EventCard
-								v-for="event in filteredEvents.slice(
-									(currentPage - 1) * 6,
-									currentPage * 6,
-								)"
-								:key="event.id"
-								:event="event"
+				<div :class="$style.events_base">
+					<transition name="fastfade" mode="out-in">
+						<Flex
+							v-if="filteredEvents.length"
+							direction="column"
+							gap="16"
+						>
+							<div :class="$style.events">
+								<EventCard
+									v-for="event in filteredEvents.slice(
+										(currentPage - 1) * 6,
+										currentPage * 6,
+									)"
+									:key="event.id"
+									:event="event"
+								/>
+							</div>
+
+							<Pagination
+								v-if="filteredEvents.length > 6"
+								v-model="currentPage"
+								:total="filteredEvents.length"
+								:limit="6"
+								:class="$style.pagination"
 							/>
+						</Flex>
+
+						<div
+							v-else-if="!isNewEventsLoaded"
+							:class="$style.events"
+						>
+							<EventCardLoading />
+							<EventCardLoading />
+							<EventCardLoading />
 						</div>
 
-						<Pagination
-							v-if="filteredEvents.length > 6"
-							v-model="currentPage"
-							:total="filteredEvents.length"
-							:limit="6"
-							:class="$style.pagination"
-						/>
-					</Flex>
-
-					<div v-else-if="!isNewEventsLoaded" :class="$style.events">
-						<EventCardLoading />
-						<EventCardLoading />
-						<EventCardLoading />
-					</div>
-
-					<Banner
-						v-else-if="!filteredEvents.length && isNewEventsLoaded"
-						icon="help"
-						color="gray"
-						size="small"
-					>
-						No events with the selected filters were found
-					</Banner>
-				</transition>
-			</div>
-		</div>
+						<Banner
+							v-else-if="
+								!filteredEvents.length && isNewEventsLoaded
+							"
+							icon="help"
+							color="gray"
+							size="small"
+						>
+							No events with the selected filters were found
+						</Banner>
+					</transition>
+				</div>
+			</Flex>
+		</Flex>
 	</div>
 </template>
 
@@ -532,13 +541,6 @@ useMeta({
 
 .show_filters_btn {
 	display: none;
-
-	margin-bottom: 24px;
-}
-
-.container {
-	display: flex;
-	gap: 40px;
 }
 
 .filters_block {
