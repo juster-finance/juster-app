@@ -70,7 +70,7 @@ export default defineComponent({
 
 			const margin = { top: 20, right: 100, bottom: 30, left: 0 },
 				width = `100%`,
-				height = 194 - margin.top - margin.bottom
+				height = 240 - margin.top - margin.bottom
 
 			d3.select(`#chart > *`).remove()
 
@@ -93,8 +93,8 @@ export default defineComponent({
 
 			/** 1h */
 			if (event.value.measurePeriod == 3600) {
-				chartEars.hour = 1
-				chartEars.minute = 0
+				chartEars.hour = 0
+				chartEars.minute = 30
 			}
 
 			/** 6h */
@@ -162,7 +162,7 @@ export default defineComponent({
 					d3.min(data, (d) => +d.value),
 					d3.max(data, (d) => +d.value),
 				])
-				.range([height, 0])
+				.range([height, 10])
 
 			/** Price line */
 			startData.value = data.find(
@@ -190,14 +190,14 @@ export default defineComponent({
 			/** Ticks */
 			const format = d3.timeFormat("%H:%M")
 
-			scale.x.ticks(10).forEach((tick) => {
+			scale.x.ticks(15).forEach((tick) => {
 				const tickG = canvas
 					.append("g")
-					.attr("transform", `translate(${scale.x(tick)}, 0)`)
+					.attr("transform", `translate(${scale.x(tick)}, 12)`)
 
-				tickG
+				const line = tickG
 					.append("line")
-					.attr("y2", 170)
+					.attr("y2", 200)
 					.attr("class", classes.time_line)
 
 				if (
@@ -205,11 +205,15 @@ export default defineComponent({
 						DateTime.fromJSDate(tick).ordinal &&
 					DateTime.fromISO(event.value.betsCloseTime).hour ==
 						DateTime.fromJSDate(tick).hour &&
-					DateTime.fromJSDate(tick).minute == 0
+					DateTime.fromISO(event.value.betsCloseTime).minute ==
+						DateTime.fromJSDate(tick).minute
 				) {
 					tickG.attr("class", classes.start)
 
-					tickG.append("text").attr("y", 190).text("Start")
+					line.attr("y1", 12)
+
+					tickG.append("text").attr("y", 0).text("Start")
+					tickG.append("text").attr("y", 220).text(format(tick))
 				} else if (
 					DateTime.fromJSDate(tick).ordinal ==
 						DateTime.fromISO(event.value.betsCloseTime).plus({
@@ -219,102 +223,33 @@ export default defineComponent({
 						DateTime.fromISO(event.value.betsCloseTime).plus({
 							hour: event.value.measurePeriod / 3600,
 						}).hour &&
-					DateTime.fromJSDate(tick).minute == 0
+					DateTime.fromJSDate(tick).minute ==
+						DateTime.fromISO(event.value.betsCloseTime).minute
 				) {
 					tickG.attr("class", classes.start)
 
-					tickG.append("text").attr("y", 190).text("Finish")
+					line.attr("y1", 12)
+
+					tickG.append("text").attr("y", 0).text("Finish")
+					tickG.append("text").attr("y", 220).text(format(tick))
 				} else {
+					if (
+						![0, 15, 30, 45].includes(
+							DateTime.fromJSDate(tick).minute,
+						)
+					)
+						return
+
 					if (format(tick) == "00:00") {
 						tickG
 							.append("text")
-							.attr("y", 190)
+							.attr("y", 220)
 							.text(DateTime.fromJSDate(tick).toFormat("LLL dd"))
 					} else {
-						tickG.append("text").attr("y", 190).text(format(tick))
+						tickG.append("text").attr("y", 220).text(format(tick))
 					}
 				}
 			})
-
-			/** find Start & Finish tick for 24h */
-			if (event.value.measurePeriod == 86400) {
-				scale.x.ticks(40).forEach((tick) => {
-					const tickG = canvas
-						.append("g")
-						.attr("transform", `translate(${scale.x(tick)}, 0)`)
-
-					tickG
-						.append("line")
-						.attr("y2", 170)
-						.attr("class", classes.time_line_transparent)
-
-					if (
-						DateTime.fromISO(event.value.betsCloseTime).ordinal ==
-							DateTime.fromJSDate(tick).ordinal &&
-						DateTime.fromISO(event.value.betsCloseTime).hour ==
-							DateTime.fromJSDate(tick).hour &&
-						DateTime.fromJSDate(tick).minute == 0
-					) {
-						tickG.attr("class", classes.start)
-
-						tickG.append("text").attr("y", 190).text("Start")
-					} else if (
-						DateTime.fromJSDate(tick).ordinal ==
-							DateTime.fromISO(event.value.betsCloseTime).plus({
-								hour: event.value.measurePeriod / 3600,
-							}).ordinal &&
-						DateTime.fromJSDate(tick).hour ==
-							DateTime.fromISO(event.value.betsCloseTime).plus({
-								hour: event.value.measurePeriod / 3600,
-							}).hour &&
-						DateTime.fromJSDate(tick).minute == 0
-					) {
-						tickG.attr("class", classes.start)
-
-						tickG.append("text").attr("y", 190).text("Finish")
-					}
-				})
-			}
-
-			/** find Start & Finish tick for 7d */
-			if (event.value.measurePeriod == 604800) {
-				scale.x.ticks(280).forEach((tick) => {
-					const tickG = canvas
-						.append("g")
-						.attr("transform", `translate(${scale.x(tick)}, 0)`)
-
-					tickG
-						.append("line")
-						.attr("y2", 170)
-						.attr("class", classes.time_line_transparent)
-
-					if (
-						DateTime.fromISO(event.value.betsCloseTime).ordinal ==
-							DateTime.fromJSDate(tick).ordinal &&
-						DateTime.fromISO(event.value.betsCloseTime).hour ==
-							DateTime.fromJSDate(tick).hour &&
-						DateTime.fromJSDate(tick).minute == 0
-					) {
-						tickG.attr("class", classes.start)
-
-						tickG.append("text").attr("y", 190).text("Start")
-					} else if (
-						DateTime.fromJSDate(tick).ordinal ==
-							DateTime.fromISO(event.value.betsCloseTime).plus({
-								hour: event.value.measurePeriod / 3600,
-							}).ordinal &&
-						DateTime.fromJSDate(tick).hour ==
-							DateTime.fromISO(event.value.betsCloseTime).plus({
-								hour: event.value.measurePeriod / 3600,
-							}).hour &&
-						DateTime.fromJSDate(tick).minute == 0
-					) {
-						tickG.attr("class", classes.start)
-
-						tickG.append("text").attr("y", 190).text("Finish")
-					}
-				})
-			}
 
 			/** Draw chart Before start */
 			const dataBeforeStart = data.filter(
@@ -685,9 +620,10 @@ export default defineComponent({
 }
 
 .chart {
+	display: flex;
 	position: relative;
 	width: 100%;
-	min-height: 190px;
+	min-height: 240px;
 }
 
 .price_axis {
