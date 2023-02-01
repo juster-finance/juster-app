@@ -369,6 +369,27 @@ onBeforeUnmount(() => {
 	box-shadow: 0 0 0 0 transparent;
 }
 
+.wrapper.text {
+	height: initial;
+
+	color: var(--text-blue);
+
+	background: transparent;
+
+	padding: 0;
+
+	transition: color 0.2s ease;
+}
+
+.wrapper.text:hover {
+	color: var(--blue);
+}
+
+.wrapper.text.small {
+	font-size: 12px;
+	line-height: 1;
+}
+
 /** OTHER */
 .wrapper.disabled {
 	opacity: 0.5;

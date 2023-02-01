@@ -347,8 +347,11 @@ const onKeydown = (e) => {
 									>
 										{{
 											numberWithSymbol(
-												state.totalLiquidity.toNumber() +
-													amount.value,
+												state.totalLiquidity.toNumber
+													? state.totalLiquidity.toNumber() +
+															amount.value
+													: state.totalLiquidity +
+															amount.value,
 												",",
 											)
 										}}

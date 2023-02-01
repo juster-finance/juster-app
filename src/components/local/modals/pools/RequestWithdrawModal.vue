@@ -8,7 +8,6 @@ import BN from "bignumber.js"
 /**
  * UI
  */
-import Spin from "@ui/Spin.vue"
 import LoadingBar from "@ui/LoadingBar.vue"
 import Modal from "@ui/Modal.vue"
 import Input from "@ui/Input.vue"
@@ -44,6 +43,8 @@ const emit = defineEmits(["onClose"])
 
 const inputEl = ref(null)
 const amount = reactive({ value: 0, error: "" })
+
+const isPoolHovered = ref(false)
 
 const opConfirmationInProgress = ref(false)
 const handleDeposit = async () => {
@@ -223,7 +224,13 @@ const handleCloseRequestFundsWarning = () => {
 			</Block>
 
 			<Flex direction="column" gap="8">
-				<Flex align="center" justify="between" :class="$style.pool">
+				<Flex
+					@mouseenter="isPoolHovered = true"
+					@mouseleave="isPoolHovered = false"
+					align="center"
+					justify="between"
+					:class="$style.pool"
+				>
 					<Flex align="center" gap="20">
 						<Flex direction="column" gap="8">
 							<Text size="14" weight="600" color="primary">
@@ -262,7 +269,14 @@ const handleCloseRequestFundsWarning = () => {
 								<Icon name="coins" size="12" color="tertiary" />
 
 								<Text size="14" weight="600" color="primary">
-									{{ numberWithSymbol(position.shares, ",") }}
+									{{
+										!isPoolHovered
+											? numberWithSymbol(
+													position.shares,
+													",",
+											  )
+											: position.shares
+									}}
 								</Text>
 
 								<template
@@ -297,9 +311,24 @@ const handleCloseRequestFundsWarning = () => {
 								</template>
 							</Flex>
 
-							<Text size="12" weight="600" color="tertiary">
+							<Text
+								v-if="!isPoolHovered"
+								size="12"
+								weight="600"
+								color="tertiary"
+							>
 								Available Shares
 							</Text>
+							<Button
+								v-else
+								@click="
+									amount.value = parseFloat(position.shares)
+								"
+								type="text"
+								size="small"
+							>
+								Withdraw all
+							</Button>
 						</Flex>
 					</Flex>
 				</Flex>
