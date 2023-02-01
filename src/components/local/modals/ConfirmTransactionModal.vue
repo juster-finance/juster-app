@@ -310,7 +310,12 @@ watch(
 
 					<Flex>
 						<Text size="14" weight="600" color="primary">
-							{{ cacheStore.submissions.payout }}
+							~{{
+								numberWithSymbol(
+									cacheStore.submissions.payout,
+									",",
+								)
+							}}
 						</Text>
 						<Text size="14" weight="600" color="tertiary">
 							&nbsp;XTZ
