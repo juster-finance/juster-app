@@ -1,5 +1,6 @@
 import { defineConfig } from "vite"
 import { visualizer } from "rollup-plugin-visualizer"
+import replace from "rollup-plugin-re"
 import vue from "@vitejs/plugin-vue"
 import path from "path"
 
@@ -42,6 +43,18 @@ export default (ctx) => {
 						},
 				  ]
 				: []),
+			{
+				...replace({
+					include: ["node_modules/@airgap/**"],
+					replaces: {
+						...(isBuild && {
+							"import * as qrcode from 'qrcode-generator';":
+								"import qrcode from 'qrcode-generator';",
+						}),
+					},
+				}),
+				enforce: "pre",
+			},
 		],
 		define: {
 			global: "window",
