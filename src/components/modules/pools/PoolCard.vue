@@ -245,7 +245,7 @@ const copy = (target) => {
 					:disabled="!!isDepositAvailable"
 				>
 					<Button
-						@click.prevent="handleDeposit"
+						@click.stop="handleDeposit"
 						:disabled="
 							!isDepositAvailable ||
 							!parseFloat(accountStore.balance)
