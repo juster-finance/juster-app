@@ -128,16 +128,6 @@ const timing = computed(() => {
 	}
 })
 
-const liquidityLevel = computed(() => {
-	if (props.event.totalLiquidityProvided >= 3000)
-		return { text: "High", icon: "liquidity_high" }
-	else if (props.event.totalLiquidityProvided >= 1000)
-		return { text: "Medium", icon: "liquidity_medium" }
-	else if (props.event.totalLiquidityProvided < 1000)
-		return { text: "Low", icon: "liquidity_low" }
-	else return { text: "Low", icon: "liquidity_low" }
-})
-
 const participants = computed(() => {
 	let avatars = [
 		...props.event.bets.map((bet) => bet.userId),
@@ -175,6 +165,14 @@ const positionForWithdraw = computed(() => {
 	return accountStore.wonPositions.find(
 		(position) => position.event.id == props.event.id,
 	)
+})
+
+const progressPercentage = computed(() => {
+	const nowDt = DateTime.now()
+	const startDt = DateTime.fromISO(props.event.betsCloseTime)
+	const endDt = startDt.plus(props.event.measurePeriod * 1000)
+
+	return ((endDt.ts - nowDt.ts) * 100) / (endDt.ts - startDt.ts)
 })
 
 /** Join to the event & Liquidity */
@@ -678,6 +676,7 @@ onUnmounted(() => {
 					<div
 						v-if="event.status === 'STARTED'"
 						:class="$style.badge_fill"
+						:style="{ right: `${progressPercentage}%` }"
 					/>
 				</Badge>
 
@@ -1101,7 +1100,11 @@ onUnmounted(() => {
 	bottom: 0;
 	right: 0;
 
-	background: rgba(255, 255, 255, 0.05);
+	background: linear-gradient(
+		rgba(255, 255, 255, 0.15),
+		rgba(255, 255, 255, 0.005)
+	);
+	border-right: 2px solid var(--border);
 }
 
 .hints {
