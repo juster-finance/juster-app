@@ -9,6 +9,11 @@ import { ref } from "vue"
  */
 import Toggleable from "@ui/Toggleable.vue"
 
+/**
+ * Services
+ */
+import { numberWithSymbol, truncate } from "@utils/amounts"
+
 const props = defineProps({
 	summary: Object,
 })
@@ -26,6 +31,19 @@ const summaryDictionary = {
 	realizedProfit: "Realized Profit",
 	unrealizedProfit: "Unrealized Profit",
 	lockedInClaims: "Locked in Claims",
+}
+
+const parseAmount = (amount) => {
+	if (
+		Math.abs(amount % 1) < 0.01 &&
+		amount !== 0 &&
+		amount < 0.01 &&
+		amount > -0.01
+	) {
+		return truncate(amount)
+	} else {
+		return numberWithSymbol(amount, ",")
+	}
 }
 </script>
 
@@ -63,7 +81,7 @@ const summaryDictionary = {
 						{{ summaryDictionary[key] }}
 					</Text>
 					<Text size="14" weight="600" color="primary">
-						{{ value ? value.toFixed(2) : 0 }}
+						{{ value ? parseAmount(value) : 0 }}
 					</Text>
 				</Flex>
 			</Flex>

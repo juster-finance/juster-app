@@ -326,9 +326,9 @@ const parseProfitAmount = (amount) => {
 
 					<template #content>
 						Realized
-						<span>{{ profit.realized.toFixed(2) }}</span
+						<span>{{ parseProfitAmount(profit.realized) }}</span
 						>, Unrealized
-						<span>{{ profit.unrealized.toFixed(2) }}</span>
+						<span>{{ parseProfitAmount(profit.unrealized) }}</span>
 					</template>
 				</Tooltip>
 
