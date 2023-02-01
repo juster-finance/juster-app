@@ -116,7 +116,9 @@ const sortedSummaries = computed(() => {
 		const aProfit = a.realizedProfit + a.unrealizedProfit.toNumber()
 		const bProfit = b.realizedProfit + b.unrealizedProfit.toNumber()
 
-		return aProfit - bProfit
+		return profit.realized + profit.unrealized < 0
+			? aProfit - bProfit
+			: bProfit - aProfit
 	})
 })
 </script>
