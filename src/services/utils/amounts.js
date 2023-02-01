@@ -54,3 +54,55 @@ export const f = (num) => {
 		return num.toFixed(2)
 	}
 }
+
+export const toFix = (num, fractionDigits = 2) => {
+	const rgxp = new RegExp(`^-?\\d+(?:\\.\\d{0,${fractionDigits}})?`)
+	return num.toString().match(rgxp)[0]
+}
+
+export const crop = (num, p = 6) => {
+	if (isNaN(num)) return `0.0`
+
+	let i = p
+	const t = []
+
+	const splittedNum = num.toString().split(".")
+
+	if (splittedNum[1]) {
+		splittedNum[1].split("").forEach((n) => {
+			if (n == "0") {
+				if (i == 0) return
+				if (i !== 6) i -= 1
+				t.push(n)
+			} else {
+				if (i == 0) return
+				i -= 1
+				t.push(n)
+			}
+		})
+
+		return `${splittedNum[0]}.${t.join("")}`
+	} else {
+		return num
+	}
+}
+
+export const truncate = (num) => {
+	if (!num) return num
+
+	const [left, right] = num.toString().split(".")
+	let result = ""
+	const rightArr = right.split("")
+
+	for (let i = 0; i < rightArr.length; i++) {
+		const digit = rightArr[i]
+		if (digit == "0" || digit == ".") {
+			result += digit
+		} else {
+			result += digit
+			break
+		}
+	}
+
+	return `${left}.${result}`
+}

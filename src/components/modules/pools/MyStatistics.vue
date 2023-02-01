@@ -14,7 +14,7 @@ import Toggleable from "@ui/Toggleable.vue"
  * Services
  */
 import { parsePoolName } from "@utils/misc"
-import { numberWithSymbol } from "@utils/amounts"
+import { numberWithSymbol, truncate } from "@utils/amounts"
 
 /**
  * Store
@@ -70,32 +70,6 @@ const profit = computed(() => {
 	}
 })
 
-// const poolsDistribution = computed(() => {
-// 	const distribution = []
-
-// 	props.positions.forEach((entry) => {
-// 		if (!distribution.length) {
-// 			distribution.push({
-// 				name: entry.pool.name,
-// 				tvl: entry.amount,
-// 			})
-// 		} else {
-// 			const pool = distribution.find((e) => e.name === entry.pool.name)
-
-// 			if (pool) {
-// 				pool.tvl += entry.amount
-// 			} else {
-// 				distribution.push({
-// 					name: entry.pool.name,
-// 					tvl: entry.amount,
-// 				})
-// 			}
-// 		}
-// 	})
-
-// 	return distribution.sort((a, b) => b.tvl - a.tvl)
-// })
-
 const sortedPositions = computed(() => {
 	const sPositions = props.positions.map((position) => {
 		return {
@@ -108,7 +82,7 @@ const sortedPositions = computed(() => {
 })
 
 const sortedSummaries = computed(() => {
-	const sums = Object.keys(props.summaries).map((pool) => {
+	let sums = Object.keys(props.summaries).map((pool) => {
 		return { ...props.summaries[pool], poolId: pool }
 	})
 
@@ -121,6 +95,14 @@ const sortedSummaries = computed(() => {
 			: bProfit - aProfit
 	})
 })
+
+const parseProfitAmount = (amount) => {
+	if (Math.abs(amount % 1) < 0.01 && amount !== 0) {
+		return truncate(amount)
+	} else {
+		return numberWithSymbol(amount, ",")
+	}
+}
 </script>
 
 <template>
@@ -255,9 +237,9 @@ const sortedSummaries = computed(() => {
 
 							<Text color="secondary" size="13" weight="600">
 								{{
-									(
-										profit.realized + profit.unrealized
-									).toFixed(2)
+									parseProfitAmount(
+										profit.realized + profit.unrealized,
+									)
 								}}
 							</Text>
 						</Flex>
@@ -372,10 +354,10 @@ const sortedSummaries = computed(() => {
 
 								<Text color="secondary" size="13" weight="600">
 									{{
-										(
+										parseProfitAmount(
 											summary.realizedProfit +
-											summary.unrealizedProfit.toNumber()
-										).toFixed(2)
+												summary.unrealizedProfit.toNumber(),
+										)
 									}}
 								</Text>
 							</Flex>
@@ -395,12 +377,12 @@ const sortedSummaries = computed(() => {
 								>
 									<Flex
 										:style="{
-											width: `${
+											width: `${Math.abs(
 												(100 *
 													(summary.realizedProfit +
 														summary.unrealizedProfit.toNumber())) /
-												profit.total
-											}%`,
+													profit.total,
+											)}%`,
 										}"
 										:class="$style.left"
 									>
@@ -445,7 +427,12 @@ const sortedSummaries = computed(() => {
 								>
 									<Flex
 										:style="{
-											width: '100%',
+											width: `${Math.abs(
+												(100 *
+													(summary.realizedProfit +
+														summary.unrealizedProfit.toNumber())) /
+													profit.total,
+											)}%`,
 										}"
 										:class="$style.right"
 									>
@@ -453,8 +440,10 @@ const sortedSummaries = computed(() => {
 											:style="{
 												width: `${
 													100 -
-													(100 * profit.unrealized) /
-														profit.total
+													(100 *
+														summary.unrealizedProfit.toNumber()) /
+														(summary.realizedProfit +
+															summary.unrealizedProfit.toNumber())
 												}%`,
 											}"
 											:class="$style.bar_green"
@@ -462,8 +451,10 @@ const sortedSummaries = computed(() => {
 										<div
 											:style="{
 												width: `${
-													(100 * profit.unrealized) /
-													profit.total
+													(100 *
+														summary.unrealizedProfit.toNumber()) /
+													(summary.realizedProfit +
+														summary.unrealizedProfit.toNumber())
 												}%`,
 												opacity: '0.5',
 											}"
@@ -476,11 +467,13 @@ const sortedSummaries = computed(() => {
 
 						<template #content>
 							Realized
-							<span>{{ summary.realizedProfit.toFixed(2) }}</span
-							>, Unrealized
-							<span>{{
-								summary.unrealizedProfit.toFixed(2)
-							}}</span>
+							<span>
+								{{ truncate(summary.realizedProfit) }}
+							</span>
+							, Unrealized
+							<span>
+								{{ truncate(summary.unrealizedProfit) }}
+							</span>
 						</template>
 					</Tooltip>
 				</Flex>

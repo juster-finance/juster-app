@@ -18,7 +18,7 @@ import LargeBanner from "@ui/LargeBanner.vue"
  */
 import { juster } from "@sdk"
 import { getCurrencyIcon } from "@utils/misc"
-import { numberWithSymbol } from "@utils/amounts"
+import { numberWithSymbol, truncate } from "@utils/amounts"
 import { supportedMarkets } from "@config"
 
 /**
@@ -234,6 +234,14 @@ const handleGetClaims = () => {
 	)
 }
 
+const parseProfitAmount = (amount) => {
+	if (Math.abs(amount % 1) < 0.01 && amount !== 0) {
+		return truncate(amount)
+	} else {
+		return numberWithSymbol(amount, ",")
+	}
+}
+
 watch(
 	() => line.value,
 	() => {
@@ -342,11 +350,7 @@ watch(
 
 				<Flex direction="column" gap="8">
 					<Text color="primary" size="16" weight="600">
-						{{
-							unrealizedProfit < 0.01 && unrealizedProfit !== 0
-								? `< 0.01`
-								: numberWithSymbol(unrealizedProfit, ",")
-						}}
+						{{ parseProfitAmount(unrealizedProfit) }}
 					</Text>
 					<Text
 						color="tertiary"
