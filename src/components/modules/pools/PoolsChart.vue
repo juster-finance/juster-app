@@ -24,7 +24,7 @@ const scale = reactive({
 })
 
 const draw = () => {
-	const margin = { top: 0, right: 20, bottom: 0, left: 0 },
+	const margin = { top: 0, right: 0, bottom: 0, left: 0 },
 		width = `100%`,
 		height = 260 - margin.top - margin.bottom
 
@@ -43,13 +43,16 @@ const draw = () => {
 	scale.x = d3
 		.scaleTime()
 		.domain(d3.extent(data.value, (d) => d.date))
-		.range([0, canvas.node().getBoundingClientRect().width - 130])
+		.range([0, canvas.node().getBoundingClientRect().width - 100])
 
 	const domain = [
 		d3.min(data.value, (d) => +d.value) - 5,
 		d3.max(data.value, (d) => +d.value) + 5,
 	]
-	scale.y = d3.scaleLinear().domain(domain).range([height, 0])
+	scale.y = d3
+		.scaleLinear()
+		.domain(domain)
+		.range([height - 40, 24])
 
 	const format = d3.timeFormat("%b %d")
 
@@ -58,7 +61,7 @@ const draw = () => {
 			.append("g")
 			.attr("transform", `translate(${scale.x(tick)}, 0)`)
 
-		tickG.append("line").attr("y2", 240).attr("class", classes.time_line)
+		tickG.append("line").attr("y2", 242).attr("class", classes.time_line)
 
 		if (!i) return
 		tickG.append("text").attr("y", 260).text(format(tick))
@@ -67,7 +70,7 @@ const draw = () => {
 	scale.y.ticks(5).forEach((tick) => {
 		const tickG = canvas
 			.append("g")
-			.attr("transform", `translate(0, ${scale.y(tick)})`)
+			.attr("transform", `translate(-10, ${scale.y(tick)})`)
 
 		tickG.append("line").attr("x2", 680).attr("class", classes.value_line)
 		tickG.append("text").attr("x", 700).text(tick)
@@ -97,13 +100,17 @@ onMounted(async () => {
 			tsGt: DateTime.fromObject({
 				year: now.year,
 				month: now.month,
-				day: now.day - i - 1,
-			}).toISO(),
+				day: now.day,
+			})
+				.minus({ day: i - 1 })
+				.toISO(),
 			tsLt: DateTime.fromObject({
 				year: now.year,
 				month: now.month,
-				day: now.day - i,
-			}).toISO(),
+				day: now.day,
+			})
+				.minus({ day: -i })
+				.toISO(),
 		})
 
 		if (!states.length) continue
@@ -117,8 +124,8 @@ onMounted(async () => {
 				DateTime.fromObject({
 					year: now.year,
 					month: now.month,
-					day: now.day - i - 1,
-				}).ts,
+					day: now.day,
+				}).minus({ day: i - 1 }).ts,
 			),
 		})
 	}
