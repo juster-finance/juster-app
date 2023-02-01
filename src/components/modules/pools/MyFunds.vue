@@ -332,7 +332,7 @@ watch(
 
 				<Flex direction="column" gap="8">
 					<Text color="primary" size="16" weight="600">
-						{{ numberWithSymbol(valueLocked, ",") }}
+						{{ parseSensitiveAmount(valueLocked) }}
 					</Text>
 					<Text
 						color="tertiary"
