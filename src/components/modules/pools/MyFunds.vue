@@ -234,8 +234,13 @@ const handleGetClaims = () => {
 	)
 }
 
-const parseProfitAmount = (amount) => {
-	if (Math.abs(amount % 1) < 0.01 && amount !== 0) {
+const parseSensitiveAmount = (amount) => {
+	if (
+		Math.abs(amount % 1) < 0.01 &&
+		amount !== 0 &&
+		amount < 0.01 &&
+		amount > -0.01
+	) {
 		return truncate(amount)
 	} else {
 		return numberWithSymbol(amount, ",")
@@ -350,7 +355,7 @@ watch(
 
 				<Flex direction="column" gap="8">
 					<Text color="primary" size="16" weight="600">
-						{{ parseProfitAmount(unrealizedProfit) }}
+						{{ parseSensitiveAmount(unrealizedProfit) }}
 					</Text>
 					<Text
 						color="tertiary"

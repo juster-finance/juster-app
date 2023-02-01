@@ -97,7 +97,12 @@ const sortedSummaries = computed(() => {
 })
 
 const parseProfitAmount = (amount) => {
-	if (Math.abs(amount % 1) < 0.01 && amount !== 0) {
+	if (
+		Math.abs(amount % 1) < 0.01 &&
+		amount !== 0 &&
+		amount < 0.01 &&
+		amount > -0.01
+	) {
 		return truncate(amount)
 	} else {
 		return numberWithSymbol(amount, ",")
