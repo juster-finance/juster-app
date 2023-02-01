@@ -1,9 +1,16 @@
 <script setup>
 /**
+ * Vendor
+ */
+import { useRouter } from "vue-router"
+
+/**
  * UI
  */
 import Button from "@ui/Button.vue"
 import Tooltip from "@ui/Tooltip.vue"
+
+const router = useRouter()
 </script>
 
 <template>
@@ -56,16 +63,21 @@ import Tooltip from "@ui/Tooltip.vue"
 			</Flex>
 
 			<Flex align="center" gap="16" :class="$style.actions">
-				<Button type="white" size="small">
+				<Button
+					@click="router.push('/events')"
+					type="white"
+					size="small"
+				>
 					<Icon name="zap_fast" size="16" /> Join your first Price
 					Event
 				</Button>
-				<router-link to="/docs">
-					<Button type="secondary" size="small">
-						<Icon name="book" size="16" /> I need help getting
-						started
-					</Button>
-				</router-link>
+				<Button
+					@click="router.push('/docs')"
+					type="secondary"
+					size="small"
+				>
+					<Icon name="book" size="16" /> I need help getting started
+				</Button>
 			</Flex>
 		</div>
 
