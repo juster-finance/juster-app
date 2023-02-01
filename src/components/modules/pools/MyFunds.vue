@@ -17,7 +17,7 @@ import LargeBanner from "@ui/LargeBanner.vue"
  * Services
  */
 import { juster } from "@sdk"
-import { getCurrencyIcon } from "@utils/misc"
+import { getCurrencyIcon, parsePoolName } from "@utils/misc"
 import { numberWithSymbol, truncate } from "@utils/amounts"
 import { supportedMarkets } from "@config"
 
@@ -548,7 +548,14 @@ watch(
 
 							<Flex align="center">
 								<Text size="14" weight="600" color="secondary">
-									Entry&nbsp;
+									{{
+										parsePoolName(
+											entry.pool.name.replace(
+												"Juster Pool: ",
+												"",
+											),
+										)
+									}}&nbsp;
 								</Text>
 								<Text size="14" weight="600" color="tertiary">
 									#{{ entry.entryId }}
