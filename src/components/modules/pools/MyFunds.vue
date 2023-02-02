@@ -42,6 +42,7 @@ const props = defineProps({
 	entries: Array,
 	positions: Array,
 	poolDuration: Number,
+	isReady: Boolean,
 })
 
 onMounted(async () => {
@@ -371,7 +372,7 @@ watch(
 
 		<Flex direction="column" gap="24">
 			<LargeBanner
-				v-if="!valueLocked && !unrealizedProfit"
+				v-if="!valueLocked && !unrealizedProfit && isReady"
 				title="Start using Liquidity Pools today"
 				description="It only takes a few minutes to learn this feature with
 						the help of detailed documentation and guides."

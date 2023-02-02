@@ -393,6 +393,7 @@ const { meta } = useMeta({
 						:entries="entries"
 						:positions="positions"
 						:summaries="summaries"
+						:isReady="isPopulated"
 						@onManualEntryApprove="handleManualEntryApprove"
 						@onDepositLiquidity="showPoolsModal = true"
 						@onGetClaims="showWithdrawClaimsModal = true"

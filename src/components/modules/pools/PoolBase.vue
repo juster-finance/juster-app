@@ -203,6 +203,7 @@ const setupSubToPositions = async () => {
 		.subscribe({
 			next: ({ poolPosition }) => {
 				position.value = poolPosition[0]
+				isPositionReady.value = true
 			},
 			error: console.error,
 		})
@@ -259,14 +260,7 @@ const init = () => {
  * Deposits with an amount <1 xtz need manual confirmation
  */
 const handleManualEntryApprove = async (entry) => {
-	// const contract = await juster.sdk._tezos.contract.at(entry.pool.address)
-	// console.log(contract)
-	// const op = await contract.methods.approveEntry(entry.entryId).send()
-
-	// op.confirmation().then((data) => {
-	// 	console.log(data)
-	// })
-	const result = await juster.provider.client.requestOperation({
+	await juster.provider.client.requestOperation({
 		operationDetails: [
 			{
 				kind: "TRANSACTION",
@@ -281,7 +275,6 @@ const handleManualEntryApprove = async (entry) => {
 			},
 		],
 	})
-	console.log(result)
 }
 
 const handleRequestWithdraw = () => {
@@ -316,8 +309,6 @@ watch(
 	() => position.value,
 	() => {
 		if (!position.value) return
-		isPositionReady.value = true
-
 		position.value.shares = BN(position.value.shares)
 	},
 )
@@ -331,6 +322,7 @@ watch(
 watch(
 	() => isFullReady.value,
 	() => {
+		if (!position.value) return
 		summary.value = makeSummaryPosition(position.value, poolState.value)
 	},
 )
@@ -421,6 +413,7 @@ const { meta } = useMeta({
 						:positions="position ? [position] : []"
 						:summaries="summary.totalDeposited ? [summary] : []"
 						:poolDuration="poolDuration"
+						:isReady="isFullReady"
 						@onManualEntryApprove="handleManualEntryApprove"
 						@onDepositLiquidity="showDepositModal = true"
 						@onRequestWithdraw="handleRequestWithdraw"
