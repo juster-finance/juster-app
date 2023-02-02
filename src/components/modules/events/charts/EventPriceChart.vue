@@ -390,7 +390,7 @@ const draw = () => {
 	const currentData = data.find(
 		(d) =>
 			new Date(d.date).getTime() ==
-			new Date(symbol.quotes[0].timestamp).getTime(),
+			new Date(quotes[0].timestamp).getTime(),
 	)
 
 	if (currentData) {
