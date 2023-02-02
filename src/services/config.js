@@ -69,6 +69,7 @@ export const verifiedMakers = {
 		"KT1JcMF3L3FkK3rszRGGxyT4tQt4JeCb7RWC",
 		"KT1XELoPAA945ExHXS9mfG1Tx3gDUn7ph9cp",
 		"KT1TNE38c5BFc9hXXAGBJ3fmXCPtHKV3Ng81",
+		"KT1MRHBX9DoLYsmN58ediuARpzH4QdgMAQz8",
 	],
 	mainnet: ["tz1h5frRwDbJMGyTPntdwMC8i745q2Z1fzyF"],
 }
