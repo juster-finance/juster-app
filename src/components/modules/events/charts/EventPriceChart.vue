@@ -66,6 +66,59 @@ const priceDynamics = computed(() => {
 const draw = () => {
 	if (!symbol.quotes.length) return
 
+	const chartEars = {
+		hour: 0,
+		minute: 0,
+	}
+
+	let quotes = []
+
+	/** 1h */
+	if (props.event.measurePeriod == 3600) {
+		chartEars.hour = 1
+		chartEars.minute = 0
+
+		quotes = symbol.quotes
+	}
+
+	/** 6h */
+	if (props.event.measurePeriod == 21600) {
+		chartEars.hour = 6
+		chartEars.minute = 30
+
+		quotes = symbol.quotes.filter((q) => {
+			const mins = []
+			;[...Array(13).keys()].forEach((a) => {
+				mins.push(a * 5)
+			})
+			return mins.includes(DateTime.fromISO(q.timestamp).minute)
+		})
+	}
+
+	/** 24h */
+	if (props.event.measurePeriod == 86400) {
+		chartEars.hour = 24
+		chartEars.minute = 0
+
+		quotes = symbol.quotes.filter((q) =>
+			[30, 0].includes(DateTime.fromISO(q.timestamp).minute),
+		)
+	}
+
+	/** 7d */
+	if (props.event.measurePeriod == 604800) {
+		chartEars.hour = 24 * 7
+		chartEars.minute = 0
+
+		quotes = symbol.quotes.filter((q) => {
+			const hours = []
+			;[...Array(13).keys()].forEach((a) => {
+				hours.push(a * 2)
+			})
+			return hours.includes(DateTime.fromISO(q.timestamp).hour)
+		})
+	}
+
 	const margin = { top: 20, right: 100, bottom: 30, left: 0 },
 		width = `100%`,
 		height = 240 - margin.top - margin.bottom
@@ -82,36 +135,7 @@ const draw = () => {
 		.append("g")
 		.attr("transform", `translate(${margin.left},${margin.top})`)
 
-	let data = prepareQuotesForD3({ quotes: symbol.quotes })
-
-	const chartEars = {
-		hour: 0,
-		minute: 0,
-	}
-
-	/** 1h */
-	if (props.event.measurePeriod == 3600) {
-		chartEars.hour = 0
-		chartEars.minute = 30
-	}
-
-	/** 6h */
-	if (props.event.measurePeriod == 21600) {
-		chartEars.hour = 6
-		chartEars.minute = 30
-	}
-
-	/** 24h */
-	if (props.event.measurePeriod == 86400) {
-		chartEars.hour = 24
-		chartEars.minute = 0
-	}
-
-	/** 7d */
-	if (props.event.measurePeriod == 604800) {
-		chartEars.hour = 24 * 7
-		chartEars.minute = 0
-	}
+	let data = prepareQuotesForD3({ quotes: quotes })
 
 	/** Simplify the data for 7d */
 	if (props.event.measurePeriod == 604800) {
