@@ -29,6 +29,9 @@ import { juster } from "@sdk"
  * UI
  */
 import Banner from "@ui/Banner.vue"
+import LoadingDots from "@ui/LoadingDots.vue"
+import LoadingBar from "@ui/LoadingBar.vue"
+import Spin from "@ui/Spin.vue"
 
 const props = defineProps({ event: { type: Object, default: () => {} } })
 
@@ -604,9 +607,17 @@ onBeforeUnmount(() => {
 
 <template>
 	<div :class="$style.wrapper">
-		<Banner v-if="!symbol.isQuotesLoaded" loading color="gray">
-			Loading quotes..
-		</Banner>
+		<Flex
+			v-if="!symbol.isQuotesLoaded"
+			align="center"
+			justify="center"
+			gap="12"
+			:class="$style.test"
+		>
+			<LoadingDots />
+			<Text size="13" weight="500" color="tertiary">Chart loading</Text>
+		</Flex>
+
 		<Banner
 			v-else-if="symbol.isQuotesLoaded && !symbol.quotes.length"
 			icon="help"
@@ -767,5 +778,9 @@ onBeforeUnmount(() => {
 	stroke: var(--blue);
 	stroke-dasharray: 4, 4;
 	stroke-width: 1;
+}
+
+.test {
+	height: 240px;
 }
 </style>

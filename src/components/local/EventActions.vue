@@ -1,14 +1,19 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { computed } from "vue"
-
-import { f } from "@utils/amounts"
 
 /**
  * UI
  */
 import Button from "@ui/Button.vue"
-import Spin from "@ui/Spin.vue"
 import LoadingBar from "@ui/LoadingBar.vue"
+
+/**
+ * Services
+ */
+import { f, numberWithSymbol } from "@utils/amounts"
 
 /**
  * Store
@@ -182,7 +187,7 @@ const btnType = computed(() => {
 
 			<template v-else-if="!isWithdrawing && positionForWithdraw">
 				<Icon name="coins" size="16" />Withdraw
-				{{ f(positionForWithdraw.value) }} XTZ
+				{{ numberWithSymbol(positionForWithdraw.value, ",") }} XTZ
 			</template>
 
 			<template v-else> <LoadingBar /></template>
