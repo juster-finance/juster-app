@@ -254,7 +254,7 @@ export default defineComponent({
 			/** Draw chart Before start */
 			const dataBeforeStart = data.filter(
 				(quote) =>
-					DateTime.fromJSDate(quote.date).ts <
+					DateTime.fromJSDate(quote.date).ts <=
 					DateTime.fromISO(event.value.betsCloseTime).ts,
 			)
 
