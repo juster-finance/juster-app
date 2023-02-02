@@ -395,7 +395,7 @@ const copy = (target) => {
 
 				<Flex
 					v-if="accountStore.pkh && position"
-					@click.prevent="handleSwitch"
+					@click.stop="handleSwitch"
 					align="center"
 					gap="8"
 					:class="$style.switch_btn"
