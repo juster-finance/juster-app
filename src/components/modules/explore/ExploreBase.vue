@@ -180,6 +180,43 @@ useMeta({
 			</metainfo>
 
 			<transition-group name="fade" mode="out-in">
+				<Flex
+					justify="between"
+					gap="40"
+					:class="[$style.block, $style.billboard]"
+				>
+					<Flex gap="12">
+						<Icon name="server" size="16" color="secondary" />
+						<Flex direction="column" gap="8">
+							<Text
+								size="13"
+								height="11"
+								weight="600"
+								color="primary"
+								>Liquidity Pools now available</Text
+							>
+							<Text
+								size="13"
+								height="16"
+								weight="500"
+								color="tertiary"
+								>Juster Pool is a new decentralized finance
+								(DeFi) instrument that aims to provide a more
+								flexible and decentralized market making process
+								for users.</Text
+							>
+						</Flex>
+					</Flex>
+
+					<Button
+						@click="router.push('/pools')"
+						type="secondary"
+						size="small"
+					>
+						<Icon name="login" size="16" />Go to Pools
+					</Button>
+				</Flex>
+
 				<FreshAccountBanner
 					v-if="accountStore.pkh && !user"
 					:class="$style.block"
@@ -309,6 +346,13 @@ useMeta({
 	letter-spacing: 0.5px;
 }
 
+.billboard {
+	border: 2px solid rgba(255, 255, 255, 0.05);
+	border-radius: 8px;
+
+	padding: 16px;
+}
+
 .head {
 	display: flex;
 	justify-content: space-between;
@@ -351,6 +395,11 @@ useMeta({
 	.head {
 		flex-direction: column;
 		gap: 16px;
+	}
+
+	.billboard {
+		flex-direction: column;
+		gap: 20px;
 	}
 }
 
