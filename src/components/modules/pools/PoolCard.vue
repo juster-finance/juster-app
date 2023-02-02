@@ -86,9 +86,11 @@ onMounted(() => {
 	}, 30_000)
 
 	juster.pools[props.pool.address].subscribeToRiskIndex((data) => {
+		if (data.isNaN()) return
 		riskIndex.value = data.toNumber() * 100
 	})
 	juster.pools[props.pool.address].subscribeToUtilization((data) => {
+		if (data.isNaN()) return
 		utilization.value = data.toNumber() * 100
 	})
 })
@@ -456,7 +458,8 @@ const copy = (target) => {
 								(utilization > 0.01 &&
 									utilization < 0.1 &&
 									'tertiary') ||
-								(utilization >= 0.1 && 'green')
+								(utilization >= 0.1 && 'green') ||
+								'tertiary'
 							"
 						/>
 						<Text size="15" weight="600" color="secondary">
