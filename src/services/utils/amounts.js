@@ -90,6 +90,9 @@ export const crop = (num, p = 6) => {
 export const truncate = (num) => {
 	if (!num) return num
 
+	/** todo: refactor */
+	if (num.toString().includes("e")) return 0
+
 	const [left, right] = num.toString().split(".")
 	let result = ""
 	const rightArr = right.split("")

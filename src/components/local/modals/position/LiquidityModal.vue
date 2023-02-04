@@ -280,102 +280,129 @@ export default defineComponent({
 </script>
 
 <template>
-	<Modal :show="show" width="500" closable @onClose="$emit('onClose')">
+	<Modal :show="show" width="500" new closable @onClose="$emit('onClose')">
 		<template v-if="accountStore.isLoggined">
-			<div :class="$style.title">Providing liquidity</div>
+			<Flex align="center" justify="between" :class="$style.head">
+				<Flex align="center" gap="8">
+					<Icon name="server" size="16" color="secondary" />
 
-			<Banner
-				v-if="currentNetwork !== 'mainnet'"
-				icon="hammer"
-				color="yellow"
-				size="small"
-				center
-				:class="$style.banner"
-			>
-				The transaction takes place on the Test Network
-			</Banner>
+					<Text
+						@click="emit('onBack')"
+						size="14"
+						weight="600"
+						color="primary"
+					>
+						Deposit Liquidity
+					</Text>
+				</Flex>
 
-			<PositionDirection
-				:event="event"
-				:amount="amount"
-				:countdown="countdownText"
-				:class="$style.direction"
-			/>
-
-			<Input
-				ref="amountInput"
-				type="number"
-				:limit="10000"
-				label="Amount"
-				placeholder="Liquidity amount"
-				subtext="ꜩ"
-				v-model="amount.value"
-				:class="$style.amount_input"
-			/>
-
-			<SplittedPool
-				:event="event"
-				:amount="amount.value"
-				side="Liquidity"
-				:class="$style.pool"
-			/>
-
-			<SlippageSelector
-				v-model="slippage"
-				:class="$style.slippage_block"
-			/>
-
-			<div :class="$style.stats">
-				<Stat name="Payout for providing"
-					>{{ (event.liquidityPercent * 100).toFixed(0) }}%</Stat
-				>
-
-				<Stat v-if="liquidityRatio" name="Ratio">
-					<Icon name="close" size="14" :class="$style.ratio_icon" />
-					{{ (1 + liquidityRatio.min).toFixed(2) }} -
-					{{ (1 + liquidityRatio.max).toFixed(2) }}
-				</Stat>
-			</div>
-
-			<Banner
-				v-if="!verifiedMakers[currentNetwork].includes(event.creatorId)"
-				icon="warning"
-				color="red"
-				size="small"
-				:class="$style.banner"
-			>
-				This event is Custom, its behavior may depend on the parameters
-			</Banner>
-
-			<Button
-				@click="handleProvideLiquidity"
-				size="large"
-				:type="buttonState.disabled ? 'secondary' : 'primary'"
-				block
-				:loading="sendingLiquidity"
-				:disabled="buttonState.disabled"
-			>
-				<Spin v-if="sendingLiquidity" size="16" />
 				<Icon
-					v-else
-					:name="!buttonState.disabled ? 'bolt' : 'lock'"
+					@click="$emit('onClose')"
+					name="close"
 					size="16"
+					color="tertiary"
+					:class="$style.close_icon"
 				/>
-				{{ buttonState.text }}
-			</Button>
+			</Flex>
 
-			<div v-if="showHint.aborted" :class="$style.hint">
-				If you did not cancel the last transaction, then
-				<a>reconnect</a> the wallet
-			</div>
-			<div v-else-if="showHint.confirmationDelay" :class="$style.hint">
-				Confirmation not appearing?
-				<a
-					href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
-					target="_blank"
-					>Read about possible solutions</a
+			<Flex direction="column" gap="32" :class="$style.base">
+				<Banner
+					v-if="currentNetwork !== 'mainnet'"
+					icon="hammer"
+					color="yellow"
+					size="small"
+					center
 				>
-			</div>
+					The transaction takes place on the Test Network
+				</Banner>
+
+				<PositionDirection
+					:event="event"
+					:amount="amount"
+					:countdown="countdownText"
+				/>
+
+				<Input
+					ref="amountInput"
+					type="number"
+					:limit="10000"
+					label="Amount"
+					placeholder="Liquidity amount"
+					subtext="ꜩ"
+					v-model="amount.value"
+				/>
+
+				<SplittedPool
+					:event="event"
+					:amount="amount.value"
+					side="Liquidity"
+				/>
+
+				<SlippageSelector v-model="slippage" />
+
+				<div :class="$style.stats">
+					<Stat name="Payout for providing"
+						>{{ (event.liquidityPercent * 100).toFixed(0) }}%</Stat
+					>
+
+					<Stat v-if="liquidityRatio" name="Ratio">
+						<Icon
+							name="close"
+							size="14"
+							:class="$style.ratio_icon"
+						/>
+						{{ (1 + liquidityRatio.min).toFixed(2) }} -
+						{{ (1 + liquidityRatio.max).toFixed(2) }}
+					</Stat>
+				</div>
+
+				<Banner
+					v-if="
+						!verifiedMakers[currentNetwork].includes(
+							event.creatorId,
+						)
+					"
+					icon="warning"
+					color="red"
+					size="small"
+				>
+					This event is Custom, its behavior may depend on the
+					parameters
+				</Banner>
+
+				<Button
+					@click="handleProvideLiquidity"
+					size="large"
+					:type="buttonState.disabled ? 'secondary' : 'primary'"
+					block
+					:loading="sendingLiquidity"
+					:disabled="buttonState.disabled"
+				>
+					<Spin v-if="sendingLiquidity" size="16" />
+					<Icon
+						v-else
+						:name="!buttonState.disabled ? 'bolt' : 'lock'"
+						size="16"
+					/>
+					{{ buttonState.text }}
+				</Button>
+
+				<div v-if="showHint.aborted" :class="$style.hint">
+					If you did not cancel the last transaction, then
+					<a>reconnect</a> the wallet
+				</div>
+				<div
+					v-else-if="showHint.confirmationDelay"
+					:class="$style.hint"
+				>
+					Confirmation not appearing?
+					<a
+						href="https://juster.notion.site/Transaction-confirmation-is-not-received-for-a-long-time-18f589e67d8943f9bf5627a066769c92"
+						target="_blank"
+						>Read about possible solutions</a
+					>
+				</div>
+			</Flex>
 		</template>
 
 		<template v-else>
@@ -403,17 +430,25 @@ export default defineComponent({
 .wrapper {
 }
 
+.head {
+	height: 56px;
+
+	padding: 0 20px;
+}
+
+.close_icon {
+	cursor: pointer;
+}
+
+.base {
+	padding: 8px 20px 20px 20px;
+}
+
 .title {
 	font-size: 20px;
 	font-weight: 600;
 	line-height: 1.2;
 	color: var(--text-primary);
-
-	margin-bottom: 24px;
-}
-
-.direction {
-	margin-bottom: 32px;
 }
 
 .description {
@@ -425,24 +460,10 @@ export default defineComponent({
 	margin-bottom: 24px;
 }
 
-.amount_input {
-	margin-bottom: 24px;
-}
-
-.pool {
-	margin-bottom: 24px;
-}
-
 .stats {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-
-	margin-bottom: 24px;
-}
-
-.slippage_block {
-	margin-bottom: 24px;
 }
 
 .ratio_icon {
@@ -455,15 +476,9 @@ export default defineComponent({
 	font-weight: 500;
 	color: var(--text-tertiary);
 	text-align: center;
-
-	margin-top: 12px;
 }
 
 .hint a {
 	color: var(--text-blue);
-}
-
-.banner {
-	margin-bottom: 24px;
 }
 </style>

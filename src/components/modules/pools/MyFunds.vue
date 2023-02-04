@@ -4,6 +4,7 @@
  */
 import { ref, onMounted, watch, computed } from "vue"
 import { DateTime, Duration } from "luxon"
+import BN from "bignumber.js"
 
 /**
  * UI

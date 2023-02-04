@@ -60,7 +60,7 @@ const profit = computed(() => {
 		const summary = props.summaries[pool]
 
 		realized += summary.realizedProfit
-		unrealized += summary.unrealizedProfit.toNumber()
+		unrealized += truncate(summary.unrealizedProfit.toNumber())
 	})
 
 	return {
@@ -118,9 +118,9 @@ const parseProfitAmount = (amount) => {
 			:class="$style.head"
 		>
 			<Flex direction="column" gap="8">
-				<Text color="primary" size="16" weight="600"
-					>My Statistics</Text
-				>
+				<Text color="primary" size="16" weight="600">
+					My Statistics
+				</Text>
 				<Text color="tertiary" size="14" weight="500" height="14">
 					Splitted data by pools
 				</Text>
@@ -332,156 +332,166 @@ const parseProfitAmount = (amount) => {
 					</template>
 				</Tooltip>
 
-				<Flex
-					v-for="summary in sortedSummaries"
-					direction="column"
-					gap="8"
-				>
-					<Tooltip placement="bottom" isWide>
-						<Flex direction="column" gap="8" wide>
-							<Flex align="center" justify="between">
-								<Text color="secondary" size="13" weight="600">
-									{{
-										parsePoolName(
-											pools
-												.find(
-													(p) =>
-														p.address ==
-														summary.poolId,
-												)
-												.name.replace(
-													"Juster Pool: ",
-													"",
-												),
-										)
-									}}
-								</Text>
-
-								<Text color="secondary" size="13" weight="600">
-									{{
-										parseProfitAmount(
-											summary.realizedProfit +
-												summary.unrealizedProfit.toNumber(),
-										)
-									}}
-								</Text>
-							</Flex>
-
-							<Flex :class="$style.progress_wrapper">
-								<Flex
-									justify="end"
-									:class="$style.left_wrapper"
-									:style="{
-										opacity:
-											summary.realizedProfit +
-												summary.unrealizedProfit.toNumber() <
-											0
-												? 1
-												: 0,
-									}"
-								>
-									<Flex
-										:style="{
-											width: `${Math.abs(
-												(100 *
-													(summary.realizedProfit +
-														summary.unrealizedProfit.toNumber())) /
-													profit.total,
-											)}%`,
-										}"
-										:class="$style.left"
+				<template v-if="profit.total">
+					<Flex
+						v-for="summary in sortedSummaries"
+						direction="column"
+						gap="8"
+					>
+						<Tooltip placement="bottom" isWide>
+							<Flex direction="column" gap="8" wide>
+								<Flex align="center" justify="between">
+									<Text
+										color="secondary"
+										size="13"
+										weight="600"
 									>
-										<div
-											:style="{
-												width: `${
-													(100 *
-														summary.unrealizedProfit.toNumber()) /
-													(summary.realizedProfit +
-														summary.unrealizedProfit.toNumber())
-												}%`,
-												opacity: '0.5',
-											}"
-											:class="$style.bar_orange"
-										/>
-										<div
-											:style="{
-												width: `${
-													100 -
-													(100 *
-														summary.unrealizedProfit.toNumber()) /
-														(summary.realizedProfit +
-															summary.unrealizedProfit.toNumber())
-												}%`,
-											}"
-											:class="$style.bar_orange"
-										/>
-									</Flex>
+										{{
+											parsePoolName(
+												pools
+													.find(
+														(p) =>
+															p.address ==
+															summary.poolId,
+													)
+													.name.replace(
+														"Juster Pool: ",
+														"",
+													),
+											)
+										}}
+									</Text>
+
+									<Text
+										color="secondary"
+										size="13"
+										weight="600"
+									>
+										{{
+											parseProfitAmount(
+												summary.realizedProfit +
+													summary.unrealizedProfit.toNumber(),
+											)
+										}}
+									</Text>
 								</Flex>
 
-								<Flex
-									justify="start"
-									:class="$style.right_wrapper"
-									:style="{
-										opacity:
-											summary.realizedProfit +
-												summary.unrealizedProfit.toNumber() >
-											0
-												? 1
-												: 0,
-									}"
-								>
+								<Flex :class="$style.progress_wrapper">
 									<Flex
+										justify="end"
+										:class="$style.left_wrapper"
 										:style="{
-											width: `${Math.abs(
-												(100 *
-													(summary.realizedProfit +
-														summary.unrealizedProfit.toNumber())) /
-													profit.total,
-											)}%`,
+											opacity:
+												summary.realizedProfit +
+													summary.unrealizedProfit.toNumber() <
+												0
+													? 1
+													: 0,
 										}"
-										:class="$style.right"
 									>
-										<div
+										<Flex
 											:style="{
-												width: `${
-													100 -
+												width: `${Math.abs(
 													(100 *
-														summary.unrealizedProfit.toNumber()) /
+														(summary.realizedProfit +
+															summary.unrealizedProfit.toNumber())) /
+														profit.total,
+												)}%`,
+											}"
+											:class="$style.left"
+										>
+											<div
+												:style="{
+													width: `${
+														(100 *
+															summary.unrealizedProfit.toNumber()) /
 														(summary.realizedProfit +
 															summary.unrealizedProfit.toNumber())
-												}%`,
-											}"
-											:class="$style.bar_green"
-										/>
-										<div
+													}%`,
+													opacity: '0.5',
+												}"
+												:class="$style.bar_orange"
+											/>
+											<div
+												:style="{
+													width: `${
+														100 -
+														(100 *
+															summary.unrealizedProfit.toNumber()) /
+															(summary.realizedProfit +
+																summary.unrealizedProfit.toNumber())
+													}%`,
+												}"
+												:class="$style.bar_orange"
+											/>
+										</Flex>
+									</Flex>
+
+									<Flex
+										justify="start"
+										:class="$style.right_wrapper"
+										:style="{
+											opacity:
+												summary.realizedProfit +
+													summary.unrealizedProfit.toNumber() >
+												0
+													? 1
+													: 0,
+										}"
+									>
+										<Flex
 											:style="{
-												width: `${
+												width: `${Math.abs(
 													(100 *
-														summary.unrealizedProfit.toNumber()) /
-													(summary.realizedProfit +
-														summary.unrealizedProfit.toNumber())
-												}%`,
-												opacity: '0.5',
+														(summary.realizedProfit +
+															summary.unrealizedProfit.toNumber())) /
+														profit.total,
+												)}%`,
 											}"
-											:class="$style.bar_green"
-										/>
+											:class="$style.right"
+										>
+											<div
+												:style="{
+													width: `${
+														100 -
+														(100 *
+															summary.unrealizedProfit.toNumber()) /
+															(summary.realizedProfit +
+																summary.unrealizedProfit.toNumber())
+													}%`,
+												}"
+												:class="$style.bar_green"
+											/>
+											<div
+												:style="{
+													width: `${
+														(100 *
+															summary.unrealizedProfit.toNumber()) /
+														(summary.realizedProfit +
+															summary.unrealizedProfit.toNumber())
+													}%`,
+													opacity: '0.5',
+												}"
+												:class="$style.bar_green"
+											/>
+										</Flex>
 									</Flex>
 								</Flex>
 							</Flex>
-						</Flex>
 
-						<template #content>
-							Realized
-							<span>
-								{{ truncate(summary.realizedProfit) }}
-							</span>
-							, Unrealized
-							<span>
-								{{ truncate(summary.unrealizedProfit) }}
-							</span>
-						</template>
-					</Tooltip>
-				</Flex>
+							<template #content>
+								Realized
+								<span>
+									{{ truncate(summary.realizedProfit) }}
+								</span>
+								, Unrealized
+								<span>
+									{{ truncate(summary.unrealizedProfit) }}
+								</span>
+							</template>
+						</Tooltip>
+					</Flex>
+				</template>
 
 				<Flex align="center" gap="16">
 					<Flex align="center" gap="6">
@@ -652,6 +662,11 @@ const parseProfitAmount = (amount) => {
 .tab.active {
 	background: rgba(255, 255, 255, 0.05);
 	color: var(--text-primary);
+}
+
+.tab.disabled {
+	opacity: 0.5;
+	pointer-events: none;
 }
 
 .deposited_dot {
