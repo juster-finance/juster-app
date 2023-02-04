@@ -372,7 +372,12 @@ watch(
 
 		<Flex direction="column" gap="24">
 			<LargeBanner
-				v-if="!valueLocked && !unrealizedProfit && isReady"
+				v-if="
+					!valueLocked &&
+					!unrealizedProfit &&
+					isReady &&
+					pools.length > 1
+				"
 				title="Start using Liquidity Pools today"
 				description="It only takes a few minutes to learn this feature with
 						the help of detailed documentation and guides."
