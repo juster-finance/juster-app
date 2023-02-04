@@ -76,9 +76,20 @@ const draw = () => {
 		tickG.append("text").attr("x", 700).text(tick)
 	})
 
+	/**
+	 * Changes to the TVL pool that will not change
+	 * in the future and will remain unchanged
+	 */
+	const recordedData = data.value.filter(
+		(d) =>
+			DateTime.fromJSDate(d.date).startOf("day") <
+			DateTime.now().startOf("day"),
+	)
+
+	/** Recorded Chart */
 	chart
 		.append("path")
-		.datum(data.value)
+		.datum(recordedData)
 		.attr("fill", "none")
 		.attr("stroke", "#457ee8")
 		.attr("stroke-width", 2)
@@ -89,6 +100,30 @@ const draw = () => {
 				.x((d) => scale.x(d.date))
 				.y((d) => scale.y(d.value)),
 		)
+
+	const currentData = data.value.slice(0, 2)
+
+	/** Today Line */
+	chart
+		.append("path")
+		.datum(currentData)
+		.attr("fill", "none")
+		.attr("stroke", "#457ee8")
+		.attr("stroke-width", 2)
+		.attr("stroke-dasharray", 5)
+		.attr(
+			"d",
+			d3
+				.line()
+				.x((d) => scale.x(d.date))
+				.y((d) => scale.y(d.value)),
+		)
+	chart
+		.append("circle")
+		.attr("cx", scale.x(currentData[0].date))
+		.attr("cy", scale.y(currentData[0].value))
+		.attr("r", 4)
+		.attr("fill", "#457ee8")
 }
 
 onMounted(async () => {
@@ -136,20 +171,7 @@ onMounted(async () => {
 
 <template>
 	<Flex direction="column" gap="24" :class="$style.wrapper">
-		<Flex justify="between" wide>
-			<Text size="16" weight="600" color="primary"> Chart </Text>
-
-			<Flex align="center" gap="8" :class="$style.filter_btn">
-				<Flex>
-					<Text size="13" weight="600" color="tertiary">
-						Pools:&nbsp;
-					</Text>
-					<Text size="13" weight="600" color="primary">All</Text>
-				</Flex>
-
-				<Icon name="arrow" size="14" color="tertiary" />
-			</Flex>
-		</Flex>
+		<Text size="16" weight="600" color="primary"> Chart </Text>
 
 		<div id="chart" :class="$style.chart" />
 
@@ -182,12 +204,6 @@ onMounted(async () => {
 	border-top: 3px solid var(--border);
 
 	padding: 24px;
-}
-
-.filter_btn {
-	cursor: pointer;
-
-	height: fit-content;
 }
 
 .chart {
