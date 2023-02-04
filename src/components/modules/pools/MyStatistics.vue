@@ -60,7 +60,7 @@ const profit = computed(() => {
 		const summary = props.summaries[pool]
 
 		realized += summary.realizedProfit
-		unrealized += truncate(summary.unrealizedProfit.toNumber())
+		unrealized += summary.unrealizedProfit.toNumber()
 	})
 
 	return {
@@ -85,6 +85,13 @@ const sortedSummaries = computed(() => {
 	let sums = Object.keys(props.summaries).map((pool) => {
 		return { ...props.summaries[pool], poolId: pool }
 	})
+
+	sums = sums.filter(
+		(s) =>
+			!(s.unrealizedProfit.toNumber() + s.realizedProfit)
+				.toString()
+				.includes("e"),
+	)
 
 	return sums.sort((a, b) => {
 		const aProfit = a.realizedProfit + a.unrealizedProfit.toNumber()
@@ -191,7 +198,7 @@ const parseProfitAmount = (amount) => {
 								</Text>
 
 								<Text color="secondary" size="13" weight="600">
-									{{ numberWithSymbol(position.tvl, ",") }}
+									{{ parseProfitAmount(position.tvl) }}
 								</Text>
 							</Flex>
 						</Flex>
