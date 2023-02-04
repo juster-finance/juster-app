@@ -303,7 +303,7 @@ const handleBet = (bet) => {
 }
 
 const handleLiquidity = () => {
-	if (event.value.status !== "NEW") return
+	if (event.value.status !== "NEW" || !accountStore.isLoggined) return
 
 	showLiquidityModal.value = true
 
@@ -678,7 +678,10 @@ onUnmounted(() => {
 									<Icon name="notifications" size="16" />
 									Notify Me
 								</DropdownItem> -->
-								<DropdownItem @click="handleLiquidity">
+								<DropdownItem
+									@click="handleLiquidity"
+									:disabled="!accountStore.isLoggined"
+								>
 									<Icon name="liquidity" size="16" />
 									Direct Deposit
 								</DropdownItem>
