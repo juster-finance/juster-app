@@ -39,6 +39,16 @@ const generatedHref = computed(() => {
 	display: flex;
 	align-items: center;
 	gap: 8px;
+
+	transition: all 0.2s ease;
+}
+
+.wrapper a:focus-visible {
+	transform: translateY(-2px);
+}
+
+.wrapper a:focus-visible .anchor_icon {
+	opacity: 1;
 }
 
 .anchor {

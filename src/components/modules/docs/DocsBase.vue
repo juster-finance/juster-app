@@ -26,7 +26,6 @@ import {
 import { useDocsStore } from "@store/docs"
 
 const route = useRoute()
-const router = useRouter()
 
 const docsStore = useDocsStore()
 
@@ -316,6 +315,10 @@ const selectArticle = (article) => {
 }
 
 .link:hover {
+	color: var(--text-secondary);
+}
+
+.link:focus-visible {
 	color: var(--text-secondary);
 }
 

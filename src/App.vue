@@ -416,7 +416,6 @@ a {
 }
 a:focus-visible {
 	outline: none;
-	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 a,
@@ -439,7 +438,14 @@ h2 {
 }
 
 h3 {
-	font-size: 17px;
+	font-size: 18px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+h4 {
+	font-size: 16px;
 	line-height: 1;
 	font-weight: 600;
 	color: var(--text-primary);

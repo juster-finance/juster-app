@@ -22,10 +22,26 @@ const links = ref([])
 
 onMounted(() => {
 	if (!docsStore.article.content) return
+	createLinksStructure()
+})
+
+watch(
+	() => docsStore.article,
+	() => {
+		createLinksStructure()
+	},
+)
+
+const createLinksStructure = () => {
 	links.value = docsStore.article.content
 		.filter((block) => block.style?.startsWith("h"))
-		.map((block) => block.children[0].text)
-})
+		.map((block) => {
+			return {
+				text: block.children[0].text,
+				level: block.style.replace("h", ""),
+			}
+		})
+}
 
 const nextArticle = computed(() => {
 	if (!docsStore.article.section) return
@@ -69,15 +85,6 @@ const prevArticle = computed(() => {
 	}
 })
 
-watch(
-	() => docsStore.article,
-	() => {
-		links.value = docsStore.article.content
-			.filter((block) => block.style?.startsWith("h"))
-			.map((block) => block.children[0].text)
-	},
-)
-
 const handleNextPage = () => {
 	docsStore.article = nextArticle.value
 
@@ -110,8 +117,7 @@ const handlePrevPage = () => {
 				v-if="docsStore.article._updatedAt"
 				size="13"
 				weight="500"
-				color="tertiary"
-				align="right"
+				color="support"
 			>
 				Last updated
 				{{

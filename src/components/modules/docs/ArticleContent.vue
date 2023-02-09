@@ -32,6 +32,8 @@ const serializers = reactive({
 	styles: {
 		blockquote: Blockquote,
 		h2: HeaderAnchor,
+		h3: HeaderAnchor,
+		h4: HeaderAnchor,
 	},
 })
 </script>
@@ -52,9 +54,15 @@ const serializers = reactive({
 }
 
 .wrapper h2 {
-	cursor: pointer;
-
 	margin-bottom: 16px;
+}
+
+.wrapper h3 {
+	margin-bottom: 14px;
+}
+
+.wrapper h4 {
+	margin-bottom: 12px;
 }
 
 .wrapper p {

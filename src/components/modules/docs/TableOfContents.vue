@@ -27,8 +27,13 @@ const generateHref = (text) => {
 				</Text>
 
 				<ul>
-					<li v-for="link in links">
-						<a :href="`#${generateHref(link)}`">{{ link }}</a>
+					<li
+						v-for="link in links"
+						:style="{ paddingLeft: `${(link.level - 2) * 10}px` }"
+					>
+						<a :href="`#${generateHref(link.text)}`">{{
+							link.text
+						}}</a>
 					</li>
 				</ul>
 			</div>
@@ -75,12 +80,11 @@ const generateHref = (text) => {
 .wrapper ul {
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
 
 	padding-inline-start: 0px;
 	list-style-type: none;
 
-	margin: 16px 0;
+	margin: 8px 0 8px 0;
 }
 
 .wrapper li {
@@ -98,6 +102,11 @@ const generateHref = (text) => {
 
 .wrapper li:hover {
 	color: var(--text-secondary);
+}
+
+.wrapper li a {
+	display: flex;
+	padding: 8px 0;
 }
 
 @media (max-width: 900px) {
