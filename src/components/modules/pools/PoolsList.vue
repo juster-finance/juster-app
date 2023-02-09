@@ -9,12 +9,7 @@ import { Searcher } from "fast-fuzzy"
  * UI
  */
 import Button from "@ui/Button.vue"
-import {
-	Dropdown,
-	DropdownItem,
-	DropdownTitle,
-	DropdownDivider,
-} from "@ui/Dropdown"
+import { Dropdown, DropdownItem } from "@ui/Dropdown"
 
 /**
  * Local

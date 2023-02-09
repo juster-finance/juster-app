@@ -302,36 +302,10 @@ const routes = [
 		redirect: "/docs/discover",
 		children: [
 			{
-				path: "discover",
-				name: "DocDiscover",
-				component: () => import("@modules/docs/DiscoverBase.vue"),
+				path: ":slug",
+				name: "Doc",
+				component: () => import("@modules/docs/DocBase.vue"),
 			},
-			{
-				path: "betting",
-				name: "DocBetting",
-				component: () => import("@modules/docs/BettingBase.vue"),
-			},
-			{
-				path: "liquidity",
-				name: "DocLiquidity",
-				component: () => import("@modules/docs/LiquidityBase.vue"),
-			},
-			{
-				path: "withdraw",
-				name: "DocWithdraw",
-				component: () => import("@modules/docs/WithdrawBase.vue"),
-			},
-			{
-				path: "roadmap",
-				name: "DocRoadmap",
-				component: () => import("@modules/docs/RoadmapBase.vue"),
-			},
-			// {
-			// 	path: ":slug",
-			// 	name: "Doc",
-			// 	component: () =>
-			// 		import( "@views/DocPage"),
-			// },
 		],
 	},
 

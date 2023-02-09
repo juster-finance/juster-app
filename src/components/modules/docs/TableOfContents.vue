@@ -1,4 +1,20 @@
-<script setup></script>
+<script setup>
+const props = defineProps({
+	title: { type: String, default: "Juster Documentation" },
+	links: Array,
+})
+
+const generateHref = (text) => {
+	return text
+		.toString()
+		.toLowerCase()
+		.replace(/\s+/g, "-")
+		.replace(/[^\w\-]+/g, "")
+		.replace(/\-\-+/g, "-")
+		.replace(/^-+/, "")
+		.replace(/-+$/, "")
+}
+</script>
 
 <template>
 	<div :class="$style.wrapper">
@@ -6,14 +22,14 @@
 			<div :class="$style.label">Content</div>
 
 			<div :class="$style.content">
-				<a href="#juster-documentation" :class="$style.head"
-					>Juster Documentation</a
-				>
+				<Text size="14" weight="600" color="primary">
+					{{ title }}
+				</Text>
 
 				<ul>
-					<li><a href="#why-juster">Why Juster?</a></li>
-					<li><a href="#mainnet-launch">Mainnet Launch</a></li>
-					<li><a href="#community">Community</a></li>
+					<li v-for="link in links">
+						<a :href="`#${generateHref(link)}`">{{ link }}</a>
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -22,10 +38,14 @@
 
 <style module>
 .wrapper {
-	width: 100%;
+	min-width: 200px;
 	position: relative;
 
 	padding-left: 70px;
+}
+
+.wrapper * {
+	white-space: nowrap;
 }
 
 .base {
@@ -52,19 +72,12 @@
 	color: var(--text-secondary);
 }
 
-.head {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-primary);
-}
-
 .wrapper ul {
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
 
-	padding-inline-start: 10px;
+	padding-inline-start: 0px;
 	list-style-type: none;
 
 	margin: 16px 0;
@@ -75,5 +88,21 @@
 	line-height: 1;
 	font-weight: 500;
 	color: var(--text-tertiary);
+
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	transition: color 0.2s ease;
+}
+
+.wrapper li:hover {
+	color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+	.wrapper {
+		padding-left: 0;
+	}
 }
 </style>

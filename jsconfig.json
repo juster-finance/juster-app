@@ -14,6 +14,7 @@
 			"@layout": ["./src/components/layout/*"],
 			"@modals": ["./src/components/local/modals/*"],
 			"@modules": ["./src/components/modules/*"],
+			"@sanity": ["./src/components/sanity/*"],
 			"@typography": ["./src/components/typography/*"],
 			"@api": ["./src/api/*"],
 			"@config": ["./src/services/config"],

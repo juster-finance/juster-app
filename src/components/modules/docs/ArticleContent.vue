@@ -1,33 +1,46 @@
-<script>
-import { computed, defineComponent, toRefs, ref } from "vue"
+<script setup>
+/**
+ * Vendor
+ */
+import { reactive } from "vue"
 
-import Markdown from "markdown-it"
+/**
+ * Sanity Components
+ */
+import Blockquote from "@sanity/Blockquote.vue"
+import Image from "@sanity/Image.vue"
+import Banner from "@sanity/Banner.vue"
+import Collapse from "@sanity/Collapse.vue"
+import HeaderAnchor from "./HeaderAnchor.vue"
 
-export default defineComponent({
-	name: "ArticleContent",
-	props: {
-		source: {
-			type: String,
-			required: true,
-		},
+/**
+ * Utils
+ */
+import PortableText from "@utils/render.js"
+
+const props = defineProps({
+	title: String,
+	content: Array,
+})
+
+const serializers = reactive({
+	types: {
+		image: Image,
+		banner: Banner,
+		collapse: Collapse,
 	},
-
-	setup(props) {
-		const { source } = toRefs(props)
-
-		const md = ref(null)
-
-		md.value = new Markdown({ html: true })
-
-		const content = computed(() => md.value.render(source.value))
-
-		return { content }
+	styles: {
+		blockquote: Blockquote,
+		h2: HeaderAnchor,
 	},
 })
 </script>
 
 <template>
-	<div v-html="content" :class="$style.wrapper" />
+	<div :class="$style.wrapper">
+		<h1>{{ title }}</h1>
+		<PortableText :blocks="content" :serializers="serializers" />
+	</div>
 </template>
 
 <style module>
@@ -40,30 +53,12 @@ export default defineComponent({
 
 .wrapper h2 {
 	cursor: pointer;
-	margin-bottom: 24px;
-}
 
-.wrapper h2::after {
-	content: "";
-	position: relative;
-	top: 2px;
-	display: inline-block;
-	width: 16px;
-	height: 16px;
-	background: url("~@/assets/icons/anchor.svg") no-repeat;
-	background-size: 100% 100%;
-	margin-left: 8px;
-	opacity: 0;
-
-	transition: opacity 0.2s ease;
-}
-
-.wrapper h2:hover::after {
-	opacity: 0.5;
+	margin-bottom: 16px;
 }
 
 .wrapper p {
-	font-size: 15px;
+	font-size: 16px;
 	line-height: 1.6;
 	color: var(--text-secondary);
 
@@ -71,7 +66,7 @@ export default defineComponent({
 }
 
 .wrapper blockquote p {
-	font-size: 14px;
+	font-size: 14x;
 	color: var(--text-tertiary);
 }
 
@@ -82,19 +77,18 @@ export default defineComponent({
 
 .wrapper ul {
 	padding-inline-start: 20px;
+	list-style-type: disc;
 
 	margin-bottom: 24px;
 }
 
 .wrapper ul li {
-	font-size: 15px;
+	font-size: 16px;
 	line-height: 1.6;
 	color: var(--text-secondary);
 
-	list-style-type: "—";
-	padding-inline-start: 1ch;
-
-	margin-bottom: 4px;
+	padding-inline-start: 0.5ch;
+	margin-bottom: 16px;
 }
 
 .wrapper ol {

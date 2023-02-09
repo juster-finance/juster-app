@@ -168,8 +168,8 @@ const getImageUrl = (image) => {
 
 .wrapper p {
 	font-size: 16px;
-	line-height: 1.7;
-	font-weight: 500;
+	line-height: 1.6;
+	font-weight: 400;
 	color: var(--text-secondary);
 }
 

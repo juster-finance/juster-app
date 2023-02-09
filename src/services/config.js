@@ -16,7 +16,7 @@ export const supportedMarkets = {
 }
 
 export const sanity = {
-	id: "7iinpn2j",
+	id: "2tokh3zd",
 }
 
 export const rpcNodes = {

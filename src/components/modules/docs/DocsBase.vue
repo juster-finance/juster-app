@@ -3,8 +3,7 @@
  * Vendor
  */
 import { onMounted, ref, reactive } from "vue"
-import { useRouter, useRoute } from "vue-router"
-import Markdown from "markdown-it"
+import { useRoute, useRouter } from "vue-router"
 
 /**
  * API
@@ -12,49 +11,43 @@ import Markdown from "markdown-it"
 import { fetchArticles, fetchSections } from "@/api/sanity"
 
 /**
+ * UI
+ */
+import {
+	Dropdown,
+	DropdownItem,
+	DropdownDivider,
+	DropdownTitle,
+} from "@ui/Dropdown"
+
+/**
  * Store
  */
 import { useDocsStore } from "@store/docs"
 
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
 
 const docsStore = useDocsStore()
 
-const expandMenu = ref(false)
+const generalLinks = ref([])
 
-const anchors = ref([])
-
-const generalLinks = reactive([
+const positions = reactive([
 	{
-		code: "DocDiscover",
-		name: "Discover",
-		icon: "compass",
-		url: "/discover",
+		section: "General",
+		links: ["Discover", "Staking", "Liquidity", "Withdraw", "Roadmap"],
 	},
 	{
-		code: "DocBetting",
-		name: "Staking",
-		icon: "price_event",
-		url: "/betting",
+		section: "Getting Started",
+		links: ["Introduction", "Wallets"],
 	},
 	{
-		code: "DocLiquidity",
-		name: "Liquidity",
-		icon: "server",
-		url: "/liquidity",
+		section: "Essentials",
+		links: [],
 	},
 	{
-		code: "DocWithdraw",
-		name: "Withdraw",
-		icon: "walletadd",
-		url: "/withdraw",
-	},
-	{
-		code: "DocRoadmap",
-		name: "Roadmap",
-		icon: "map",
-		url: "/roadmap",
+		section: "Extra Topics",
+		links: ["Glossary", "FAQ"],
 	},
 ])
 
@@ -64,94 +57,88 @@ onMounted(async () => {
 	const allSections = await fetchSections()
 	const articles = await fetchArticles()
 
-	if (docsStore.article.title) {
-		let articleBySlug
-
-		Object.keys(docsStore.sections).forEach((section) => {
-			docsStore.sections[section].forEach((article) => {
-				if (article.slug.current == route.params.slug) {
-					articleBySlug = article
-				}
-			})
+	/** Sections */
+	allSections
+		.sort((a, b) => {
+			const aSectionIdx = positions.findIndex(
+				(p) => p.section === a.title,
+			)
+			const bSectionIdx = positions.findIndex(
+				(p) => p.section === b.title,
+			)
+			return aSectionIdx - bSectionIdx
+		})
+		.forEach((section) => {
+			if (!docsStore.sections[section.title]) {
+				docsStore.sections[section.title] = []
+			}
 		})
 
+	generalLinks.value = articles
+		.filter((a) => !a.section)
+		.sort((a, b) => {
+			const section = positions.find((p) => p.section === "General")
+			const aArticleIdx = section.links.findIndex((l) => l === a.title)
+			const bArticleIdx = section.links.findIndex((l) => l === b.title)
+			return aArticleIdx - bArticleIdx
+		})
+
+	/** Sort articles */
+	articles
+		.filter((a) => a.section)
+		.sort((a, b) => {
+			const aSection = positions.find(
+				(p) => p.section === a.section.title,
+			)
+			const bSection = positions.find(
+				(p) => p.section === b.section.title,
+			)
+			const aArticleIdx = aSection.links.findIndex((l) => l === a.title)
+			const bArticleIdx = bSection.links.findIndex((l) => l === b.title)
+			return aArticleIdx - bArticleIdx
+		})
+		.forEach((article) => {
+			if (docsStore.sections[article.section.title]) {
+				docsStore.sections[article.section.title].push(article)
+			}
+		})
+
+	/** Select current */
+	if (route.params.slug) {
+		let articleBySlug
+		articles.forEach((article) => {
+			if (article.slug.current == route.params.slug)
+				articleBySlug = article
+		})
 		selectArticle(articleBySlug)
-	} else {
-		/** Sections */
-		allSections
-			.sort((a, b) => a.position - b.position)
-			.forEach((section) => {
-				if (!docsStore.sections[section.title]) {
-					docsStore.sections[section.title] = []
-				}
-			})
-
-		/** Sort articles */
-		articles
-			.sort((a, b) => a.position - b.position)
-			.forEach((article) => {
-				if (docsStore.sections[article.section.title]) {
-					docsStore.sections[article.section.title].push(article)
-				}
-			})
-
-		/** pre-selected article */
-		// if (route.params.slug) {
-
-		// 	let articleBySlug
-
-		// 	Object.keys(docsStore.sections).forEach((section) => {
-		// 		docsStore.sections[section].forEach((article) => {
-		// 			if (article.slug.current == route.params.slug) {
-		// 				articleBySlug = article
-		// 			}
-		// 		})
-		// 	})
-
-		// 	selectArticle(articleBySlug)
-		// } else {
-		// 	selectArticle(docsStore.sections[allSections[0].title][0])
-		// }
 	}
 })
 
 const selectArticle = (article) => {
 	docsStore.article = article
-
-	router.push(`/docs/${article.slug.current}`)
-
-	/** find content */
-	const md = new Markdown()
-	const body = md.render(article.Body)
-	const regex = /(<h2>.+)/g
-	const content = body.match(regex)
-
-	anchors.value =
-		content &&
-		content.map((anchor) =>
-			anchor.replaceAll("<h2>", "").replaceAll("</h2>", ""),
-		)
 }
 </script>
 
 <template>
 	<div :class="$style.wrapper">
-		<div :class="[$style.nav, expandMenu && $style.expanded]">
+		<div :class="$style.nav">
 			<div :class="$style.general_links">
 				<router-link
 					v-for="(generalLink, gIndex) in generalLinks"
 					:key="gIndex"
-					:to="`/docs${generalLink.url}`"
+					@click="selectArticle(generalLink)"
+					:to="`/docs/${generalLink.slug.current}`"
 					:class="[
 						$style.general_link,
-						route.name === generalLink.code && $style.active,
+						docsStore.article.slug.current ===
+							generalLink.slug.current && $style.active,
 					]"
 				>
 					<div :class="$style.icon">
 						<Icon :name="generalLink.icon" size="16" />
 					</div>
 
-					{{ generalLink.name }}
+					{{ generalLink.title }}
 				</router-link>
 			</div>
 
@@ -162,9 +149,10 @@ const selectArticle = (article) => {
 			>
 				<div :class="$style.title">{{ index }}</div>
 
-				<div
+				<router-link
 					v-for="article in section"
 					:key="article._id"
+					:to="article.slug.current"
 					@click="selectArticle(article)"
 					:class="[
 						$style.link,
@@ -172,38 +160,62 @@ const selectArticle = (article) => {
 					]"
 				>
 					{{ article.title }}
-				</div>
+				</router-link>
 			</div>
 		</div>
 
 		<div :class="$style.base">
+			<Dropdown>
+				<template #trigger>
+					<Flex align="center" gap="8" wide :class="$style.menu_btn">
+						<Icon name="menu" size="16" color="secondary" />
+						<Text size="14" weight="600" color="primary">Menu</Text>
+					</Flex>
+				</template>
+
+				<template #dropdown>
+					<router-link
+						v-for="link in generalLinks"
+						@click="selectArticle(link)"
+						:to="`/docs/${link.slug.current}`"
+					>
+						<DropdownItem>
+							<Icon
+								:name="link.icon"
+								size="16"
+								color="secondary"
+							/>
+							{{ link.title }}
+						</DropdownItem>
+					</router-link>
+					<DropdownDivider />
+
+					<template
+						v-for="(section, sectionName) in docsStore.sections"
+					>
+						<DropdownTitle>{{ sectionName }}</DropdownTitle>
+						<router-link
+							v-for="link in section"
+							@click="selectArticle(link)"
+							:to="`/docs/${link.slug.current}`"
+						>
+							<DropdownItem>
+								{{ link.title }}
+							</DropdownItem>
+						</router-link>
+						<DropdownDivider />
+					</template>
+				</template>
+			</Dropdown>
+
 			<router-view />
 		</div>
-
-		<!-- <div v-if="anchors" :class="$style.anchors">
-			<span :class="$style.anchors_title">Content</span>
-			<div
-				v-for="(anchor, index) in anchors"
-				:key="index"
-				:class="$style.anchor"
-			>
-				{{ anchor }}
-			</div>
-		</div> -->
-
-		<Icon
-			@click="expandMenu = !expandMenu"
-			:name="expandMenu ? 'close' : 'menu'"
-			size="20"
-			:class="$style.menu_btn"
-		/>
 	</div>
 </template>
 
 <style module>
 .wrapper {
 	display: flex;
-	position: relative;
 }
 
 .nav {
@@ -305,13 +317,10 @@ const selectArticle = (article) => {
 
 .link:hover {
 	color: var(--text-secondary);
-	background: var(--opacity-05);
 }
 
 .link.active {
-	color: var(--text-primary);
-
-	border-right: 3px solid var(--blue);
+	color: var(--text-blue);
 }
 
 .base {
@@ -320,57 +329,25 @@ const selectArticle = (article) => {
 	margin: 50px 0 0 80px;
 }
 
-.anchors {
-	height: fit-content;
-	position: sticky;
-	top: 130px;
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
-
-	margin: 0 0 0 100px;
-}
-
-.anchors span {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-tertiary);
-}
-
-.anchor {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-secondary);
-
-	transition: color 0.2s ease;
-}
-
-.anchor:hover {
-	color: var(--text-primary);
-}
-
 .menu_btn {
 	display: none;
-	position: absolute;
-	top: 32px;
-	left: 0;
+
 	cursor: pointer;
 	background: var(--btn-secondary-bg);
-	box-sizing: content-box;
-	padding: 4px;
+	padding: 8px;
 	border-radius: 6px;
 	border: 1px solid var(--border);
 
-	fill: var(--icon);
+	margin-bottom: 32px;
+}
+
+@media (max-width: 1100px) {
+	.base {
+		margin: 50px 0 0 0;
+	}
 }
 
 @media (max-width: 850px) {
-	.base {
-		margin: 32px 0 0 32px;
-	}
-
 	.anchors {
 		margin-left: 40px;
 	}
@@ -384,27 +361,11 @@ const selectArticle = (article) => {
 
 @media (max-width: 600px) {
 	.menu_btn {
-		display: initial;
+		display: flex;
 	}
 
 	.nav {
-		position: absolute;
-		left: -250px;
-		top: 0;
-		bottom: 0;
-
-		padding-top: 100px;
-
-		transition: left 0.15s ease;
-	}
-
-	.nav.expanded {
-		left: 0;
-	}
-
-	.base {
-		margin-left: 0;
-		margin-top: 80px;
+		display: none;
 	}
 }
 </style>
