@@ -11,6 +11,8 @@ import Blockquote from "@sanity/Blockquote.vue"
 import Image from "@sanity/Image.vue"
 import Banner from "@sanity/Banner.vue"
 import Collapse from "@sanity/Collapse.vue"
+import List from "@sanity/List.vue"
+import ListItem from "@sanity/ListItem.vue"
 import HeaderAnchor from "./HeaderAnchor.vue"
 
 /**
@@ -22,6 +24,8 @@ const props = defineProps({
 	title: String,
 	content: Array,
 })
+
+console.log(props.content)
 
 const serializers = reactive({
 	types: {
@@ -35,6 +39,8 @@ const serializers = reactive({
 		h3: HeaderAnchor,
 		h4: HeaderAnchor,
 	},
+	list: List,
+	listItem: ListItem,
 })
 </script>
 
