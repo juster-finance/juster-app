@@ -21,5 +21,7 @@ console.log(props)
 <style module>
 .wrapper {
 	width: 100%;
+
+	margin-bottom: 40px;
 }
 </style>
