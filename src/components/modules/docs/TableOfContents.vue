@@ -43,8 +43,9 @@ const generateHref = (text) => {
 
 <style module>
 .wrapper {
-	min-width: 200px;
 	position: relative;
+	min-width: 200px;
+	flex-grow: 1;
 
 	padding-left: 70px;
 }

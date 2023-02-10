@@ -11,6 +11,8 @@ import Blockquote from "@sanity/Blockquote.vue"
 import Image from "@sanity/Image.vue"
 import Banner from "@sanity/Banner.vue"
 import Collapse from "@sanity/Collapse.vue"
+import Code from "@sanity/Code.vue"
+import CodeBlock from "@sanity/CodeBlock.vue"
 import List from "@sanity/List.vue"
 import ListItem from "@sanity/ListItem.vue"
 import HeaderAnchor from "./HeaderAnchor.vue"
@@ -25,19 +27,21 @@ const props = defineProps({
 	content: Array,
 })
 
-console.log(props.content)
-
 const serializers = reactive({
 	types: {
 		image: Image,
 		banner: Banner,
 		collapse: Collapse,
+		codeBlock: CodeBlock,
 	},
 	styles: {
 		blockquote: Blockquote,
 		h2: HeaderAnchor,
 		h3: HeaderAnchor,
 		h4: HeaderAnchor,
+	},
+	marks: {
+		code: Code,
 	},
 	list: List,
 	listItem: ListItem,

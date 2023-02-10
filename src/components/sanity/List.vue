@@ -4,7 +4,6 @@ import ListItem from "./ListItem.vue"
 const props = defineProps({
 	children: Array,
 })
-console.log(props)
 </script>
 
 <template>

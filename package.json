@@ -26,6 +26,7 @@
 		"node-stdlib-browser": "^1.2.0",
 		"pinia": "^2.0.13",
 		"qrcode": "^1.5.1",
+		"shiki": "^0.14.0",
 		"uuid": "^8.3.2",
 		"vite-plugin-node-stdlib-browser": "^0.1.1",
 		"vue": "^3.2.45",
