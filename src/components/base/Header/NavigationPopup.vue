@@ -55,12 +55,13 @@ const resourcesLinks = ref([
 		title: "Developers",
 		description: "Learn the product in more detail",
 		url: "/docs",
+		disabled: true,
 	},
 	{
 		icon: "map",
 		title: "Roadmap",
 		description: "Explore the product path",
-		url: "/docs",
+		url: "/docs/roadmap",
 	},
 	{
 		icon: "github",
@@ -292,7 +293,10 @@ watch(
 										link.url.startsWith('https://') &&
 										'_blank'
 									"
-									:class="$style.item"
+									:class="[
+										$style.item,
+										link.disabled && $style.disabled,
+									]"
 								>
 									<div :class="$style.icon_wrapper">
 										<Icon :name="link.icon" size="20" />
