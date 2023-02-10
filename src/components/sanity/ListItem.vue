@@ -17,7 +17,7 @@ const props = defineProps({
 				size="20"
 				color="green"
 			/>
-			<div v-else="listItem === 'bullet'" :class="[$style.dot]" />
+			<div v-else="listItem === 'bullet'" :class="[$style.line]" />
 		</div>
 
 		<Text size="16" weight="500" color="secondary" height="16">
@@ -35,12 +35,11 @@ const props = defineProps({
 	margin-top: 2px;
 }
 
-.dot {
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
+.line {
+	width: 12px;
+	height: 1px;
 	background: var(--text-tertiary);
 
-	margin-top: 8px;
+	margin-top: 10px;
 }
 </style>
