@@ -237,8 +237,8 @@ export default defineComponent({
 						fall (during the time frame specified in the event), put
 						the amount you want to risk, and send the order.<br />
 						Your bet will be confirmed in approximately 30 seconds
-						and you will be able see it in the "My bets" list on the
-						Event page.
+						and you will be able see it in the "My stakes" list on
+						the Event page.
 					</div>
 
 					<div :class="$style.step_actions">

@@ -70,10 +70,10 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 			<div :class="$style.info">
 				<div v-if="!pending" :class="$style.title">
-					{{ accountStore.pkh == bet.userId ? "My" : "" }} Bet
+					{{ accountStore.pkh == bet.userId ? "My" : "" }} Stake
 				</div>
 
-				<div v-else :class="$style.title">Pending Bet</div>
+				<div v-else :class="$style.title">Pending Stake</div>
 
 				<div v-if="!pending" :class="$style.time">
 					{{
