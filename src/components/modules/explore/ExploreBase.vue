@@ -377,7 +377,7 @@ useMeta({
 
 .my_positions {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(530px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 	grid-gap: 16px;
 
 	margin-top: 24px;
@@ -400,6 +400,10 @@ useMeta({
 	.billboard {
 		flex-direction: column;
 		gap: 20px;
+	}
+
+	.my_positions {
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 	}
 }
 

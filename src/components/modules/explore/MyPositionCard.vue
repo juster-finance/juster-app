@@ -213,4 +213,16 @@ const value = computed(() => {
 	border-radius: 50%;
 	background: var(--border);
 }
+
+@media (max-width: 400px) {
+	.wrapper {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 20px;
+
+		height: initial;
+
+		padding: 16px;
+	}
+}
 </style>
