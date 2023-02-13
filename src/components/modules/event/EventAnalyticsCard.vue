@@ -253,11 +253,11 @@ const distributionOfBets = computed(() => {
 				<div :class="$style.text">
 					<p>
 						Most users to the
-						<span
-							>"{{
+						<span>
+							{{
 								distributionOfUsers == "rise" ? "Rise" : "Fall"
-							}}"</span
-						>
+							}}
+						</span>
 						side
 					</p>
 					<p>
