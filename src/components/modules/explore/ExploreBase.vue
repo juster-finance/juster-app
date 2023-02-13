@@ -201,9 +201,9 @@ useMeta({
 								weight="500"
 								color="tertiary"
 								>Juster Pool is a new decentralized finance
-								(DeFi) instrument that aims to provide a more
-								flexible and decentralized market making process
-								for users.</Text
+								instrument that aims to provide a more flexible
+								and decentralized market making process for
+								users.</Text
 							>
 						</Flex>
 					</Flex>
