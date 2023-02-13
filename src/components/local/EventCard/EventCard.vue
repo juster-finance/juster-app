@@ -100,25 +100,20 @@ const { stop: destroyFinishCountdown } = useCountdown(finishDt)
 
 const timing = computed(() => {
 	const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("en")
-
 	const endDt = eventDt.plus(props.event.measurePeriod * 1000)
 
 	return {
 		start: {
-			time: eventDt.toLocaleString({
-				hour: "numeric",
-				minute: "numeric",
-			}),
+			dt: eventDt,
+			time: eventDt.toLocaleString(DateTime.TIME_24_SIMPLE),
 			day: eventDt.toLocaleString({
 				day: "numeric",
 			}),
 			month: eventDt.toLocaleString({ month: "short" }),
 		},
 		end: {
-			time: endDt.toLocaleString({
-				hour: "numeric",
-				minute: "numeric",
-			}),
+			dt: endDt,
+			time: endDt.toLocaleString(DateTime.TIME_24_SIMPLE),
 			day: endDt.toLocaleString({
 				day: "numeric",
 			}),
@@ -657,7 +652,12 @@ onUnmounted(() => {
 				<Badge color="gray" :class="$style.badge">
 					<Icon name="time" size="12" />
 
-					{{ timing.start.time }}
+					{{
+						event.measurePeriod / 60 / 60 < 24
+							? timing.start.time
+							: timing.start.dt.toFormat("dd LLL")
+					}}
+
 					<span>
 						{{
 							toReadableDuration({
@@ -671,7 +671,12 @@ onUnmounted(() => {
 							}).text[0].toUpperCase()
 						}}
 					</span>
-					{{ timing.end.time }}
+
+					{{
+						event.measurePeriod / 60 / 60 < 24
+							? timing.end.time
+							: timing.end.dt.toFormat("dd LLL")
+					}}
 
 					<div
 						v-if="event.status === 'STARTED'"
