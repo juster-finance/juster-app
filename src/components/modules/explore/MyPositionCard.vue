@@ -133,7 +133,7 @@ const value = computed(() => {
 
 			<Badge size="medium" color="gray">
 				<Icon name="coins" size="14" color="tertiary" />
-				{{ value }} ꜩ
+				{{ value }}<span>XTZ</span>
 			</Badge>
 		</Flex>
 	</router-link>
