@@ -15,7 +15,7 @@ import { supportedMarkets } from "@config"
 /**
  * API
  */
-import { fetchQuoteByTimestamp } from "@/api/quotes"
+import { fetchQuoteByTimestamp, fetchQuoteByRange } from "@/api/quotes"
 
 /**
  * Store
@@ -33,30 +33,48 @@ const props = defineProps({
 
 const showMore = ref(false)
 
-const prevQuote = ref({})
+const prevQuotePrice = ref({})
 const startQuote = ref({})
 
 /**
- * ------{ prevQuote }---< measurePeriod >---{ startQuote }-------
+ * ------{ prevQuotePrice }---< measurePeriod >---{ startQuote }-------
  * ---------------------------------------------^-Start of event--
  *
  * If the event has not yet started, then use the last available quote
- * { prevQuote } is chosen relative to the start of the event or relative to the current time (before start, { currentQuote })
+ * { prevQuotePrice } is chosen relative to the start of the event or relative to the current time (before start, { currentQuote })
  */
 
 onMounted(async () => {
 	/** First Quote (to compare) */
-	const prevDt = DateTime.now()
+	let prevDt = DateTime.now()
+
+	prevDt =
+		DateTime.fromISO(props.event.betsCloseTime).ts > DateTime.now().ts
+			? DateTime.now()
+			: DateTime.fromISO(props.event.betsCloseTime)
+
+	prevDt = prevDt
 		.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
 		.minus({ hour: props.event.measurePeriod / 3600 })
-		.toISO()
 
-	const rawQuote = await fetchQuoteByTimestamp({
+	const [targetedRawQuote] = await fetchQuoteByTimestamp({
 		id: props.event.currencyPair.id,
-		ts: prevDt,
+		ts: prevDt.toISO(),
 	})
 
-	prevQuote.value = rawQuote[0]
+	const rawQuotes = await fetchQuoteByRange({
+		id: props.event.currencyPair.id,
+		tsGt: prevDt.minus({ minute: 30 }).toJSDate(),
+		tsLt: prevDt.toJSDate(),
+	})
+
+	const avgRaqQuotePrice =
+		rawQuotes.reduce((acc, curr) => (acc += curr.price), 0) /
+		rawQuotes.length
+
+	prevQuotePrice.value = targetedRawQuote
+		? targetedRawQuote.price
+		: avgRaqQuotePrice
 
 	/** Last Quote (to compare) */
 	if (["STARTED", "FINISHED"].includes(props.event.status)) {
@@ -92,12 +110,12 @@ const priceDetails = computed(() => {
 
 	return {
 		state:
-			priceToCompare - prevQuote.value.price < 0
+			priceToCompare - prevQuotePrice.value < 0
 				? PriceStates.DROPPED
 				: PriceStates.WENT_UP,
 		percentageDiff: (
-			(Math.abs(priceToCompare - prevQuote.value.price) /
-				((priceToCompare + prevQuote.value.price) / 2)) *
+			(Math.abs(priceToCompare - prevQuotePrice.value) /
+				((priceToCompare + prevQuotePrice.value) / 2)) *
 			100
 		).toFixed(2),
 	}
