@@ -1,5 +1,8 @@
-<script>
-import { defineComponent, onMounted } from "vue"
+<script setup>
+/**
+ * Vendor
+ */
+import { ref, onMounted } from "vue"
 import { useMeta } from "vue-meta"
 
 /**
@@ -17,35 +20,17 @@ import { fetchReleases } from "@/api/sanity"
  */
 import ReleaseCard from "./ReleaseCard.vue"
 
-/**
- * Store
- */
-import { useReleasesStore } from "@store/releases"
+const releases = ref([])
 
-export default defineComponent({
-	name: "ReleasesBase",
-	components: {
-		Button,
-		ReleaseCard,
-	},
+/** Meta */
+useMeta({
+	title: "Releases",
+	description: "New updates and improvements to Juster.",
+})
 
-	setup() {
-		/** Meta */
-		useMeta({
-			title: "Releases",
-			description: "New updates and improvements to Juster.",
-		})
-
-		const releasesStore = useReleasesStore()
-
-		onMounted(async () => {
-			releasesStore.all = await fetchReleases()
-		})
-
-		return {
-			releasesStore,
-		}
-	},
+onMounted(async () => {
+	releases.value = await fetchReleases()
+	console.log(releases.value)
 })
 </script>
 
@@ -63,22 +48,20 @@ export default defineComponent({
 
 			<div :class="$style.buttons">
 				<a href="https://discord.gg/FeGDCkHhnB" target="_blank">
-					<Button type="secondary" size="small"
-						><Icon name="discord" size="16" />Join our Discord
-						Server</Button
-					></a
-				>
+					<Button type="secondary" size="small">
+						<Icon name="discord" size="16" />Discord Server
+					</Button>
+				</a>
 				<a href="https://twitter.com/Juster_fi" target="_blank">
-					<Button type="secondary" size="small"
-						><Icon name="twitter" size="16" />Read our
-						Twitter</Button
-					>
+					<Button type="secondary" size="small">
+						<Icon name="twitter" size="16" />Twitter
+					</Button>
 				</a>
 			</div>
 
 			<div :class="$style.releases">
 				<ReleaseCard
-					v-for="release in releasesStore.all"
+					v-for="release in releases"
 					:key="release._id"
 					:release="release"
 					:class="$style.card"

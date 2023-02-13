@@ -315,11 +315,6 @@ const routes = [
 		name: "Releases",
 		component: () => import("@views/ReleasesPage.vue"),
 	},
-	{
-		path: "/releases/:slug",
-		name: "Release",
-		component: () => import("@views/ReleasePage.vue"),
-	},
 ]
 
 const router = createRouter({

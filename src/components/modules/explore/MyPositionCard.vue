@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { computed } from "vue"
 import { DateTime } from "luxon"
 
@@ -18,6 +21,7 @@ import { abbreviateNumber } from "@utils/amounts"
  * Store
  */
 import { useAccountStore } from "@store/account"
+
 const accountStore = useAccountStore()
 
 const props = defineProps({
@@ -82,8 +86,8 @@ const value = computed(() => {
 
 <template>
 	<router-link :to="`/events/${event.id}`">
-		<div :class="$style.wrapper">
-			<div :class="$style.left">
+		<Flex align="center" justify="between" :class="$style.wrapper">
+			<Flex align="center" gap="16">
 				<div
 					:class="[
 						$style.event_icon,
@@ -100,24 +104,12 @@ const value = computed(() => {
 					/>
 				</div>
 
-				<div :class="$style.info">
+				<Flex direction="column" justify="center" gap="8">
 					<div :class="$style.title">
-						<img
-							v-if="event.winnerBets == 'ABOVE_EQ'"
-							:src="require('@/assets/icons/higher_won.svg')"
-							alt="won_side_icon"
-						/>
-						<img
-							v-else-if="event.winnerBets == 'BELOW'"
-							:src="require('@/assets/icons/lower_won.svg')"
-							alt="won_side_icon"
-						/>
-						<Icon v-else name="sides" size="16" />
 						{{
 							supportedMarkets[symbol] &&
 							supportedMarkets[symbol].description
 						}}
-						<span>price event</span>
 					</div>
 
 					<div :class="$style.timing">
@@ -136,37 +128,35 @@ const value = computed(() => {
 							<span>({{ eventDuration }})</span>
 						</div>
 					</div>
-				</div>
-			</div>
+				</Flex>
+			</Flex>
 
-			<div :class="$style.right">
-				<Badge size="medium" color="gray"
-					><Icon name="wallet" size="14" /> <span>Value:</span>
-					{{ value }} ꜩ</Badge
-				>
-			</div>
-		</div>
+			<Badge size="medium" color="gray">
+				<Icon name="coins" size="14" color="tertiary" />
+				{{ value }} ꜩ
+			</Badge>
+		</Flex>
 	</router-link>
 </template>
 
 <style module>
 .wrapper {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-
-	height: 70px;
+	height: 62px;
 	border-radius: 8px;
-	border: 1px solid var(--border);
 	background: var(--card-bg);
+	box-shadow: 0 0 0 0 transparent;
 
-	padding: 0 20px;
+	padding: 0 16px;
+
+	transition: all 0.2s ease;
 }
 
-.left {
-	display: flex;
-	align-items: center;
-	gap: 16px;
+.wrapper:hover {
+	box-shadow: 0 0 0 2px var(--border);
+}
+
+.wrapper:focus {
+	box-shadow: 0 0 0 2px var(--border);
 }
 
 .event_icon {
@@ -180,8 +170,8 @@ const value = computed(() => {
 }
 
 .event_icon.green {
-	fill: var(--green);
-	background: rgba(26, 161, 104, 0.1);
+	fill: var(--purple);
+	background: rgba(133, 90, 209, 0.1);
 }
 
 .event_icon.yellow {
@@ -189,45 +179,13 @@ const value = computed(() => {
 	background: rgba(245, 183, 43, 0.1);
 }
 
-.info {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	gap: 8px;
-}
-
 .title {
 	display: flex;
 	align-items: center;
 
-	height: 20px;
-
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 600;
 	color: var(--text-primary);
-}
-
-.title img {
-	display: flex;
-
-	width: 16px;
-	height: 16px;
-
-	margin-right: 6px;
-}
-
-.title svg {
-	display: flex;
-
-	fill: var(--text-tertiary);
-
-	margin-right: 6px;
-}
-
-.title span {
-	color: var(--text-tertiary);
-
-	margin-left: 4px;
 }
 
 .timing {
@@ -254,11 +212,5 @@ const value = computed(() => {
 	height: 4px;
 	border-radius: 50%;
 	background: var(--border);
-}
-
-.right {
-	display: flex;
-	align-items: center;
-	gap: 8px;
 }
 </style>

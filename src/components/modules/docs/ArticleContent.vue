@@ -50,7 +50,7 @@ const serializers = reactive({
 
 <template>
 	<div :class="$style.wrapper">
-		<h1>{{ title }}</h1>
+		<h1 v-if="title">{{ title }}</h1>
 		<PortableText :blocks="content" :serializers="serializers" />
 	</div>
 </template>

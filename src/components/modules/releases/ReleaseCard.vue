@@ -1,24 +1,20 @@
 <script setup>
-import { ref, computed } from "vue"
+/**
+ * Vendor
+ */
+import { computed } from "vue"
 import { DateTime } from "luxon"
-import Markdown from "markdown-it"
+
+/**
+ * Modules
+ */
+import ArticleContent from "@modules/docs/ArticleContent.vue"
 
 const props = defineProps({ release: { type: Object } })
-
-const md = ref(null)
-md.value = new Markdown({ html: true })
-
-const firstParagraphRegex = /\<p>(.*?)\<\/p>/
-const content = computed(
-	() => firstParagraphRegex.exec(md.value.render(props.release.Body))[0],
-)
 </script>
 
 <template>
-	<router-link
-		:to="`/releases/${release.slug.current}`"
-		:class="$style.wrapper"
-	>
+	<Flex direction="column" gap="10">
 		<div :class="$style.card">
 			<div :class="$style.timeline">
 				<div :class="$style.moment">
@@ -35,20 +31,12 @@ const content = computed(
 
 			<div :class="$style.cover" />
 
-			<h2 :class="$style.title">{{ release.title }}</h2>
-
-			<div v-html="content" :class="$style.body_preview" />
+			<ArticleContent :content="release.content" />
 		</div>
-	</router-link>
+	</Flex>
 </template>
 
 <style module>
-.wrapper {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-
 .card {
 	width: 100%;
 
@@ -64,24 +52,6 @@ const content = computed(
 	border-radius: 16px;
 
 	margin-bottom: 32px;
-}
-
-.title {
-	font-size: 24px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-primary);
-
-	margin-bottom: 16px;
-}
-
-.body_preview {
-	font-size: 16px;
-	line-height: 1.6;
-	font-weight: 400;
-	color: var(--text-tertiary);
-
-	margin-bottom: 20px;
 }
 
 .timeline {
