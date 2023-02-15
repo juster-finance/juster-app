@@ -103,11 +103,13 @@ const routes = [
 		beforeEnter: (to, from, next) => {
 			const accountStore = useAccountStore()
 
-			if (accountStore.isLoggined) {
-				next()
-			} else {
-				next({ name: "Explore" })
-			}
+			next({ name: "Explore" })
+
+			// if (accountStore.isLoggined) {
+			// 	next()
+			// } else {
+			// 	next({ name: "Explore" })
+			// }
 		},
 		redirect: "/settings/account/",
 		children: [

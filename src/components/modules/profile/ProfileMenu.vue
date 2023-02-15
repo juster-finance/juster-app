@@ -143,7 +143,7 @@ const handleLogout = () => {
 				</Flex>
 
 				<Flex direction="column" :class="$style.links">
-					<Flex
+					<!-- <Flex
 						@click="router.push('/settings')"
 						align="center"
 						gap="8"
@@ -154,7 +154,7 @@ const handleLogout = () => {
 						<Text size="13" color="primary" weight="500">
 							Settings
 						</Text>
-					</Flex>
+					</Flex> -->
 					<Flex
 						@click="handleOpenReleases"
 						align="center"
