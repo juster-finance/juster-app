@@ -28,14 +28,8 @@ const handleCancel = () => {
 </script>
 
 <template>
-	<Modal
-		:show="show"
-		width="500"
-		required
-		z-index="1005"
-		@onClose="$emit('onClose')"
-	>
-		<Flex direction="column" gap="24">
+	<Modal :show="show" width="500" required z-index="1005" new>
+		<Flex direction="column" gap="24" :class="$style.base">
 			<Flex direction="column" gap="12">
 				<Text size="14" weight="600" color="primary">
 					{{ appStore.confirmation.title }}
@@ -150,6 +144,10 @@ const handleCancel = () => {
 </template>
 
 <style module>
+.base {
+	padding: 20px;
+}
+
 .divider {
 	width: 100%;
 	height: 1px;
