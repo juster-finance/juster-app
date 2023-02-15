@@ -30,7 +30,7 @@ onMounted(async () => {
 </script>
 
 <template>
-	<Modal :show="show" width="500" new closable @onClose="$emit('onClose')">
+	<Modal :show="show" width="500" new closable @onClose="emit('onClose')">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
 				<Icon name="users" size="16" color="secondary" />
