@@ -114,6 +114,10 @@
 	color: var(--text-blue);
 }
 
+.color--orange {
+	color: var(--orange);
+}
+
 .color--green {
 	color: var(--green);
 }

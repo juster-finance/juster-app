@@ -30,7 +30,6 @@ useMeta({
 
 onMounted(async () => {
 	releases.value = await fetchReleases()
-	console.log(releases.value)
 })
 </script>
 
@@ -61,9 +60,10 @@ onMounted(async () => {
 
 			<div :class="$style.releases">
 				<ReleaseCard
-					v-for="release in releases"
+					v-for="(release, idx) in releases"
 					:key="release._id"
 					:release="release"
+					:idx="idx"
 					:class="$style.card"
 				/>
 			</div>

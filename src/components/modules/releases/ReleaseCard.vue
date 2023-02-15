@@ -2,15 +2,19 @@
 /**
  * Vendor
  */
-import { computed } from "vue"
 import { DateTime } from "luxon"
+
+/**
+ * Services
+ */
+import { getSanityImageUrl } from "@/services/sanity"
 
 /**
  * Modules
  */
 import ArticleContent from "@modules/docs/ArticleContent.vue"
 
-const props = defineProps({ release: { type: Object } })
+const props = defineProps({ release: { type: Object }, idx: Number })
 </script>
 
 <template>
@@ -23,15 +27,34 @@ const props = defineProps({ release: { type: Object } })
 							locale: "en",
 						}).toRelative()
 					}}
-					<div :class="$style.dot" />
+					<div :class="[$style.dot, idx === 0 && $style.orange]" />
 				</div>
 
 				<div :class="$style.line" />
 			</div>
 
-			<div :class="$style.cover" />
+			<img
+				:src="getSanityImageUrl(release.poster)"
+				:class="$style.cover"
+			/>
 
-			<ArticleContent :content="release.content" />
+			<Flex direction="column" gap="16">
+				<Text
+					v-if="release.type"
+					size="13"
+					weight="500"
+					:color="
+						(release.type === 'improvements' && 'orange') || 'blue'
+					"
+				>
+					{{
+						(release.type === "improvements" && "Patch") ||
+						(release.type === "major" && "New Release")
+					}}
+				</Text>
+
+				<ArticleContent :content="release.content" />
+			</Flex>
 		</div>
 	</Flex>
 </template>
@@ -81,6 +104,10 @@ const props = defineProps({ release: { type: Object } })
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
+	background: var(--border);
+}
+
+.dot.orange {
 	background: var(--orange);
 	box-shadow: 0px 0px 15px var(--orange);
 }
