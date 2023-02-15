@@ -189,18 +189,20 @@ const hasHedge = computed(() => {
 
 			<Tooltip
 				v-if="hasHedge && event.status !== 'FINISHED'"
-				placement="bottom-start"
+				placement="left-start"
+				textAlign="right"
 			>
 				<div :class="[$style.icon, hasHedge && $style.yellow]">
 					<Icon name="warning" size="20" />
 				</div>
 
-				<template #content
-					>Your stakes are aimed both ways.<br /><span
+				<template #content>
+					Your stakes are aimed both ways.<br />
+					<span
 						>The final profit will be calculated at the end of the
-						event</span
-					></template
-				>
+						event
+					</span>
+				</template>
 			</Tooltip>
 			<div
 				v-else
