@@ -19,6 +19,7 @@ const props = defineProps({
 	poolsStates: Object,
 	pools: Array,
 	poolsAPY: Object,
+	poolMetrics: Object,
 })
 
 const isReady = computed(
@@ -211,10 +212,16 @@ const apy = computed(() => {
 			</Text>
 		</Flex>
 
-		<Flex direction="column" justify="center" gap="8" :class="$style.stat">
+		<Flex
+			v-if="pools.length === 1"
+			direction="column"
+			justify="center"
+			gap="8"
+			:class="$style.stat"
+		>
 			<Flex align="center" gap="6" :class="$style.stat__values">
 				<Text v-if="isReady" size="16" weight="600" color="primary">
-					0%
+					{{ poolMetrics.utilization.toFixed(2) }}%
 				</Text>
 				<LoadingDots v-else :class="$style.dots_anim" />
 

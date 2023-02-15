@@ -110,6 +110,9 @@ const subStates = ref({})
 const subEvents = ref({})
 const events = ref([])
 
+const riskIndex = ref(0)
+const utilization = ref(0)
+
 const populatePool = async () => {
 	poolState.value = await juster.pools[
 		route.params.address
@@ -244,6 +247,15 @@ onMounted(() => {
 	if (Object.keys(juster.pools).length && pool.value) {
 		init()
 	}
+
+	juster.pools[pool.value.address].subscribeToRiskIndex((data) => {
+		if (data.isNaN()) return
+		riskIndex.value = data.toNumber() * 100
+	})
+	juster.pools[pool.value.address].subscribeToUtilization((data) => {
+		if (data.isNaN()) return
+		utilization.value = data.toNumber() * 100
+	})
 })
 
 const isInited = ref(false)
@@ -433,7 +445,11 @@ const { meta } = useMeta({
 				</Flex>
 
 				<Flex direction="column" gap="24" wide :class="$style.base">
-					<PoolsStats :pools="[pool]" :poolsStates="[poolState]" />
+					<PoolsStats
+						:pools="[pool]"
+						:poolsStates="[poolState]"
+						:poolMetrics="{ utilization, riskIndex }"
+					/>
 
 					<PoolsChart v-if="pool" :pool="pool" />
 
