@@ -440,10 +440,10 @@ const { meta } = useMeta({
 					<Flex direction="column" gap="24" :class="$style.events">
 						<Flex direction="column" gap="8">
 							<Text size="16" weight="600" color="primary">
-								Events
+								Pool line
 							</Text>
 							<Text size="14" weight="500" color="tertiary">
-								New and running events
+								Events launched based on this pool
 							</Text>
 						</Flex>
 
