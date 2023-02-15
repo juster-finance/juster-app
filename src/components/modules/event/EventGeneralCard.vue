@@ -131,6 +131,8 @@ const endDiff = computed(() =>
 		.diff(DateTime.fromISO(props.event.betsCloseTime), ["hours"])
 		.toObject(),
 )
+
+const isHighdemand = computed(() => props.event.bets.length >= 4)
 </script>
 
 <template>
@@ -298,7 +300,7 @@ const endDiff = computed(() =>
 			<div
 				:class="[
 					$style.card__bottom,
-					event.bets.length >= 6 && $style.highdemand_radius,
+					isHighdemand && $style.highdemand_radius,
 				]"
 			>
 				<div
@@ -336,7 +338,7 @@ const endDiff = computed(() =>
 				/>
 			</div>
 
-			<div v-if="event.bets.length >= 4" :class="$style.card__highdemand">
+			<div v-if="isHighdemand" :class="$style.card__highdemand">
 				<div :class="$style.left">
 					<Icon name="bolt" size="14" />
 					<span>High-demand</span>
