@@ -45,6 +45,10 @@ const positions = reactive([
 		links: [],
 	},
 	{
+		section: "Pools",
+		links: ["Overview"],
+	},
+	{
 		section: "Extra Topics",
 		links: ["Glossary", "FAQ"],
 	},
@@ -92,8 +96,13 @@ onMounted(async () => {
 			const bSection = positions.find(
 				(p) => p.section === b.section.title,
 			)
-			const aArticleIdx = aSection.links.findIndex((l) => l === a.title)
-			const bArticleIdx = bSection.links.findIndex((l) => l === b.title)
+
+			const aArticleIdx = aSection
+				? aSection.links.findIndex((l) => l === a.title)
+				: 0
+			const bArticleIdx = bSection
+				? bSection.links.findIndex((l) => l === b.title)
+				: 0
 			return aArticleIdx - bArticleIdx
 		})
 		.forEach((article) => {
