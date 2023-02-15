@@ -137,7 +137,10 @@ const handleEnd = () => {
 						left: `${getCirclePos(index).left}%`,
 						top: `${getCirclePos(index).top}%`,
 					}"
-					:class="$style.circle_wrapper"
+					:class="[
+						$style.circle_wrapper,
+						index === activeStepIndex && $style.current,
+					]"
 				>
 					<Flex
 						align="center"
@@ -159,7 +162,7 @@ const handleEnd = () => {
 
 				<div
 					v-if="activeStepIndex == 5"
-					:class="$style.circle_wrapper"
+					:class="[$style.circle_wrapper, $style.current]"
 					:style="{
 						left: `50%`,
 						top: `70%`,
@@ -258,11 +261,16 @@ const handleEnd = () => {
 					direction="column"
 					gap="32"
 					align="center"
-					:class="$style.base"
-					style="width: 370px"
+					:class="[$style.base]"
+					style="max-width: 370px"
 				>
 					<Flex direction="column" gap="16" align="center">
-						<Text size="24" weight="600" color="primary">
+						<Text
+							size="24"
+							weight="600"
+							color="primary"
+							:class="$style.title"
+						>
 							Welcome to Juster Finance
 						</Text>
 
@@ -272,6 +280,7 @@ const handleEnd = () => {
 							color="tertiary"
 							height="16"
 							align="center"
+							:class="$style.description"
 						>
 							Now we'll help you dive into the application. Check
 							that the correct account is selected.
@@ -375,10 +384,16 @@ const handleEnd = () => {
 					gap="32"
 					align="center"
 					:class="$style.base"
-					style="width: 550px"
+					style="max-width: 550px"
 				>
 					<Flex direction="column" gap="16" align="center">
-						<Text size="24" weight="600" color="primary">
+						<Text
+							size="24"
+							weight="600"
+							color="primary"
+							align="center"
+							:class="$style.title"
+						>
 							Decentralized Financial Instrument
 						</Text>
 						<Text
@@ -387,6 +402,7 @@ const handleEnd = () => {
 							color="tertiary"
 							height="16"
 							align="center"
+							:class="$style.description"
 						>
 							Juster is an on-chain smart contract platform
 							allowing users to take part in an automated betting
@@ -411,16 +427,22 @@ const handleEnd = () => {
 					wide
 					justify="between"
 					align="center"
+					:class="$style.events_step"
 				>
 					<Flex
 						direction="column"
 						gap="40"
 						align="start"
 						:class="$style.base"
-						style="width: 500px"
+						style="max-width: 500px"
 					>
 						<Flex direction="column" gap="20">
-							<Text size="24" weight="600" color="primary">
+							<Text
+								size="24"
+								weight="600"
+								color="primary"
+								:class="$style.title"
+							>
 								Price Event
 							</Text>
 							<Text
@@ -428,6 +450,7 @@ const handleEnd = () => {
 								weight="500"
 								color="tertiary"
 								height="16"
+								:class="$style.description"
 							>
 								On the right side you can see the event card. It
 								is still accepting stakes from those wishing to
@@ -445,6 +468,7 @@ const handleEnd = () => {
 										size="14"
 										weight="600"
 										color="tertiary"
+										height="16"
 									>
 										The duration of the event varies, from 6
 										hours to 7 days
@@ -460,6 +484,7 @@ const handleEnd = () => {
 										size="14"
 										weight="600"
 										color="tertiary"
+										height="16"
 									>
 										The time of acceptance of stakes and
 										deposits is limited
@@ -490,17 +515,24 @@ const handleEnd = () => {
 					v-else-if="activeStepIndex === 3"
 					justify="between"
 					direction="rowReversed"
+					gap="60"
 					wide
 					align="center"
+					:class="$style.stake_step"
 				>
 					<Flex
 						direction="column"
 						gap="40"
 						:class="$style.base"
-						style="width: 500px"
+						style="max-width: 500px"
 					>
 						<Flex direction="column" gap="20">
-							<Text size="24" weight="600" color="primary">
+							<Text
+								size="24"
+								weight="600"
+								color="primary"
+								:class="$style.title"
+							>
 								Placing Stakes
 							</Text>
 							<Text
@@ -508,6 +540,7 @@ const handleEnd = () => {
 								weight="500"
 								color="tertiary"
 								height="16"
+								:class="$style.description"
 							>
 								First, select a currency pair. Next, choose a
 								time interval. Then, select the anticipated
@@ -518,7 +551,12 @@ const handleEnd = () => {
 
 							<Flex align="center" gap="6">
 								<Icon name="money" size="16" color="tertiary" />
-								<Text size="14" weight="600" color="tertiary">
+								<Text
+									size="14"
+									weight="600"
+									color="tertiary"
+									height="16"
+								>
 									Payout may vary depending on the demand of
 									the chosen side
 								</Text>
@@ -556,7 +594,7 @@ const handleEnd = () => {
 					<img
 						src="@/assets/onboarding/event_chart.png"
 						alt="event_chart"
-						style="width: 600px; user-select: none"
+						:class="$style.event_chart_img"
 					/>
 				</Flex>
 
@@ -567,10 +605,16 @@ const handleEnd = () => {
 					gap="32"
 					align="center"
 					:class="$style.base"
-					style="width: 370px"
+					style="max-width: 370px"
 				>
 					<Flex direction="column" gap="16" align="center">
-						<Text size="24" weight="600" color="primary">
+						<Text
+							size="24"
+							weight="600"
+							color="primary"
+							align="center"
+							:class="$style.title"
+						>
 							Liquidity Pools & Providing
 						</Text>
 						<Text
@@ -579,6 +623,7 @@ const handleEnd = () => {
 							color="tertiary"
 							height="16"
 							align="center"
+							:class="$style.description"
 						>
 							You can participate in events as a liquidity
 							provider and earn payouts
@@ -607,10 +652,15 @@ const handleEnd = () => {
 					gap="32"
 					align="center"
 					:class="$style.base"
-					style="width: 490px"
+					style="max-width: 490px"
 				>
 					<Flex direction="column" gap="16" align="center">
-						<Text size="24" weight="600" color="primary">
+						<Text
+							size="24"
+							weight="600"
+							color="primary"
+							:class="$style.title"
+						>
 							Done!
 						</Text>
 						<Text
@@ -619,6 +669,7 @@ const handleEnd = () => {
 							color="tertiary"
 							height="16"
 							align="center"
+							:class="$style.description"
 						>
 							You can learn more about the application in the<br />
 							docs or ask a question on our discord server
@@ -1094,13 +1145,15 @@ const handleEnd = () => {
 	transition: all 0.7s var(--bezier);
 }
 
-.base {
-}
-
 .event_card {
 	width: 400px;
 
 	margin: 0 90px;
+}
+
+.event_chart_img {
+	max-width: 600px;
+	user-select: none;
 }
 
 .theme_card {
@@ -1156,5 +1209,58 @@ const handleEnd = () => {
 
 .sa_badge__btn:hover {
 	fill: var(--text-secondary);
+}
+
+@media (max-width: 1050px) {
+	.events_step {
+		flex-direction: column;
+		gap: 40px;
+	}
+
+	.event_card {
+		min-width: 300px;
+	}
+
+	.stake_step {
+		flex-direction: column;
+		gap: 40px;
+	}
+}
+
+@media (max-width: 800px) {
+	.slider {
+		margin-top: 0;
+	}
+
+	.event_chart_img {
+		width: inherit;
+	}
+}
+
+@media (max-width: 550px) {
+	.title {
+		font-size: 18px;
+		line-height: 1.6;
+	}
+
+	.description {
+		font-size: 14px;
+	}
+
+	.slider {
+		min-height: 200px;
+	}
+
+	.circle_wrapper {
+		opacity: 0;
+	}
+
+	.circle_wrapper.current {
+		opacity: 1;
+	}
+
+	.event_card {
+		width: 100%;
+	}
 }
 </style>

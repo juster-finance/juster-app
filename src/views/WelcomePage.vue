@@ -19,6 +19,6 @@ import WelcomeBase from "@modules/welcome/WelcomeBase.vue"
 <style module>
 .wrapper {
 	max-width: 1250px;
-	height: calc(100vh - 328px + 120px);
+	height: 100vh;
 }
 </style>
