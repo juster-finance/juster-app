@@ -180,6 +180,11 @@ useMeta({
 			</metainfo>
 
 			<transition-group name="fade" mode="out-in">
+				<FreshAccountBanner
+					v-if="accountStore.pkh && !user"
+					:class="$style.block"
+				/>
+
 				<Flex
 					justify="between"
 					gap="40"
@@ -216,11 +221,6 @@ useMeta({
 						<Icon name="login" size="16" />Go to Pools
 					</Button>
 				</Flex>
-
-				<FreshAccountBanner
-					v-if="accountStore.pkh && !user"
-					:class="$style.block"
-				/>
 
 				<!-- My Positions -->
 				<div v-if="myPositions.length" :class="$style.block">

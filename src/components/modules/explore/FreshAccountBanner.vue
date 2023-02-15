@@ -68,15 +68,14 @@ const router = useRouter()
 					type="white"
 					size="small"
 				>
-					<Icon name="zap_fast" size="16" /> Join your first Price
-					Event
+					<Icon name="zap_fast" size="16" /> Explore price events
 				</Button>
 				<Button
-					@click="router.push('/docs')"
+					@click="router.push('/docs/discover')"
 					type="secondary"
 					size="small"
 				>
-					<Icon name="book" size="16" /> I need help getting started
+					<Icon name="book" size="16" /> Getting Started
 				</Button>
 			</Flex>
 		</div>
