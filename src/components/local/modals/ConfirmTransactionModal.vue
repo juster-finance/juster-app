@@ -64,7 +64,7 @@ watch(
 </script>
 
 <template>
-	<Modal :show="show" width="500" required new @onClose="$emit('onClose')">
+	<Modal :show="show" width="500" required new>
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
 				<Icon name="checkcircle" size="16" color="secondary" />

@@ -9,14 +9,13 @@ import Modal from "@ui/Modal.vue"
 import Input from "@ui/Input.vue"
 import Button from "@ui/Button.vue"
 
+const emit = defineEmits(["onAdd", "onClose"])
 const props = defineProps({
 	show: {
 		type: Boolean,
 		default: false,
 	},
 })
-
-const emit = defineEmits(["onAdd"])
 
 const address = ref("")
 
@@ -48,7 +47,7 @@ watch(
 </script>
 
 <template>
-	<Modal :show="show" width="500" new closable @onClose="$emit('onClose')">
+	<Modal :show="show" width="500" new closable @onClose="emit('onClose')">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
 				<Icon name="search" size="16" color="secondary" />
@@ -57,7 +56,7 @@ watch(
 			</Flex>
 
 			<Icon
-				@click="$emit('onClose')"
+				@click="emit('onClose')"
 				name="close"
 				size="16"
 				color="tertiary"
@@ -94,11 +93,11 @@ watch(
 	padding: 0 20px;
 }
 
-.base {
-	padding: 8px 20px 20px 20px;
-}
-
 .close_icon {
 	cursor: pointer;
+}
+
+.base {
+	padding: 8px 20px 20px 20px;
 }
 </style>

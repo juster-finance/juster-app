@@ -445,7 +445,7 @@ onUnmounted(() => {
 				:style="{ ...contextMenuStyles }"
 			>
 				<template #dropdown>
-					<DropdownItem @click.prevent="showNotifyMeModal = true">
+					<DropdownItem disabled>
 						<Icon name="notifications" size="16" />Notify Me
 					</DropdownItem>
 

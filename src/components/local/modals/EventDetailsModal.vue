@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { computed } from "vue"
 import { DateTime } from "luxon"
 
@@ -12,6 +15,7 @@ import Modal from "@ui/Modal.vue"
  */
 import { toReadableDuration } from "@utils/date"
 
+const emit = defineEmits(["onClose"])
 const props = defineProps({
 	show: { type: Boolean },
 	event: { type: Object, default: () => {} },
@@ -23,7 +27,14 @@ const eventDuration = computed(() =>
 </script>
 
 <template>
-	<Modal :show="show" width="500" new closable @onClose="$emit('onClose')">
+	<Modal
+		:show="show"
+		width="500"
+		new
+		disable-trap
+		closable
+		@onClose="emit('onClose')"
+	>
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
 				<Icon name="menu" size="16" color="secondary" />
@@ -39,7 +50,7 @@ const eventDuration = computed(() =>
 			</Flex>
 
 			<Icon
-				@click="$emit('onClose')"
+				@click="emit('onClose')"
 				name="close"
 				size="16"
 				color="tertiary"

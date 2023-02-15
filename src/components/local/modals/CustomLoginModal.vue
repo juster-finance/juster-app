@@ -137,11 +137,10 @@ const handleCloseCustomRpcInfo = () => {
 </script>
 
 <template>
-	<Modal :show="show" width="650" closable new @onClose="$emit('onClose')">
+	<Modal :show="show" width="650" closable new @onClose="emit('onClose')">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
-				<Icon name="login" size="16" color="secondary" />
-
+				<Icon name="settings" size="16" color="secondary" />
 				<Text
 					size="14"
 					weight="600"
@@ -153,7 +152,7 @@ const handleCloseCustomRpcInfo = () => {
 			</Flex>
 
 			<Icon
-				@click="$emit('onClose')"
+				@click="emit('onClose')"
 				name="close"
 				size="16"
 				color="tertiary"
