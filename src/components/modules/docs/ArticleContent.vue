@@ -62,19 +62,19 @@ const serializers = reactive({
 }
 
 .wrapper h1 {
-	margin-bottom: 24px;
+	margin: 0 0 1em 0;
 }
 
 .wrapper h2 {
-	margin-bottom: 16px;
+	margin: 2em 0 1em 0;
 }
 
 .wrapper h3 {
-	margin-bottom: 14px;
+	margin: 2em 0 1em 0;
 }
 
 .wrapper h4 {
-	margin-bottom: 12px;
+	margin: 2em 0 1em 0;
 }
 
 .wrapper p {
@@ -82,7 +82,7 @@ const serializers = reactive({
 	line-height: 1.6;
 	color: var(--text-secondary);
 
-	margin-bottom: 40px;
+	margin: 0.8em 0 1.2em 0;
 }
 
 .wrapper blockquote p {
@@ -99,33 +99,8 @@ const serializers = reactive({
 	color: var(--text-blue);
 }
 
-.wrapper ul {
-	padding-inline-start: 20px;
-	list-style-type: disc;
-
-	margin-bottom: 24px;
-}
-
-.wrapper ul li {
-	font-size: 16px;
-	line-height: 1.6;
-	color: var(--text-secondary);
-
-	padding-inline-start: 0.5ch;
-	margin-bottom: 16px;
-}
-
-.wrapper ol {
-	padding-inline-start: 20px;
-
-	margin-bottom: 24px;
-}
-
-.wrapper ol li {
-	font-size: 15px;
-	line-height: 1.6;
-	color: var(--text-secondary);
-
-	margin-bottom: 4px;
+.wrapper strong {
+	color: var(--text-primary);
+	font-weight: 600;
 }
 </style>

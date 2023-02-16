@@ -38,23 +38,7 @@ const props = defineProps({ release: { type: Object }, idx: Number })
 				:class="$style.cover"
 			/>
 
-			<Flex direction="column" gap="16">
-				<Text
-					v-if="release.type"
-					size="13"
-					weight="500"
-					:color="
-						(release.type === 'improvements' && 'orange') || 'blue'
-					"
-				>
-					{{
-						(release.type === "improvements" && "Patch") ||
-						(release.type === "major" && "New Release")
-					}}
-				</Text>
-
-				<ArticleContent :content="release.content" />
-			</Flex>
+			<ArticleContent :content="release.content" />
 		</div>
 	</Flex>
 </template>
@@ -73,8 +57,6 @@ const props = defineProps({ release: { type: Object }, idx: Number })
 	background: rgba(255, 255, 255, 0.03);
 
 	border-radius: 16px;
-
-	margin-bottom: 32px;
 }
 
 .timeline {

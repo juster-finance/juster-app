@@ -20,7 +20,7 @@ const props = defineProps({
 			<div v-else="listItem === 'bullet'" :class="[$style.line]" />
 		</div>
 
-		<Text size="16" weight="500" color="secondary" height="16">
+		<Text size="16" weight="500" color="secondary" height="18">
 			{{ text }}
 		</Text>
 	</Flex>
@@ -36,10 +36,10 @@ const props = defineProps({
 }
 
 .line {
-	width: 12px;
-	height: 1px;
-	background: var(--text-tertiary);
+	width: 8px;
+	height: 2px;
+	background: var(--text-support);
 
-	margin-top: 10px;
+	margin-top: 12px;
 }
 </style>

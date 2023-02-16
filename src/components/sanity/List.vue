@@ -21,6 +21,6 @@ const props = defineProps({
 .wrapper {
 	width: 100%;
 
-	margin-bottom: 40px;
+	margin: 0.8em 0 1.2em 0;
 }
 </style>

@@ -85,6 +85,10 @@
 	line-height: 1.6;
 }
 
+.lh--18 {
+	line-height: 1.8;
+}
+
 /* Text Align */
 .ta--left {
 	text-align: left;
