@@ -6,6 +6,11 @@ import { onMounted, onBeforeUnmount, ref, watch, computed } from "vue"
 import { DateTime } from "luxon"
 
 /**
+ * UI
+ */
+import Tooltip from "@ui/Tooltip.vue"
+
+/**
  * Modules
  */
 import ArticleContent from "./ArticleContent.vue"
@@ -149,44 +154,57 @@ const handlePrevPage = () => {
 			</Text>
 
 			<Flex align="center" gap="32" :class="$style.nav">
-				<Flex
-					v-if="prevPost"
-					@click="handlePrevPage"
-					align="center"
-					justify="between"
-					wide
-					:class="$style.next_btn"
-				>
-					<Flex direction="column" gap="8">
-						<Text size="12" color="tertiary" weight="500">
-							Previous Page
-						</Text>
-						<Text size="14" color="primary" weight="500">{{
-							prevPost.title
-						}}</Text>
+				<Tooltip v-if="prevPost" isWide>
+					<Flex
+						@click="handlePrevPage"
+						align="center"
+						justify="between"
+						:class="$style.next_btn"
+					>
+						<Flex direction="column" gap="8">
+							<Text size="12" color="tertiary" weight="500">
+								Previous Page
+							</Text>
+							<Text size="14" color="primary" weight="500">{{
+								prevPost.title
+							}}</Text>
+						</Flex>
+
+						<Icon name="arrowleft" size="16" color="tertiary" />
 					</Flex>
 
-					<Icon name="arrowleft" size="16" color="tertiary" />
-				</Flex>
-				<Flex
-					v-if="nextPost"
-					@click="handleNextPage"
-					align="center"
-					justify="between"
-					wide
-					:class="$style.next_btn"
-				>
-					<Icon name="arrowright" size="16" color="tertiary" />
+					<template #content>
+						<span>Use</span>
+						{{ "<-" }}
+						<span> key to go back</span>
+					</template>
+				</Tooltip>
 
-					<Flex align="end" direction="column" gap="8">
-						<Text size="12" color="tertiary" weight="500">
-							Next Page
-						</Text>
-						<Text size="14" color="primary" weight="500">{{
-							nextPost.title
-						}}</Text>
+				<Tooltip v-if="nextPost" isWide placement="bottom-end">
+					<Flex
+						@click="handleNextPage"
+						align="center"
+						justify="between"
+						:class="$style.next_btn"
+					>
+						<Icon name="arrowright" size="16" color="tertiary" />
+
+						<Flex align="end" direction="column" gap="8">
+							<Text size="12" color="tertiary" weight="500">
+								Next Page
+							</Text>
+							<Text size="14" color="primary" weight="500">{{
+								nextPost.title
+							}}</Text>
+						</Flex>
 					</Flex>
-				</Flex>
+
+					<template #content>
+						<span>Use</span>
+						->
+						<span> key to go forward</span>
+					</template>
+				</Tooltip>
 			</Flex>
 		</Flex>
 
@@ -212,13 +230,13 @@ const handlePrevPage = () => {
 }
 
 .next_btn {
+	flex: 1;
 	cursor: pointer;
 	border-radius: 8px;
 	border: 2px solid var(--border);
 	height: 68px;
 
 	padding: 0 16px;
-	margin-bottom: 150px;
 
 	transition: all 0.2s ease;
 }

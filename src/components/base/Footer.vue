@@ -220,8 +220,8 @@ onBeforeUnmount(() => {
 								{{ statusBlock.text }}
 							</Button>
 
-							<template #content
-								><span>DipDup:</span> {{ status.dipdup
+							<template #content>
+								<span>DipDup:</span> {{ status.dipdup
 								}}<br /><span>Network:</span> {{ status.network
 								}}<br /><span>Quotes:</span>
 								{{ status.quotes }}</template
