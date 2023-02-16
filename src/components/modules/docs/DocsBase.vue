@@ -2,8 +2,8 @@
 /**
  * Vendor
  */
-import { onMounted, ref, reactive } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { onMounted, ref, watch, reactive } from "vue"
+import { useRoute } from "vue-router"
 
 /**
  * API
@@ -29,6 +29,7 @@ const route = useRoute()
 
 const docsStore = useDocsStore()
 
+const allPosts = ref([])
 const generalLinks = ref([])
 
 /** Custom Positions */
@@ -65,6 +66,8 @@ onMounted(async () => {
 
 	const sections = await fetchSections()
 	const posts = await fetchPosts()
+
+	allPosts.value = posts
 
 	/** Sections */
 	sections
@@ -140,6 +143,18 @@ onMounted(async () => {
 		selectPost(postBySlug)
 	}
 })
+
+watch(
+	() => route.params,
+	() => {
+		const { slug } = route.params
+
+		if (slug !== docsStore.post.slug.current) {
+			const newPost = allPosts.value.find((p) => slug === p.slug.current)
+			if (newPost) selectPost(newPost)
+		}
+	},
+)
 
 const selectPost = (post) => {
 	docsStore.post = post

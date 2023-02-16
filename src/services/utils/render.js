@@ -79,7 +79,7 @@ const attachMarks = (span, remainingMarks, serializers, markDefs) => {
 
 	if (serializerIsVueComponent(serializer)) {
 		const props = extractProps(markDef)
-		return createElement(serializer, { props }, () =>
+		return createElement(serializer, { ...props }, () =>
 			attachMarks(span, marks, serializers, markDefs),
 		)
 	}
@@ -264,7 +264,7 @@ const defaultSerializers = {
 	marks: {
 		strong: "strong",
 		em: "em",
-		link: linkSerializer,
+		external_link: linkSerializer,
 		"strike-through": strikeSerializer,
 		underline: underlineSerializer,
 		highlight: highlightSerializer,

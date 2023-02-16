@@ -11,6 +11,7 @@ import Blockquote from "@sanity/Blockquote.vue"
 import Image from "@sanity/Image.vue"
 import Banner from "@sanity/Banner.vue"
 import Collapse from "@sanity/Collapse.vue"
+import Link from "@sanity/Link.vue"
 import Code from "@sanity/Code.vue"
 import CodeBlock from "@sanity/CodeBlock.vue"
 import List from "@sanity/List.vue"
@@ -42,6 +43,7 @@ const serializers = reactive({
 	},
 	marks: {
 		code: Code,
+		link: Link,
 	},
 	list: List,
 	listItem: ListItem,
