@@ -8,7 +8,7 @@ import { useRoute, useRouter } from "vue-router"
 /**
  * API
  */
-import { fetchArticles, fetchSections } from "@/api/sanity"
+import { fetchPosts, fetchSections } from "@/api/sanity"
 
 /**
  * UI
@@ -31,6 +31,7 @@ const docsStore = useDocsStore()
 
 const generalLinks = ref([])
 
+/** Custom Positions */
 const positions = reactive([
 	{
 		section: "General",
@@ -46,7 +47,12 @@ const positions = reactive([
 	},
 	{
 		section: "Pools",
-		links: ["Overview"],
+		links: [
+			"Overview",
+			"Metrics",
+			"Depositing Liquidity",
+			"Request Withdrawal",
+		],
 	},
 	{
 		section: "Extra Topics",
@@ -57,17 +63,17 @@ const positions = reactive([
 onMounted(async () => {
 	if (Object.keys(docsStore.sections).length) return
 
-	const allSections = await fetchSections()
-	const articles = await fetchArticles()
+	const sections = await fetchSections()
+	const posts = await fetchPosts()
 
 	/** Sections */
-	allSections
+	sections
 		.sort((a, b) => {
 			const aSectionIdx = positions.findIndex(
-				(p) => p.section === a.title,
+				(p) => p.section.toLowerCase() === a.title.toLowerCase(),
 			)
 			const bSectionIdx = positions.findIndex(
-				(p) => p.section === b.title,
+				(p) => p.section.toLowerCase() === b.title.toLowerCase(),
 			)
 			return aSectionIdx - bSectionIdx
 		})
@@ -77,53 +83,66 @@ onMounted(async () => {
 			}
 		})
 
-	generalLinks.value = articles
+	generalLinks.value = posts
 		.filter((a) => !a.section)
 		.sort((a, b) => {
 			const section = positions.find((p) => p.section === "General")
-			const aArticleIdx = section.links.findIndex((l) => l === a.title)
-			const bArticleIdx = section.links.findIndex((l) => l === b.title)
-			return aArticleIdx - bArticleIdx
+			const aPostIdx = section.links.findIndex((l) => l === a.title)
+			const bPostIdx = section.links.findIndex((l) => l === b.title)
+			return aPostIdx - bPostIdx
 		})
 
-	/** Sort articles */
-	articles
+	posts
 		.filter((a) => a.section)
-		.sort((a, b) => {
-			const aSection = positions.find(
-				(p) => p.section === a.section.title,
-			)
-			const bSection = positions.find(
-				(p) => p.section === b.section.title,
-			)
-
-			const aArticleIdx = aSection
-				? aSection.links.findIndex((l) => l === a.title)
-				: 0
-			const bArticleIdx = bSection
-				? bSection.links.findIndex((l) => l === b.title)
-				: 0
-			return aArticleIdx - bArticleIdx
-		})
-		.forEach((article) => {
-			if (docsStore.sections[article.section.title]) {
-				docsStore.sections[article.section.title].push(article)
+		.forEach((post) => {
+			if (docsStore.sections[post.section.title]) {
+				docsStore.sections[post.section.title].push(post)
 			}
 		})
 
+	/** Sort posts */
+	Object.keys(docsStore.sections).forEach((section) => {
+		docsStore.sections[section] = docsStore.sections[section].sort(
+			(a, b) => {
+				const aPosition = positions.find(
+					(p) =>
+						p.section.toLowerCase() ===
+						a.section.title.toLowerCase(),
+				)
+				const bPosition = positions.find(
+					(p) =>
+						p.section.toLowerCase() ===
+						b.section.title.toLowerCase(),
+				)
+
+				const aPostIdx = aPosition
+					? aPosition.links.findIndex(
+							(l) => l.toLowerCase() === a.title.toLowerCase(),
+					  )
+					: 0
+				const bPostIdx = bPosition
+					? bPosition.links.findIndex(
+							(l) => l.toLowerCase() === b.title.toLowerCase(),
+					  )
+					: 0
+
+				return aPostIdx - bPostIdx
+			},
+		)
+	})
+
 	/** Select current */
 	if (route.params.slug) {
-		let articleBySlug
-		articles.forEach((article) => {
-			if (article.slug.current == route.params.slug)
-				articleBySlug = article
+		let postBySlug
+		posts.forEach((post) => {
+			if (post.slug.current == route.params.slug) postBySlug = post
 		})
-		selectArticle(articleBySlug)
+		selectPost(postBySlug)
 	}
 })
 
-const selectArticle = (article) => {
-	docsStore.article = article
+const selectPost = (post) => {
+	docsStore.post = post
 }
 </script>
 
@@ -134,11 +153,11 @@ const selectArticle = (article) => {
 				<router-link
 					v-for="(generalLink, gIndex) in generalLinks"
 					:key="gIndex"
-					@click="selectArticle(generalLink)"
+					@click="selectPost(generalLink)"
 					:to="`/docs/${generalLink.slug.current}`"
 					:class="[
 						$style.general_link,
-						docsStore.article.slug.current ===
+						docsStore.post.slug.current ===
 							generalLink.slug.current && $style.active,
 					]"
 				>
@@ -158,16 +177,16 @@ const selectArticle = (article) => {
 				<div :class="$style.title">{{ index }}</div>
 
 				<router-link
-					v-for="article in section"
-					:key="article._id"
-					:to="article.slug.current"
-					@click="selectArticle(article)"
+					v-for="post in section"
+					:key="post._id"
+					:to="post.slug.current"
+					@click="selectPost(post)"
 					:class="[
 						$style.link,
-						docsStore.article == article && $style.active,
+						docsStore.post == post && $style.active,
 					]"
 				>
-					{{ article.title }}
+					{{ post.title }}
 				</router-link>
 			</div>
 		</div>
@@ -184,7 +203,7 @@ const selectArticle = (article) => {
 				<template #dropdown>
 					<router-link
 						v-for="link in generalLinks"
-						@click="selectArticle(link)"
+						@click="selectPost(link)"
 						:to="`/docs/${link.slug.current}`"
 					>
 						<DropdownItem>
@@ -204,7 +223,7 @@ const selectArticle = (article) => {
 						<DropdownTitle>{{ sectionName }}</DropdownTitle>
 						<router-link
 							v-for="link in section"
-							@click="selectArticle(link)"
+							@click="selectPost(link)"
 							:to="`/docs/${link.slug.current}`"
 						>
 							<DropdownItem>

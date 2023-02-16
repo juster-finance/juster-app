@@ -73,7 +73,6 @@ watch(
 					},
 					function (error) {
 						if (error) console.error(error)
-						console.log("success!")
 
 						const logo = new Image()
 						logo.src = new URL(

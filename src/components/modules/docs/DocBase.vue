@@ -2,7 +2,7 @@
 /**
  * Vendor
  */
-import { onMounted, ref, watch, computed } from "vue"
+import { onMounted, onBeforeUnmount, ref, watch, computed } from "vue"
 import { DateTime } from "luxon"
 
 /**
@@ -21,19 +21,26 @@ const docsStore = useDocsStore()
 const links = ref([])
 
 onMounted(() => {
-	if (!docsStore.article.content) return
+	document.addEventListener("keydown", onKeydown)
+
+	if (!docsStore.post.content) return
 	createLinksStructure()
 })
 
+onBeforeUnmount(() => {
+	console.log("123")
+	document.removeEventListener("keydown", onKeydown)
+})
+
 watch(
-	() => docsStore.article,
+	() => docsStore.post,
 	() => {
 		createLinksStructure()
 	},
 )
 
 const createLinksStructure = () => {
-	links.value = docsStore.article.content
+	links.value = docsStore.post.content
 		.filter((block) => block.style?.startsWith("h"))
 		.map((block) => {
 			return {
@@ -43,16 +50,27 @@ const createLinksStructure = () => {
 		})
 }
 
-const nextArticle = computed(() => {
-	if (!docsStore.article.section) return
+/** Handle ArrowLeft / ArrowRight navigation */
+const onKeydown = (e) => {
+	if (e.key === "ArrowLeft") {
+		handlePrevPage()
+	}
 
-	const currentSection = docsStore.article.section.title
-	const selectedArticleIndex = docsStore.sections[currentSection].indexOf(
-		docsStore.article,
+	if (e.key === "ArrowRight") {
+		handleNextPage()
+	}
+}
+
+const nextPost = computed(() => {
+	if (!docsStore.post.section) return
+
+	const currentSection = docsStore.post.section.title
+	const selectedPostIndex = docsStore.sections[currentSection].indexOf(
+		docsStore.post,
 	)
 
-	if (docsStore.sections[currentSection][selectedArticleIndex + 1]) {
-		return docsStore.sections[currentSection][selectedArticleIndex + 1]
+	if (docsStore.sections[currentSection][selectedPostIndex + 1]) {
+		return docsStore.sections[currentSection][selectedPostIndex + 1]
 	} else {
 		const allSections = Object.keys(docsStore.sections)
 		const currentSectionIndex = allSections.indexOf(currentSection)
@@ -64,29 +82,30 @@ const nextArticle = computed(() => {
 	}
 })
 
-const prevArticle = computed(() => {
-	if (!docsStore.article.section) return
+const prevPost = computed(() => {
+	if (!docsStore.post.section) return
 
-	const currentSection = docsStore.article.section.title
-	const selectedArticleIndex = docsStore.sections[currentSection].indexOf(
-		docsStore.article,
+	const currentSection = docsStore.post.section.title
+	const selectedPostIndex = docsStore.sections[currentSection].indexOf(
+		docsStore.post,
 	)
 
-	if (docsStore.sections[currentSection][selectedArticleIndex - 1]) {
-		return docsStore.sections[currentSection][selectedArticleIndex - 1]
+	if (docsStore.sections[currentSection][selectedPostIndex - 1]) {
+		return docsStore.sections[currentSection][selectedPostIndex - 1]
 	} else {
 		const allSections = Object.keys(docsStore.sections)
 		const currentSectionIndex = allSections.indexOf(currentSection)
+		const prevSection =
+			docsStore.sections[allSections[currentSectionIndex - 1]]
 
-		return (
-			docsStore.sections[allSections[currentSectionIndex - 1]] &&
-			docsStore.sections[allSections[currentSectionIndex - 1]][0]
-		)
+		return prevSection && prevSection[prevSection.length - 1]
 	}
 })
 
 const handleNextPage = () => {
-	docsStore.article = nextArticle.value
+	if (!nextPost.value) return
+
+	docsStore.post = nextPost.value
 
 	document.getElementById("app").scrollTo({
 		top: 0,
@@ -95,7 +114,9 @@ const handleNextPage = () => {
 }
 
 const handlePrevPage = () => {
-	docsStore.article = prevArticle.value
+	if (!prevPost.value) return
+
+	docsStore.post = prevPost.value
 
 	document.getElementById("app").scrollTo({
 		top: 0,
@@ -108,20 +129,20 @@ const handlePrevPage = () => {
 	<Flex :class="$style.wrapper">
 		<Flex direction="column" :class="$style.content">
 			<ArticleContent
-				v-if="docsStore.article.content"
-				:title="docsStore.article.title"
-				:content="docsStore.article.content"
+				v-if="docsStore.post.content"
+				:title="docsStore.post.title"
+				:content="docsStore.post.content"
 			/>
 
 			<Text
-				v-if="docsStore.article._updatedAt"
+				v-if="docsStore.post._updatedAt"
 				size="13"
 				weight="500"
 				color="support"
 			>
 				Last updated
 				{{
-					DateTime.fromISO(docsStore.article._updatedAt)
+					DateTime.fromISO(docsStore.post._updatedAt)
 						.setLocale("en")
 						.toFormat("FF")
 				}}
@@ -129,7 +150,7 @@ const handlePrevPage = () => {
 
 			<Flex align="center" gap="32" :class="$style.nav">
 				<Flex
-					v-if="prevArticle"
+					v-if="prevPost"
 					@click="handlePrevPage"
 					align="center"
 					justify="between"
@@ -141,14 +162,14 @@ const handlePrevPage = () => {
 							Previous Page
 						</Text>
 						<Text size="14" color="primary" weight="500">{{
-							prevArticle.title
+							prevPost.title
 						}}</Text>
 					</Flex>
 
 					<Icon name="arrowleft" size="16" color="tertiary" />
 				</Flex>
 				<Flex
-					v-if="nextArticle"
+					v-if="nextPost"
 					@click="handleNextPage"
 					align="center"
 					justify="between"
@@ -162,7 +183,7 @@ const handlePrevPage = () => {
 							Next Page
 						</Text>
 						<Text size="14" color="primary" weight="500">{{
-							nextArticle.title
+							nextPost.title
 						}}</Text>
 					</Flex>
 				</Flex>
@@ -170,8 +191,8 @@ const handlePrevPage = () => {
 		</Flex>
 
 		<TableOfContents
-			v-if="docsStore.article.title && links.length"
-			:title="docsStore.article.title"
+			v-if="docsStore.post.title && links.length"
+			:title="docsStore.post.title"
 			:links="links"
 		/>
 	</Flex>

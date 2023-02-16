@@ -5,6 +5,21 @@ import axios from "axios"
  */
 import { sanity } from "@config"
 
+export const fetchPosts = async () => {
+	try {
+		const {
+			data: { result: posts },
+		} = await axios.get(
+			`https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'post'] { ..., section->, content[] { ..., asset-> } }`,
+		)
+
+		return posts
+	} catch (error) {
+		console.error(error)
+		return {}
+	}
+}
+
 export const fetchArticles = async () => {
 	try {
 		const {
