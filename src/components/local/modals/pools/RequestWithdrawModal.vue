@@ -196,7 +196,7 @@ const handleCloseRequestFundsWarning = () => {
 					color="primary"
 					:class="$style.head_btn"
 				>
-					Request Withdraw
+					Request Withdrawal
 				</Text>
 			</Flex>
 

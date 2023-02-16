@@ -788,7 +788,7 @@ watch(
 					keybind="R+W"
 					block
 				>
-					<Icon name="money" size="16" />Request Withdraw
+					<Icon name="money" size="16" />Request Withdrawal
 				</Button>
 			</Flex>
 		</Flex>
