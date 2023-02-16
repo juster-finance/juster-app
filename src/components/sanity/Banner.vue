@@ -50,17 +50,17 @@ const props = defineProps({
 
 .wrapper.warning {
 	fill: var(--yellow);
-	color: var(--yellow);
-	background: rgba(245, 183, 43, 0.1);
+	color: var(--text-secondary);
+	background: rgba(255, 255, 255, 0.05);
 
-	border: 1px solid var(--yellow);
+	border: 1px solid var(--border);
 }
 
 .wrapper.danger {
 	fill: var(--red);
-	color: var(--red);
-	background: rgba(224, 92, 67, 0.1);
+	color: var(--text-secondary);
+	background: rgba(255, 255, 255, 0.05);
 
-	border: 1px solid var(--red);
+	border: 1px solid var(--border);
 }
 </style>
