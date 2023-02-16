@@ -11,6 +11,11 @@ import { DateTime } from "luxon"
  */
 import { fetchArticles } from "@/api/sanity"
 
+/**
+ * Services
+ */
+import { getSanityImageUrl } from "@/services/sanity"
+
 /** Meta */
 useMeta({
 	title: "Blog",
@@ -39,59 +44,25 @@ const freshArticle = computed(() => articles.value[0])
 
 		<div :class="$style.divider" />
 
-		<Flex align="center" direction="column" :class="$style.large_post">
-			<div :class="$style.cover" />
+		<router-link :to="`/blog/${freshArticle.slug.current}`">
+			<Flex align="center" direction="column" :class="$style.large_post">
+				<img
+					:src="getSanityImageUrl(freshArticle.poster)"
+					:class="$style.cover"
+				/>
 
-			<Flex
-				direction="column"
-				align="center"
-				gap="8"
-				:class="$style.content"
-			>
-				<Text size="14" weight="600" color="blue">{{
-					freshArticle.tag
-				}}</Text>
-				<h1>{{ freshArticle.title }}</h1>
-				<div :class="$style.body">
-					{{ freshArticle.content[0].children[0].text }}
-				</div>
-			</Flex>
-
-			<Flex align="center" gap="8" :class="$style.metadata">
-				<Flex align="center" gap="8">
-					<Icon name="logo_symbol" size="20" color="brand" />
-					<Text size="14" weight="500" color="primary">
-						Juster Team
-					</Text>
-				</Flex>
-
-				<Icon name="dot" size="16" style="fill: var(--border)" />
-
-				<Text size="14" weight="500" color="tertiary">
-					{{
-						DateTime.fromISO(freshArticle._updatedAt).toFormat(
-							"dd LLL, y",
-						)
-					}}
-				</Text>
-			</Flex>
-		</Flex>
-
-		<Flex wrap="wrap" justify="between" :class="$style.posts">
-			<Flex
-				v-for="article in articles.slice(1, articles.length)"
-				direction="column"
-				:class="$style.post"
-			>
-				<div :class="$style.cover" />
-
-				<Flex direction="column" gap="8" :class="$style.content">
+				<Flex
+					direction="column"
+					align="center"
+					gap="8"
+					:class="$style.content"
+				>
 					<Text size="14" weight="600" color="blue">{{
-						article.tag
+						freshArticle.tag
 					}}</Text>
-					<h1>{{ article.title }}</h1>
+					<h1>{{ freshArticle.title }}</h1>
 					<div :class="$style.body">
-						{{ article.content[0].children[0].text }}
+						{{ freshArticle.content[0].children[0].text }}
 					</div>
 				</Flex>
 
@@ -105,11 +76,58 @@ const freshArticle = computed(() => articles.value[0])
 
 					<Icon name="dot" size="16" style="fill: var(--border)" />
 
-					<Text size="14" weight="500" color="tertiary"
-						>Feb 2, 2022</Text
-					>
+					<Text size="14" weight="500" color="tertiary">
+						{{
+							DateTime.fromISO(freshArticle._updatedAt).toFormat(
+								"dd LLL, y",
+							)
+						}}
+					</Text>
 				</Flex>
 			</Flex>
+		</router-link>
+
+		<Flex wrap="wrap" justify="between" :class="$style.posts">
+			<router-link
+				v-for="article in articles.slice(1, articles.length)"
+				:to="`/blog/${article.slug.current}`"
+			>
+				<Flex direction="column" :class="$style.post">
+					<img
+						:src="getSanityImageUrl(article.poster)"
+						:class="$style.cover"
+					/>
+
+					<Flex direction="column" gap="8" :class="$style.content">
+						<Text size="14" weight="600" color="blue">{{
+							article.tag
+						}}</Text>
+						<h1>{{ article.title }}</h1>
+						<div :class="$style.body">
+							{{ article.content[0].children[0].text }}
+						</div>
+					</Flex>
+
+					<Flex align="center" gap="8" :class="$style.metadata">
+						<Flex align="center" gap="8">
+							<Icon name="logo_symbol" size="20" color="brand" />
+							<Text size="14" weight="500" color="primary">
+								Juster Team
+							</Text>
+						</Flex>
+
+						<Icon
+							name="dot"
+							size="16"
+							style="fill: var(--border)"
+						/>
+
+						<Text size="14" weight="500" color="tertiary"
+							>Feb 2, 2022</Text
+						>
+					</Flex>
+				</Flex>
+			</router-link>
 		</Flex>
 	</div>
 </template>

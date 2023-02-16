@@ -282,6 +282,12 @@ const routes = [
 		component: () => import("@views/Other/BlogPage.vue"),
 	},
 	{
+		path: "/blog/:slug",
+		name: "Article",
+		component: () => import("@views/Other/ArticlePage.vue"),
+	},
+
+	{
 		path: "/terms",
 		name: "Terms",
 		component: () => import("@views/Other/TermsPage.vue"),

@@ -20,6 +20,25 @@ export const fetchArticles = async () => {
 	}
 }
 
+export const fetchArticleBySlug = async (slug) => {
+	try {
+		const {
+			data: { result: article },
+		} = await axios.get(
+			`https://${
+				sanity.id
+			}.api.sanity.io/v1/data/query/production?query=${encodeURIComponent(
+				`*[_type == 'article' && slug.current == "${slug}"]`,
+			)}`,
+		)
+
+		return article[0]
+	} catch (error) {
+		console.error(error)
+		return {}
+	}
+}
+
 export const fetchSections = async () => {
 	try {
 		const {

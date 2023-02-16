@@ -30,8 +30,13 @@
 .fz--24 {
 	font-size: 24px;
 }
+
 .fz--26 {
 	font-size: 26px;
+}
+
+.fz--32 {
+	font-size: 32px;
 }
 
 /* Font Weight */
