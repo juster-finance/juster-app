@@ -1,5 +1,4 @@
 import { h } from "vue"
-
 import merge from "lodash.merge"
 
 const notNull = (x) => x !== null
@@ -99,18 +98,13 @@ const attachMarks = (span, remainingMarks, serializers, markDefs) => {
 
 const spanSerializer = (span, serializers, markDefs) => {
 	const defaults = ["em", "strong", "code", "a"]
+
 	// Defaults first
 	const marks = [...span.marks].sort((a, b) => {
 		if (defaults.includes(a)) return 1
 		if (defaults.includes(b)) return -1
 		return 0
 	})
-
-	/** fix: links to last children */
-	if (marks.includes("e7db5e15cc33")) {
-		marks.splice(marks.indexOf("e7db5e15cc33"), 1)
-		marks.push("e7db5e15cc33")
-	}
 
 	return attachMarks(span, marks, serializers, markDefs)
 }
@@ -139,10 +133,8 @@ const linkSerializer = (props, children) => {
 	return createElement(
 		"a",
 		{
-			attrs: {
-				href: props.url ? props.url : props.href,
-				target: "_blank",
-			},
+			href: props.url ? props.url : props.href,
+			target: "_blank",
 		},
 		[children],
 	)

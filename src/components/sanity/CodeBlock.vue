@@ -10,7 +10,7 @@ import { ref, onBeforeMount } from "vue"
 import { initHighlighter } from "@/services/shiki"
 
 const props = defineProps({
-	code: String,
+	code: Object,
 	title: String,
 })
 

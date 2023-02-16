@@ -193,9 +193,9 @@ const handlePrevPage = () => {
 							<Text size="12" color="tertiary" weight="500">
 								Next Page
 							</Text>
-							<Text size="14" color="primary" weight="500">{{
-								nextPost.title
-							}}</Text>
+							<Text size="14" color="primary" weight="500">
+								{{ nextPost.title }}
+							</Text>
 						</Flex>
 					</Flex>
 

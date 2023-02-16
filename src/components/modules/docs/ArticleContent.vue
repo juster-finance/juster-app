@@ -93,6 +93,10 @@ const serializers = reactive({
 	font-weight: 500;
 }
 
+.wrapper p a {
+	color: var(--text-blue);
+}
+
 .wrapper ul {
 	padding-inline-start: 20px;
 	list-style-type: disc;

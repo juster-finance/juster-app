@@ -2,7 +2,7 @@
 const props = defineProps({
 	listItem: String,
 	level: Number,
-	text: Array,
+	text: String,
 })
 </script>
 
