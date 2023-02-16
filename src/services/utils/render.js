@@ -9,12 +9,19 @@ let createElement = h
 const createElementFromStyle = (block, serializers, children) => {
 	if (block.style) {
 		const styleSerializer = serializers.styles[block.style]
+
 		if (styleSerializer) {
+			const isCustomSerializer = typeof styleSerializer === "object"
 			const headerLevel =
 				block.style.startsWith("h") && block.style.length === 2
 					? block.style.replace("h", "")
 					: null
-			return createElement(styleSerializer, { h: headerLevel }, children)
+
+			return createElement(
+				styleSerializer,
+				{ h: headerLevel },
+				isCustomSerializer ? () => children : children,
+			)
 		}
 	}
 	return children.flatMap((a) => a)
