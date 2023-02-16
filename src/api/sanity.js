@@ -20,6 +20,25 @@ export const fetchPosts = async () => {
 	}
 }
 
+export const fetchPostById = async (id) => {
+	try {
+		const {
+			data: { result: post },
+		} = await axios.get(
+			`https://${
+				sanity.id
+			}.api.sanity.io/v1/data/query/production?query=${encodeURIComponent(
+				`*[_type == 'post' && _id == '${id}']`,
+			)} { ..., section-> }`,
+		)
+
+		return post[0]
+	} catch (error) {
+		console.error(error)
+		return {}
+	}
+}
+
 export const fetchArticles = async () => {
 	try {
 		const {
