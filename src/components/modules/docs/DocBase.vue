@@ -33,7 +33,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-	console.log("123")
 	document.removeEventListener("keydown", onKeydown)
 })
 
