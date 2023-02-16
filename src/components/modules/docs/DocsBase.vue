@@ -186,7 +186,19 @@ const selectPost = (post) => {
 						docsStore.post == post && $style.active,
 					]"
 				>
-					{{ post.title }}
+					<Flex align="center" gap="8">
+						{{ post.title }}
+
+						<Text
+							v-if="post.new"
+							size="12"
+							weight="600"
+							color="brand"
+							:class="$style.badge"
+						>
+							New
+						</Text>
+					</Flex>
 				</router-link>
 			</div>
 		</div>
@@ -370,6 +382,13 @@ const selectPost = (post) => {
 	border: 1px solid var(--border);
 
 	margin-bottom: 32px;
+}
+
+.badge {
+	border-radius: 4px;
+	background: rgba(238, 91, 70, 0.1);
+
+	padding: 2px 4px;
 }
 
 @media (max-width: 1100px) {
