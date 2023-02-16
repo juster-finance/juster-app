@@ -1,5 +1,15 @@
 <script setup>
+/**
+ * Vendor
+ */
+import { ref, onMounted, computed } from "vue"
 import { useMeta } from "vue-meta"
+import { DateTime } from "luxon"
+
+/**
+ * API
+ */
+import { fetchArticles } from "@/api/sanity"
 
 /** Meta */
 useMeta({
@@ -7,18 +17,24 @@ useMeta({
 	description:
 		"Learn about new features, development approaches, financial tools, and dive into releases.",
 })
+
+const articles = ref([])
+
+onMounted(async () => {
+	articles.value = await fetchArticles()
+})
+
+const freshArticle = computed(() => articles.value[0])
 </script>
 
 <template>
-	<div :class="$style.wrapper">
+	<div v-if="articles.length">
 		<metainfo>
 			<template #title="{ content }">{{ content }} • Juster</template>
 		</metainfo>
 
 		<Flex justify="between" align="center">
 			<h1 :class="$style.title">Blog</h1>
-
-			<Icon name="moon" size="16" :class="$style.moon" />
 		</Flex>
 
 		<div :class="$style.divider" />
@@ -32,145 +48,73 @@ useMeta({
 				gap="8"
 				:class="$style.content"
 			>
-				<div :class="$style.category">Product Building</div>
-				<h1>Summary of two quarters in 2022</h1>
+				<Text size="14" weight="600" color="blue">{{
+					freshArticle.tag
+				}}</Text>
+				<h1>{{ freshArticle.title }}</h1>
 				<div :class="$style.body">
-					Bank transfers have been at the core of global payments
-					since Western Union added money transfers to its telegram
-					services in 1871, giving individuals the ability to move
-					money across distances via an electronic communication
-					network for the first time.
+					{{ freshArticle.content[0].children[0].text }}
 				</div>
 			</Flex>
 
 			<Flex align="center" gap="8" :class="$style.metadata">
-				<Flex align="center" gap="8" :class="$style.author">
-					<Icon name="logo_symbol" size="20" />
-					Juster Team
+				<Flex align="center" gap="8">
+					<Icon name="logo_symbol" size="20" color="brand" />
+					<Text size="14" weight="500" color="primary">
+						Juster Team
+					</Text>
 				</Flex>
 
 				<Icon name="dot" size="16" style="fill: var(--border)" />
 
-				<div :class="$style.date">Feb 2, 2022</div>
+				<Text size="14" weight="500" color="tertiary">
+					{{
+						DateTime.fromISO(freshArticle._updatedAt).toFormat(
+							"dd LLL, y",
+						)
+					}}
+				</Text>
 			</Flex>
 		</Flex>
 
 		<Flex wrap="wrap" justify="between" :class="$style.posts">
-			<Flex direction="column" :class="$style.post">
+			<Flex
+				v-for="article in articles.slice(1, articles.length)"
+				direction="column"
+				:class="$style.post"
+			>
 				<div :class="$style.cover" />
 
 				<Flex direction="column" gap="8" :class="$style.content">
-					<div :class="$style.category">Development</div>
-					<h1>Summary of two quarters in 2022</h1>
+					<Text size="14" weight="600" color="blue">{{
+						article.tag
+					}}</Text>
+					<h1>{{ article.title }}</h1>
 					<div :class="$style.body">
-						Bank transfers have been at the core of global payments
-						since Western Union added money transfers to its
-						telegram services in 1871, giving individuals the
-						ability to move money across distances via an electronic
-						communication network for the first time.
+						{{ article.content[0].children[0].text }}
 					</div>
 				</Flex>
 
 				<Flex align="center" gap="8" :class="$style.metadata">
-					<Flex align="center" gap="8" :class="$style.author">
-						<div :class="$style.avatar" />
-						ztepler
+					<Flex align="center" gap="8">
+						<Icon name="logo_symbol" size="20" color="brand" />
+						<Text size="14" weight="500" color="primary">
+							Juster Team
+						</Text>
 					</Flex>
 
 					<Icon name="dot" size="16" style="fill: var(--border)" />
 
-					<div :class="$style.date">Feb 2, 2022</div>
-				</Flex>
-			</Flex>
-			<Flex direction="column" :class="$style.post">
-				<div :class="$style.cover" />
-
-				<Flex direction="column" gap="8" :class="$style.content">
-					<div :class="$style.category">Development</div>
-					<h1>Summary of two quarters in 2022</h1>
-					<div :class="$style.body">
-						Bank transfers have been at the core of global payments
-						since Western Union added money transfers to its
-						telegram services in 1871, giving individuals the
-						ability to move money across distances via an electronic
-						communication network for the first time.
-					</div>
-				</Flex>
-
-				<Flex align="center" gap="8" :class="$style.metadata">
-					<Flex align="center" gap="8" :class="$style.author">
-						<div :class="$style.avatar" />
-						ztepler
-					</Flex>
-
-					<Icon name="dot" size="16" style="fill: var(--border)" />
-
-					<div :class="$style.date">Feb 2, 2022</div>
-				</Flex>
-			</Flex>
-			<Flex direction="column" :class="$style.post">
-				<div :class="$style.cover" />
-
-				<Flex direction="column" gap="8" :class="$style.content">
-					<div :class="$style.category">Development</div>
-					<h1>Summary of two quarters in 2022</h1>
-					<div :class="$style.body">
-						Bank transfers have been at the core of global payments
-						since Western Union added money transfers to its
-						telegram services in 1871, giving individuals the
-						ability to move money across distances via an electronic
-						communication network for the first time.
-					</div>
-				</Flex>
-
-				<Flex align="center" gap="8" :class="$style.metadata">
-					<Flex align="center" gap="8" :class="$style.author">
-						<div :class="$style.avatar" />
-						ztepler
-					</Flex>
-
-					<Icon name="dot" size="16" style="fill: var(--border)" />
-
-					<div :class="$style.date">Feb 2, 2022</div>
-				</Flex>
-			</Flex>
-			<Flex direction="column" :class="$style.post">
-				<div :class="$style.cover" />
-
-				<Flex direction="column" gap="8" :class="$style.content">
-					<div :class="$style.category">Development</div>
-					<h1>Summary of two quarters in 2022</h1>
-					<div :class="$style.body">
-						Bank transfers have been at the core of global payments
-						since Western Union added money transfers to its
-						telegram services in 1871, giving individuals the
-						ability to move money across distances via an electronic
-						communication network for the first time.
-					</div>
-				</Flex>
-
-				<Flex align="center" gap="8" :class="$style.metadata">
-					<Flex align="center" gap="8" :class="$style.author">
-						<div :class="$style.avatar" />
-						ztepler
-					</Flex>
-
-					<Icon name="dot" size="16" style="fill: var(--border)" />
-
-					<div :class="$style.date">Feb 2, 2022</div>
+					<Text size="14" weight="500" color="tertiary"
+						>Feb 2, 2022</Text
+					>
 				</Flex>
 			</Flex>
 		</Flex>
-
-		<div :class="$style.divider" />
-		<div :class="$style.subscribe">Subscribe via RSS</div>
 	</div>
 </template>
 
 <style module>
-.wrapper {
-}
-
 .title {
 	font-size: 16px;
 	line-height: 1;
@@ -229,13 +173,6 @@ useMeta({
 	max-width: 600px;
 }
 
-.category {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--blue);
-}
-
 .large_post h1 {
 	font-size: 36px;
 	line-height: 1.8;
@@ -268,34 +205,5 @@ useMeta({
 
 .metadata {
 	margin-top: 24px;
-}
-
-.author {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-primary);
-	fill: var(--brand);
-}
-
-.avatar {
-	width: 20px;
-	height: 20px;
-	border-radius: 50%;
-	background: var(--border);
-}
-
-.date {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-tertiary);
-}
-
-.subscribe {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-secondary);
 }
 </style>

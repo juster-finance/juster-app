@@ -10,7 +10,7 @@ export const fetchArticles = async () => {
 		const {
 			data: { result: articles },
 		} = await axios.get(
-			`https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'post'] { ..., section->, content[] { ..., asset-> } }`,
+			`https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'article']`,
 		)
 
 		return articles
