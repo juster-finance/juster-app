@@ -208,6 +208,43 @@ const handleKeydown = (e) => {
 			</div>
 
 			<div :class="$style.block">
+				<div :class="$style.subtitle">Status</div>
+
+				<div :class="$style.badges">
+					<div
+						v-for="(status, index) in filters.statuses"
+						:key="index"
+						@click="$emit('onSelect', 'statuses', status)"
+						:class="[
+							$style.badge,
+							$style[status.color],
+							status.active && $style.active,
+						]"
+					>
+						<Icon :name="status.icon" size="14" />
+						{{ status.name }}
+					</div>
+				</div>
+			</div>
+
+			<div :class="$style.block">
+				<div :class="$style.subtitle">Period</div>
+
+				<div :class="$style.badges">
+					<div
+						v-for="(period, index) in filters.periods"
+						:key="index"
+						@click="$emit('onSelect', 'periods', period)"
+						:class="[$style.badge, period.active && $style.active]"
+					>
+						<Icon name="time" size="14" />
+						{{ period.name }}
+					</div>
+				</div>
+			</div>
+		</template>
+		<template v-else>
+			<div :class="$style.block">
 				<div :class="$style.subtitle">Liquidity</div>
 
 				<div :class="$style.range_picker">
@@ -264,43 +301,6 @@ const handleKeydown = (e) => {
 				</div>
 			</div>
 
-			<div :class="$style.block">
-				<div :class="$style.subtitle">Status</div>
-
-				<div :class="$style.badges">
-					<div
-						v-for="(status, index) in filters.statuses"
-						:key="index"
-						@click="$emit('onSelect', 'statuses', status)"
-						:class="[
-							$style.badge,
-							$style[status.color],
-							status.active && $style.active,
-						]"
-					>
-						<Icon :name="status.icon" size="14" />
-						{{ status.name }}
-					</div>
-				</div>
-			</div>
-
-			<div :class="$style.block">
-				<div :class="$style.subtitle">Period</div>
-
-				<div :class="$style.badges">
-					<div
-						v-for="(period, index) in filters.periods"
-						:key="index"
-						@click="$emit('onSelect', 'periods', period)"
-						:class="[$style.badge, period.active && $style.active]"
-					>
-						<Icon name="time" size="14" />
-						{{ period.name }}
-					</div>
-				</div>
-			</div>
-		</template>
-		<template v-else>
 			<div :class="$style.block">
 				<div :class="$style.subtitle">Participants</div>
 
