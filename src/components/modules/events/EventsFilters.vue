@@ -470,7 +470,7 @@ const handleKeydown = (e) => {
 	margin: 0 20px 24px 20px;
 
 	border-radius: 6px;
-	outline: 1px solid var(--border);
+	box-shadow: 0 0 0 2px var(--border);
 }
 
 .tab {
