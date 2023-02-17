@@ -764,19 +764,35 @@ watch(
 			/>
 
 			<Flex direction="column" gap="12">
-				<Button
-					@click="handleDepositLiquidityClick"
-					@onKeybind="handleDepositLiquidityClick"
-					:disabled="
-						!isDepositAvailable || !parseFloat(accountStore.balance)
-					"
-					type="primary"
-					size="medium"
-					keybind="D+L"
-					block
+				<Tooltip
+					placement="bottom"
+					:button="{
+						icon: 'login',
+						text: 'Connect Wallet',
+						url: '/connect',
+						type: 'primary',
+					}"
+					is-wide
+					:disabled="!!isDepositAvailable"
 				>
-					<Icon name="plus_circle" size="16" />Deposit Liquidity
-				</Button>
+					<Button
+						@click="handleDepositLiquidityClick"
+						@onKeybind="handleDepositLiquidityClick"
+						:disabled="
+							!isDepositAvailable ||
+							!parseFloat(accountStore.balance)
+						"
+						type="primary"
+						size="medium"
+						keybind="D+L"
+						block
+					>
+						<Icon name="plus_circle" size="16" />Deposit Liquidity
+					</Button>
+					<template #content>
+						Connect a wallet to make a deposit
+					</template>
+				</Tooltip>
 
 				<Button
 					v-if="pools.length === 1"

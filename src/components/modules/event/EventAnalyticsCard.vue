@@ -166,7 +166,7 @@ const distributionOfBets = computed(() => {
 				Details
 			</Text>
 
-			<Tooltip placement="left" text-align="right">
+			<Tooltip placement="bottom-end" text-align="right">
 				<Icon name="help" size="16" />
 
 				<template #content>

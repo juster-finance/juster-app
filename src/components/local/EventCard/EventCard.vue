@@ -536,13 +536,25 @@ onUnmounted(() => {
 							</template>
 						</div>
 
-						<template #content>{{
-							verifiedMakers[currentNetwork].includes(
-								event.creatorId,
-							)
-								? "Recurring event by Juster"
-								: "Custom event from user"
-						}}</template>
+						<template #content>
+							<template
+								v-if="
+									verifiedMakers[currentNetwork].includes(
+										event.creatorId,
+									)
+								"
+							>
+								<Flex align="center" gap="6">
+									<Icon
+										name="repeat"
+										size="14"
+										color="secondary"
+									/>
+									Recurring event by Juster
+								</Flex>
+							</template>
+							<template v-else> Custom event from user </template>
+						</template>
 					</Tooltip>
 				</div>
 			</div>

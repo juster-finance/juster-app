@@ -82,16 +82,14 @@ const router = useRouter()
 
 		<Tooltip
 			placement="bottom-end"
-			textAlign="left"
+			textAlign="right"
 			:class="$style.help_icon"
 		>
 			<Icon name="help" size="16" />
 
 			<template #content>
-				<span>
-					As soon as you make your first stake<br />
-					or deposit, this window disappears.
-				</span>
+				As soon as you make your first stake<br />
+				or deposit, this window disappears.
 			</template>
 		</Tooltip>
 	</Flex>

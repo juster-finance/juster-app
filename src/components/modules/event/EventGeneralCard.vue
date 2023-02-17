@@ -157,7 +157,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 			</div>
 
 			<div :class="$style.users">
-				<Tooltip placement="bottom-end">
+				<Tooltip placement="top-end">
 					<div
 						@click="emit('openParticipants')"
 						:class="$style.participants"
@@ -191,7 +191,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 					>
 				</Tooltip>
 
-				<Tooltip placement="bottom-end">
+				<Tooltip placement="top">
 					<div :class="$style.creator">
 						<template
 							v-if="
@@ -222,11 +222,25 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 						</template>
 					</div>
 
-					<template #content>{{
-						verifiedMakers[currentNetwork].includes(event.creatorId)
-							? "Recurring event by Juster"
-							: "Custom event from user"
-					}}</template>
+					<template #content>
+						<template
+							v-if="
+								verifiedMakers[currentNetwork].includes(
+									event.creatorId,
+								)
+							"
+						>
+							<Flex align="center" gap="6">
+								<Icon
+									name="repeat"
+									size="14"
+									color="secondary"
+								/>
+								Recurring event by Juster
+							</Flex>
+						</template>
+						<template v-else> Custom event from user </template>
+					</template>
 				</Tooltip>
 			</div>
 		</div>
@@ -452,11 +466,12 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 					['In progress', 'Finished'].includes(startStatus) &&
 					event.status == 'NEW'
 				"
-				placement="top-start"
+				placement="top"
 				:button="{
 					icon: 'book',
 					text: 'Learn More',
 					url: '/docs',
+					type: 'secondary',
 				}"
 				is-wide
 			>

@@ -243,7 +243,13 @@ const copy = (target) => {
 
 			<Flex gap="8">
 				<Tooltip
-					placement="bottom-end"
+					placement="left"
+					:button="{
+						icon: 'login',
+						text: 'Connect Wallet',
+						url: '/connect',
+						type: 'primary',
+					}"
 					:disabled="!!isDepositAvailable"
 				>
 					<Button

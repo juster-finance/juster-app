@@ -653,17 +653,53 @@ onUnmounted(() => {
 									color="green"
 							/></span>
 
-							<span
+							<Flex
 								v-if="
 									verifiedMakers[currentNetwork].includes(
 										event.creatorId,
 									)
 								"
-								>Recurring • Initial Liquidity Included</span
+								align="center"
+								gap="8"
 							>
-							<span v-else
-								>Custom • Unknown state of Liquidity</span
-							>
+								<Flex align="center" gap="4">
+									<Text
+										size="12"
+										weight="600"
+										color="tertiary"
+									>
+										Recurring
+									</Text>
+								</Flex>
+								<Text size="11" weight="500" color="support">
+									✦
+								</Text>
+								<Text size="12" weight="600" color="tertiary">
+									Initial Liquidity Included
+								</Text>
+							</Flex>
+							<Flex v-else align="center" gap="8">
+								<Flex align="center" gap="4">
+									<Icon
+										name="warning"
+										size="12"
+										color="yellow"
+									/>
+									<Text
+										size="12"
+										weight="600"
+										color="tertiary"
+									>
+										Custom
+									</Text>
+								</Flex>
+								<Text size="11" weight="500" color="support">
+									✦
+								</Text>
+								<Text size="12" weight="600" color="tertiary">
+									Unknown state of Liquidity
+								</Text>
+							</Flex>
 						</div>
 
 						<Dropdown side="top">

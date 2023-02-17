@@ -52,15 +52,15 @@ const statusBlock = computed(() => {
 		status.network === STATUSES.GOOD &&
 		status.quotes == STATUSES.GOOD
 	) {
-		return { text: "All systems online", color: "green" }
+		return { text: "Stable", color: "green" }
 	} else if (
 		status.dipdup === STATUSES.DELAYED &&
 		status.network === STATUSES.DELAYED &&
 		status.quotes == STATUSES.DELAYED
 	) {
-		return { text: "All systems delayed", color: "red" }
+		return { text: "Everything delayed", color: "red" }
 	} else {
-		return { text: "Some systems delayed", color: "yellow" }
+		return { text: "Systems delayed", color: "yellow" }
 	}
 })
 
@@ -78,7 +78,7 @@ const checkDipdup = async () => {
 		.diff(dipdupDt, ["minutes", "seconds"])
 		.toObject()
 
-	if (dipdupDiff.minutes >= 1) {
+	if (dipdupDiff.minutes >= 3) {
 		status.dipdup = STATUSES.DELAYED
 	} else {
 		status.dipdup = STATUSES.GOOD
@@ -114,7 +114,7 @@ const checkQuotes = () => {
 		)
 		.toObject()
 
-	if (quotesDiff.minutes >= 3) {
+	if (quotesDiff.minutes >= 10) {
 		status.quotes = STATUSES.DELAYED
 	} else {
 		status.quotes = STATUSES.GOOD
@@ -206,7 +206,7 @@ onBeforeUnmount(() => {
 			<div :class="$style.bottom">
 				<div :class="$style.block">
 					<div :class="$style.left">
-						<Tooltip placement="top-start">
+						<Tooltip placement="top">
 							<Button
 								type="secondary"
 								size="small"
@@ -216,7 +216,15 @@ onBeforeUnmount(() => {
 									$style[statusBlock.color],
 								]"
 							>
-								<div :class="$style.dot" />
+								<Icon
+									:name="
+										(statusBlock.color === 'green' &&
+											'checkcircle') ||
+										'warning'
+									"
+									size="14"
+									:class="$style"
+								/>
 								{{ statusBlock.text }}
 							</Button>
 
@@ -224,8 +232,8 @@ onBeforeUnmount(() => {
 								<span>DipDup:</span> {{ status.dipdup
 								}}<br /><span>Network:</span> {{ status.network
 								}}<br /><span>Quotes:</span>
-								{{ status.quotes }}</template
-							>
+								{{ status.quotes }}
+							</template>
 						</Tooltip>
 
 						<Dropdown side="top">
@@ -233,12 +241,7 @@ onBeforeUnmount(() => {
 								<Button
 									type="secondary"
 									size="small"
-									:class="[
-										$style.footer_btn,
-										currentNetwork == 'mainnet'
-											? $style.green
-											: $style.yellow,
-									]"
+									:class="[$style.footer_btn]"
 									data-cy="network-dropdown"
 								>
 									<Icon
@@ -272,10 +275,6 @@ onBeforeUnmount(() => {
 												: 'dot'
 										"
 										size="16"
-										:class="
-											currentNetwork === 'mainnet' &&
-											$style.blue_icon
-										"
 									/>
 									Main Network
 								</DropdownItem>
@@ -292,10 +291,6 @@ onBeforeUnmount(() => {
 												: 'dot'
 										"
 										size="16"
-										:class="
-											currentNetwork === 'testnet' &&
-											$style.blue_icon
-										"
 									/>
 									Test Network
 								</DropdownItem>
@@ -346,18 +341,39 @@ onBeforeUnmount(() => {
 					</div>
 				</div>
 
-				<div :class="$style.block">
-					<div :class="$style.copyrights">
-						<div :class="$style.year">© 2022</div>
-						<span>Juster 1.0.</span> Market data provided by
-						Coinbase Harbinger
-					</div>
+				<Flex justify="between">
+					<Flex align="center">
+						<Text size="14" weight="500" color="tertiary">
+							© {{ DateTime.now().year }}&nbsp;&nbsp;
+						</Text>
+						<Text size="11" color="support">✦</Text>
+						<Text size="14" weight="500" color="secondary">
+							&nbsp;&nbsp;Juster 1.1&nbsp;
+						</Text>
+						<Text size="14" weight="500" color="tertiary">
+							Market data provided by&nbsp;
+						</Text>
+						<a
+							href="https://tzkt.io/KT1AdbYiPYb5hDuEuVrfxmFehtnBCXv4Np7r/operations/"
+							target="_blank"
+						>
+							<Text size="14" weight="500" color="secondary">
+								Harbinger Oracle
+							</Text>
+						</a>
+					</Flex>
 
-					<div :class="$style.warning">
-						Participation in gambling is prohibited for persons
-						under the age of 21+
-					</div>
-				</div>
+					<Flex direction="column" gap="8" align="end">
+						<Text size="12" weight="500" color="support">
+							Participation in gambling is prohibited for persons
+							under the age of 21+
+						</Text>
+						<Text size="12" weight="500" color="support">
+							Check your country's restrictions before using the
+							application
+						</Text>
+					</Flex>
+				</Flex>
 			</div>
 		</div>
 	</div>
@@ -455,52 +471,16 @@ onBeforeUnmount(() => {
 	color: var(--text-secondary);
 }
 
-.dot {
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
+.footer_btn.green svg {
+	fill: var(--green);
 }
 
-.footer_btn.green .dot {
-	background: var(--green);
+.footer_btn.yellow svg {
+	fill: var(--yellow);
 }
 
-.footer_btn.yellow .dot {
-	background: var(--yellow);
-}
-
-.footer_btn.red .dot {
-	background: var(--red);
-}
-
-.copyrights {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--text-tertiary);
-	white-space: nowrap;
-}
-
-.copyrights span {
-	color: var(--text-secondary);
-}
-
-.year {
-	font-weight: 500;
-}
-
-.warning {
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-support);
-}
-
-.blue_icon svg {
-	fill: var(--blue);
+.footer_btn.red svg {
+	fill: var(--red);
 }
 
 @media (max-width: 900px) {

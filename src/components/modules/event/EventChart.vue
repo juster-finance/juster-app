@@ -17,7 +17,7 @@ defineProps({ event: { type: Object, default: () => {} } })
 const isOpen = ref(true)
 
 const selectedTab = ref("Price")
-const tabs = ref(["Price", "TVL"])
+const tabs = ref(["Price"])
 </script>
 
 <template>
@@ -50,9 +50,7 @@ const tabs = ref(["Price", "TVL"])
 			</div>
 
 			<Tooltip placement="bottom-end" text-align="right">
-				<div :class="$style.label">
-					<Icon name="help" size="12" />Details
-				</div>
+				<Icon name="help" size="14" color="tertiary" />
 
 				<template #content>
 					Gray Chart <span>- price before start</span><br />
@@ -115,25 +113,10 @@ const tabs = ref(["Price", "TVL"])
 
 .bottom {
 	display: flex;
-	align-items: center;
+	align-items: flex-end;
 	justify-content: space-between;
 
 	padding: 0 16px 16px 16px;
-}
-
-.label {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-tertiary);
-}
-
-.label svg {
-	fill: var(--text-secondary);
 }
 
 .tabs {
@@ -166,6 +149,6 @@ const tabs = ref(["Price", "TVL"])
 
 .tab.active {
 	color: var(--text-primary);
-	background: var(--btn-secondary-bg);
+	background: var(--opacity-05);
 }
 </style>

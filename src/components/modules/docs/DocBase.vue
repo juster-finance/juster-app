@@ -179,7 +179,7 @@ const handlePrevPage = () => {
 					</template>
 				</Tooltip>
 
-				<Tooltip v-if="nextPost" isWide placement="bottom-end">
+				<Tooltip v-if="nextPost" isWide placement="bottom">
 					<Flex
 						@click="handleNextPage"
 						align="center"
