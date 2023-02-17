@@ -158,7 +158,7 @@ const handleNetworkDblClick = () => {
 					</router-link>
 					<router-link to="/events" :class="$style.mobile_menu__link">
 						<div :class="$style.left">
-							<Icon name="arrows" size="14" />
+							<Icon name="price_event" size="14" />
 							<span>Events</span>
 						</div>
 
@@ -169,11 +169,24 @@ const handleNetworkDblClick = () => {
 					<router-link to="/pools" :class="$style.mobile_menu__link">
 						<div :class="$style.left">
 							<Icon name="server" size="14" />
-							<span>Liquidity Pools</span>
+							<span>Pools</span>
 						</div>
 
 						<div :class="$style.mobile_menu__description">
 							Provide liquidity for events
+						</div>
+					</router-link>
+					<router-link
+						to="/docs/discover"
+						:class="$style.mobile_menu__link"
+					>
+						<div :class="$style.left">
+							<Icon name="book" size="14" />
+							<span>Documentation</span>
+						</div>
+
+						<div :class="$style.mobile_menu__description">
+							Guides, Articles, etc
 						</div>
 					</router-link>
 					<router-link
