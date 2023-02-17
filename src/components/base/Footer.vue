@@ -245,11 +245,14 @@ onBeforeUnmount(() => {
 										:name="
 											currentNetwork === 'testnet'
 												? 'hammer'
-												: 'bolt'
+												: 'explorer'
 										"
 										size="12"
-									/>{{
-										capitalizeFirstLetter(currentNetwork)
+									/>
+									{{
+										currentNetwork === "mainnet"
+											? "Main Network"
+											: "Test Network"
 									}}
 									<Icon name="arrow" size="12" />
 								</Button>
@@ -274,7 +277,7 @@ onBeforeUnmount(() => {
 											$style.blue_icon
 										"
 									/>
-									Mainnet
+									Main Network
 								</DropdownItem>
 								<DropdownItem
 									@click="handleSwitch('testnet')"
@@ -294,7 +297,7 @@ onBeforeUnmount(() => {
 											$style.blue_icon
 										"
 									/>
-									Testnet
+									Test Network
 								</DropdownItem>
 							</template>
 						</Dropdown>

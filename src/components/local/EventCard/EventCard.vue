@@ -496,7 +496,7 @@ onUnmounted(() => {
 									$style.more_participants,
 								]"
 							>
-								+{{ participants.length - 3 }}
+								<Icon name="dots" size="12" color="secondary" />
 							</div>
 						</div>
 
@@ -514,10 +514,15 @@ onUnmounted(() => {
 									)
 								"
 							>
-								<Icon name="logo_symbol" size="24" />
+								<Icon
+									name="logo_symbol"
+									size="24"
+									color="primary"
+								/>
 								<Icon
 									name="verified"
 									size="16"
+									color="green"
 									:class="$style.verified_icon"
 								/>
 							</template>
@@ -977,7 +982,6 @@ onUnmounted(() => {
 }
 
 .verified_icon {
-	fill: var(--brand);
 	background: var(--card-bg);
 	border-radius: 50%;
 
@@ -991,7 +995,7 @@ onUnmounted(() => {
 	width: 34px;
 	height: 34px;
 
-	background: rgba(0, 0, 0, 0.15);
+	background: var(--app-bg);
 	border-radius: 50px;
 	border: 3px solid var(--card-bg);
 
@@ -1011,7 +1015,7 @@ onUnmounted(() => {
 	font-weight: 700;
 	color: var(--text-blue);
 
-	background: rgb(35, 35, 35);
+	background: var(--app-bg);
 	border-radius: 50px;
 	border: 3px solid var(--card-bg);
 }
@@ -1088,7 +1092,7 @@ onUnmounted(() => {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 8px;
+	gap: 12px;
 
 	margin-bottom: 24px;
 }

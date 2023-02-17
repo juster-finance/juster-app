@@ -286,7 +286,7 @@ onBeforeUnmount(() => {
 
 .wrapper.small {
 	height: 32px;
-	padding: 0 12px;
+	padding: 0 10px;
 	font-size: 13px;
 	gap: 8px;
 	border-radius: 6px;

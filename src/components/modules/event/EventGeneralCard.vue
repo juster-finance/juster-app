@@ -179,7 +179,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 								$style.more_participants,
 							]"
 						>
-							+{{ participantsAvatars.length - 3 }}
+							<Icon name="dots" size="12" color="secondary" />
 						</div>
 					</div>
 
@@ -200,10 +200,15 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 								)
 							"
 						>
-							<Icon name="logo_symbol" size="24" />
+							<Icon
+								name="logo_symbol"
+								size="24"
+								color="primary"
+							/>
 							<Icon
 								name="verified"
 								size="16"
+								color="green"
 								:class="$style.verified_icon"
 							/>
 						</template>
@@ -631,21 +636,20 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 }
 
 .verified_icon {
-	fill: var(--brand);
-	background: var(--card-bg);
-	border-radius: 50%;
-
 	position: absolute;
 	top: -4px;
 	right: -4px;
 	box-sizing: content-box;
+
+	background: var(--card-bg);
+	border-radius: 50%;
 }
 
 .user_avatar {
 	width: 34px;
 	height: 34px;
 
-	background: rgba(0, 0, 0, 0.15);
+	background: var(--app-bg);
 	border-radius: 50px;
 	border: 3px solid var(--card-bg);
 
@@ -660,12 +664,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 	align-items: center;
 	justify-content: center;
 
-	font-size: 11px;
-	line-height: 1.1;
-	font-weight: 700;
-	color: var(--text-blue);
-
-	background: rgb(35, 35, 35);
+	background: var(--app-bg);
 	border-radius: 50px;
 	border: 3px solid var(--card-bg);
 }

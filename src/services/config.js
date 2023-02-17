@@ -1,7 +1,7 @@
 export const dipdup = {
 	mainnet: {
-		graphq: "https://juster.dipdup.net/v1/graphql",
-		ws: "wss://juster.dipdup.net/v1/graphql",
+		graphq: "https://api.juster.fi/v1/graphql",
+		ws: "wss://api.juster.fi/v1/graphql",
 	},
 	testnet: {
 		graphq: `https://api.ithacanet-pool.juster.fi/v1/graphql`,
@@ -71,7 +71,15 @@ export const verifiedMakers = {
 		"KT1TNE38c5BFc9hXXAGBJ3fmXCPtHKV3Ng81",
 		"KT1MRHBX9DoLYsmN58ediuARpzH4QdgMAQz8",
 	],
-	mainnet: ["tz1h5frRwDbJMGyTPntdwMC8i745q2Z1fzyF"],
+	mainnet: [
+		"tz1h5frRwDbJMGyTPntdwMC8i745q2Z1fzyF",
+		"KT1Pq4GZ8E5ATLJdAmy7ypwnNzxhjmTQwtzP",
+		"KT1KWxEUXmhoSqv8qjzwRQEVmhHGFTSVewAt",
+		"KT1WGwGfW2Wx4EMJ2DNLnvoNEYCKA6GggQhb",
+		"KT1JKiMQWE8hcSGq8j89mYDEY4DLpTE4vEaD",
+		"KT1VWjtgFCM1bs3QRcqHcP31dowjDgdgVtxR",
+		"KT1AatPqLrUumRZz4FRC9nG1acTvyizeQ4ni",
+	],
 }
 
 export const contracts = {
