@@ -408,7 +408,7 @@ onBeforeUnmount(() => {
 	align-items: center;
 	gap: 12px;
 
-	fill: var(--text-primary);
+	fill: var(--text-support);
 }
 
 .columns {

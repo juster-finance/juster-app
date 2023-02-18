@@ -214,7 +214,7 @@ html {
 .app_base {
 	flex: 1;
 
-	min-height: 100vh;
+	min-height: 90vh;
 
 	padding-top: 80px;
 }
