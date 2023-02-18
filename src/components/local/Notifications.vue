@@ -197,7 +197,6 @@ notificationsStore.$subscribe(() => {
 	width: 330px;
 	background: rgba(39, 39, 42, 0.8);
 	box-shadow: rgb(0 0 0 / 20%) 0px 4px 24px;
-	backdrop-filter: blur(10px) saturate(190%) contrast(80%) brightness(75%);
 	border: 1px solid rgb(60, 63, 68);
 	border-radius: 8px;
 	padding: 16px;
@@ -357,5 +356,27 @@ notificationsStore.$subscribe(() => {
 
 .notification .close_icon:hover {
 	opacity: 1;
+}
+
+@supports (backdrop-filter: blur(5px)) {
+	.notification {
+		backdrop-filter: blur(10px) saturate(190%) contrast(80%) brightness(75%);
+	}
+}
+
+@supports not (backdrop-filter: blur(5px)) {
+	.notification {
+		background: var(--card-bg);
+	}
+}
+
+@media (max-width: 500px) {
+	.notification {
+		width: calc(100vw - 32px - 32px);
+	}
+
+	.close_icon {
+		opacity: 1;
+	}
 }
 </style>
