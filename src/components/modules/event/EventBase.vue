@@ -40,7 +40,7 @@ import DepositCard from "@modules/events/DepositCard.vue"
  */
 import ParticipantsModal from "@local/modals/ParticipantsModal.vue"
 import LiquidityModal from "@local/modals/position/LiquidityModal.vue"
-import NewBetModal from "@local/modals/position/NewBetModal.vue"
+import StakeModal from "@local/modals/position/StakeModal.vue"
 import ConfirmTransactionModal from "@local/modals/ConfirmTransactionModal.vue"
 import EventDetailsModal from "@local/modals/EventDetailsModal.vue"
 import NotifyMeModal from "@local/modals/NotifyMeModal.vue"
@@ -557,7 +557,7 @@ onUnmounted(() => {
 			<template #title="{ content }"> {{ content }} • Juster </template>
 		</metainfo>
 
-		<NewBetModal
+		<StakeModal
 			:show="showBetModal"
 			:event="event"
 			@onBet="handleBet"

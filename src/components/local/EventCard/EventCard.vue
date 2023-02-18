@@ -25,7 +25,7 @@ import ParticipantsModal from "@local/modals/ParticipantsModal.vue"
 import ConfirmTransactionModal from "@local/modals/ConfirmTransactionModal.vue"
 import NotifyMeModal from "@local/modals/NotifyMeModal.vue"
 import LiquidityModal from "@local/modals/position/LiquidityModal.vue"
-import NewBetModal from "@local/modals/position/NewBetModal.vue"
+import StakeModal from "@local/modals/position/StakeModal.vue"
 import EventActions from "@local/EventActions.vue"
 
 /**
@@ -411,7 +411,7 @@ onUnmounted(() => {
 <template>
 	<router-link :to="`/events/${event.id}`" :class="$style.wrapper">
 		<div ref="card">
-			<NewBetModal
+			<StakeModal
 				:show="showBetModal"
 				:event="event"
 				@onContinue="handleContinue"
