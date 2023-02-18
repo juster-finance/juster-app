@@ -503,8 +503,8 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 					>
 				</div>
 
-				<template #content
-					>Price change that separates betting pools
+				<template #content>
+					Price change that separates betting pools
 				</template>
 			</Tooltip>
 

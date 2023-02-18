@@ -68,6 +68,8 @@ onBeforeMount(() => {
 	})
 })
 onMounted(async () => {
+	// window.addEventListener("mousedown", (e) => alert(e))
+
 	marketStore.pools = await fetchAllPools()
 	initPools(marketStore.pools)
 

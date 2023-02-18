@@ -9,11 +9,22 @@ export function useOnOutsidePress(el, onOutsidePressCallback) {
 
 	const component = element ? element : el.value
 
-	const handler = (e) =>
-		component && !component.contains(e.target) && onOutsidePressCallback(e)
+	const handler = (e) => {
+		return (
+			component &&
+			!component.contains(e.target) &&
+			onOutsidePressCallback(e)
+		)
+	}
 
-	const event = events.find((x) => `on${x}`)
-	return useEvent(document, event, handler, { passive: true })
+	const ua = navigator.userAgent
+
+	return useEvent(
+		document,
+		ua.match(/iPad/i) || ua.match(/iPhone/) ? "touchstart" : "mousedown",
+		handler,
+		{ passive: true },
+	)
 }
 
 export function useEvent(el, name, listener, options) {
@@ -23,8 +34,9 @@ export function useEvent(el, name, listener, options) {
 		const element = isRef(el) ? el : ref(el)
 
 		const removeEventListener = (e) => e.removeEventListener(name, listener)
-		const addEventListener = (e) =>
+		const addEventListener = (e) => {
 			e.addEventListener(name, listener, options)
+		}
 
 		const removeWatch = watch(
 			element,
