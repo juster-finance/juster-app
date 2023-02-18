@@ -204,7 +204,7 @@ const onKeydown = (event) => {
 }
 
 .canvas {
-	position: absolute;
+	position: fixed;
 	inset: 0;
 	z-index: 2000;
 }
