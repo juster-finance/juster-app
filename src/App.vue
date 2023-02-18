@@ -118,8 +118,6 @@ html {
 	box-sizing: border-box;
 
 	background: var(--app-bg);
-
-	margin-left: calc(100vw - 100%);
 }
 
 .dropdown-enter-active,
@@ -362,6 +360,10 @@ html {
 
 * {
 	touch-action: pan-x pan-y;
+}
+
+body::-webkit-scrollbar {
+	width: 0px;
 }
 
 *::-webkit-scrollbar {

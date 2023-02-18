@@ -65,12 +65,16 @@ watch(
 	() => props.show,
 	() => {
 		if (!props.show) {
+			document.body.style.overflow = null
+
 			if (!props.disableTrap) trap.value.deactivate()
 
 			if (removeOutside) {
 				removeOutside()
 			}
 		} else {
+			document.body.style.overflow = "hidden"
+
 			nextTick(() => {
 				if (!props.disableTrap) {
 					trap.value = focusTrap.createFocusTrap(modal.value)
