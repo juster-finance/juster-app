@@ -291,7 +291,7 @@ const buttonState = computed(() => {
 	}
 
 	if (!side.value) {
-		return { text: "Choose your side", disabled: true }
+		return { text: "Choose the side", disabled: true }
 	}
 
 	if (countdownStatus.value !== "In progress")
@@ -465,7 +465,7 @@ const handleUserTransactionConfirmation = () => {
 				</Flex>
 			</Flex>
 
-			<Flex align="center" justify="between">
+			<Flex align="center" justify="between" :class="$style.event">
 				<Flex align="center" gap="16">
 					<div :class="$style.symbol_imgs">
 						<img
@@ -510,7 +510,7 @@ const handleUserTransactionConfirmation = () => {
 					</Flex>
 				</Flex>
 
-				<Flex gap="6">
+				<Flex gap="12">
 					<Badge
 						v-if="
 							countdownStatus == 'In progress' &&
@@ -952,5 +952,13 @@ const handleUserTransactionConfirmation = () => {
 	position: absolute;
 	top: 10px;
 	right: 0;
+}
+
+@media (max-width: 500px) {
+	.event {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 24px;
+	}
 }
 </style>
