@@ -21,6 +21,7 @@ import { toReadableDuration } from "@utils/date"
  */
 import LoadingBar from "@ui/LoadingBar.vue"
 import Modal from "@ui/Modal.vue"
+import Tooltip from "@ui/Tooltip.vue"
 import Button from "@ui/Button.vue"
 import Badge from "@ui/Badge.vue"
 
@@ -693,9 +694,20 @@ const handleUserTransactionConfirmation = () => {
 				</Flex>
 
 				<Flex direction="column" gap="16" :class="$style.payout_block">
-					<Text size="14" weight="600" color="secondary">
-						Success Payout
-					</Text>
+					<Flex align="center" gap="4">
+						<Text size="14" weight="600" color="secondary">
+							Success Payout
+						</Text>
+
+						<Tooltip placemenet="bottom">
+							<Icon name="help" size="14" color="support" />
+
+							<template #content>
+								This payout depends on the outcome<br />
+								of the event and the side you choose
+							</template>
+						</Tooltip>
+					</Flex>
 
 					<Flex>
 						<Text size="26" weight="600" color="secondary">
