@@ -341,8 +341,8 @@ onBeforeUnmount(() => {
 					</div>
 				</div>
 
-				<Flex justify="between">
-					<Flex align="center">
+				<Flex justify="between" :class="$style.copyrights">
+					<Flex align="center" wrap="wrap" :class="$style.line">
 						<Text size="14" weight="500" color="tertiary">
 							© {{ DateTime.now().year }}&nbsp;&nbsp;
 						</Text>
@@ -363,7 +363,12 @@ onBeforeUnmount(() => {
 						</a>
 					</Flex>
 
-					<Flex direction="column" gap="8" align="end">
+					<Flex
+						direction="column"
+						gap="8"
+						align="end"
+						:class="$style.line"
+					>
 						<Text size="12" weight="500" color="support">
 							Participation in gambling is prohibited for persons
 							under the age of 21+
@@ -493,6 +498,23 @@ onBeforeUnmount(() => {
 		flex-direction: column;
 		gap: 24px;
 	}
+
+	.copyrights {
+		flex-wrap: wrap;
+		justify-content: center;
+
+		gap: 24px;
+	}
+
+	.line {
+		align-items: center;
+		justify-content: center;
+	}
+
+	.line * {
+		text-align: center;
+		line-height: 1.6;
+	}
 }
 
 @media (max-width: 700px) {
@@ -503,16 +525,6 @@ onBeforeUnmount(() => {
 
 	.column {
 		align-items: center;
-	}
-
-	.copyrights {
-		flex-wrap: wrap;
-		justify-content: center;
-	}
-
-	.warning {
-		text-align: center;
-		line-height: 1.6;
 	}
 }
 </style>
