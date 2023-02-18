@@ -118,6 +118,8 @@ html {
 	box-sizing: border-box;
 
 	background: var(--app-bg);
+
+	margin-left: calc(100vw - 100%);
 }
 
 .dropdown-enter-active,
