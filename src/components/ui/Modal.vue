@@ -145,8 +145,8 @@ const onKeydown = (event) => {
 			>
 				<div
 					ref="modal"
-					:class="[$style.modal, showShakeAnimation && $style.shake]"
 					:style="calcModalStyles"
+					:class="[$style.modal, showShakeAnimation && $style.shake]"
 				>
 					<slot />
 
@@ -237,5 +237,17 @@ const onKeydown = (event) => {
 
 .close_icon:hover {
 	background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 600px) {
+	.wrapper {
+		/* align-items: flex-end; */
+	}
+
+	.modal {
+		width: 100% !important;
+
+		margin: 16px;
+	}
 }
 </style>

@@ -130,13 +130,13 @@ const returnForLiquidity = computed(() => {
 			<div :class="[$style.param, $style.up]">
 				<Icon name="arrow_circle_top_right" size="12" />{{
 					numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
-				}}&nbsp;<span>ꜩ</span>
+				}}&nbsp;<span>XTZ</span>
 			</div>
 
 			<div :class="[$style.param, $style.down]">
 				<Icon name="arrow_circle_top_right" size="12" />{{
 					numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
-				}}&nbsp;<span>ꜩ</span>
+				}}&nbsp;<span>XTZ</span>
 			</div>
 
 			<div
@@ -144,7 +144,7 @@ const returnForLiquidity = computed(() => {
 				:class="[$style.param]"
 			>
 				{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
-					>ꜩ</span
+					>XTZ</span
 				>
 			</div>
 			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
@@ -163,7 +163,7 @@ const returnForLiquidity = computed(() => {
 				<div :class="$style.value">
 					<Icon name="arrow_circle_top_right" size="12" />{{
 						numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
-					}}&nbsp;<span>ꜩ</span>
+					}}&nbsp;<span>XTZ</span>
 				</div>
 			</div>
 
@@ -173,7 +173,7 @@ const returnForLiquidity = computed(() => {
 				<div :class="$style.value">
 					<Icon name="arrow_circle_top_right" size="12" />{{
 						numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
-					}}&nbsp;<span>ꜩ</span>
+					}}&nbsp;<span>XTZ</span>
 				</div>
 			</div>
 
@@ -185,7 +185,7 @@ const returnForLiquidity = computed(() => {
 
 				<div :class="$style.value">
 					{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
-						>ꜩ</span
+						>XTZ</span
 					>
 				</div>
 			</div>

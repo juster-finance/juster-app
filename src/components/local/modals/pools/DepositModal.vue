@@ -492,7 +492,7 @@ const onKeydown = (e) => {
 								}} </Text
 							>&nbsp;
 							<Text size="14" weight="600" color="tertiary">
-								ꜩ </Text
+								XTZ </Text
 							>&nbsp;
 							<Text size="14" weight="600" color="support">
 								-> </Text
