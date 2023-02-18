@@ -203,18 +203,20 @@ html {
 	display: flex;
 	flex-direction: column;
 
-	height: 100vh;
+	overflow-x: hidden;
 }
 
 .app_wrapper {
 	display: flex;
 	flex-direction: column;
-
-	height: 100%;
 }
 
 .app_base {
 	flex: 1;
+
+	min-height: 100vh;
+
+	padding-top: 80px;
 }
 
 :root {

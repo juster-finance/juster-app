@@ -285,6 +285,8 @@ const handleNetworkDblClick = () => {
 
 <style module>
 .wrapper {
+	position: fixed;
+	top: 0;
 	width: 100%;
 	min-height: 80px;
 
