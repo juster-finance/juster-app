@@ -203,9 +203,6 @@ html {
 	display: flex;
 	flex-direction: column;
 
-	overflow-x: hidden;
-
-	/* overflow-y: auto; */
 	height: 100vh;
 }
 
@@ -214,7 +211,6 @@ html {
 	flex-direction: column;
 
 	height: 100%;
-	padding-top: 80px;
 }
 
 .app_base {
@@ -382,7 +378,6 @@ body:hover *::-webkit-scrollbar-thumb {
 }
 
 body {
-	overflow-y: hidden;
 	overscroll-behavior-x: none;
 	overscroll-behavior-y: none;
 	user-select: none;
