@@ -33,7 +33,7 @@ const props = defineProps({
 
 const showMore = ref(false)
 
-const prevQuotePrice = ref({})
+const prevQuotePrice = ref(0)
 const startQuote = ref({})
 
 /**
@@ -113,11 +113,13 @@ const priceDetails = computed(() => {
 			priceToCompare - prevQuotePrice.value < 0
 				? PriceStates.DROPPED
 				: PriceStates.WENT_UP,
-		percentageDiff: (
-			(Math.abs(priceToCompare - prevQuotePrice.value) /
-				((priceToCompare + prevQuotePrice.value) / 2)) *
-			100
-		).toFixed(2),
+		percentageDiff: prevQuotePrice.value
+			? (
+					(Math.abs(priceToCompare - prevQuotePrice.value) /
+						((priceToCompare + prevQuotePrice.value) / 2)) *
+					100
+			  ).toFixed(2)
+			: 0,
 	}
 })
 
