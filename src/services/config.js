@@ -60,6 +60,9 @@ export const verifiedMakers = {
         "KT1AatPqLrUumRZz4FRC9nG1acTvyizeQ4ni",
         "KT1VWjtgFCM1bs3QRcqHcP31dowjDgdgVtxR",
         "KT1JKiMQWE8hcSGq8j89mYDEY4DLpTE4vEaD",
+        "KT1Pq4GZ8E5ATLJdAmy7ypwnNzxhjmTQwtzP",
+        "KT1KWxEUXmhoSqv8qjzwRQEVmhHGFTSVewAt",
+        "KT1WGwGfW2Wx4EMJ2DNLnvoNEYCKA6GggQhb",
     ],
 }
 
