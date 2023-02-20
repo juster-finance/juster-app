@@ -76,11 +76,11 @@ const showPoolsGuidesModal = ref(false)
 						<DropdownDivider />
 
 						<DropdownTitle>Timeline</DropdownTitle>
-						<DropdownItem>
+						<DropdownItem disabled>
 							<Icon name="time" size="16" />
 							My history
 						</DropdownItem>
-						<DropdownItem>
+						<DropdownItem disabled>
 							<Icon name="time" size="16" />
 							Pools history
 						</DropdownItem>

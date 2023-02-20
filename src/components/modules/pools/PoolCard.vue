@@ -539,7 +539,7 @@ const copy = (target) => {
 
 					<DropdownDivider />
 
-					<DropdownItem>
+					<DropdownItem disabled>
 						<Icon name="time" size="16" />Pool timeline
 					</DropdownItem>
 
