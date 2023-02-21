@@ -81,7 +81,7 @@ onMounted(async () => {
 	display: flex;
 	flex-direction: column;
 
-	width: 700px;
+	max-width: 700px;
 }
 
 .title {
@@ -90,13 +90,13 @@ onMounted(async () => {
 	font-weight: 600;
 	color: var(--text-primary);
 
-	margin-top: 40px;
-	margin-bottom: 32px;
+	margin-top: 2em;
+	margin-bottom: 1em;
 }
 
 .description {
 	font-size: 16px;
-	line-height: 1;
+	line-height: 1.6;
 	font-weight: 500;
 	color: var(--text-secondary);
 
@@ -115,5 +115,15 @@ onMounted(async () => {
 	display: flex;
 	flex-direction: column;
 	gap: 80px;
+}
+
+@media (max-width: 700px) {
+	.title {
+		font-size: 24px;
+	}
+
+	.description {
+		font-size: 14px;
+	}
 }
 </style>

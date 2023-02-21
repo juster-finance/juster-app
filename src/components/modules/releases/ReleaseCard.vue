@@ -39,6 +39,14 @@ const props = defineProps({ release: { type: Object }, idx: Number })
 			/>
 
 			<ArticleContent :content="release.content" />
+
+			<Text size="12" weight="500" color="tertiary">
+				{{
+					DateTime.fromISO(release._createdAt, {
+						locale: "en",
+					}).toRelative()
+				}}
+			</Text>
 		</div>
 	</Flex>
 </template>
@@ -51,8 +59,9 @@ const props = defineProps({ release: { type: Object }, idx: Number })
 }
 
 .cover {
-	width: 700px;
+	width: 100%;
 	aspect-ratio: 16/9;
+	margin-bottom: 50px;
 
 	background: rgba(255, 255, 255, 0.03);
 
@@ -100,5 +109,17 @@ const props = defineProps({ release: { type: Object }, idx: Number })
 	background: linear-gradient(var(--border), transparent);
 
 	margin-right: 5px;
+}
+
+@media (max-width: 1100px) {
+	.timeline {
+		display: none;
+	}
+}
+
+@media (max-width: 700px) {
+	.cover {
+		margin-bottom: 0;
+	}
 }
 </style>
