@@ -75,6 +75,17 @@ const profit = computed(() => {
 	}
 })
 
+const maxValue = computed(() => {
+	let totals = []
+
+	Object.keys(props.summaries).forEach((pool) => {
+		const summary = props.summaries[pool]
+		totals.push(summary.realizedProfit + summary.unrealizedProfit.toNumber())
+	})
+
+	return Math.max(...[profit.value.total, ...totals])
+})
+
 const sortedPositions = computed(() => {
 	const sPositions = props.positions.map((position) => {
 		return {
@@ -189,7 +200,7 @@ const parseProfitAmount = (amount) => {
 							<Text color="secondary" size="13" weight="600"> Total Profit </Text>
 
 							<Text color="secondary" size="13" weight="600">
-								{{ parseProfitAmount(profit.realized + profit.unrealized) }}
+								{{ parseProfitAmount(profit.total) }}
 							</Text>
 						</Flex>
 
@@ -203,7 +214,7 @@ const parseProfitAmount = (amount) => {
 							>
 								<Flex
 									:style="{
-										width: '100%',
+										width: `${(profit.total / maxValue) * 100}%`,
 									}"
 									:class="$style.left"
 								>
@@ -232,7 +243,7 @@ const parseProfitAmount = (amount) => {
 							>
 								<Flex
 									:style="{
-										width: '100%',
+										width: `${(profit.total / maxValue) * 100}%`,
 									}"
 									:class="$style.right"
 								>
@@ -289,7 +300,7 @@ const parseProfitAmount = (amount) => {
 										<Flex
 											:style="{
 												width: `${Math.abs(
-													(100 * (summary.realizedProfit + summary.unrealizedProfit.toNumber())) / profit.total,
+													(100 * (summary.realizedProfit + summary.unrealizedProfit.toNumber())) / maxValue,
 												)}%`,
 											}"
 											:class="$style.left"
@@ -327,7 +338,7 @@ const parseProfitAmount = (amount) => {
 										<Flex
 											:style="{
 												width: `${Math.abs(
-													(100 * (summary.realizedProfit + summary.unrealizedProfit.toNumber())) / profit.total,
+													(100 * (summary.realizedProfit + summary.unrealizedProfit.toNumber())) / maxValue,
 												)}%`,
 											}"
 											:class="$style.right"
