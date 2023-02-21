@@ -44,7 +44,7 @@ export const fetchArticles = async () => {
 		const {
 			data: { result: articles },
 		} = await axios.get(
-			`https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'article']`,
+			`https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'article'] {..., content[] { ..., asset-> } }`,
 		)
 
 		return articles
@@ -62,7 +62,7 @@ export const fetchArticleBySlug = async (slug) => {
 			`https://${
 				sanity.id
 			}.api.sanity.io/v1/data/query/production?query=${encodeURIComponent(
-				`*[_type == 'article' && slug.current == "${slug}"]`,
+				`*[_type == 'article' && slug.current == "${slug}"] {..., content[] { ..., asset-> } }`,
 			)}`,
 		)
 
