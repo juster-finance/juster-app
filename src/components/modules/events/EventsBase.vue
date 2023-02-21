@@ -155,10 +155,15 @@ const marketStore = useMarketStore()
 const subscription = ref(null)
 
 const isNewEventsLoaded = ref(false)
+const isFinishedEventsLoaded = ref(false)
 
 const currentPage = ref(1)
 
 let filters = ref(cloneDeep(defaultFilters))
+
+const isFinishedEventsToggled = computed(() =>
+	filters.value.statuses.find((s) => s.name === "Finished" && s.active),
+)
 
 const showFilters = ref(false)
 
@@ -363,6 +368,7 @@ onMounted(async () => {
 	marketStore.events = [...marketStore.events, ...cloneDeep(runningEvents)]
 
 	let finishedEvents = await fetchEventsByStatus({ status: "FINISHED" })
+	isFinishedEventsLoaded.value = true
 	marketStore.events = [
 		...marketStore.events,
 		...cloneDeep(finishedEvents).sort(
@@ -469,6 +475,17 @@ useMeta({
 				/>
 
 				<div :class="$style.events_base">
+					<Banner
+						v-if="
+							!isFinishedEventsLoaded && isFinishedEventsToggled
+						"
+						loading
+						color="gray"
+						size="small"
+					>
+						Last thousand finished events is loading
+					</Banner>
+
 					<transition name="fastfade" mode="out-in">
 						<Flex
 							v-if="filteredEvents.length"
@@ -506,7 +523,9 @@ useMeta({
 
 						<Banner
 							v-else-if="
-								!filteredEvents.length && isNewEventsLoaded
+								!filteredEvents.length &&
+								isNewEventsLoaded &&
+								isFinishedEventsLoaded
 							"
 							icon="help"
 							color="gray"
