@@ -36,28 +36,40 @@ const generalLinks = ref([])
 const positions = reactive([
 	{
 		section: "General",
-		links: ["Discover", "Staking", "Liquidity", "Withdraw", "Roadmap"],
+		links: ["Discover", "Events", "Liquidity", "Withdraw", "Roadmap"],
 	},
 	{
-		section: "Getting Started",
-		links: ["Introduction", "Wallets"],
-	},
-	{
-		section: "Essentials",
-		links: [],
+		section: "Events",
+		links: [
+			"Price Events",
+			"How to Stake",
+			"Get a Payout",
+			"Providing Liquidity",
+		],
 	},
 	{
 		section: "Pools",
 		links: [
 			"Overview",
+			"Event Line",
 			"Metrics",
-			"Depositing Liquidity",
-			"Request Withdrawal",
+			"Depositing liquidity",
+			"Request withdrawal",
 		],
 	},
 	{
 		section: "Extra Topics",
-		links: ["Glossary", "FAQ"],
+		links: [
+			"FAQ",
+			"Glossary",
+			"Wallets",
+			"Concepts",
+			"Markets",
+			"My submissions",
+			"Statistics",
+			"Fees",
+			"How to get Tezos",
+		],
 	},
 ])
 
