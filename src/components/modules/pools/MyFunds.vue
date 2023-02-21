@@ -780,7 +780,7 @@ watch(
 						type: 'primary',
 					}"
 					is-wide
-					:disabled="accountStore.pkh.length"
+					:disabled="!!accountStore.pkh.length"
 				>
 					<Button
 						@click="handleDepositLiquidityClick"

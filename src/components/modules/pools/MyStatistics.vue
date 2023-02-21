@@ -29,6 +29,7 @@ const props = defineProps({
 	poolsAPY: Object,
 	poolsStates: Object,
 	summaries: Object,
+	isReady: Boolean,
 })
 
 const expanded = ref(true)
@@ -48,6 +49,7 @@ const selectedTab = ref(tabs[0].title)
 const pools = computed(() => marketStore.pools)
 
 const valueLocked = computed(() => {
+	if (!props.isReady) return 0
 	return props.positions
 		.reduce((acc, curr) => {
 			return acc.plus(
@@ -158,7 +160,7 @@ const parseProfitAmount = (amount) => {
 				:class="$style.mgs"
 			>
 				<Flex
-					v-if="!valueLocked"
+					v-if="!valueLocked & isReady"
 					direction="column"
 					gap="16"
 					align="center"
@@ -178,69 +180,94 @@ const parseProfitAmount = (amount) => {
 					</Text>
 				</Flex>
 
-				<template v-if="valueLocked">
-					<Flex
-						v-for="position in sortedPositions"
-						direction="column"
-						gap="8"
-					>
-						<Flex align="center" justify="between">
-							<Text color="secondary" size="13" weight="600">
-								{{
-									parsePoolName(
-										position.pool.name.replace(
-											"Juster Pool: ",
-											"",
-										),
-									)
-								}}
-							</Text>
-
-							<Flex align="center" gap="8">
-								<Text color="tertiary" size="13" weight="600">
-									{{
-										(
-											(position.tvl * 100) /
-											valueLocked
-										).toFixed(0)
-									}}%
-								</Text>
-
+				<template v-if="isReady">
+					<template v-if="valueLocked">
+						<Flex
+							v-for="position in sortedPositions"
+							direction="column"
+							gap="8"
+						>
+							<Flex align="center" justify="between">
 								<Text color="secondary" size="13" weight="600">
-									{{ parseProfitAmount(position.tvl) }}
+									{{
+										parsePoolName(
+											position.pool.name.replace(
+												"Juster Pool: ",
+												"",
+											),
+										)
+									}}
 								</Text>
-							</Flex>
-						</Flex>
 
-						<Flex :class="$style.progress_wrapper">
-							<div
-								:style="{
-									width: `${
-										(position.tvl * 100) / valueLocked
-									}%`,
-									borderRadius: '0 3px 3px 0',
-								}"
-								:class="$style.bar_deposited"
-							/>
-							<!-- <div
+								<Flex align="center" gap="8">
+									<Text
+										color="tertiary"
+										size="13"
+										weight="600"
+									>
+										{{
+											(
+												(position.tvl * 100) /
+												valueLocked
+											).toFixed(0)
+										}}%
+									</Text>
+
+									<Text
+										color="secondary"
+										size="13"
+										weight="600"
+									>
+										{{ parseProfitAmount(position.tvl) }}
+									</Text>
+								</Flex>
+							</Flex>
+
+							<Flex :class="$style.progress_wrapper">
+								<div
+									:style="{
+										width: `${
+											(position.tvl * 100) / valueLocked
+										}%`,
+										borderRadius: '0 3px 3px 0',
+									}"
+									:class="$style.bar_deposited"
+								/>
+								<!-- <div
 							:style="{
 								width: `${30}%`,
 								borderRadius: '0 3px 3px 0',
 							}"
 							:class="$style.bar_locked"
 						/> -->
+							</Flex>
+						</Flex>
+					</template>
+
+					<Flex v-if="valueLocked" align="center" gap="16">
+						<Flex align="center" gap="6">
+							<div :class="$style.deposited_dot" />
+							<Text size="12" weight="600" color="secondary">
+								Total Value Locked
+							</Text>
 						</Flex>
 					</Flex>
 				</template>
+				<template v-else>
+					<Flex direction="column" gap="8">
+						<Flex align="center" justify="between">
+							<Text color="secondary" size="13" weight="600">
+								Pools
+							</Text>
 
-				<Flex v-if="valueLocked" align="center" gap="16">
-					<Flex align="center" gap="6">
-						<div :class="$style.deposited_dot" />
-						<Text size="12" weight="600" color="secondary">
-							Total Value Locked
-						</Text>
+							<Text color="tertiary" size="13" weight="600">
+								Loading...
+							</Text>
+						</Flex>
+
+						<Flex :class="$style.progress_wrapper_loading"> </Flex>
 					</Flex>
-				</Flex>
+				</template>
 			</Flex>
 
 			<Flex
@@ -591,6 +618,26 @@ const parseProfitAmount = (amount) => {
 	border-radius: 3px;
 	overflow: hidden;
 	background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes mig {
+	0% {
+		background: rgba(255, 255, 255, 0.05);
+	}
+	50% {
+		background: rgba(255, 255, 255, 0.15);
+	}
+	100% {
+		background: rgba(255, 255, 255, 0.05);
+	}
+}
+.progress_wrapper_loading {
+	width: 100%;
+	height: 12px;
+	border-radius: 3px;
+	overflow: hidden;
+
+	animation: mig 2s infinite;
 }
 
 .left_wrapper {

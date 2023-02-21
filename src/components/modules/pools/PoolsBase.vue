@@ -403,11 +403,12 @@ const { meta } = useMeta({
 					/>
 
 					<MyStatistics
-						v-if="isPopulated && accountStore.pkh"
+						v-if="accountStore.pkh"
 						:positions="positions"
 						:poolsAPY="poolsAPY"
 						:poolsStates="poolsStates"
 						:summaries="summaries"
+						:isReady="isPopulated"
 					/>
 
 					<BottomInfo
