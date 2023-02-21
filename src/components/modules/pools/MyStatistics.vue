@@ -52,11 +52,7 @@ const valueLocked = computed(() => {
 	if (!props.isReady) return 0
 	return props.positions
 		.reduce((acc, curr) => {
-			return acc.plus(
-				curr.shares.multipliedBy(
-					props.poolsStates[curr.poolId].sharePrice,
-				),
-			)
+			return acc.plus(curr.shares.multipliedBy(props.poolsStates[curr.poolId].sharePrice))
 		}, BN(0))
 		.toNumber()
 })
@@ -83,9 +79,7 @@ const sortedPositions = computed(() => {
 	const sPositions = props.positions.map((position) => {
 		return {
 			...position,
-			tvl: position.shares.multipliedBy(
-				props.poolsStates[position.poolId].sharePrice,
-			),
+			tvl: position.shares.multipliedBy(props.poolsStates[position.poolId].sharePrice),
 		}
 	})
 
@@ -97,30 +91,18 @@ const sortedSummaries = computed(() => {
 		return { ...props.summaries[pool], poolId: pool }
 	})
 
-	sums = sums.filter(
-		(s) =>
-			!(s.unrealizedProfit.toNumber() + s.realizedProfit)
-				.toString()
-				.includes("e"),
-	)
+	sums = sums.filter((s) => !(s.unrealizedProfit.toNumber() + s.realizedProfit).toString().includes("e"))
 
 	return sums.sort((a, b) => {
 		const aProfit = a.realizedProfit + a.unrealizedProfit.toNumber()
 		const bProfit = b.realizedProfit + b.unrealizedProfit.toNumber()
 
-		return profit.realized + profit.unrealized < 0
-			? aProfit - bProfit
-			: bProfit - aProfit
+		return profit.realized + profit.unrealized < 0 ? aProfit - bProfit : bProfit - aProfit
 	})
 })
 
 const parseProfitAmount = (amount) => {
-	if (
-		Math.abs(amount % 1) < 0.01 &&
-		amount !== 0 &&
-		amount < 0.01 &&
-		amount > -0.01
-	) {
+	if (Math.abs(amount % 1) < 0.01 && amount !== 0 && amount < 0.01 && amount > -0.01) {
 		return truncate(amount)
 	} else {
 		return numberWithSymbol(amount, ",")
@@ -130,94 +112,39 @@ const parseProfitAmount = (amount) => {
 
 <template>
 	<div :class="$style.wrapper">
-		<Flex
-			@click="expanded = !expanded"
-			justify="between"
-			:class="$style.head"
-		>
+		<Flex @click="expanded = !expanded" justify="between" :class="$style.head">
 			<Flex direction="column" gap="8">
-				<Text color="primary" size="16" weight="600">
-					My Statistics
-				</Text>
-				<Text color="tertiary" size="14" weight="500" height="14">
-					Explore the distribution of your funds
-				</Text>
+				<Text color="primary" size="16" weight="600"> My Statistics </Text>
+				<Text color="tertiary" size="14" weight="500" height="14"> Explore the distribution of your funds </Text>
 			</Flex>
 
-			<Icon
-				name="arrow"
-				size="20"
-				color="tertiary"
-				:class="[$style.arrow_icon, expanded && $style.toggle]"
-			/>
+			<Icon name="arrow" size="20" color="tertiary" :class="[$style.arrow_icon, expanded && $style.toggle]" />
 		</Flex>
 
 		<Toggleable :expanded="expanded">
-			<Flex
-				v-if="selectedTab === 'TVL'"
-				direction="column"
-				gap="24"
-				:class="$style.mgs"
-			>
-				<Flex
-					v-if="!valueLocked & isReady"
-					direction="column"
-					gap="16"
-					align="center"
-					:class="$style.empty_warn"
-				>
+			<Flex v-if="selectedTab === 'TVL'" direction="column" gap="24" :class="$style.mgs">
+				<Flex v-if="!valueLocked & isReady" direction="column" gap="16" align="center" :class="$style.empty_warn">
 					<Icon name="bar_chart" size="24" color="support" />
 
-					<Text
-						size="13"
-						color="support"
-						weight="500"
-						height="16"
-						align="center"
-					>
-						After the first deposits here you will see what pools
-						were provided with liquidity and in what amount
+					<Text size="13" color="support" weight="500" height="16" align="center">
+						After the first deposits here you will see what pools were provided with liquidity and in what amount
 					</Text>
 				</Flex>
 
 				<template v-if="isReady">
 					<template v-if="valueLocked">
-						<Flex
-							v-for="position in sortedPositions"
-							direction="column"
-							gap="8"
-						>
+						<Flex v-for="position in sortedPositions" direction="column" gap="8">
 							<Flex align="center" justify="between">
 								<Text color="secondary" size="13" weight="600">
-									{{
-										parsePoolName(
-											position.pool.name.replace(
-												"Juster Pool: ",
-												"",
-											),
-										)
-									}}
+									{{ parsePoolName(position.pool.name.replace("Juster Pool: ", "")) }}
 								</Text>
 
 								<Flex align="center" gap="8">
-									<Text
-										color="tertiary"
-										size="13"
-										weight="600"
-									>
-										{{
-											(
-												(position.tvl * 100) /
-												valueLocked
-											).toFixed(0)
-										}}%
+									<Text color="tertiary" size="13" weight="600">
+										{{ ((position.tvl * 100) / valueLocked).toFixed(0) }}%
 									</Text>
 
-									<Text
-										color="secondary"
-										size="13"
-										weight="600"
-									>
+									<Text color="secondary" size="13" weight="600">
 										{{ parseProfitAmount(position.tvl) }}
 									</Text>
 								</Flex>
@@ -226,20 +153,11 @@ const parseProfitAmount = (amount) => {
 							<Flex :class="$style.progress_wrapper">
 								<div
 									:style="{
-										width: `${
-											(position.tvl * 100) / valueLocked
-										}%`,
+										width: `${(position.tvl * 100) / valueLocked}%`,
 										borderRadius: '0 3px 3px 0',
 									}"
 									:class="$style.bar_deposited"
 								/>
-								<!-- <div
-							:style="{
-								width: `${30}%`,
-								borderRadius: '0 3px 3px 0',
-							}"
-							:class="$style.bar_locked"
-						/> -->
 							</Flex>
 						</Flex>
 					</template>
@@ -247,22 +165,16 @@ const parseProfitAmount = (amount) => {
 					<Flex v-if="valueLocked" align="center" gap="16">
 						<Flex align="center" gap="6">
 							<div :class="$style.deposited_dot" />
-							<Text size="12" weight="600" color="secondary">
-								Total Value Locked
-							</Text>
+							<Text size="12" weight="600" color="secondary"> Total Value Locked </Text>
 						</Flex>
 					</Flex>
 				</template>
 				<template v-else>
 					<Flex direction="column" gap="8">
 						<Flex align="center" justify="between">
-							<Text color="secondary" size="13" weight="600">
-								Pools
-							</Text>
+							<Text color="secondary" size="13" weight="600"> Pools </Text>
 
-							<Text color="tertiary" size="13" weight="600">
-								Loading...
-							</Text>
+							<Text color="tertiary" size="13" weight="600"> Loading... </Text>
 						</Flex>
 
 						<Flex :class="$style.progress_wrapper_loading"> </Flex>
@@ -270,25 +182,14 @@ const parseProfitAmount = (amount) => {
 				</template>
 			</Flex>
 
-			<Flex
-				v-else-if="selectedTab === 'Profit'"
-				direction="column"
-				gap="24"
-				:class="$style.mgs"
-			>
+			<Flex v-else-if="selectedTab === 'Profit'" direction="column" gap="24" :class="$style.mgs">
 				<Tooltip placement="bottom" isWide>
 					<Flex direction="column" gap="8" wide>
 						<Flex align="center" justify="between">
-							<Text color="secondary" size="13" weight="600">
-								Total Profit
-							</Text>
+							<Text color="secondary" size="13" weight="600"> Total Profit </Text>
 
 							<Text color="secondary" size="13" weight="600">
-								{{
-									parseProfitAmount(
-										profit.realized + profit.unrealized,
-									)
-								}}
+								{{ parseProfitAmount(profit.realized + profit.unrealized) }}
 							</Text>
 						</Flex>
 
@@ -308,21 +209,14 @@ const parseProfitAmount = (amount) => {
 								>
 									<div
 										:style="{
-											width: `${
-												(100 * profit.unrealized) /
-												profit.total
-											}%`,
+											width: `${(100 * profit.unrealized) / profit.total}%`,
 											opacity: '0.5',
 										}"
 										:class="$style.bar_orange"
 									/>
 									<div
 										:style="{
-											width: `${
-												100 -
-												(100 * profit.unrealized) /
-													profit.total
-											}%`,
+											width: `${100 - (100 * profit.unrealized) / profit.total}%`,
 										}"
 										:class="$style.bar_orange"
 									/>
@@ -344,20 +238,13 @@ const parseProfitAmount = (amount) => {
 								>
 									<div
 										:style="{
-											width: `${
-												100 -
-												(100 * profit.unrealized) /
-													profit.total
-											}%`,
+											width: `${100 - (100 * profit.unrealized) / profit.total}%`,
 										}"
 										:class="$style.bar_green"
 									/>
 									<div
 										:style="{
-											width: `${
-												(100 * profit.unrealized) /
-												profit.total
-											}%`,
+											width: `${(100 * profit.unrealized) / profit.total}%`,
 											opacity: '0.5',
 										}"
 										:class="$style.bar_green"
@@ -376,46 +263,18 @@ const parseProfitAmount = (amount) => {
 				</Tooltip>
 
 				<template v-if="profit.total">
-					<Flex
-						v-for="summary in sortedSummaries"
-						direction="column"
-						gap="8"
-					>
+					<Flex v-for="summary in sortedSummaries" direction="column" gap="8">
 						<Tooltip placement="bottom" isWide>
 							<Flex direction="column" gap="8" wide>
 								<Flex align="center" justify="between">
-									<Text
-										color="secondary"
-										size="13"
-										weight="600"
-									>
+									<Text color="secondary" size="13" weight="600">
 										{{
-											parsePoolName(
-												pools
-													.find(
-														(p) =>
-															p.address ==
-															summary.poolId,
-													)
-													.name.replace(
-														"Juster Pool: ",
-														"",
-													),
-											)
+											parsePoolName(pools.find((p) => p.address == summary.poolId).name.replace("Juster Pool: ", ""))
 										}}
 									</Text>
 
-									<Text
-										color="secondary"
-										size="13"
-										weight="600"
-									>
-										{{
-											parseProfitAmount(
-												summary.realizedProfit +
-													summary.unrealizedProfit.toNumber(),
-											)
-										}}
+									<Text color="secondary" size="13" weight="600">
+										{{ parseProfitAmount(summary.realizedProfit + summary.unrealizedProfit.toNumber()) }}
 									</Text>
 								</Flex>
 
@@ -424,21 +283,13 @@ const parseProfitAmount = (amount) => {
 										justify="end"
 										:class="$style.left_wrapper"
 										:style="{
-											opacity:
-												summary.realizedProfit +
-													summary.unrealizedProfit.toNumber() <
-												0
-													? 1
-													: 0,
+											opacity: summary.realizedProfit + summary.unrealizedProfit.toNumber() < 0 ? 1 : 0,
 										}"
 									>
 										<Flex
 											:style="{
 												width: `${Math.abs(
-													(100 *
-														(summary.realizedProfit +
-															summary.unrealizedProfit.toNumber())) /
-														profit.total,
+													(100 * (summary.realizedProfit + summary.unrealizedProfit.toNumber())) / profit.total,
 												)}%`,
 											}"
 											:class="$style.left"
@@ -446,10 +297,8 @@ const parseProfitAmount = (amount) => {
 											<div
 												:style="{
 													width: `${
-														(100 *
-															summary.unrealizedProfit.toNumber()) /
-														(summary.realizedProfit +
-															summary.unrealizedProfit.toNumber())
+														(100 * summary.unrealizedProfit.toNumber()) /
+														(summary.realizedProfit + summary.unrealizedProfit.toNumber())
 													}%`,
 													opacity: '0.5',
 												}"
@@ -459,10 +308,8 @@ const parseProfitAmount = (amount) => {
 												:style="{
 													width: `${
 														100 -
-														(100 *
-															summary.unrealizedProfit.toNumber()) /
-															(summary.realizedProfit +
-																summary.unrealizedProfit.toNumber())
+														(100 * summary.unrealizedProfit.toNumber()) /
+															(summary.realizedProfit + summary.unrealizedProfit.toNumber())
 													}%`,
 												}"
 												:class="$style.bar_orange"
@@ -474,21 +321,13 @@ const parseProfitAmount = (amount) => {
 										justify="start"
 										:class="$style.right_wrapper"
 										:style="{
-											opacity:
-												summary.realizedProfit +
-													summary.unrealizedProfit.toNumber() >
-												0
-													? 1
-													: 0,
+											opacity: summary.realizedProfit + summary.unrealizedProfit.toNumber() > 0 ? 1 : 0,
 										}"
 									>
 										<Flex
 											:style="{
 												width: `${Math.abs(
-													(100 *
-														(summary.realizedProfit +
-															summary.unrealizedProfit.toNumber())) /
-														profit.total,
+													(100 * (summary.realizedProfit + summary.unrealizedProfit.toNumber())) / profit.total,
 												)}%`,
 											}"
 											:class="$style.right"
@@ -497,10 +336,8 @@ const parseProfitAmount = (amount) => {
 												:style="{
 													width: `${
 														100 -
-														(100 *
-															summary.unrealizedProfit.toNumber()) /
-															(summary.realizedProfit +
-																summary.unrealizedProfit.toNumber())
+														(100 * summary.unrealizedProfit.toNumber()) /
+															(summary.realizedProfit + summary.unrealizedProfit.toNumber())
 													}%`,
 												}"
 												:class="$style.bar_green"
@@ -508,10 +345,8 @@ const parseProfitAmount = (amount) => {
 											<div
 												:style="{
 													width: `${
-														(100 *
-															summary.unrealizedProfit.toNumber()) /
-														(summary.realizedProfit +
-															summary.unrealizedProfit.toNumber())
+														(100 * summary.unrealizedProfit.toNumber()) /
+														(summary.realizedProfit + summary.unrealizedProfit.toNumber())
 													}%`,
 													opacity: '0.5',
 												}"
@@ -539,28 +374,20 @@ const parseProfitAmount = (amount) => {
 				<Flex align="center" gap="16">
 					<Flex align="center" gap="6">
 						<div :class="$style.orange_dot" />
-						<Text size="12" weight="600" color="secondary">
-							Realized Loss
-						</Text>
+						<Text size="12" weight="600" color="secondary"> Realized Loss </Text>
 					</Flex>
 					<Flex align="center" gap="6">
 						<div :class="$style.orange_dot" style="opacity: 0.5" />
-						<Text size="12" weight="600" color="secondary">
-							Unrealized
-						</Text>
+						<Text size="12" weight="600" color="secondary"> Unrealized </Text>
 					</Flex>
 
 					<Flex align="center" gap="6">
 						<div :class="$style.green_dot" />
-						<Text size="12" weight="600" color="secondary">
-							Realized Profit
-						</Text>
+						<Text size="12" weight="600" color="secondary"> Realized Profit </Text>
 					</Flex>
 					<Flex align="center" gap="6">
 						<div :class="$style.green_dot" style="opacity: 0.5" />
-						<Text size="12" weight="600" color="secondary">
-							Unrealized
-						</Text>
+						<Text size="12" weight="600" color="secondary"> Unrealized </Text>
 					</Flex>
 				</Flex>
 			</Flex>
@@ -572,10 +399,7 @@ const parseProfitAmount = (amount) => {
 					@click="selectedTab = tab.title"
 					align="center"
 					gap="8"
-					:class="[
-						$style.tab,
-						selectedTab === tab.title && $style.active,
-					]"
+					:class="[$style.tab, selectedTab === tab.title && $style.active]"
 				>
 					<Icon :name="tab.icon" size="14" color="tertiary" />
 					<Text size="14" weight="600">{{ tab.title }}</Text>
