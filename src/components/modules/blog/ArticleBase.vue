@@ -60,7 +60,12 @@ onMounted(async () => {
 				style="rotate: -90deg"
 			/>
 
-			<Text size="16" weight="600" color="primary">
+			<Text
+				size="16"
+				weight="600"
+				color="primary"
+				:class="$style.breadcrumbs"
+			>
 				{{ article.title }}
 			</Text>
 		</Flex>
@@ -91,8 +96,10 @@ onMounted(async () => {
 					</Text>
 				</Flex>
 
-				<h1>
-					<Text size="32">{{ article.title }}</Text>
+				<h1 :class="$style.title">
+					<Text size="32" height="16" align="center">{{
+						article.title
+					}}</Text>
 				</h1>
 			</Flex>
 
@@ -146,5 +153,22 @@ onMounted(async () => {
 
 .content {
 	max-width: 700px;
+}
+
+.breadcrumbs {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+	.cover {
+		margin-bottom: 0;
+	}
+
+	.title div {
+		font-size: 24px;
+	}
 }
 </style>

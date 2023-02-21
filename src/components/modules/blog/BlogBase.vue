@@ -122,9 +122,13 @@ const freshArticle = computed(() => articles.value[0])
 							style="fill: var(--border)"
 						/>
 
-						<Text size="14" weight="500" color="tertiary"
-							>Feb 2, 2022</Text
-						>
+						<Text size="14" weight="500" color="tertiary">
+							{{
+								DateTime.fromISO(
+									freshArticle._updatedAt,
+								).toFormat("dd LLL, y")
+							}}
+						</Text>
 					</Flex>
 				</Flex>
 			</router-link>
@@ -223,5 +227,15 @@ const freshArticle = computed(() => articles.value[0])
 
 .metadata {
 	margin-top: 24px;
+}
+
+@media (max-width: 700px) {
+	.large_post h1 {
+		font-size: 24px;
+	}
+
+	.large_post .body {
+		font-size: 14px;
+	}
 }
 </style>
