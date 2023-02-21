@@ -37,12 +37,6 @@ const handleOpenWithdrawals = () => {
 	analytics.log("openWithdrawals")
 }
 
-const handleOpenReleases = () => {
-	router.push("/releases")
-
-	analytics.log("openReleases")
-}
-
 const handleLogout = () => {
 	/** confirmation.request -> onConfirm -> callback */
 	accountStore.logout()
@@ -143,28 +137,15 @@ const handleLogout = () => {
 				</Flex>
 
 				<Flex direction="column" :class="$style.links">
-					<!-- <Flex
-						@click="router.push('/settings')"
+					<Flex
 						align="center"
 						gap="8"
-						:class="$style.link"
+						:class="[$style.link, $style.disabled]"
 						tabindex="1"
 					>
 						<Icon name="settings" size="16" />
 						<Text size="13" color="primary" weight="500">
 							Settings
-						</Text>
-					</Flex> -->
-					<Flex
-						@click="handleOpenReleases"
-						align="center"
-						gap="8"
-						:class="$style.link"
-						tabindex="1"
-					>
-						<Icon name="spark" size="16" />
-						<Text size="13" color="primary" weight="500">
-							What's New
 						</Text>
 					</Flex>
 					<Flex
@@ -243,6 +224,11 @@ const handleLogout = () => {
 	padding: 0 8px;
 
 	transition: background 200ms ease;
+}
+
+.link.disabled {
+	pointer-events: none;
+	opacity: 0.5;
 }
 
 .link:hover {

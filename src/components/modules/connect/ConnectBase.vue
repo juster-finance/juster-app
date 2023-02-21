@@ -260,23 +260,23 @@ onMounted(async () => {
 			<div :class="$style.labels">
 				<div
 					v-if="currentNetwork !== 'mainnet'"
-					:class="[$style.label, $style.yellow]"
+					:class="[$style.label]"
 				>
-					<Icon name="hammer" size="14" />
+					<Icon name="hammer" size="14" color="yellow" />
 					<span>
 						<b>Test Network.</b> Use only testing and exploring
 						opportunities
 					</span>
 				</div>
 				<div :class="$style.label">
-					<Icon name="eye" size="14" />
-					<span
-						><b>View only permissions.</b> We will never do anything
-						without your approval</span
-					>
+					<Icon name="eye" size="14" color="tertiary" />
+					<span>
+						<b>View only permissions.</b> We will never do anything
+						without your approval
+					</span>
 				</div>
 				<div :class="$style.label">
-					<Icon name="users" size="14" />
+					<Icon name="users" size="14" color="tertiary" />
 					<span>
 						Used by <b>{{ allUsersCounter.length }}</b> Users
 						{{ currentNetwork !== "mainnet" ? "(Testnet)" : "" }}
@@ -356,13 +356,7 @@ onMounted(async () => {
 	gap: 12px;
 }
 
-.label.yellow svg {
-	fill: var(--yellow);
-}
-
 .label svg {
-	fill: var(--text-tertiary);
-
 	margin-top: 2px;
 }
 

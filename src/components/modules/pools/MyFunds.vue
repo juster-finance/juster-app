@@ -383,6 +383,7 @@ watch(
 				v-if="
 					!valueLocked &&
 					!unrealizedProfit &&
+					!pendingEntries.length &&
 					isReady &&
 					pools.length > 1
 				"
