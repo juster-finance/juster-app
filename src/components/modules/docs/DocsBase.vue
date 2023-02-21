@@ -74,8 +74,6 @@ const positions = reactive([
 ])
 
 onMounted(async () => {
-	if (Object.keys(docsStore.sections).length) return
-
 	const sections = await fetchSections()
 	const posts = await fetchPosts()
 
@@ -93,9 +91,7 @@ onMounted(async () => {
 			return aSectionIdx - bSectionIdx
 		})
 		.forEach((section) => {
-			if (!docsStore.sections[section.title]) {
-				docsStore.sections[section.title] = []
-			}
+			docsStore.sections[section.title] = []
 		})
 
 	generalLinks.value = posts
@@ -176,58 +172,62 @@ const selectPost = (post) => {
 <template>
 	<div :class="$style.wrapper">
 		<div :class="$style.nav">
-			<div :class="$style.general_links">
-				<router-link
-					v-for="(generalLink, gIndex) in generalLinks"
-					:key="gIndex"
-					@click="selectPost(generalLink)"
-					:to="`/docs/${generalLink.slug.current}`"
-					:class="[
-						$style.general_link,
-						docsStore.post.slug.current ===
-							generalLink.slug.current && $style.active,
-					]"
-				>
-					<div :class="$style.icon">
-						<Icon :name="generalLink.icon" size="16" />
+			<transition name="fade">
+				<Flex v-if="generalLinks.length" direction="column" gap="40">
+					<div :class="$style.general_links">
+						<router-link
+							v-for="(generalLink, gIndex) in generalLinks"
+							:key="gIndex"
+							@click="selectPost(generalLink)"
+							:to="`/docs/${generalLink.slug.current}`"
+							:class="[
+								$style.general_link,
+								docsStore.post.slug.current ===
+									generalLink.slug.current && $style.active,
+							]"
+						>
+							<div :class="$style.icon">
+								<Icon :name="generalLink.icon" size="16" />
+							</div>
+
+							{{ generalLink.title }}
+						</router-link>
 					</div>
 
-					{{ generalLink.title }}
-				</router-link>
-			</div>
+					<div
+						v-for="(section, index) in docsStore.sections"
+						:key="section"
+						:class="$style.section"
+					>
+						<div :class="$style.title">{{ index }}</div>
 
-			<div
-				v-for="(section, index) in docsStore.sections"
-				:key="section"
-				:class="$style.section"
-			>
-				<div :class="$style.title">{{ index }}</div>
-
-				<router-link
-					v-for="post in section"
-					:key="post._id"
-					:to="post.slug.current"
-					@click="selectPost(post)"
-					:class="[
-						$style.link,
-						docsStore.post == post && $style.active,
-					]"
-				>
-					<Flex align="center" gap="8">
-						{{ post.title }}
-
-						<Text
-							v-if="post.new"
-							size="12"
-							weight="600"
-							color="brand"
-							:class="$style.badge"
+						<router-link
+							v-for="post in section"
+							:key="post._id"
+							:to="post.slug.current"
+							@click="selectPost(post)"
+							:class="[
+								$style.link,
+								docsStore.post == post && $style.active,
+							]"
 						>
-							New
-						</Text>
-					</Flex>
-				</router-link>
-			</div>
+							<Flex align="center" gap="8">
+								{{ post.title }}
+
+								<Text
+									v-if="post.new"
+									size="12"
+									weight="600"
+									color="brand"
+									:class="$style.badge"
+								>
+									New
+								</Text>
+							</Flex>
+						</router-link>
+					</div>
+				</Flex>
+			</transition>
 		</div>
 
 		<div :class="$style.base">
@@ -285,10 +285,6 @@ const selectPost = (post) => {
 }
 
 .nav {
-	display: flex;
-	flex-direction: column;
-	gap: 40px;
-
 	width: 200px;
 	min-height: 100vh;
 

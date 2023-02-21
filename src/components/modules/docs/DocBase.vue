@@ -152,7 +152,12 @@ const handlePrevPage = () => {
 				}}
 			</Text>
 
-			<Flex align="center" gap="32" :class="$style.nav">
+			<Flex
+				v-if="prevPost || nextPost"
+				align="center"
+				gap="32"
+				:class="$style.nav"
+			>
 				<Tooltip v-if="prevPost" isWide>
 					<Flex
 						@click="handlePrevPage"
