@@ -30,8 +30,6 @@ import { juster } from "@sdk"
  */
 import Banner from "@ui/Banner.vue"
 import LoadingDots from "@ui/LoadingDots.vue"
-import LoadingBar from "@ui/LoadingBar.vue"
-import Spin from "@ui/Spin.vue"
 
 const props = defineProps({ event: { type: Object, default: () => {} } })
 
@@ -112,8 +110,8 @@ const draw = () => {
 
 		quotes = symbol.quotes.filter((q) => {
 			const hours = []
-			;[...Array(13).keys()].forEach((a) => {
-				hours.push(a * 2)
+			;[...Array(24).keys()].forEach((a) => {
+				hours.push(a)
 			})
 			return hours.includes(DateTime.fromISO(q.timestamp).hour)
 		})
@@ -636,7 +634,7 @@ onBeforeUnmount(() => {
 			align="center"
 			justify="center"
 			gap="12"
-			:class="$style.test"
+			:class="$.loading_block"
 		>
 			<LoadingDots />
 			<Text size="13" weight="500" color="tertiary">Chart loading</Text>
@@ -646,9 +644,10 @@ onBeforeUnmount(() => {
 			v-else-if="symbol.isQuotesLoaded && !symbol.quotes.length"
 			icon="help"
 			color="gray"
-			>Quotes for the event are not yet available, please wait for the
-			pre-launch period</Banner
 		>
+			Quotes for the event are not yet available, please wait for the
+			pre-launch period
+		</Banner>
 
 		<template v-else>
 			<!-- Chart -->
@@ -804,7 +803,7 @@ onBeforeUnmount(() => {
 	stroke-width: 1;
 }
 
-.test {
+.loading_block {
 	height: 240px;
 }
 </style>
