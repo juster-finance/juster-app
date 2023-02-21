@@ -61,11 +61,10 @@ const togglePendingClaims = () => {
 }
 
 const isDepositAvailable = computed(() => {
-	if (!accountStore.pkh) return false
-
 	return (
 		props.pools.length > 0 &&
-		props.pools.length === Object.keys(props.poolsStates).length
+		props.pools.length === Object.keys(props.poolsStates).length &&
+		accountStore.pkh.length
 	)
 })
 
@@ -781,7 +780,7 @@ watch(
 						type: 'primary',
 					}"
 					is-wide
-					:disabled="!!isDepositAvailable"
+					:disabled="accountStore.pkh.length"
 				>
 					<Button
 						@click="handleDepositLiquidityClick"
