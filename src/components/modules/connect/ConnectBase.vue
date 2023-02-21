@@ -275,13 +275,6 @@ onMounted(async () => {
 						without your approval</span
 					>
 				</div>
-				<div v-if="currentNetwork === 'mainnet'" :class="$style.label">
-					<Icon name="shield_tick" size="14" />
-					<span>
-						<b>Secure smart contracts.</b> Audited by Baking Bad
-						Security 34 days ago
-					</span>
-				</div>
 				<div :class="$style.label">
 					<Icon name="users" size="14" />
 					<span>
