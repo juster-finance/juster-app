@@ -34,6 +34,7 @@ export const fetchEventsByStatus = async ({ status }) => {
 			event: [
 				{
 					where: { status: { _in: status } },
+					order_by: { createdTime: "desc" },
 				},
 				eventModel,
 			],
