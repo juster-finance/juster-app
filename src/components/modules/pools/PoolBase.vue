@@ -420,7 +420,7 @@ const { meta } = useMeta({
 					<MyFunds
 						title="My Pool Funds"
 						:pools="[pool]"
-						:poolsStates="[poolState]"
+						:poolsStates="{ [pool.address]: poolState }"
 						:entries="entries"
 						:positions="position ? [position] : []"
 						:summaries="summary.totalDeposited ? [summary] : []"

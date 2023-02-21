@@ -76,10 +76,17 @@ const handleDepositLiquidityClick = () => {
 
 const valueLocked = computed(() => {
 	if (!props.positions.length) return 0
-	return props.positions.reduce(
-		(acc, curr) => (acc = acc + curr.depositedAmount),
-		0,
-	)
+	if (!props.isReady) return 0
+
+	return props.positions
+		.reduce((acc, curr) => {
+			return acc.plus(
+				curr.shares.multipliedBy(
+					props.poolsStates[curr.poolId].sharePrice,
+				),
+			)
+		}, BN(0))
+		.toNumber()
 })
 
 const isEntryReadyToManualApprove = (entry) => {
@@ -491,7 +498,7 @@ watch(
 
 						<div
 							v-if="manualEntries.length"
-							:class="[$style.bar_progress, $style.orange]"
+							:class="[$style.bar_progress, $style.gray]"
 							:style="{
 								width: `${
 									100 -
@@ -911,8 +918,8 @@ watch(
 	background: var(--green);
 }
 
-.bar_progress.orange {
-	background: var(--orange);
+.bar_progress.gray {
+	background: var(--opacity-10);
 }
 
 .bar_anim {

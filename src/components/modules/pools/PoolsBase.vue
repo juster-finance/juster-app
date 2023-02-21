@@ -239,6 +239,12 @@ const setupSubToPositions = async () => {
 		})
 		.subscribe({
 			next: ({ poolPosition }) => {
+				poolPosition = poolPosition.map((p) => {
+					return {
+						...p,
+						shares: BN(p.shares),
+					}
+				})
 				positions.value = poolPosition
 			},
 			error: console.error,
@@ -306,11 +312,8 @@ watch(
 	() => isPopulated.value,
 	() => {
 		positions.value.forEach((pos) => {
-			const position = pos
-			position.shares = BN(pos.shares)
-
 			summaries.value[pos.poolId] = makeSummaryPosition(
-				position,
+				pos,
 				poolsStates.value[pos.poolId],
 			)
 		})
@@ -400,9 +403,10 @@ const { meta } = useMeta({
 					/>
 
 					<MyStatistics
-						v-if="positions.length"
+						v-if="positions.length && isPopulated"
 						:positions="positions"
 						:poolsAPY="poolsAPY"
+						:poolsStates="poolsStates"
 						:summaries="summaries"
 					/>
 

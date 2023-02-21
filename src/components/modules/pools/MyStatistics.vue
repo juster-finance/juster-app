@@ -3,6 +3,7 @@
  * Vendor
  */
 import { ref, reactive, computed } from "vue"
+import BN from "bignumber.js"
 
 /**
  * UI
@@ -26,6 +27,7 @@ const marketStore = useMarketStore()
 const props = defineProps({
 	positions: Array,
 	poolsAPY: Object,
+	poolsStates: Object,
 	summaries: Object,
 })
 
@@ -45,12 +47,17 @@ const selectedTab = ref(tabs[0].title)
 
 const pools = computed(() => marketStore.pools)
 
-const valueLocked = computed(() =>
-	props.positions.reduce(
-		(acc, curr) => (acc = acc + curr.depositedAmount),
-		0,
-	),
-)
+const valueLocked = computed(() => {
+	return props.positions
+		.reduce((acc, curr) => {
+			return acc.plus(
+				curr.shares.multipliedBy(
+					props.poolsStates[curr.poolId].sharePrice,
+				),
+			)
+		}, BN(0))
+		.toNumber()
+})
 
 const profit = computed(() => {
 	let realized = 0
@@ -74,7 +81,9 @@ const sortedPositions = computed(() => {
 	const sPositions = props.positions.map((position) => {
 		return {
 			...position,
-			tvl: position.depositedAmount,
+			tvl: position.shares.multipliedBy(
+				props.poolsStates[position.poolId].sharePrice,
+			),
 		}
 	})
 
@@ -129,7 +138,7 @@ const parseProfitAmount = (amount) => {
 					My Statistics
 				</Text>
 				<Text color="tertiary" size="14" weight="500" height="14">
-					Splitted data by pools
+					Explore the distribution of your funds
 				</Text>
 			</Flex>
 

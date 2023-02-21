@@ -5,6 +5,7 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import { useRouter } from "vue-router"
 import { DateTime } from "luxon"
+import BN from "bignumber.js"
 
 /**
  * UI
@@ -140,6 +141,10 @@ const isDepositAvailable = computed(() => {
 	if (props.pool.isDepositPaused) return false
 
 	return true
+})
+
+const valueLocked = computed(() => {
+	return props.position.shares.multipliedBy(props.state.sharePrice)
 })
 
 const showUserData = ref(false)
@@ -287,7 +292,7 @@ const copy = (target) => {
 						color="tertiary"
 						:class="$style.stat__title"
 					>
-						TVL
+						{{ showUserData ? "My TVL" : "TVL" }}
 					</Text>
 
 					<Flex align="center" gap="6">
@@ -301,10 +306,7 @@ const copy = (target) => {
 						>
 							{{
 								showUserData
-									? numberWithSymbol(
-											position.depositedAmount,
-											",",
-									  )
+									? numberWithSymbol(valueLocked, ",")
 									: numberWithSymbol(
 											state.totalLiquidity,
 											",",
@@ -390,7 +392,7 @@ const copy = (target) => {
 						<Text size="15" weight="600" color="secondary">
 							{{
 								showUserData
-									? position.shares.toFixed(2)
+									? numberWithSymbol(position.shares, ",")
 									: apy
 									? `${numberWithSymbol(apy * 100, ",")}%`
 									: `0%`
