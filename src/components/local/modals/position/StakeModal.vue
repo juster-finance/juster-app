@@ -53,15 +53,8 @@ const cacheStore = useApplicationCacheStore()
 const symbol = computed(() => props.event.currencyPair.symbol)
 
 /** Countdown setup */
-const eventStartTime = computed(() =>
-	new Date(props.event?.betsCloseTime).getTime(),
-)
-const {
-	countdownText,
-	status: countdownStatus,
-	start,
-	stop,
-} = useCountdown(eventStartTime)
+const eventStartTime = computed(() => new Date(props.event?.betsCloseTime).getTime())
+const { countdownText, status: countdownStatus, start, stop } = useCountdown(eventStartTime)
 
 /** User inputs */
 const side = ref(props.preselectedSide)
@@ -99,21 +92,12 @@ const handleInput = () => {
 }
 
 const handleKeydown = (e) => {
-	if (
-		e.key.length == 1 &&
-		!e.metaKey &&
-		!e.ctrlKey &&
-		e.key !== "." &&
-		!/^\d+$/.test(e.key)
-	) {
+	if (e.key.length == 1 && !e.metaKey && !e.ctrlKey && e.key !== "." && !/^\d+$/.test(e.key)) {
 		e.preventDefault()
 	}
 
 	const hasSelection = !!window.getSelection().toString()
-	if (
-		(e.key == "." && !amount.value.toString().length) ||
-		(e.key == "." && hasSelection)
-	) {
+	if ((e.key == "." && !amount.value.toString().length) || (e.key == "." && hasSelection)) {
 		e.preventDefault()
 	}
 
@@ -141,12 +125,8 @@ const balanceToAmountRatio = computed(() => {
  */
 const ratio = computed(() => {
 	return {
-		rise:
-			props.event.poolBelow /
-			(props.event.poolAboveEq + parseFloat(amount.value)),
-		fall:
-			props.event.poolAboveEq /
-			(props.event.poolBelow + parseFloat(amount.value)),
+		rise: props.event.poolBelow / (props.event.poolAboveEq + parseFloat(amount.value)),
+		fall: props.event.poolAboveEq / (props.event.poolBelow + parseFloat(amount.value)),
 	}
 })
 const ratioBeforeBet = computed(() => {
@@ -180,8 +160,7 @@ const fee = computed(() =>
 
 /** Reward */
 const winDelta = computed(() => {
-	const selectedRatio =
-		side.value == "Rise" ? ratio.value.rise : ratio.value.fall
+	const selectedRatio = side.value == "Rise" ? ratio.value.rise : ratio.value.fall
 
 	return parseFloat(amount.value) * selectedRatio * (1 - fee.value)
 })
@@ -189,9 +168,7 @@ const reward = computed(() => {
 	return winDelta.value + parseFloat(amount.value)
 })
 const minReward = computed(() => {
-	return (
-		winDelta.value * (1 - slippage.value / 100) + parseFloat(amount.value)
-	)
+	return winDelta.value * (1 - slippage.value / 100) + parseFloat(amount.value)
 })
 
 const payoutText = computed(() => {
@@ -238,12 +215,10 @@ watch(
 		} else {
 			start()
 
-			if (cacheStore.submissions.amount)
-				amount.value = cacheStore.submissions.amount
+			if (cacheStore.submissions.amount) amount.value = cacheStore.submissions.amount
 			side.value = cacheStore.submissions.side
 
-			if (cacheStore.submissions.isTransactionConfirmed)
-				handleUserTransactionConfirmation()
+			if (cacheStore.submissions.isTransactionConfirmed) handleUserTransactionConfirmation()
 
 			document.addEventListener("keydown", onKeydown)
 
@@ -294,19 +269,15 @@ const buttonState = computed(() => {
 		return { text: "Choose the side", disabled: true }
 	}
 
-	if (countdownStatus.value !== "In progress")
-		return { text: "Acceptance of stakes is closed", disabled: true }
-	if (sendingBet.value)
-		return { text: "Awaiting confirmation..", disabled: true }
+	if (countdownStatus.value !== "In progress") return { text: "Acceptance of stakes is closed", disabled: true }
+	if (sendingBet.value) return { text: "Awaiting confirmation..", disabled: true }
 
-	if (parseFloat(amount.value) > accountStore.balance)
-		return { text: "Insufficient funds", disabled: true }
+	if (parseFloat(amount.value) > accountStore.balance) return { text: "Insufficient funds", disabled: true }
 
 	switch (side.value) {
 		case "Rise":
 		case "Fall":
-			if (!amount.value)
-				return { text: "Type stake amount", disabled: true }
+			if (!amount.value) return { text: "Type stake amount", disabled: true }
 			if (amount.value)
 				return {
 					text: "Continue",
@@ -316,6 +287,8 @@ const buttonState = computed(() => {
 })
 
 const handleStake = () => {
+	if (buttonState.value.disabled) return
+
 	cacheStore.submissions.event = props.event
 	cacheStore.submissions.payout = payoutText.value
 	cacheStore.submissions.side = side.value
@@ -357,8 +330,7 @@ const handleUserTransactionConfirmation = () => {
 					notification: {
 						type: "success",
 						title: "Your bet has been accepted",
-						description:
-							"We need to process your bet, it will take 15-30 seconds",
+						description: "We need to process your bet, it will take 15-30 seconds",
 						autoDestroy: true,
 					},
 				})
@@ -368,9 +340,7 @@ const handleUserTransactionConfirmation = () => {
 				eventId: props.event.id,
 				amount: amount.value,
 				fm: fee.value.toNumber(),
-				tts:
-					DateTime.fromISO(props.event.betsCloseTime).ts -
-					DateTime.now().ts,
+				tts: DateTime.fromISO(props.event.betsCloseTime).ts - DateTime.now().ts,
 			})
 
 			emit("onClose")
@@ -403,64 +373,29 @@ const handleUserTransactionConfirmation = () => {
 </script>
 
 <template>
-	<Modal
-		:show="show"
-		width="500"
-		closable
-		:block-closing="appStore.confirmation.show"
-		new
-		@onClose="emit('onClose')"
-	>
+	<Modal :show="show" width="500" closable :block-closing="appStore.confirmation.show" new @onClose="emit('onClose')">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
 				<Icon name="server" size="16" color="secondary" />
 
-				<Text
-					size="14"
-					weight="600"
-					color="secondary"
-					:class="$style.head_btn"
-				>
-					Stake
-				</Text>
+				<Text size="14" weight="600" color="secondary" :class="$style.head_btn"> Stake </Text>
 
-				<Icon
-					name="arrow"
-					size="12"
-					color="tertiary"
-					rotate="-90"
-					:class="$style.arrow_icon"
-				/>
+				<Icon name="arrow" size="12" color="tertiary" rotate="-90" :class="$style.arrow_icon" />
 
-				<Text size="14" weight="600" color="primary">
-					Event #{{ numberWithSymbol(event.id, ",") }}
-				</Text>
+				<Text size="14" weight="600" color="primary"> Event #{{ numberWithSymbol(event.id, ",") }} </Text>
 			</Flex>
 
-			<Icon
-				@click="emit('onClose')"
-				name="close"
-				size="16"
-				color="tertiary"
-				:class="$style.close_icon"
-			/>
+			<Icon @click="emit('onClose')" name="close" size="16" color="tertiary" :class="$style.close_icon" />
 		</Flex>
 
 		<Flex direction="column" gap="32" :class="$style.base">
-			<Flex
-				v-if="!verifiedMakers[currentNetwork].includes(event.creatorId)"
-				gap="12"
-				:class="$style.warning_badge"
-			>
+			<Flex v-if="!verifiedMakers[currentNetwork].includes(event.creatorId)" gap="12" :class="$style.warning_badge">
 				<Icon name="warning" size="16" color="orange" />
 
 				<Flex direction="column" gap="8">
-					<Text size="14" weight="600" color="primary">
-						This is custom event by user
-					</Text>
+					<Text size="14" weight="600" color="primary"> This is custom event by user </Text>
 					<Text size="13" weight="500" color="tertiary" height="16">
-						At the moment we support such events partially, so the
-						conditions and parameters may be unpredictable
+						At the moment we support such events partially, so the conditions and parameters may be unpredictable
 					</Text>
 				</Flex>
 			</Flex>
@@ -468,89 +403,45 @@ const handleUserTransactionConfirmation = () => {
 			<Flex align="center" justify="between" :class="$style.event">
 				<Flex align="center" gap="16">
 					<div :class="$style.symbol_imgs">
-						<img
-							:src="getCurrencyIcon(symbol.split('-')[0])"
-							alt="symbol"
-						/>
+						<img :src="getCurrencyIcon(symbol.split('-')[0])" alt="symbol" />
 						<img :src="getCurrencyIcon('USD')" alt="symbol" />
 					</div>
 
 					<Flex direction="column" gap="8">
 						<Text size="14" weight="600" color="primary">
-							{{
-								supportedMarkets[symbol] &&
-								supportedMarkets[symbol].description
-							}}
+							{{ supportedMarkets[symbol] && supportedMarkets[symbol].description }}
 						</Text>
 
 						<Flex align="center" gap="8">
 							<Flex align="center" gap="4">
-								<Icon
-									name="price_event"
-									size="12"
-									color="tertiary"
-								/>
-								<Text size="12" weight="600" color="tertiary"
-									>Price Event</Text
-								>
+								<Icon name="price_event" size="12" color="tertiary" />
+								<Text size="12" weight="600" color="tertiary">Price Event</Text>
 							</Flex>
 
-							<Text size="8" weight="500" color="tertiary">
-								✦
-							</Text>
+							<Text size="8" weight="500" color="tertiary"> ✦ </Text>
 
 							<Text size="12" weight="600" color="tertiary">
-								{{
-									countdownStatus.value !== "In progress"
-										? "Open"
-										: "Closed"
-								}}
+								{{ countdownStatus.value !== "In progress" ? "Open" : "Closed" }}
 							</Text>
 						</Flex>
 					</Flex>
 				</Flex>
 
 				<Flex gap="12">
-					<Badge
-						v-if="
-							countdownStatus == 'In progress' &&
-							event.status == 'NEW'
-						"
-						size="small"
-						color="purple"
-					>
+					<Badge v-if="countdownStatus == 'In progress' && event.status == 'NEW'" size="small" color="purple">
 						<Icon name="event_new" size="12" />New
 					</Badge>
 
-					<Badge
-						v-else-if="
-							countdownStatus == 'Finished' &&
-							event.status == 'NEW'
-						"
-						color="yellow"
-						:class="$style.main_badge"
-					>
+					<Badge v-else-if="countdownStatus == 'Finished' && event.status == 'NEW'" color="yellow" :class="$style.main_badge">
 						<Icon name="event_new" size="12" />Starting
 					</Badge>
-					<Badge
-						v-else-if="event.status == 'STARTED'"
-						color="yellow"
-						:class="$style.main_badge"
-					>
+					<Badge v-else-if="event.status == 'STARTED'" color="yellow" :class="$style.main_badge">
 						<Icon name="event_active" size="12" />Running
 					</Badge>
-					<Badge
-						v-else-if="event.status == 'FINISHED'"
-						color="green"
-						:class="$style.main_badge"
-					>
+					<Badge v-else-if="event.status == 'FINISHED'" color="green" :class="$style.main_badge">
 						<Icon name="event_finished" size="12" />Finished
 					</Badge>
-					<Badge
-						v-else-if="event.status == 'CANCELED'"
-						color="gray"
-						:class="$style.main_badge"
-					>
+					<Badge v-else-if="event.status == 'CANCELED'" color="gray" :class="$style.main_badge">
 						<Icon name="stop" size="12" />Canceled
 					</Badge>
 
@@ -582,25 +473,14 @@ const handleUserTransactionConfirmation = () => {
 						wide
 						align="center"
 						justify="between"
-						:class="[
-							$style.side_btn,
-							$style.left,
-							side === 'Rise' && $style.higher,
-						]"
+						:class="[$style.side_btn, $style.left, side === 'Rise' && $style.higher]"
 					>
 						<Flex align="center" gap="6">
 							<Icon name="higher" size="14" color="primary" />
-							<Text size="14" weight="600" color="primary">
-								Rise
-							</Text>
+							<Text size="14" weight="600" color="primary"> Rise </Text>
 						</Flex>
 
-						<Text
-							size="12"
-							weight="600"
-							color="tertiary"
-							:class="$style.ratio"
-						>
+						<Text size="12" weight="600" color="tertiary" :class="$style.ratio">
 							x{{ (1 + ratioBeforeBet.rise).toFixed(2) }}
 						</Text>
 					</Flex>
@@ -610,26 +490,15 @@ const handleUserTransactionConfirmation = () => {
 						wide
 						align="center"
 						justify="between"
-						:class="[
-							$style.side_btn,
-							$style.right,
-							side === 'Fall' && $style.lower,
-						]"
+						:class="[$style.side_btn, $style.right, side === 'Fall' && $style.lower]"
 					>
-						<Text
-							size="12"
-							weight="600"
-							color="tertiary"
-							:class="$style.ratio"
-						>
+						<Text size="12" weight="600" color="tertiary" :class="$style.ratio">
 							x{{ (1 + ratioBeforeBet.fall).toFixed(2) }}
 						</Text>
 
 						<Flex align="center" gap="6">
 							<Icon name="lower" size="14" color="primary" />
-							<Text size="14" weight="600" color="primary">
-								Fall
-							</Text>
+							<Text size="14" weight="600" color="primary"> Fall </Text>
 						</Flex>
 					</Flex>
 				</Flex>
@@ -651,42 +520,17 @@ const handleUserTransactionConfirmation = () => {
 								autofocus
 								:class="$style.active_input"
 							/>
-							<input
-								:value="`${amount.value} XTZ`"
-								:class="$style.behind_input"
-							/>
+							<input :value="`${amount.value} XTZ`" disabled :class="$style.behind_input" />
 						</Flex>
 
-						<Flex
-							align="center"
-							gap="8"
-							:class="$style.percent_btns"
-						>
-							<Text
-								@click="handlePercent(0.01)"
-								size="14"
-								weight="600"
-								color="primary"
-								:class="$style.percent_btn"
-							>
+						<Flex align="center" gap="8" :class="$style.percent_btns">
+							<Text @click="handlePercent(0.01)" size="14" weight="600" color="primary" :class="$style.percent_btn">
 								1%
 							</Text>
-							<Text
-								@click="handlePercent(0.05)"
-								size="14"
-								weight="600"
-								color="primary"
-								:class="$style.percent_btn"
-							>
+							<Text @click="handlePercent(0.05)" size="14" weight="600" color="primary" :class="$style.percent_btn">
 								5%
 							</Text>
-							<Text
-								@click="handlePercent(0.1)"
-								size="14"
-								weight="600"
-								color="primary"
-								:class="$style.percent_btn"
-							>
+							<Text @click="handlePercent(0.1)" size="14" weight="600" color="primary" :class="$style.percent_btn">
 								10%
 							</Text>
 						</Flex>
@@ -695,9 +539,7 @@ const handleUserTransactionConfirmation = () => {
 
 				<Flex direction="column" gap="16" :class="$style.payout_block">
 					<Flex align="center" gap="4">
-						<Text size="14" weight="600" color="secondary">
-							Success Payout
-						</Text>
+						<Text size="14" weight="600" color="secondary"> Success Payout </Text>
 
 						<Tooltip placemenet="bottom">
 							<Icon name="help" size="14" color="support" />
@@ -713,41 +555,29 @@ const handleUserTransactionConfirmation = () => {
 						<Text size="26" weight="600" color="secondary">
 							{{ payoutText }}
 						</Text>
-						<Text size="26" weight="600" color="tertiary">
-							&nbsp;XTZ
-						</Text>
+						<Text size="26" weight="600" color="tertiary"> &nbsp;XTZ </Text>
 					</Flex>
 				</Flex>
 			</Flex>
 
 			<Flex direction="column" gap="20">
 				<Flex align="center" justify="between">
-					<Text size="14" weight="600" color="tertiary">
-						Balance check
-					</Text>
+					<Text size="14" weight="600" color="tertiary"> Balance check </Text>
 
 					<Flex align="center" gap="4">
 						<Icon
-							:name="
-								balanceToAmountRatio.status !== 'bad'
-									? 'checkcircle'
-									: 'warning'
-							"
+							:name="balanceToAmountRatio.status !== 'bad' ? 'checkcircle' : 'warning'"
 							size="12"
 							:color="
-								(balanceToAmountRatio.status === 'awaiting' &&
-									'tertiary') ||
-								(balanceToAmountRatio.status === 'ok' &&
-									'green') ||
-								(balanceToAmountRatio.status === 'medium' &&
-									'yellow') ||
+								(balanceToAmountRatio.status === 'awaiting' && 'tertiary') ||
+								(balanceToAmountRatio.status === 'ok' && 'green') ||
+								(balanceToAmountRatio.status === 'medium' && 'yellow') ||
 								(balanceToAmountRatio.status === 'bad' && 'red')
 							"
 						/>
 						<Text size="12" weight="700" color="secondary">
 							{{
-								balanceToAmountRatio.percent > 0 &&
-								balanceToAmountRatio.percent < 1
+								balanceToAmountRatio.percent > 0 && balanceToAmountRatio.percent < 1
 									? "<1"
 									: balanceToAmountRatio.percent.toFixed(0)
 							}}%
@@ -755,9 +585,7 @@ const handleUserTransactionConfirmation = () => {
 					</Flex>
 				</Flex>
 				<Flex align="center" justify="between">
-					<Text size="14" weight="600" color="tertiary">
-						Time to start
-					</Text>
+					<Text size="14" weight="600" color="tertiary"> Time to start </Text>
 
 					<Text size="14" weight="600" color="secondary">
 						{{ countdownText }}
@@ -765,14 +593,7 @@ const handleUserTransactionConfirmation = () => {
 				</Flex>
 			</Flex>
 
-			<Button
-				@click="handleStake"
-				size="large"
-				type="primary"
-				block
-				:loading="sendingBet"
-				:disabled="buttonState.disabled"
-			>
+			<Button @click="handleStake" size="large" type="primary" block :loading="sendingBet" :disabled="buttonState.disabled">
 				<LoadingBar v-if="sendingBet" size="16" />
 				<template v-else>
 					<Icon name="login" size="16" />
