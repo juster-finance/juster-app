@@ -110,6 +110,10 @@ onMounted(async () => {
 			<img :src="getSanityImageUrl(article.poster)" :class="$style.cover" />
 
 			<Flex direction="column" gap="24" align="center">
+				<h1 :class="$style.title">
+					<Text size="32" height="16" align="center">{{ article.title }}</Text>
+				</h1>
+
 				<Flex align="center" gap="8">
 					<Flex align="center" gap="8">
 						<Icon name="logo_symbol" size="20" color="brand" />
@@ -122,10 +126,6 @@ onMounted(async () => {
 						{{ DateTime.fromISO(article._updatedAt).toFormat("dd LLL, y") }}
 					</Text>
 				</Flex>
-
-				<h1 :class="$style.title">
-					<Text size="32" height="16" align="center">{{ article.title }}</Text>
-				</h1>
 			</Flex>
 
 			<ArticleContent :content="article.content" :class="$style.content" />
