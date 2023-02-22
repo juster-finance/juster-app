@@ -134,12 +134,15 @@ const parseProfitAmount = (amount) => {
 
 		<Toggleable :expanded="expanded">
 			<Flex v-if="selectedTab === 'TVL'" direction="column" gap="24" :class="$style.mgs">
-				<Flex v-if="!valueLocked & isReady" direction="column" gap="16" align="center" :class="$style.empty_warn">
+				<Flex v-if="!valueLocked & isReady" direction="column" gap="24" align="center" :class="$style.empty_warn">
 					<Icon name="bar_chart" size="24" color="support" />
 
-					<Text size="13" color="support" weight="500" height="16" align="center">
-						After the first deposits here you will see what pools were provided with liquidity and in what amount
-					</Text>
+					<Flex direction="column" align="center" gap="8">
+						<Text size="13" weight="500" color="tertiary">There is no data available</Text>
+						<Text size="13" color="support" weight="500" height="16" align="center">
+							Provide liquidity to at least one pool to activate the charts
+						</Text>
+					</Flex>
 				</Flex>
 
 				<template v-if="isReady">
