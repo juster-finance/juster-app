@@ -29,12 +29,7 @@ import { useAccountStore } from "@store/account"
 
 const accountStore = useAccountStore()
 
-const emit = defineEmits([
-	"onDepositLiquidity",
-	"onGetClaims",
-	"onManualEntryApprove",
-	"onRequestWithdraw",
-])
+const emit = defineEmits(["onDepositLiquidity", "onGetClaims", "onManualEntryApprove", "onRequestWithdraw"])
 const props = defineProps({
 	title: { type: String, default: "My Funds" },
 	pools: Array,
@@ -61,11 +56,7 @@ const togglePendingClaims = () => {
 }
 
 const isDepositAvailable = computed(() => {
-	return (
-		props.pools.length > 0 &&
-		props.pools.length === Object.keys(props.poolsStates).length &&
-		accountStore.pkh.length
-	)
+	return props.pools.length > 0 && props.pools.length === Object.keys(props.poolsStates).length && accountStore.pkh.length
 })
 
 const handleDepositLiquidityClick = () => {
@@ -79,11 +70,7 @@ const valueLocked = computed(() => {
 
 	return props.positions
 		.reduce((acc, curr) => {
-			return acc.plus(
-				curr.shares.multipliedBy(
-					props.poolsStates[curr.poolId].sharePrice,
-				),
-			)
+			return acc.plus(curr.shares.multipliedBy(props.poolsStates[curr.poolId].sharePrice))
 		}, BN(0))
 		.toNumber()
 })
@@ -98,15 +85,9 @@ const isEntryReadyToManualApprove = (entry) => {
 	)
 }
 
-const pendingEntries = computed(() =>
-	props.entries.filter(
-		(entry) => entry.status === "PENDING" && entry.amount >= 1,
-	),
-)
+const pendingEntries = computed(() => props.entries.filter((entry) => entry.status === "PENDING" && entry.amount >= 1))
 
-const manualEntries = computed(() =>
-	props.entries.filter((e) => isEntryReadyToManualApprove(e)),
-)
+const manualEntries = computed(() => props.entries.filter((e) => isEntryReadyToManualApprove(e)))
 
 const unrealizedProfit = computed(() => {
 	let profit = 0
@@ -128,12 +109,7 @@ const availableClaims = computed(() => {
 	if (!props.positions.length) return []
 
 	props.positions.forEach((position) => {
-		claims = [
-			...claims,
-			...position.claims.filter(
-				(claim) => claim.event.result && !claim.withdrawn,
-			),
-		]
+		claims = [...claims, ...position.claims.filter((claim) => claim.event.result && !claim.withdrawn)]
 	})
 	return claims
 })
@@ -141,39 +117,25 @@ const availableClaims = computed(() => {
 const pendingClaims = computed(() => {
 	let claims = []
 	props.positions.forEach((position) => {
-		claims = [
-			...claims,
-			...position.claims.filter((claim) => !claim.event.result),
-		]
+		claims = [...claims, ...position.claims.filter((claim) => !claim.event.result)]
 	})
 	return claims
 })
 
-const allClaims = computed(() => [
-	...availableClaims.value,
-	...pendingClaims.value,
-])
+const allClaims = computed(() => [...availableClaims.value, ...pendingClaims.value])
 
 const oldestClaim = computed(() => {
 	if (!availableClaims.value.length) return
 
 	const claim = availableClaims.value.sort((a, b) => {
-		const { betsCloseTime: aBetsCloseTime, measurePeriod: aMeasurePeriod } =
-			a.event.event
-		const { betsCloseTime: bBetsCloseTime, measurePeriod: bMeasurePeriod } =
-			b.event.event
+		const { betsCloseTime: aBetsCloseTime, measurePeriod: aMeasurePeriod } = a.event.event
+		const { betsCloseTime: bBetsCloseTime, measurePeriod: bMeasurePeriod } = b.event.event
 
 		const aDiff = DateTime.now()
-			.diff(
-				DateTime.fromISO(aBetsCloseTime).plus(aMeasurePeriod * 1000),
-				["days"],
-			)
+			.diff(DateTime.fromISO(aBetsCloseTime).plus(aMeasurePeriod * 1000), ["days"])
 			.toObject()
 		const bDiff = DateTime.now()
-			.diff(
-				DateTime.fromISO(bBetsCloseTime).plus(bMeasurePeriod * 1000),
-				["days"],
-			)
+			.diff(DateTime.fromISO(bBetsCloseTime).plus(bMeasurePeriod * 1000), ["days"])
 			.toObject()
 
 		return bDiff.days - aDiff.days
@@ -182,9 +144,7 @@ const oldestClaim = computed(() => {
 	let days = 0
 	const { betsCloseTime, measurePeriod } = claim.event.event
 	days = DateTime.now()
-		.diff(DateTime.fromISO(betsCloseTime).plus(measurePeriod * 1000), [
-			"days",
-		])
+		.diff(DateTime.fromISO(betsCloseTime).plus(measurePeriod * 1000), ["days"])
 		.toObject().days
 
 	return { data: claim, days }
@@ -218,20 +178,14 @@ const getClaimReadyTime = (claim) => {
 	const { betsCloseTime, measurePeriod } = claim.event.event
 
 	const endDt = DateTime.fromISO(betsCloseTime).plus(measurePeriod * 1000)
-	const diff = endDt
-		.setLocale("en")
-		.diff(DateTime.now(), ["hours", "minutes"])
+	const diff = endDt.setLocale("en").diff(DateTime.now(), ["hours", "minutes"])
 
 	return {
 		diff,
 		text:
 			diff.toObject().hours >= 1
 				? `${diff.toObject().hours.toFixed(0)}h`
-				: `${
-						diff.toObject().minutes > 0
-							? diff.toObject().minutes.toFixed(0)
-							: 0
-				  }m`,
+				: `${diff.toObject().minutes > 0 ? diff.toObject().minutes.toFixed(0) : 0}m`,
 	}
 }
 
@@ -243,12 +197,7 @@ const handleGetClaims = () => {
 }
 
 const parseSensitiveAmount = (amount) => {
-	if (
-		Math.abs(amount % 1) < 0.01 &&
-		amount !== 0 &&
-		amount < 0.01 &&
-		amount > -0.01
-	) {
+	if (Math.abs(amount % 1) < 0.01 && amount !== 0 && amount < 0.01 && amount > -0.01) {
 		return truncate(amount)
 	} else {
 		return numberWithSymbol(amount, ",")
@@ -258,11 +207,7 @@ const parseSensitiveAmount = (amount) => {
 watch(
 	() => line.value,
 	() => {
-		if (
-			!isCurrencyPairFetched.value &&
-			line.value &&
-			props.pools.length === 1
-		) {
+		if (!isCurrencyPairFetched.value && line.value && props.pools.length === 1) {
 			getCurrencyPair()
 		}
 	},
@@ -278,12 +223,7 @@ watch(
 		<Flex v-if="currencyPair.symbol" :class="$style.pool_line">
 			<Flex align="center" gap="14" :class="$style.badge">
 				<div :class="$style.currency">
-					<img
-						:src="
-							getCurrencyIcon(currencyPair.symbol.split('-')[0])
-						"
-						alt="symbol"
-					/>
+					<img :src="getCurrencyIcon(currencyPair.symbol.split('-')[0])" alt="symbol" />
 				</div>
 
 				<Flex direction="column" gap="8">
@@ -293,14 +233,8 @@ watch(
 
 					<Flex align="center" gap="12">
 						<Flex align="center" gap="6">
-							<Icon
-								name="price_event"
-								size="12"
-								color="support"
-							/>
-							<Text size="13" weight="600" color="tertiary">
-								{{ line.maxEvents }} events
-							</Text>
+							<Icon name="price_event" size="12" color="support" />
+							<Text size="13" weight="600" color="tertiary"> {{ line.maxEvents }} events </Text>
 						</Flex>
 
 						<Flex v-if="poolDuration" align="center" gap="6">
@@ -322,135 +256,68 @@ watch(
 			</Flex>
 		</Flex>
 
-		<Flex
-			align="center"
-			gap="32"
-			:class="[
-				$style.funds,
-				!valueLocked && !unrealizedProfit && $style.opacity,
-			]"
-		>
+		<Flex align="center" gap="32" :class="[$style.funds, !valueLocked && !unrealizedProfit && $style.opacity]">
 			<Flex align="center" gap="14" :class="$style.badge">
-				<Icon
-					name="coins"
-					size="20"
-					color="secondary"
-					:class="$style.icon"
-				/>
+				<Icon name="coins" size="20" color="secondary" :class="$style.icon" />
 
 				<Flex direction="column" gap="8">
 					<Text color="primary" size="16" weight="600">
 						{{ parseSensitiveAmount(valueLocked) }}
 					</Text>
-					<Text
-						color="tertiary"
-						size="13"
-						weight="500"
-						:class="$style.badge__subtitle"
-					>
-						Total Value Locked
-					</Text>
+					<Text color="tertiary" size="13" weight="500" :class="$style.badge__subtitle"> Total Value Locked </Text>
 				</Flex>
 			</Flex>
 
 			<Flex align="center" gap="14" :class="$style.badge">
-				<Icon
-					name="coins_plus"
-					size="20"
-					:color="unrealizedProfit > 0 ? 'green' : 'secondary'"
-					:class="$style.icon"
-				/>
+				<Icon name="coins_plus" size="20" :color="unrealizedProfit > 0 ? 'green' : 'secondary'" :class="$style.icon" />
 
 				<Flex direction="column" gap="8">
 					<Text color="primary" size="16" weight="600">
 						{{ parseSensitiveAmount(unrealizedProfit) }}
 					</Text>
-					<Text
-						color="tertiary"
-						size="13"
-						weight="500"
-						:class="$style.badge__subtitle"
-					>
-						Unrealized Profit
-					</Text>
+					<Text color="tertiary" size="13" weight="500" :class="$style.badge__subtitle"> Unrealized Profit </Text>
 				</Flex>
 			</Flex>
 		</Flex>
 
 		<Flex direction="column" gap="24">
 			<LargeBanner
-				v-if="
-					!valueLocked &&
-					!unrealizedProfit &&
-					!pendingEntries.length &&
-					isReady &&
-					pools.length > 1
-				"
+				v-if="!valueLocked && !unrealizedProfit && !pendingEntries.length && isReady && pools.length > 1"
 				title="Start using Liquidity Pools today"
 				description="It only takes a few minutes to learn this feature with
 						the help of detailed documentation and guides."
 				:icon="{ name: 'Book', color: 'orange' }"
 			>
 				<template #buttons>
-					<router-link to="/docs/pools">
-						<Text size="13" weight="600" color="blue">
-							Getting Started
-						</Text>
+					<router-link to="/docs/pools-overview">
+						<Text size="13" weight="600" color="blue"> Getting Started </Text>
 					</router-link>
 				</template>
 			</LargeBanner>
 
-			<Flex
-				v-if="pendingEntries.length || manualEntries.length"
-				direction="column"
-				gap="12"
-				:class="$style.progress"
-			>
-				<Flex
-					@click="togglePendingEntries()"
-					direction="column"
-					gap="12"
-				>
+			<Flex v-if="pendingEntries.length || manualEntries.length" direction="column" gap="12" :class="$style.progress">
+				<Flex @click="togglePendingEntries()" direction="column" gap="12">
 					<Flex align="center" justify="between" wide>
 						<Tooltip placement="top-start" text-align="left">
 							<Flex align="center" gap="6">
-								<Text size="14" color="secondary" weight="600">
-									Pending Entries
-								</Text>
+								<Text size="14" color="secondary" weight="600"> Pending Entries </Text>
 
 								<Icon
-									:name="
-										manualEntries.length
-											? 'warning'
-											: 'help'
-									"
+									:name="manualEntries.length ? 'warning' : 'help'"
 									size="14"
-									:color="
-										manualEntries.length
-											? 'orange'
-											: 'support'
-									"
+									:color="manualEntries.length ? 'orange' : 'support'"
 								/>
 							</Flex>
 
 							<template #content>
-								<Flex
-									v-if="!manualEntries.length"
-									direction="column"
-									gap="6"
-								>
+								<Flex v-if="!manualEntries.length" direction="column" gap="6">
 									Your deposits awaiting confirmation
-									<span>
-										This may take some time depending on<br />the
-										selected pool, or rather its period
-									</span>
+									<span> This may take some time depending on<br />the selected pool, or rather its period </span>
 								</Flex>
 								<Flex v-else direction="column" gap="6">
-									One (or more) entries need manual
-									confirmation
+									One (or more) entries need manual confirmation
 									<span>
-										This is due to the fact that the
-										amount<br />
+										This is due to the fact that the amount<br />
 										of the deposit was less than one tezos
 									</span>
 								</Flex>
@@ -459,16 +326,8 @@ watch(
 
 						<Flex align="center" gap="4">
 							<Text size="14" color="tertiary" weight="600">
-								{{
-									pendingEntries.length + manualEntries.length
-								}}
-								{{
-									pendingEntries.length +
-										manualEntries.length ==
-									1
-										? "entry"
-										: "entries"
-								}}
+								{{ pendingEntries.length + manualEntries.length }}
+								{{ pendingEntries.length + manualEntries.length == 1 ? "entry" : "entries" }}
 							</Text>
 
 							<Icon
@@ -476,9 +335,7 @@ watch(
 								size="14"
 								color="tertiary"
 								:style="{
-									transform: showEntries
-										? `rotate(180deg)`
-										: null,
+									transform: showEntries ? `rotate(180deg)` : null,
 								}"
 							/>
 						</Flex>
@@ -488,11 +345,7 @@ watch(
 						<div
 							:class="[$style.bar_progress, $style.blue]"
 							:style="{
-								width: `${
-									(pendingEntries.length * 100) /
-									(pendingEntries.length +
-										manualEntries.length)
-								}%`,
+								width: `${(pendingEntries.length * 100) / (pendingEntries.length + manualEntries.length)}%`,
 							}"
 						/>
 
@@ -500,29 +353,13 @@ watch(
 							v-if="manualEntries.length"
 							:class="[$style.bar_progress, $style.gray]"
 							:style="{
-								width: `${
-									100 -
-									(pendingEntries.length * 100) /
-										(pendingEntries.length +
-											manualEntries.length)
-								}%`,
+								width: `${100 - (pendingEntries.length * 100) / (pendingEntries.length + manualEntries.length)}%`,
 							}"
 						/>
 
-						<svg
-							width="200%"
-							height="12"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-							:class="$style.bar_anim"
-						>
+						<svg width="200%" height="12" fill="none" xmlns="http://www.w3.org/2000/svg" :class="$style.bar_anim">
 							<defs>
-								<pattern
-									id="lines"
-									patternUnits="userSpaceOnUse"
-									width="20"
-									height="12"
-								>
+								<pattern id="lines" patternUnits="userSpaceOnUse" width="20" height="12">
 									<path
 										fill-rule="evenodd"
 										clip-rule="evenodd"
@@ -532,57 +369,26 @@ watch(
 									/>
 								</pattern>
 							</defs>
-							<rect
-								width="100%"
-								height="100%"
-								fill="url(#lines)"
-							/>
+							<rect width="100%" height="100%" fill="url(#lines)" />
 						</svg>
 					</Flex>
 				</Flex>
 
 				<Flex v-show="showEntries" direction="column" gap="12">
-					<Flex
-						v-for="entry in [...pendingEntries, ...manualEntries]"
-						justify="between"
-						align="center"
-					>
+					<Flex v-for="entry in [...pendingEntries, ...manualEntries]" justify="between" align="center">
 						<Flex align="center" gap="8">
-							<Spin
-								v-if="!isEntryReadyToManualApprove(entry)"
-								size="12"
-								style="opacity: 0.5"
-							/>
-							<Icon
-								v-else
-								name="warning"
-								size="12"
-								color="tertiary"
-							/>
+							<Spin v-if="!isEntryReadyToManualApprove(entry)" size="12" style="opacity: 0.5" />
+							<Icon v-else name="warning" size="12" color="tertiary" />
 
 							<Flex align="center">
 								<Text size="14" weight="600" color="secondary">
-									{{
-										parsePoolName(
-											entry.pool.name.replace(
-												"Juster Pool: ",
-												"",
-											),
-										)
-									}}&nbsp;
+									{{ parsePoolName(entry.pool.name.replace("Juster Pool: ", "")) }}&nbsp;
 								</Text>
-								<Text size="14" weight="600" color="tertiary">
-									#{{ entry.entryId }}
-								</Text>
+								<Text size="14" weight="600" color="tertiary"> #{{ entry.entryId }} </Text>
 							</Flex>
 						</Flex>
 
-						<Text
-							v-if="!isEntryReadyToManualApprove(entry)"
-							size="14"
-							weight="600"
-							color="secondary"
-						>
+						<Text v-if="!isEntryReadyToManualApprove(entry)" size="14" weight="600" color="secondary">
 							{{ numberWithSymbol(entry.amount, ",") }} ꜩ
 						</Text>
 
@@ -601,19 +407,12 @@ watch(
 				</Flex>
 			</Flex>
 
-			<Flex
-				v-if="allClaims.length"
-				direction="column"
-				gap="12"
-				:class="$style.progress"
-			>
+			<Flex v-if="allClaims.length" direction="column" gap="12" :class="$style.progress">
 				<Flex @click="togglePendingClaims" direction="column" gap="12">
 					<Flex align="center" justify="between" wide>
 						<Tooltip placement="bottom-start" text-align="left">
 							<Flex align="center" gap="6">
-								<Text size="14" color="secondary" weight="600">
-									Pending Claims
-								</Text>
+								<Text size="14" color="secondary" weight="600"> Pending Claims </Text>
 								<Icon name="help" size="14" color="support" />
 							</Flex>
 
@@ -621,8 +420,7 @@ watch(
 								<Flex direction="column" gap="6">
 									Your funds are being prepared for withdrawal
 									<span>
-										You have to wait until the events in
-										which<br />
+										You have to wait until the events in which<br />
 										your funds are used are over
 									</span>
 								</Flex>
@@ -631,18 +429,10 @@ watch(
 
 						<Flex align="center" gap="4">
 							<Text size="14" color="tertiary" weight="600">
-								{{ allClaims.length - pendingClaims.length }} of
-								{{ allClaims.length }},
+								{{ allClaims.length - pendingClaims.length }} of {{ allClaims.length }},
 							</Text>
 							<Text size="14" color="secondary" weight="600">
-								{{
-									(
-										((allClaims.length -
-											pendingClaims.length) *
-											100) /
-										allClaims.length
-									).toFixed(0)
-								}}%
+								{{ (((allClaims.length - pendingClaims.length) * 100) / allClaims.length).toFixed(0) }}%
 							</Text>
 
 							<Icon
@@ -650,9 +440,7 @@ watch(
 								size="14"
 								color="tertiary"
 								:style="{
-									transform: showClaims
-										? `rotate(180deg)`
-										: null,
+									transform: showClaims ? `rotate(180deg)` : null,
 								}"
 							/>
 						</Flex>
@@ -662,27 +450,12 @@ watch(
 						<div
 							:class="[$style.bar_progress, $style.green]"
 							:style="{
-								width: `${
-									((allClaims.length - pendingClaims.length) *
-										100) /
-									allClaims.length
-								}%`,
+								width: `${((allClaims.length - pendingClaims.length) * 100) / allClaims.length}%`,
 							}"
 						>
-							<svg
-								width="200%"
-								height="12"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-								:class="$style.bar_anim"
-							>
+							<svg width="200%" height="12" fill="none" xmlns="http://www.w3.org/2000/svg" :class="$style.bar_anim">
 								<defs>
-									<pattern
-										id="lines"
-										patternUnits="userSpaceOnUse"
-										width="20"
-										height="12"
-									>
+									<pattern id="lines" patternUnits="userSpaceOnUse" width="20" height="12">
 										<path
 											fill-rule="evenodd"
 											clip-rule="evenodd"
@@ -692,45 +465,23 @@ watch(
 										/>
 									</pattern>
 								</defs>
-								<rect
-									width="100%"
-									height="100%"
-									fill="url(#lines)"
-								/>
+								<rect width="100%" height="100%" fill="url(#lines)" />
 							</svg>
 						</div>
 					</Flex>
 				</Flex>
 
 				<Flex v-show="showClaims" direction="column" gap="12">
-					<Flex
-						v-for="claim in allClaims"
-						justify="between"
-						align="center"
-					>
+					<Flex v-for="claim in allClaims" justify="between" align="center">
 						<Flex align="center" gap="8">
-							<Icon
-								v-if="claim.event.result"
-								name="check"
-								size="12"
-								color="green"
-							/>
+							<Icon v-if="claim.event.result" name="check" size="12" color="green" />
 							<Spin v-else size="12" style="opacity: 0.5" />
 
 							<Flex align="center">
-								<Text size="14" weight="600" color="secondary">
-									Claim&nbsp;
-								</Text>
-								<Text size="14" weight="600" color="tertiary">
-									#{{ numberWithSymbol(claim.eventId, ",") }}
-								</Text>
+								<Text size="14" weight="600" color="secondary"> Claim&nbsp; </Text>
+								<Text size="14" weight="600" color="tertiary"> #{{ numberWithSymbol(claim.eventId, ",") }} </Text>
 							</Flex>
-							<Text
-								v-if="!claim.event.result"
-								size="14"
-								weight="600"
-								color="support"
-							>
+							<Text v-if="!claim.event.result" size="14" weight="600" color="support">
 								&nbsp;~{{ getClaimReadyTime(claim).text }}
 							</Text>
 						</Flex>
@@ -739,9 +490,7 @@ watch(
 							<Text size="14" weight="600" color="secondary">
 								{{ numberWithSymbol(claim.amount, ",") }}
 							</Text>
-							<Text size="14" weight="600" color="tertiary"
-								>ꜩ</Text
-							>
+							<Text size="14" weight="600" color="tertiary">ꜩ</Text>
 						</Flex>
 					</Flex>
 				</Flex>
@@ -785,10 +534,7 @@ watch(
 					<Button
 						@click="handleDepositLiquidityClick"
 						@onKeybind="handleDepositLiquidityClick"
-						:disabled="
-							!isDepositAvailable ||
-							!parseFloat(accountStore.balance)
-						"
+						:disabled="!isDepositAvailable || !parseFloat(accountStore.balance)"
 						type="primary"
 						size="medium"
 						keybind="D+L"
@@ -796,9 +542,7 @@ watch(
 					>
 						<Icon name="plus_circle" size="16" />Deposit Liquidity
 					</Button>
-					<template #content>
-						Connect a wallet to make a deposit
-					</template>
+					<template #content> Connect a wallet to make a deposit </template>
 				</Tooltip>
 
 				<Button
