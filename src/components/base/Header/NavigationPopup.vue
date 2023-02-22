@@ -109,10 +109,7 @@ watch(
 		const navElRect = navEl.getBoundingClientRect()
 
 		nextTick(() => {
-			posX.value =
-				navElRect.left +
-				navElRect.width / 2 -
-				navEl.parentElement.getBoundingClientRect().left
+			posX.value = navElRect.left + navElRect.width / 2 - navEl.parentElement.getBoundingClientRect().left
 		})
 	},
 )
@@ -120,11 +117,7 @@ watch(
 
 <template>
 	<transition name="navpopup">
-		<div
-			v-if="activeLink.length"
-			@click="emit('onClick')"
-			:class="[$style.wrapper, activeLink.length && $style.animate]"
-		>
+		<div v-if="activeLink.length" @click="emit('onClick')" :class="[$style.wrapper, activeLink.length && $style.animate]">
 			<div :class="$style.carret">
 				<svg
 					ref="carretRef"
@@ -151,30 +144,16 @@ watch(
 			>
 				<template v-if="activeLink === 'Browse'">
 					<Flex :class="$style.base">
-						<Flex
-							direction="column"
-							gap="24"
-							:class="$style.column"
-						>
+						<Flex direction="column" gap="24" :class="$style.column">
 							<div :class="$style.atlas_block">
 								<component
 									v-for="(link, i) in browseLinks"
-									:is="
-										link.url.startsWith('https://')
-											? 'a'
-											: 'router-link'
-									"
+									:is="link.url.startsWith('https://') ? 'a' : 'router-link'"
 									:key="i"
 									:to="link.url"
 									:href="link.url"
-									:target="
-										link.url.startsWith('https://') &&
-										_blank
-									"
-									:class="[
-										$style.item,
-										link.disabled && $style.disabled,
-									]"
+									:target="link.url.startsWith('https://') && _blank"
+									:class="[$style.item, link.disabled && $style.disabled]"
 								>
 									<div :class="$style.icon_wrapper">
 										<Icon :name="link.icon" size="20" />
@@ -190,19 +169,11 @@ watch(
 
 						<div :class="$style.divider" />
 
-						<Flex
-							direction="column"
-							gap="24"
-							:class="$style.column"
-						>
+						<Flex direction="column" gap="16" :class="$style.column">
 							<div :class="$style.advanced_block">
 								<router-link to="/pools" :class="$style.item">
 									<div :class="$style.icon_wrapper">
-										<Icon
-											name="server"
-											size="20"
-											color="brand"
-										/>
+										<Icon name="server" size="20" color="brand" />
 									</div>
 
 									<div :class="$style.text">
@@ -212,60 +183,33 @@ watch(
 								</router-link>
 							</div>
 
-							<div :class="$style.guides_block">
-								<div :class="$style.label">featured guides</div>
+							<Flex direction="column" gap="16" :class="$style.guides_block">
+								<Text size="11" weight="700" color="support">FEATURED GUIDES</Text>
 
-								<div :class="$style.guide">
-									<span>What are liquidity pools?</span>
-									<span>Advanced</span>
-								</div>
-
-								<div :class="$style.guide">
-									<span>Creating and managing events</span>
-									<span>Advanced</span>
-								</div>
-							</div>
+								<router-link to="/blog/liquidity-pools-introduction">
+									<Flex direction="column" gap="8">
+										<Text size="13" weight="500" color="secondary">What you need to know to use Pools</Text>
+										<Text size="12" weight="600" color="tertiary">Advanced</Text>
+									</Flex>
+								</router-link>
+							</Flex>
 						</Flex>
 					</Flex>
 
-					<Flex
-						align="center"
-						justify="between"
-						:class="$style.bottom"
-					>
+					<Flex align="center" justify="between" :class="$style.bottom">
 						<router-link to="/releases">
 							<Button size="small" type="secondary" block>
-								<Icon
-									name="asterisk"
-									size="16"
-									style="fill: var(--green)"
-								/>What's New in 1.1
+								<Icon name="asterisk" size="16" style="fill: var(--green)" />What's New in 1.1
 							</Button>
 						</router-link>
 
 						<Flex gap="8">
-							<Button
-								size="small"
-								type="tertiary"
-								link="https://status.juster.fi"
-							>
-								<Icon
-									name="bolt"
-									size="16"
-									color="tertiary"
-								/>System Status
+							<Button size="small" type="tertiary" link="https://status.juster.fi">
+								<Icon name="bolt" size="16" color="tertiary" />System Status
 							</Button>
 
-							<Button
-								size="small"
-								type="tertiary"
-								link="https://discord.gg/FeGDCkHhnB"
-							>
-								<Icon
-									name="help"
-									size="16"
-									color="tertiary"
-								/>Support
+							<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
+								<Icon name="help" size="16" color="tertiary" />Support
 							</Button>
 						</Flex>
 					</Flex>
@@ -273,30 +217,16 @@ watch(
 
 				<template v-if="activeLink === 'Resources'">
 					<Flex :class="$style.base">
-						<Flex
-							direction="column"
-							gap="24"
-							:class="$style.column"
-						>
+						<Flex direction="column" gap="24" :class="$style.column">
 							<div :class="$style.atlas_block">
 								<component
-									:is="
-										link.url.startsWith('https://')
-											? 'a'
-											: 'router-link'
-									"
+									:is="link.url.startsWith('https://') ? 'a' : 'router-link'"
 									v-for="(link, i) in resourcesLinks"
 									:key="i"
 									:to="link.url"
 									:href="link.url"
-									:target="
-										link.url.startsWith('https://') &&
-										'_blank'
-									"
-									:class="[
-										$style.item,
-										link.disabled && $style.disabled,
-									]"
+									:target="link.url.startsWith('https://') && '_blank'"
+									:class="[$style.item, link.disabled && $style.disabled]"
 								>
 									<div :class="$style.icon_wrapper">
 										<Icon :name="link.icon" size="20" />
@@ -312,95 +242,69 @@ watch(
 
 						<div :class="$style.divider" />
 
-						<Flex
-							direction="column"
-							gap="24"
-							:class="$style.column"
-						>
-							<div :class="$style.guides_block">
-								<div :class="$style.label">GETTING STARTED</div>
+						<Flex direction="column" gap="24" :class="$style.column">
+							<Flex direction="column" gap="16" :class="$style.guides_block">
+								<Text size="11" weight="700" color="support">GETTING STARTED</Text>
 
-								<div :class="$style.guide">
-									<span>How to participate?</span>
-									<span>Basic</span>
-								</div>
-
-								<div :class="$style.guide">
-									<span>Liquidity & Payouts</span>
-									<span>Basic</span>
-								</div>
-							</div>
-
-							<div :class="$style.guides_block">
-								<div :class="$style.label">use cases</div>
-
-								<div :class="$style.guide">
-									<span>Betting: Symbols, Sports, etc</span>
-									<span>Guide</span>
-								</div>
-
-								<div :class="$style.guide">
-									<span>Binary Options Mode</span>
-									<span>Guide</span>
-								</div>
-
-								<div :class="$style.guide">
-									<span>Shared Liquidity Pool</span>
-									<span>Guide</span>
-								</div>
-							</div>
+								<router-link to="/docs/events-how-to-stake">
+									<Flex direction="column" gap="8">
+										<Text size="13" weight="500" color="secondary">How to Stake</Text>
+										<Text size="12" weight="600" color="tertiary">Basic</Text>
+									</Flex>
+								</router-link>
+								<router-link to="/docs/events-providing-liquidity">
+									<Flex direction="column" gap="8">
+										<Text size="13" weight="500" color="secondary">Providing Liquidity</Text>
+										<Text size="12" weight="600" color="tertiary">Advanced</Text>
+									</Flex>
+								</router-link>
+								<router-link to="/docs/how-to-get-tezos">
+									<Flex direction="column" gap="8">
+										<Text size="13" weight="500" color="secondary">How to get Tezos</Text>
+										<Text size="12" weight="600" color="tertiary">Basic</Text>
+									</Flex>
+								</router-link>
+							</Flex>
 						</Flex>
 					</Flex>
 
-					<Flex
-						align="center"
-						justify="between"
-						:class="$style.bottom"
-					>
-						<Button size="small" type="secondary">
-							<Icon
-								name="shield_tick"
-								size="14"
-								color="green"
-							/>Security Audits
-						</Button>
+					<!-- <Flex align="center" justify="between" :class="$style.bottom">
+						<Button size="small" type="secondary"> <Icon name="shield_tick" size="14" color="green" />Security Audits </Button>
 
-						<Button
-							size="small"
-							type="tertiary"
-							link="https://discord.gg/FeGDCkHhnB"
-						>
-							<Icon
-								name="document"
-								size="14"
-								color="primary"
-							/>White-Papper
+						<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
+							<Icon name="document" size="14" color="primary" />White-Papper
 						</Button>
+					</Flex> -->
+					<Flex align="center" justify="between" :class="$style.bottom">
+						<router-link to="/releases">
+							<Button size="small" type="secondary" block>
+								<Icon name="asterisk" size="16" style="fill: var(--green)" />What's New in 1.1
+							</Button>
+						</router-link>
+
+						<Flex gap="8">
+							<Button size="small" type="tertiary" link="https://status.juster.fi">
+								<Icon name="bolt" size="16" color="tertiary" />System Status
+							</Button>
+
+							<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
+								<Icon name="help" size="16" color="tertiary" />Support
+							</Button>
+						</Flex>
 					</Flex>
 				</template>
 
 				<template v-if="activeLink === 'Community'">
 					<Flex :class="$style.base">
-						<Flex
-							direction="column"
-							gap="24"
-							:class="$style.column"
-						>
+						<Flex direction="column" gap="24" :class="$style.column">
 							<div :class="$style.atlas_block">
 								<component
-									:is="
-										link.url.startsWith('https://')
-											? 'a'
-											: 'router-link'
-									"
+									:is="link.url.startsWith('https://') ? 'a' : 'router-link'"
 									v-for="(link, i) in communityLinks"
 									:key="i"
 									:to="link.url"
 									:href="link.url"
-									:target="
-										link.url.startsWith('https://') &&
-										'_blank'
-									"
+									:target="link.url.startsWith('https://') && '_blank'"
 									:class="$style.item"
 								>
 									<div :class="$style.icon_wrapper">
@@ -417,62 +321,59 @@ watch(
 
 						<div :class="$style.divider" />
 
-						<Flex
-							direction="column"
-							gap="24"
-							:class="$style.column"
-						>
-							<div :class="$style.guides_block">
-								<div :class="$style.label">GETTING STARTED</div>
+						<Flex direction="column" gap="24" :class="$style.column">
+							<Flex direction="column" gap="16" :class="$style.guides_block">
+								<Text size="11" weight="700" color="support">EXTRA TOPICS</Text>
 
-								<div :class="$style.guide">
-									<span>How to participate?</span>
-									<span>Basic</span>
-								</div>
-
-								<div :class="$style.guide">
-									<span>Liquidity & Payouts</span>
-									<span>Basic</span>
-								</div>
-							</div>
-
-							<div :class="$style.guides_block">
-								<div :class="$style.label">use cases</div>
-
-								<div :class="$style.guide">
-									<span>Betting: Symbols, Sports, etc</span>
-									<span>Guide</span>
-								</div>
-
-								<div :class="$style.guide">
-									<span>Binary Options Mode</span>
-									<span>Guide</span>
-								</div>
-
-								<div :class="$style.guide">
-									<span>Shared Liquidity Pool</span>
-									<span>Guide</span>
-								</div>
-							</div>
+								<router-link to="/docs/concepts">
+									<Flex direction="column" gap="8">
+										<Text size="13" weight="500" color="secondary">Learn the Concepts</Text>
+										<Text size="12" weight="600" color="tertiary">Basic</Text>
+									</Flex>
+								</router-link>
+								<router-link to="/docs/markets-symbols">
+									<Flex direction="column" gap="8">
+										<Text size="13" weight="500" color="secondary">Available Markets</Text>
+										<Text size="12" weight="600" color="tertiary">Basic</Text>
+									</Flex>
+								</router-link>
+								<router-link to="/docs/faq">
+									<Flex direction="column" gap="8">
+										<Text size="13" weight="500" color="secondary">FAQ</Text>
+										<Text size="12" weight="600" color="tertiary">Basic</Text>
+									</Flex>
+								</router-link>
+								<router-link to="/docs/fees">
+									<Flex direction="column" gap="8">
+										<Text size="13" weight="500" color="secondary">About Fees</Text>
+										<Text size="12" weight="600" color="tertiary">Basic</Text>
+									</Flex>
+								</router-link>
+							</Flex>
 						</Flex>
 					</Flex>
 
-					<Flex
-						align="center"
-						justify="between"
-						:class="$style.bottom"
-					>
-						<Button size="small" type="secondary">
-							<Icon
-								name="telegram"
-								size="14"
-								color="primary"
-							/>Telegram Channel
-						</Button>
+					<!-- <Flex align="center" justify="between" :class="$style.bottom">
+						<Button size="small" type="secondary"> <Icon name="telegram" size="14" color="primary" />Telegram Channel </Button>
 
-						<Button size="small" type="tertiary">
-							<Icon name="help" size="14" color="tertiary" />About
-						</Button>
+						<Button size="small" type="tertiary"> <Icon name="help" size="14" color="tertiary" />About </Button>
+					</Flex> -->
+					<Flex align="center" justify="between" :class="$style.bottom">
+						<router-link to="/releases">
+							<Button size="small" type="secondary" block>
+								<Icon name="asterisk" size="16" style="fill: var(--green)" />What's New in 1.1
+							</Button>
+						</router-link>
+
+						<Flex gap="8">
+							<Button size="small" type="tertiary" link="https://status.juster.fi">
+								<Icon name="bolt" size="16" color="tertiary" />System Status
+							</Button>
+
+							<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
+								<Icon name="help" size="16" color="tertiary" />Support
+							</Button>
+						</Flex>
 					</Flex>
 				</template>
 			</Flex>
@@ -553,17 +454,6 @@ watch(
 	background: var(--border);
 }
 
-.label {
-	font-size: 11px;
-	line-height: 1;
-	font-weight: 700;
-	color: var(--text-tertiary);
-
-	text-transform: uppercase;
-
-	padding: 0 8px;
-}
-
 .item {
 	display: flex;
 	align-items: center;
@@ -593,12 +483,7 @@ watch(
 	display: flex;
 
 	background: linear-gradient(rgb(40, 40, 43), rgb(50, 50, 53)) padding-box,
-		linear-gradient(
-				to bottom,
-				rgba(255, 255, 255, 0.2),
-				rgba(255, 255, 255, 0)
-			)
-			border-box;
+		linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0)) border-box;
 	border-radius: 10px;
 	border: 1px solid transparent;
 
@@ -640,36 +525,11 @@ watch(
 }
 
 .guides_block {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
+	padding: 8px;
 }
 
 .advanced_block .label {
 	margin-bottom: 16px;
-}
-
-.guide {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	cursor: pointer;
-
-	padding: 0 8px;
-}
-
-.guide span:nth-child(1) {
-	font-size: 13px;
-	line-height: 1.1;
-	font-weight: 500;
-	color: var(--text-primary);
-}
-
-.guide span:nth-child(2) {
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-tertiary);
 }
 
 .buttons {
