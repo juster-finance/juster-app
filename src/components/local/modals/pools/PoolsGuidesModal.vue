@@ -66,32 +66,18 @@ const activeTab = ref(0)
 			<Flex align="center" gap="8">
 				<Icon name="lightbulb" size="16" color="secondary" />
 
-				<Text
-					@click="emit('onBack')"
-					size="14"
-					weight="600"
-					color="primary"
-					:class="$style.head_btn"
-				>
+				<Text @click="emit('onBack')" size="14" weight="600" color="primary" :class="$style.head_btn">
 					Liquidity Pools guides
 				</Text>
 			</Flex>
 
-			<Icon
-				@click="emit('onClose')"
-				name="close"
-				size="16"
-				color="tertiary"
-				:class="$style.close_icon"
-			/>
+			<Icon @click="emit('onClose')" name="close" size="16" color="tertiary" :class="$style.close_icon" />
 		</Flex>
 
 		<Flex direction="column" gap="32" :class="$style.base">
 			<Flex direction="column" gap="16">
 				<Flex align="center" gap="32">
-					<Text size="14" weight="600" color="tertiary">
-						Learn about
-					</Text>
+					<Text size="14" weight="600" color="tertiary"> Learn about </Text>
 
 					<Text
 						v-for="(tab, index) in tabs"
@@ -112,14 +98,10 @@ const activeTab = ref(0)
 				<Icon name="money" size="16" color="orange" />
 
 				<Flex direction="column" gap="8">
-					<Text size="14" weight="600" color="primary">
-						Currently the APY is unstable
-					</Text>
+					<Text size="14" weight="600" color="primary"> Currently the APY is unstable </Text>
 					<Text size="13" weight="500" color="tertiary" height="16">
-						Liquidity pools were launched recently and are just
-						beginning to gain momentum. More time is needed to
-						stabilize the annual percentage yield and other
-						indicators (utilization, risk index, etc).
+						Liquidity pools were launched recently and are just beginning to gain momentum. More time is needed to stabilize the
+						annual percentage yield and other indicators (utilization, risk index, etc).
 					</Text>
 				</Flex>
 			</Flex>
@@ -150,10 +132,12 @@ const activeTab = ref(0)
 			<Flex direction="column" gap="16">
 				<div :class="$style.divider" />
 
-				<Button type="secondary" size="small" block>
-					Learn more in docs
-					<Icon name="open" size="16" color="tertiary" />
-				</Button>
+				<router-link to="/docs/pools-overview">
+					<Button type="secondary" size="small" block>
+						Learn more in docs
+						<Icon name="open" size="16" color="tertiary" />
+					</Button>
+				</router-link>
 			</Flex>
 		</Flex>
 	</Modal>
