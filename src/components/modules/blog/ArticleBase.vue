@@ -58,9 +58,32 @@ onMounted(async () => {
 		property: "og:image",
 		content: getSanityImageUrl(article.value.poster),
 	})
+
+	/** Twitter */
 	meta.meta.push({
-		property: "twitter:image:src",
+		property: "twitter:image",
 		content: getSanityImageUrl(article.value.poster),
+	})
+
+	meta.meta.push({
+		property: "twitter:site",
+		content: "@juster_fi",
+	})
+	meta.meta.push({
+		property: "twitter:creator",
+		content: "@juster_fi",
+	})
+	meta.meta.push({
+		property: "twitter:card",
+		content: "summary_large_image",
+	})
+	meta.meta.push({
+		property: "twitter:title",
+		content: article.value.title,
+	})
+	meta.meta.push({
+		property: "twitter:description",
+		content: article.value.content[0].children[0].text,
 	})
 })
 </script>
