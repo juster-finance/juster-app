@@ -26,6 +26,7 @@ import ArticleContent from "@modules/docs/ArticleContent.vue"
 const { meta } = useMeta({
 	title: "",
 	description: "",
+	meta: [],
 })
 
 const route = useRoute()
@@ -37,6 +38,30 @@ onMounted(async () => {
 
 	meta.title = article.value.title
 	meta.description = article.value.content[0].children[0].text
+	meta.meta.push({
+		property: "og:title",
+		content: article.value.title,
+	})
+	meta.meta.push({
+		property: "og:description",
+		content: article.value.content[0].children[0].text,
+	})
+	meta.meta.push({
+		property: "og:type",
+		content: "article",
+	})
+	meta.meta.push({
+		property: "og:url",
+		content: `https://app.juster.fi${route.fullPath}`,
+	})
+	meta.meta.push({
+		property: "og:image",
+		content: getSanityImageUrl(article.value.poster),
+	})
+	meta.meta.push({
+		property: "twitter:image:src",
+		content: getSanityImageUrl(article.value.poster),
+	})
 })
 </script>
 
@@ -48,65 +73,39 @@ onMounted(async () => {
 
 		<Flex align="center" gap="8" :class="$style.head">
 			<Text size="16" weight="600" color="tertiary">
-				<router-link to="/blog" :class="$style.link">
-					Blog
-				</router-link>
+				<router-link to="/blog" :class="$style.link"> Blog </router-link>
 			</Text>
 
-			<Icon
-				name="arrow"
-				size="16"
-				color="tertiary"
-				style="rotate: -90deg"
-			/>
+			<Icon name="arrow" size="16" color="tertiary" style="rotate: -90deg" />
 
-			<Text
-				size="16"
-				weight="600"
-				color="primary"
-				:class="$style.breadcrumbs"
-			>
+			<Text size="16" weight="600" color="primary" :class="$style.breadcrumbs">
 				{{ article.title }}
 			</Text>
 		</Flex>
 
 		<Flex direction="column" align="center" gap="60">
-			<img
-				:src="getSanityImageUrl(article.poster)"
-				:class="$style.cover"
-			/>
+			<img :src="getSanityImageUrl(article.poster)" :class="$style.cover" />
 
 			<Flex direction="column" gap="24" align="center">
 				<Flex align="center" gap="8">
 					<Flex align="center" gap="8">
 						<Icon name="logo_symbol" size="20" color="brand" />
-						<Text size="14" weight="500" color="primary">
-							Juster Team
-						</Text>
+						<Text size="14" weight="500" color="primary"> Juster Team </Text>
 					</Flex>
 
 					<Icon name="dot" size="16" style="fill: var(--border)" />
 
 					<Text size="14" weight="500" color="tertiary">
-						{{
-							DateTime.fromISO(article._updatedAt).toFormat(
-								"dd LLL, y",
-							)
-						}}
+						{{ DateTime.fromISO(article._updatedAt).toFormat("dd LLL, y") }}
 					</Text>
 				</Flex>
 
 				<h1 :class="$style.title">
-					<Text size="32" height="16" align="center">{{
-						article.title
-					}}</Text>
+					<Text size="32" height="16" align="center">{{ article.title }}</Text>
 				</h1>
 			</Flex>
 
-			<ArticleContent
-				:content="article.content"
-				:class="$style.content"
-			/>
+			<ArticleContent :content="article.content" :class="$style.content" />
 		</Flex>
 	</div>
 </template>
@@ -138,8 +137,7 @@ onMounted(async () => {
 
 	border-radius: 12px;
 	background: var(--card-bg);
-	box-shadow: 0px 30px 60px -30px rgba(0, 0, 0, 0.15),
-		0px 50px 100px -20px rgba(0, 0, 0, 0.15);
+	box-shadow: 0px 30px 60px -30px rgba(0, 0, 0, 0.15), 0px 50px 100px -20px rgba(0, 0, 0, 0.15);
 
 	margin-bottom: 50px;
 

@@ -3,7 +3,7 @@
  * Vendor
  */
 import { ref, reactive, computed, watch } from "vue"
-import { estimateFeeMultiplier, calculateRatio } from "@juster-finance/sdk"
+import { estimateFeeMultiplier } from "@juster-finance/sdk"
 import { DateTime } from "luxon"
 import BN from "bignumber.js"
 
@@ -23,6 +23,7 @@ import LoadingBar from "@ui/LoadingBar.vue"
 import Modal from "@ui/Modal.vue"
 import Tooltip from "@ui/Tooltip.vue"
 import Button from "@ui/Button.vue"
+import Banner from "@ui/Banner.vue"
 import Badge from "@ui/Badge.vue"
 
 /**
@@ -124,9 +125,13 @@ const balanceToAmountRatio = computed(() => {
  * Ratio
  */
 const ratio = computed(() => {
+	const stakeAmount = !isNaN(parseFloat(amount.value)) ? parseFloat(amount.value) : 0
+	const belowAmount = props.event.poolBelow
+	const aboveAmount = props.event.poolAboveEq
+
 	return {
-		rise: props.event.poolBelow / (props.event.poolAboveEq + parseFloat(amount.value)),
-		fall: props.event.poolAboveEq / (props.event.poolBelow + parseFloat(amount.value)),
+		rise: (belowAmount + (side.value === "Fall" ? stakeAmount : 0)) / (aboveAmount + (side.value === "Rise" ? stakeAmount : 0)),
+		fall: (aboveAmount + (side.value === "Rise" ? stakeAmount : 0)) / (belowAmount + (side.value === "Fall" ? stakeAmount : 0)),
 	}
 })
 const ratioBeforeBet = computed(() => {
@@ -134,17 +139,6 @@ const ratioBeforeBet = computed(() => {
 		rise: props.event.poolBelow / props.event.poolAboveEq,
 		fall: props.event.poolAboveEq / props.event.poolBelow,
 	}
-})
-const ratioAfterBet = computed(() => {
-	return calculateRatio(
-		{
-			poolAboveEq: BN(props.event.poolAboveEq),
-			poolBelow: BN(props.event.poolBelow),
-		},
-		"aboveEq",
-		BN(parseFloat(amount.value)),
-		BN(winDelta.value),
-	).toNumber()
 })
 
 const fee = computed(() =>
@@ -344,11 +338,6 @@ const handleUserTransactionConfirmation = () => {
 			})
 
 			emit("onClose")
-			// context.emit("onBet", {
-			// 	side: betType == "aboveEq" ? "ABOVE_EQ" : "BELOW",
-			// 	amount: amount.value,
-			// 	reward: minReward.value,
-			// })
 		})
 		.catch((err) => {
 			/** analytics */
@@ -480,9 +469,10 @@ const handleUserTransactionConfirmation = () => {
 							<Text size="14" weight="600" color="primary"> Rise </Text>
 						</Flex>
 
-						<Text size="12" weight="600" color="tertiary" :class="$style.ratio">
-							x{{ (1 + ratioBeforeBet.rise).toFixed(2) }}
-						</Text>
+						<Flex>
+							<Text size="12" weight="600" color="tertiary" :class="$style.ratio"> x</Text>
+							<Text size="12" weight="600" color="secondary" :class="$style.ratio"> {{ (1 + ratio.rise).toFixed(2) }} </Text>
+						</Flex>
 					</Flex>
 
 					<Flex
@@ -492,9 +482,10 @@ const handleUserTransactionConfirmation = () => {
 						justify="between"
 						:class="[$style.side_btn, $style.right, side === 'Fall' && $style.lower]"
 					>
-						<Text size="12" weight="600" color="tertiary" :class="$style.ratio">
-							x{{ (1 + ratioBeforeBet.fall).toFixed(2) }}
-						</Text>
+						<Flex>
+							<Text size="12" weight="600" color="tertiary" :class="$style.ratio"> x</Text>
+							<Text size="12" weight="600" color="secondary" :class="$style.ratio"> {{ (1 + ratio.fall).toFixed(2) }} </Text>
+						</Flex>
 
 						<Flex align="center" gap="6">
 							<Icon name="lower" size="14" color="primary" />
@@ -536,6 +527,10 @@ const handleUserTransactionConfirmation = () => {
 						</Flex>
 					</Flex>
 				</Flex>
+
+				<Banner v-if="ratio.rise < 0.5 || ratio.fall < 0.5" icon="warning" color="yellow" size="small" style="border-radius: 4px">
+					Too much displacement of the payout ratio
+				</Banner>
 
 				<Flex direction="column" gap="16" :class="$style.payout_block">
 					<Flex align="center" gap="4">

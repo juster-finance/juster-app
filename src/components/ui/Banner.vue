@@ -14,16 +14,7 @@ defineProps({
 </script>
 
 <template>
-	<Flex
-		align="center"
-		gap="8"
-		:class="[
-			$style.wrapper,
-			$style[color],
-			$style[size],
-			center && $style.center,
-		]"
-	>
+	<Flex align="center" gap="8" :class="[$style.wrapper, $style[color], $style[size], center && $style.center]">
 		<Spin v-if="loading" size="14" />
 		<Icon v-else :name="icon" size="14" />
 
@@ -60,7 +51,7 @@ defineProps({
 .wrapper.yellow {
 	fill: var(--yellow);
 	color: var(--yellow);
-	background: rgba(245, 183, 43, 0.15);
+	background: var(--opacity-05);
 }
 
 .wrapper.green {
