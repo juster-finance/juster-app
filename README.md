@@ -39,8 +39,6 @@
 
 <br/>
 
-<img src="https://i.imgur.com/xhWvft1.png">
-
 <br/>
 
 # Decentralized Betting Protocol
