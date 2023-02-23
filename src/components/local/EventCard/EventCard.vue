@@ -1,13 +1,5 @@
 <script setup>
-import {
-	onMounted,
-	onBeforeUnmount,
-	onUnmounted,
-	ref,
-	reactive,
-	computed,
-	nextTick,
-} from "vue"
+import { onMounted, onBeforeUnmount, onUnmounted, ref, reactive, computed, nextTick } from "vue"
 import { DateTime } from "luxon"
 
 /**
@@ -83,18 +75,11 @@ const symbol = computed(() => props.event.currencyPair.symbol)
 
 /** Countdown setup: Time to start */
 const startDt = computed(() => new Date(props.event?.betsCloseTime).getTime())
-const {
-	status: startStatus,
-	stop: destroyStartCountdown,
-	start,
-} = useCountdown(startDt)
+const { status: startStatus, stop: destroyStartCountdown, start } = useCountdown(startDt)
 
 /** Countdown setup: Time to finish */
 const finishDt = computed(() =>
-	DateTime.fromISO(props.event.betsCloseTime)
-		.plus({ second: props.event.measurePeriod })
-		.toJSDate()
-		.getTime(),
+	DateTime.fromISO(props.event.betsCloseTime).plus({ second: props.event.measurePeriod }).toJSDate().getTime(),
 )
 const { stop: destroyFinishCountdown } = useCountdown(finishDt)
 
@@ -124,10 +109,7 @@ const timing = computed(() => {
 })
 
 const participants = computed(() => {
-	let avatars = [
-		...props.event.bets.map((bet) => bet.userId),
-		...props.event.deposits.map((deposit) => deposit.userId),
-	]
+	let avatars = [...props.event.bets.map((bet) => bet.userId), ...props.event.deposits.map((deposit) => deposit.userId)]
 
 	/** remove duplicates */
 	avatars = [...new Set(avatars)]
@@ -138,12 +120,8 @@ const participants = computed(() => {
 const userTVL = computed(() => {
 	let tvl = 0
 
-	tvl += props.event.deposits
-		.filter((deposit) => deposit.userId == accountStore.pkh)
-		.reduce((a, { amountBelow }) => a + amountBelow, 0)
-	tvl += props.event.bets
-		.filter((bet) => bet.userId == accountStore.pkh)
-		.reduce((a, { amount }) => a + amount, 0)
+	tvl += props.event.deposits.filter((deposit) => deposit.userId == accountStore.pkh).reduce((a, { amountBelow }) => a + amountBelow, 0)
+	tvl += props.event.bets.filter((bet) => bet.userId == accountStore.pkh).reduce((a, { amount }) => a + amount, 0)
 
 	return tvl
 })
@@ -152,14 +130,10 @@ const userTVL = computed(() => {
 const hasWonBet = computed(() => {
 	if (!props.event) return
 
-	return !!props.event.bets
-		.filter((bet) => bet.userId == accountStore.pkh)
-		.filter((bet) => bet.side == props.event.winnerBets).length
+	return !!props.event.bets.filter((bet) => bet.userId == accountStore.pkh).filter((bet) => bet.side == props.event.winnerBets).length
 })
 const positionForWithdraw = computed(() => {
-	return accountStore.wonPositions.find(
-		(position) => position.event.id == props.event.id,
-	)
+	return accountStore.wonPositions.find((position) => position.event.id == props.event.id)
 })
 
 const progressPercentage = computed(() => {
@@ -173,11 +147,7 @@ const progressPercentage = computed(() => {
 /** Join to the event & Liquidity */
 const handleJoin = (target) => {
 	/** disable Bet / Liquidity right after betsCloseTime */
-	if (
-		startStatus.value == "Finished" ||
-		props.event.totalLiquidityProvided == 0
-	)
-		return
+	if (startStatus.value == "Finished" || props.event.totalLiquidityProvided == 0) return
 
 	analytics.log("showBetModal", { where: "event_card" })
 
@@ -220,10 +190,9 @@ const handleWithdraw = () => {
 					isWithdrawing.value = false
 
 					/** rm won position from store */
-					accountStore.positionsForWithdrawal =
-						accountStore.positionsForWithdrawal.filter(
-							(position) => position.event.id != props.event.id,
-						)
+					accountStore.positionsForWithdrawal = accountStore.positionsForWithdrawal.filter(
+						(position) => position.event.id != props.event.id,
+					)
 
 					updateWithdrawals()
 
@@ -240,8 +209,7 @@ const handleWithdraw = () => {
 				notification: {
 					type: "success",
 					title: "Withdrawal request sent",
-					description:
-						"Processing takes about 10-30 seconds. Funds will appear in your wallet soon",
+					description: "Processing takes about 10-30 seconds. Funds will appear in your wallet soon",
 					autoDestroy: true,
 				},
 			})
@@ -297,11 +265,7 @@ const copy = (target) => {
 				actions: [
 					{
 						name: "Open in new tab",
-						callback: () =>
-							window.open(
-								`https://app.juster.fi/events/${props.event.id}`,
-								"_blank",
-							),
+						callback: () => window.open(`https://app.juster.fi/events/${props.event.id}`, "_blank"),
 					},
 				],
 			},
@@ -332,8 +296,7 @@ const contextMenuHandler = (e) => {
 onMounted(async () => {
 	start()
 
-	if (card.value)
-		card.value.addEventListener("contextmenu", contextMenuHandler)
+	if (card.value) card.value.addEventListener("contextmenu", contextMenuHandler)
 
 	if (props.event.status === "FINISHED") return
 
@@ -396,10 +359,7 @@ onBeforeUnmount(() => {
 })
 
 onUnmounted(() => {
-	if (
-		Object.prototype.hasOwnProperty.call(subscription.value, "_state") &&
-		!subscription.value?.closed
-	) {
+	if (Object.prototype.hasOwnProperty.call(subscription.value, "_state") && !subscription.value?.closed) {
 		subscription.value.unsubscribe()
 	}
 
@@ -411,32 +371,16 @@ onUnmounted(() => {
 <template>
 	<router-link :to="`/events/${event.id}`" :class="$style.wrapper">
 		<div ref="card">
-			<StakeModal
-				:show="showBetModal"
-				:event="event"
-				@onContinue="handleContinue"
-				@onClose="showBetModal = false"
-			/>
+			<StakeModal :show="showBetModal" :event="event" @onContinue="handleContinue" @onClose="showBetModal = false" />
 			<ConfirmTransactionModal
 				:show="showConfirmTransactionModal"
 				@onCancel="handleCancelTransaction"
 				@onConfirm="handleConfirmTransaction"
 				@onClose="showConfirmTransactionModal = false"
 			/>
-			<LiquidityModal
-				:show="showLiquidityModal"
-				:event="event"
-				@onClose="showLiquidityModal = false"
-			/>
-			<ParticipantsModal
-				:show="showParticipantsModal"
-				@onClose="showParticipantsModal = false"
-				:event="event"
-			/>
-			<NotifyMeModal
-				:show="showNotifyMeModal"
-				@onClose="showNotifyMeModal = false"
-			/>
+			<LiquidityModal :show="showLiquidityModal" :event="event" @onClose="showLiquidityModal = false" />
+			<ParticipantsModal :show="showParticipantsModal" @onClose="showParticipantsModal = false" :event="event" />
+			<NotifyMeModal :show="showNotifyMeModal" @onClose="showNotifyMeModal = false" />
 
 			<Dropdown
 				:force-open="openContextMenu"
@@ -445,31 +389,20 @@ onUnmounted(() => {
 				:style="{ ...contextMenuStyles }"
 			>
 				<template #dropdown>
-					<DropdownItem disabled>
-						<Icon name="notifications" size="16" />Notify Me
-					</DropdownItem>
+					<DropdownItem disabled> <Icon name="notifications" size="16" />Notify Me </DropdownItem>
 
-					<DropdownItem @click.prevent="handleParticipants">
-						<Icon name="users" size="16" />View participants
-					</DropdownItem>
+					<DropdownItem @click.prevent="handleParticipants"> <Icon name="users" size="16" />View participants </DropdownItem>
 
 					<DropdownDivider />
 
-					<DropdownItem @click.prevent="copy('id')">
-						<Icon name="copy" size="16" />Copy ID
-					</DropdownItem>
-					<DropdownItem @click.prevent="copy('url')">
-						<Icon name="copy" size="16" />Copy URL
-					</DropdownItem>
+					<DropdownItem @click.prevent="copy('id')"> <Icon name="copy" size="16" />Copy ID </DropdownItem>
+					<DropdownItem @click.prevent="copy('url')"> <Icon name="copy" size="16" />Copy URL </DropdownItem>
 				</template>
 			</Dropdown>
 
 			<div :class="$style.header">
 				<div :class="$style.symbol_imgs">
-					<img
-						:src="getCurrencyIcon(symbol.split('-')[0])"
-						alt="symbol"
-					/>
+					<img :src="getCurrencyIcon(symbol.split('-')[0])" alt="symbol" />
 					<img :src="getCurrencyIcon('USD')" alt="symbol" />
 				</div>
 
@@ -477,54 +410,25 @@ onUnmounted(() => {
 					<Tooltip placement="bottom-end">
 						<div :class="$style.participants">
 							<img
-								v-for="participantAddress in participants.slice(
-									0,
-									3,
-								)"
+								v-for="participantAddress in participants.slice(0, 3)"
 								:key="participantAddress"
 								:src="`https://services.tzkt.io/v1/avatars/${participantAddress}`"
-								:class="[
-									$style.user_avatar,
-									$style.participant,
-								]"
+								:class="[$style.user_avatar, $style.participant]"
 								alt="avatar"
 							/>
-							<div
-								v-if="participants.length > 3"
-								:class="[
-									$style.participant,
-									$style.more_participants,
-								]"
-							>
+							<div v-if="participants.length > 3" :class="[$style.participant, $style.more_participants]">
 								<Icon name="dots" size="12" color="secondary" />
 							</div>
 						</div>
 
-						<template #content
-							>Participants ({{ participants.length }})</template
-						>
+						<template #content>Participants ({{ participants.length }})</template>
 					</Tooltip>
 
 					<Tooltip placement="bottom-end">
 						<div :class="$style.creator">
-							<template
-								v-if="
-									verifiedMakers[currentNetwork].includes(
-										event.creatorId,
-									)
-								"
-							>
-								<Icon
-									name="logo_symbol"
-									size="24"
-									color="primary"
-								/>
-								<Icon
-									name="verified"
-									size="16"
-									color="green"
-									:class="$style.verified_icon"
-								/>
+							<template v-if="verifiedMakers[currentNetwork].includes(event.creatorId)">
+								<Icon name="logo_symbol" size="24" color="primary" />
+								<Icon name="verified" size="16" color="green" :class="$style.verified_icon" />
 							</template>
 
 							<template v-else>
@@ -537,19 +441,9 @@ onUnmounted(() => {
 						</div>
 
 						<template #content>
-							<template
-								v-if="
-									verifiedMakers[currentNetwork].includes(
-										event.creatorId,
-									)
-								"
-							>
+							<template v-if="verifiedMakers[currentNetwork].includes(event.creatorId)">
 								<Flex align="center" gap="6">
-									<Icon
-										name="repeat"
-										size="14"
-										color="secondary"
-									/>
+									<Icon name="repeat" size="14" color="secondary" />
 									Recurring event by Juster
 								</Flex>
 							</template>
@@ -560,10 +454,7 @@ onUnmounted(() => {
 			</div>
 
 			<div :class="$style.title">
-				{{
-					supportedMarkets[symbol] &&
-					supportedMarkets[symbol].description
-				}}
+				{{ supportedMarkets[symbol] && supportedMarkets[symbol].description }}
 			</div>
 
 			<div :class="$style.description">
@@ -572,12 +463,8 @@ onUnmounted(() => {
 						name="price_event"
 						size="12"
 						:style="{
-							fill:
-								(event.winnerBets === 'ABOVE_EQ' &&
-									'var(--green)') ||
-								(event.winnerBets === 'BELOW' && 'var(--red)'),
-							transform:
-								event.winnerBets === 'BELOW' && 'scaleX(-1)',
+							fill: (event.winnerBets === 'ABOVE_EQ' && 'var(--green)') || (event.winnerBets === 'BELOW' && 'var(--red)'),
+							transform: event.winnerBets === 'BELOW' && 'scaleX(-1)',
 						}"
 					/>
 					Price Event
@@ -586,53 +473,25 @@ onUnmounted(() => {
 				<div :class="$style.dot" />
 
 				<span v-if="event.status === 'NEW'">Open for stakes</span>
-				<span v-else-if="event.status === 'STARTED'">
-					Watching the price
-				</span>
-				<span v-else-if="event.status === 'FINISHED'">
-					Price determined
-				</span>
+				<span v-else-if="event.status === 'STARTED'"> Watching the price </span>
+				<span v-else-if="event.status === 'FINISHED'"> Price determined </span>
 			</div>
 
 			<div :class="$style.badges">
-				<Tooltip
-					v-if="startStatus == 'In progress' && event.status == 'NEW'"
-					placement="bottom-start"
-				>
-					<Badge
-						size="small"
-						color="purple"
-						:class="$style.main_badge"
-					>
-						<Icon name="event_new" size="12" />New
-					</Badge>
+				<Tooltip v-if="startStatus == 'In progress' && event.status == 'NEW'" placement="bottom-start">
+					<Badge size="small" color="purple" :class="$style.main_badge"> <Icon name="event_new" size="12" />New </Badge>
 
-					<template #content>
-						The event is available for betting and providing
-						liquidity
-					</template>
+					<template #content> The event is available for betting and providing liquidity </template>
 				</Tooltip>
-				<Tooltip
-					v-else-if="
-						startStatus == 'Finished' && event.status == 'NEW'
-					"
-					placement="bottom-start"
-					text-align="left"
-				>
-					<Badge color="yellow" :class="$style.main_badge">
-						<Icon name="event_new" size="12" />Starting
-					</Badge>
+				<Tooltip v-else-if="startStatus == 'Finished' && event.status == 'NEW'" placement="bottom-start" text-align="left">
+					<Badge color="yellow" :class="$style.main_badge"> <Icon name="event_new" size="12" />Starting </Badge>
 
 					<template #content>
 						Submissions is closed.<br />
 						<span>The end of the event is pending</span>
 					</template>
 				</Tooltip>
-				<Tooltip
-					v-else-if="event.status == 'STARTED'"
-					placement="bottom-start"
-					text-align="left"
-				>
+				<Tooltip v-else-if="event.status == 'STARTED'" placement="bottom-start" text-align="left">
 					<Badge color="yellow" :class="$style.main_badge">
 						<Icon name="event_active" size="12" />
 						Running
@@ -642,38 +501,20 @@ onUnmounted(() => {
 						<span>The end of the event is pending</span>
 					</template>
 				</Tooltip>
-				<Tooltip
-					v-else-if="event.status == 'FINISHED'"
-					placement="bottom-start"
-				>
-					<Badge color="green" :class="$style.main_badge">
-						<Icon name="event_finished" size="12" />Finished
-					</Badge>
-					<template #content
-						>The event is closed, winning side determined</template
-					>
+				<Tooltip v-else-if="event.status == 'FINISHED'" placement="bottom-start">
+					<Badge color="green" :class="$style.main_badge"> <Icon name="event_finished" size="12" />Finished </Badge>
+					<template #content>The event is closed, winning side determined</template>
 				</Tooltip>
-				<Tooltip
-					v-else-if="event.status == 'CANCELED'"
-					placement="bottom-start"
-				>
-					<Badge color="gray" :class="$style.main_badge">
-						<Icon name="stop" size="12" />Canceled
-					</Badge>
-					<template #content
-						>This event has been canceled, funds returned</template
-					>
+				<Tooltip v-else-if="event.status == 'CANCELED'" placement="bottom-start">
+					<Badge color="gray" :class="$style.main_badge"> <Icon name="stop" size="12" />Canceled </Badge>
+					<template #content>This event has been canceled, funds returned</template>
 				</Tooltip>
 
 				<!-- Duration Badge -->
 				<Badge color="gray" :class="$style.badge">
 					<Icon name="time" size="12" />
 
-					{{
-						event.measurePeriod / 60 / 60 < 24
-							? timing.start.time
-							: timing.start.dt.toFormat("dd LLL")
-					}}
+					{{ event.measurePeriod / 60 / 60 < 24 ? timing.start.time : timing.start.dt.toFormat("dd LLL") }}
 
 					<span>
 						{{
@@ -689,31 +530,14 @@ onUnmounted(() => {
 						}}
 					</span>
 
-					{{
-						event.measurePeriod / 60 / 60 < 24
-							? timing.end.time
-							: timing.end.dt.toFormat("dd LLL")
-					}}
+					{{ event.measurePeriod / 60 / 60 < 24 ? timing.end.time : timing.end.dt.toFormat("dd LLL") }}
 
-					<div
-						v-if="event.status === 'STARTED'"
-						:class="$style.badge_fill"
-						:style="{ right: `${progressPercentage}%` }"
-					/>
+					<div v-if="event.status === 'STARTED'" :class="$style.badge_fill" :style="{ right: `${progressPercentage}%` }" />
 				</Badge>
 
 				<!-- Custom Badge -->
-				<Tooltip
-					v-if="
-						!verifiedMakers[currentNetwork].includes(
-							event.creatorId,
-						)
-					"
-					placement="bottom-start"
-				>
-					<Badge color="yellow" :class="$style.badge">
-						<Icon name="bolt" size="12" /> Custom
-					</Badge>
+				<Tooltip v-if="!verifiedMakers[currentNetwork].includes(event.creatorId)" placement="bottom-start">
+					<Badge color="yellow" :class="$style.badge"> <Icon name="bolt" size="12" /> Custom </Badge>
 
 					<template #content>Custom event from user</template>
 				</Tooltip>
@@ -734,57 +558,32 @@ onUnmounted(() => {
 			</div>
 
 			<div :class="$style.hints">
-				<div
-					v-if="startStatus == 'In progress'"
-					:class="[$style.hint, $style.gray]"
-				>
+				<div v-if="startStatus == 'In progress'" :class="[$style.hint, $style.gray]">
 					<Icon name="time" size="14" />
 					<div>
 						Starting
 						<span>
-							{{
-								DateTime.fromISO(event.betsCloseTime)
-									.setLocale("en")
-									.toRelative()
-							}}
+							{{ DateTime.fromISO(event.betsCloseTime).setLocale("en").toRelative() }}
 						</span>
 					</div>
 				</div>
 
-				<div
-					v-else-if="
-						startStatus == 'Finished' && event.status == 'NEW'
-					"
-					:class="[$style.hint, $style.gray]"
-				>
+				<div v-else-if="startStatus == 'Finished' && event.status == 'NEW'" :class="[$style.hint, $style.gray]">
 					<Icon name="time" size="14" />
 					<div>Starting</div>
 				</div>
 
-				<div
-					v-else-if="
-						startStatus == 'Finished' && event.status == 'STARTED'
-					"
-					:class="[$style.hint, $style.yellow]"
-				>
+				<div v-else-if="startStatus == 'Finished' && event.status == 'STARTED'" :class="[$style.hint, $style.yellow]">
 					<Icon name="time" size="14" />
 					<div>
 						Ending
 						<span>
-							{{
-								DateTime.fromISO(event.betsCloseTime)
-									.plus({ second: event.measurePeriod })
-									.setLocale("en")
-									.toRelative()
-							}}
+							{{ DateTime.fromISO(event.betsCloseTime).plus({ second: event.measurePeriod }).setLocale("en").toRelative() }}
 						</span>
 					</div>
 				</div>
 
-				<div
-					v-else-if="event.status == 'FINISHED'"
-					:class="[$style.hint, $style.gray]"
-				>
+				<div v-else-if="event.status == 'FINISHED'" :class="[$style.hint, $style.gray]">
 					<Icon name="time" size="14" />
 					<div>
 						Ended
@@ -800,19 +599,12 @@ onUnmounted(() => {
 					</div>
 				</div>
 
-				<div
-					v-if="event.status == 'CANCELED'"
-					:class="[$style.hint, $style.red]"
-				>
+				<div v-if="event.status == 'CANCELED'" :class="[$style.hint, $style.red]">
 					<Icon name="flag" size="14" />
 					<div><span>Canceled</span> Measurement delay</div>
 				</div>
 
-				<Tooltip
-					v-if="event.status !== 'FINISHED'"
-					placement="top-start"
-					text-align="left"
-				>
+				<Tooltip v-if="event.status !== 'FINISHED'" placement="top-start" text-align="left">
 					<div
 						:class="[
 							$style.hint,
@@ -824,8 +616,7 @@ onUnmounted(() => {
 						<Icon
 							:name="
 								(event.bets.length >= 3 && 'liquidity_high') ||
-								(event.bets.length >= 1 &&
-									'liquidity_medium') ||
+								(event.bets.length >= 1 && 'liquidity_medium') ||
 								(event.bets.length === 0 && 'liquidity_low')
 							"
 							size="14"
@@ -849,10 +640,7 @@ onUnmounted(() => {
 					</template>
 				</Tooltip>
 
-				<Tooltip
-					v-if="event.winnerBets == 'BELOW'"
-					placement="bottom-start"
-				>
+				<Tooltip v-if="event.winnerBets == 'BELOW'" placement="bottom-start">
 					<div :class="[$style.hint, $style.red]">
 						<Icon name="arrow_circle_bottom_right" size="14" />
 						<div><span>Fall</span> won</div>
@@ -860,19 +648,11 @@ onUnmounted(() => {
 
 					<template #content
 						><span>Difference =</span> <br />
-						{{
-							(
-								event.closedRate * 100 -
-								event.startRate * 100
-							).toFixed(2)
-						}}</template
+						{{ (event.closedRate * 100 - event.startRate * 100).toFixed(2) }}</template
 					>
 				</Tooltip>
 
-				<Tooltip
-					v-if="event.winnerBets == 'ABOVE_EQ'"
-					placement="bottom-start"
-				>
+				<Tooltip v-if="event.winnerBets == 'ABOVE_EQ'" placement="bottom-start">
 					<div :class="[$style.hint, $style.green]">
 						<Icon name="arrow_circle_top_right" size="14" />
 						<div><span>Rise</span> won</div>
@@ -880,12 +660,7 @@ onUnmounted(() => {
 
 					<template #content
 						><span>Difference =</span> <br />
-						{{
-							(
-								event.closedRate * 100 -
-								event.startRate * 100
-							).toFixed(2)
-						}}</template
+						{{ (event.closedRate * 100 - event.startRate * 100).toFixed(2) }}</template
 					>
 				</Tooltip>
 			</div>
@@ -896,11 +671,9 @@ onUnmounted(() => {
 				:event="event"
 				:is-won="hasWonBet"
 				:position-for-withdraw="positionForWithdraw"
-				:disabled="
-					event.totalLiquidityProvided == 0 ||
-					startStatus == 'Finished'
-				"
+				:disabled="event.totalLiquidityProvided == 0 || startStatus == 'Finished'"
 				:is-withdrawing="isWithdrawing"
+				:is-involved="!!userTVL"
 				:class="$style.bottom_actions"
 			/>
 		</div>
@@ -1121,10 +894,7 @@ onUnmounted(() => {
 	bottom: 0;
 	right: 0;
 
-	background: linear-gradient(
-		rgba(255, 255, 255, 0.15),
-		rgba(255, 255, 255, 0.005)
-	);
+	background: linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.005));
 	border-right: 2px solid var(--border);
 }
 

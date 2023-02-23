@@ -24,6 +24,13 @@ import { currentNetwork } from "@sdk"
 import { toReadableDuration } from "@utils/date"
 import { supportedMarkets, verifiedMakers } from "@config"
 
+/**
+ * Store
+ */
+import { useAccountStore } from "@store/account"
+
+const accountStore = useAccountStore()
+
 const props = defineProps({
 	event: {
 		type: Object,
@@ -61,15 +68,21 @@ const emit = defineEmits(["openParticipants", "onBet", "onWithdraw"])
 const symbol = computed(() => props.event.currencyPair.symbol)
 
 const participantsAvatars = computed(() => {
-	let avatars = [
-		...props.event.bets.map((bet) => bet.userId),
-		...props.event.deposits.map((deposit) => deposit.userId),
-	]
+	let avatars = [...props.event.bets.map((bet) => bet.userId), ...props.event.deposits.map((deposit) => deposit.userId)]
 
 	/** remove duplicates */
 	avatars = [...new Set(avatars)]
 
 	return avatars
+})
+
+const userTVL = computed(() => {
+	let tvl = 0
+
+	tvl += props.event.deposits.filter((deposit) => deposit.userId == accountStore.pkh).reduce((a, { amountBelow }) => a + amountBelow, 0)
+	tvl += props.event.bets.filter((bet) => bet.userId == accountStore.pkh).reduce((a, { amount }) => a + amount, 0)
+
+	return tvl
 })
 
 const timing = computed(() => {
@@ -110,15 +123,10 @@ const priceDynamics = computed(() => {
 
 	const percent =
 		props.event.status == "FINISHED"
-			? (100 * Math.abs(closedRate - startRate)) /
-			  ((closedRate + startRate) / 2)
-			: (100 * Math.abs(props.price.rate - startRate)) /
-			  ((props.price.rate + startRate) / 2)
+			? (100 * Math.abs(closedRate - startRate)) / ((closedRate + startRate) / 2)
+			: (100 * Math.abs(props.price.rate - startRate)) / ((props.price.rate + startRate) / 2)
 
-	const diff =
-		props.event.status == "FINISHED"
-			? closedRate - startRate
-			: props.price.rate - startRate
+	const diff = props.event.status == "FINISHED" ? closedRate - startRate : props.price.rate - startRate
 
 	return { diff, percent }
 })
@@ -143,99 +151,50 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 					name="price_event"
 					size="16"
 					:style="{
-						fill:
-							(event.winnerBets === 'ABOVE_EQ' &&
-								'var(--green)') ||
-							(event.winnerBets === 'BELOW' && 'var(--red)'),
+						fill: (event.winnerBets === 'ABOVE_EQ' && 'var(--green)') || (event.winnerBets === 'BELOW' && 'var(--red)'),
 						transform: event.winnerBets === 'BELOW' && 'scaleX(-1)',
 					}"
 				/>
-				{{
-					supportedMarkets[symbol] && supportedMarkets[symbol].target
-				}}
+				{{ supportedMarkets[symbol] && supportedMarkets[symbol].target }}
 				<span>price event</span>
 			</div>
 
 			<div :class="$style.users">
 				<Tooltip placement="top-end">
-					<div
-						@click="emit('openParticipants')"
-						:class="$style.participants"
-					>
+					<div @click="emit('openParticipants')" :class="$style.participants">
 						<img
-							v-for="participantAvatar in participantsAvatars.slice(
-								0,
-								3,
-							)"
+							v-for="participantAvatar in participantsAvatars.slice(0, 3)"
 							:key="participantAvatar"
 							:src="`https://services.tzkt.io/v1/avatars/${participantAvatar}`"
 							:class="[$style.user_avatar, $style.participant]"
 							alt="avatar"
 						/>
-						<div
-							v-if="participantsAvatars.length > 3"
-							:class="[
-								$style.participant,
-								$style.more_participants,
-							]"
-						>
+						<div v-if="participantsAvatars.length > 3" :class="[$style.participant, $style.more_participants]">
 							<Icon name="dots" size="12" color="secondary" />
 						</div>
 					</div>
 
 					<template #content
-						>Participants
-						<span
-							>({{ participantsAvatars.length }})</span
-						></template
+						>Participants <span>({{ participantsAvatars.length }})</span></template
 					>
 				</Tooltip>
 
 				<Tooltip placement="top">
 					<div :class="$style.creator">
-						<template
-							v-if="
-								verifiedMakers[currentNetwork].includes(
-									event.creatorId,
-								)
-							"
-						>
-							<Icon
-								name="logo_symbol"
-								size="24"
-								color="primary"
-							/>
-							<Icon
-								name="verified"
-								size="16"
-								color="green"
-								:class="$style.verified_icon"
-							/>
+						<template v-if="verifiedMakers[currentNetwork].includes(event.creatorId)">
+							<Icon name="logo_symbol" size="24" color="primary" />
+							<Icon name="verified" size="16" color="green" :class="$style.verified_icon" />
 						</template>
 
 						<template v-else>
-							<img
-								:src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`"
-								:class="$style.user_avatar"
-								alt="avatar"
-							/>
+							<img :src="`https://services.tzkt.io/v1/avatars/${event.creatorId}`" :class="$style.user_avatar" alt="avatar" />
 						</template>
 					</div>
 
 					<template #content>
-						<template
-							v-if="
-								verifiedMakers[currentNetwork].includes(
-									event.creatorId,
-								)
-							"
-						>
+						<template v-if="verifiedMakers[currentNetwork].includes(event.creatorId)">
 							<Flex align="center" gap="6">
-								<Icon
-									name="repeat"
-									size="14"
-									color="secondary"
-								/>
+								<Icon name="repeat" size="14" color="secondary" />
 								Recurring event by Juster
 							</Flex>
 						</template>
@@ -256,40 +215,19 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 						event.status == 'CANCELED' && $style.gray,
 					]"
 				>
-					<template
-						v-if="
-							(startStatus == 'In progress') &
-							(event.status == 'NEW')
-						"
-					>
+					<template v-if="(startStatus == 'In progress') & (event.status == 'NEW')">
 						<Icon name="event_new" size="14" /> New
 					</template>
-					<template
-						v-else-if="
-							startStatus == 'Finished' && event.status == 'NEW'
-						"
-					>
+					<template v-else-if="startStatus == 'Finished' && event.status == 'NEW'">
 						<Icon name="event_new" size="14" /> Starting
 					</template>
-					<template
-						v-else-if="
-							startStatus == 'Finished' &&
-							event.status == 'STARTED'
-						"
-					>
+					<template v-else-if="startStatus == 'Finished' && event.status == 'STARTED'">
 						<Icon name="event_active" size="14" /> Running
 					</template>
-					<template
-						v-else-if="
-							startStatus == 'Finished' &&
-							event.status == 'FINISHED'
-						"
-					>
+					<template v-else-if="startStatus == 'Finished' && event.status == 'FINISHED'">
 						<Icon name="event_finished" size="14" /> Finished
 					</template>
-					<template v-else-if="event.status == 'CANCELED'">
-						<Icon name="stop" size="14" /> Canceled
-					</template>
+					<template v-else-if="event.status == 'CANCELED'"> <Icon name="stop" size="14" /> Canceled </template>
 				</div>
 
 				<div :class="$style.card__duration">
@@ -316,33 +254,15 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 				</div>
 			</div>
 
-			<div
-				:class="[
-					$style.card__bottom,
-					isHighdemand && $style.highdemand_radius,
-				]"
-			>
-				<div
-					:class="[
-						$style.card__side,
-						['STARTED', 'FINISHED'].includes(event.status) &&
-							$style.opacity,
-					]"
-				>
+			<div :class="[$style.card__bottom, isHighdemand && $style.highdemand_radius]">
+				<div :class="[$style.card__side, ['STARTED', 'FINISHED'].includes(event.status) && $style.opacity]">
 					<div :class="$style.card__time">
-						{{ timing.start.time
-						}}<span>, {{ timing.start.date }}</span>
+						{{ timing.start.time }}<span>, {{ timing.start.date }}</span>
 					</div>
 					<div :class="$style.card__day">{{ timing.start.day }}</div>
 				</div>
 
-				<div
-					:class="[
-						$style.card__side,
-						$style.right,
-						event.status == 'FINISHED' && $style.opacity,
-					]"
-				>
+				<div :class="[$style.card__side, $style.right, event.status == 'FINISHED' && $style.opacity]">
 					<div :class="$style.card__time">
 						<span>{{ timing.end.date }}, </span>
 						{{ timing.end.time }}
@@ -350,11 +270,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 					<div :class="$style.card__day">{{ timing.end.day }}</div>
 				</div>
 
-				<Icon
-					name="arrowright"
-					size="14"
-					:class="$style.card__arrow_icon"
-				/>
+				<Icon name="arrowright" size="14" :class="$style.card__arrow_icon" />
 			</div>
 
 			<div v-if="isHighdemand" :class="$style.card__highdemand">
@@ -375,23 +291,13 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 		<div :class="$style.params">
 			<!-- First Param -->
 			<!-- *New/Starting* -->
-			<div
-				v-if="
-					['In progress', 'Finished'].includes(startStatus) &&
-					event.status == 'NEW'
-				"
-				:class="$style.param"
-			>
+			<div v-if="['In progress', 'Finished'].includes(startStatus) && event.status == 'NEW'" :class="$style.param">
 				<span><Icon name="time" size="14" />Start</span>
 
 				<span v-if="startStatus == 'In progress'">
 					<!-- in X days -->
 					<template v-if="endDiff.hours > 24">
-						{{
-							DateTime.fromISO(event.betsCloseTime)
-								.setLocale("en")
-								.toRelative()
-						}}
+						{{ DateTime.fromISO(event.betsCloseTime).setLocale("en").toRelative() }}
 					</template>
 					<!-- 00:00:00 -->
 					<template v-else>
@@ -402,23 +308,13 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 			</div>
 
 			<!-- *Active* -->
-			<div
-				v-else-if="
-					startStatus == 'Finished' && event.status == 'STARTED'
-				"
-				:class="$style.param"
-			>
+			<div v-else-if="startStatus == 'Finished' && event.status == 'STARTED'" :class="$style.param">
 				<span> <Icon name="time" size="14" />Finish </span>
 
 				<span v-if="finishStatus == 'In progress'">
 					<!-- in X days -->
 					<template v-if="endDiff.hours > 24">
-						{{
-							DateTime.fromISO(event.betsCloseTime)
-								.setLocale("en")
-								.plus({ second: event.measurePeriod })
-								.toRelative()
-						}}
+						{{ DateTime.fromISO(event.betsCloseTime).setLocale("en").plus({ second: event.measurePeriod }).toRelative() }}
 					</template>
 					<!-- 00:00:00 -->
 					<template v-else>
@@ -429,26 +325,14 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 			</div>
 
 			<!-- *Finished* -->
-			<div
-				v-else-if="
-					startStatus == 'Finished' && event.status == 'FINISHED'
-				"
-				:class="$style.param"
-			>
+			<div v-else-if="startStatus == 'Finished' && event.status == 'FINISHED'" :class="$style.param">
 				<span>
 					<Icon name="checkcircle" size="14" />
 					Won Side
 				</span>
 
-				<span
-					:class="
-						priceDynamics.diff > 0
-							? $style.green_icon
-							: $style.red_icon
-					"
-					><Icon name="arrow_circle_top_right" size="12" />{{
-						event.winnerBets == "ABOVE_EQ" ? "Up" : "Down"
-					}}</span
+				<span :class="priceDynamics.diff > 0 ? $style.green_icon : $style.red_icon"
+					><Icon name="arrow_circle_top_right" size="12" />{{ event.winnerBets == "ABOVE_EQ" ? "Up" : "Down" }}</span
 				>
 			</div>
 
@@ -462,10 +346,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 			<!-- Second Param -->
 			<!-- *New/Starting* -->
 			<Tooltip
-				v-if="
-					['In progress', 'Finished'].includes(startStatus) &&
-					event.status == 'NEW'
-				"
+				v-if="['In progress', 'Finished'].includes(startStatus) && event.status == 'NEW'"
 				placement="top"
 				:button="{
 					icon: 'book',
@@ -482,18 +363,14 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 						<Icon
 							:name="
 								(event.targetDynamics == 1 && 'checkcircle') ||
-								([1.05, 0.95].includes(event.targetDynamics) &&
-									'warning') ||
+								([1.05, 0.95].includes(event.targetDynamics) && 'warning') ||
 								'warning'
 							"
 							size="12"
 							:style="{
 								fill: `var(--${
 									(event.targetDynamics == 1 && 'green') ||
-									([1.05, 0.95].includes(
-										event.targetDynamics,
-									) &&
-										'yellow') ||
+									([1.05, 0.95].includes(event.targetDynamics) && 'yellow') ||
 									'red'
 								})`,
 							}"
@@ -503,46 +380,23 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 					>
 				</div>
 
-				<template #content>
-					Price change that separates betting pools
-				</template>
+				<template #content> Price change that separates betting pools </template>
 			</Tooltip>
 
 			<!-- *Active/Finished* -->
-			<div
-				v-if="
-					startStatus == 'Finished' &&
-					['STARTED', 'FINISHED'].includes(event.status)
-				"
-				:class="$style.param"
-			>
+			<div v-if="startStatus == 'Finished' && ['STARTED', 'FINISHED'].includes(event.status)" :class="$style.param">
 				<span>
-					<Icon
-						v-if="event.winnerBets == 'BELOW'"
-						name="lower_won"
-						size="14"
-					/>
-					<Icon
-						v-else-if="event.winnerBets == 'ABOVE_EQ'"
-						name="higher_won"
-						size="14"
-					/>
+					<Icon v-if="event.winnerBets == 'BELOW'" name="lower_won" size="14" />
+					<Icon v-else-if="event.winnerBets == 'ABOVE_EQ'" name="higher_won" size="14" />
 					<Icon v-else name="sides" size="14" />
 
 					Price Dynamics
 				</span>
 
-				<span
-					v-if="priceDynamics.diff"
-					:class="
-						priceDynamics.diff > 0
-							? $style.green_full
-							: $style.red_full
-					"
-					><Icon name="carret" size="12" />{{
-						Math.abs(priceDynamics.diff).toFixed(2)
-					}}
-					({{ priceDynamics.percent.toFixed(2) }}%)</span
+				<span v-if="priceDynamics.diff" :class="priceDynamics.diff > 0 ? $style.green_full : $style.red_full"
+					><Icon name="carret" size="12" />{{ Math.abs(priceDynamics.diff).toFixed(2) }} ({{
+						priceDynamics.percent.toFixed(2)
+					}}%)</span
 				>
 				<span v-else> 0.00 (0.00%) </span>
 			</div>
@@ -566,10 +420,9 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 			:event="event"
 			:isWon="isWon"
 			:positionForWithdraw="positionForWithdraw"
-			:disabled="
-				event.totalLiquidityProvided == 0 || startStatus == 'Finished'
-			"
+			:disabled="event.totalLiquidityProvided == 0 || startStatus == 'Finished'"
 			:isWithdrawing="isWithdrawing"
+			:is-involved="!!userTVL"
 			:class="$style.event_actions"
 		/>
 	</div>

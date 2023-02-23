@@ -29,6 +29,7 @@ const props = defineProps({
 	positionForWithdraw: Object,
 	disabled: Boolean,
 	isWithdrawing: Boolean,
+	isInvolved: Boolean,
 	large: {
 		type: Boolean,
 		default: false,
@@ -164,7 +165,8 @@ const isFinished = computed(() => {
 				<Icon name="coins" size="16" />Withdraw {{ numberWithSymbol(positionForWithdraw.value, ",") }} XTZ
 			</template>
 
-			<template v-else-if="!isWon">No funds to withdraw</template>
+			<template v-else-if="!isWon && isInvolved">No funds to withdraw</template>
+			<template v-else-if="!isWon && !isInvolved">Event is successfuly finished</template>
 
 			<template v-else> <LoadingBar /></template>
 		</Button>
