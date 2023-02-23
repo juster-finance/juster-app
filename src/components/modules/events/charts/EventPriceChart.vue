@@ -1,15 +1,5 @@
 <script setup>
-import {
-	defineComponent,
-	ref,
-	reactive,
-	toRefs,
-	onMounted,
-	onBeforeUnmount,
-	useCssModule,
-	computed,
-	nextTick,
-} from "vue"
+import { defineComponent, ref, reactive, toRefs, onMounted, onBeforeUnmount, useCssModule, computed, nextTick } from "vue"
 import * as d3 from "d3"
 import { DateTime } from "luxon"
 
@@ -53,10 +43,7 @@ const priceDynamics = computed(() => {
 
 	if (!symbol.quotes.length) return 0
 
-	const diff =
-		props.event.status == "FINISHED"
-			? closedRate - startRate
-			: symbol.quotes[0].price - startRate
+	const diff = props.event.status == "FINISHED" ? closedRate - startRate : symbol.quotes[0].price - startRate
 
 	return diff
 })
@@ -98,9 +85,7 @@ const draw = () => {
 		chartEars.hour = 24
 		chartEars.minute = 0
 
-		quotes = symbol.quotes.filter((q) =>
-			[30, 0].includes(DateTime.fromISO(q.timestamp).minute),
-		)
+		quotes = symbol.quotes.filter((q) => [30, 0].includes(DateTime.fromISO(q.timestamp).minute))
 	}
 
 	/** 7d */
@@ -129,18 +114,14 @@ const draw = () => {
 		.attr("width", width)
 		.attr("height", height + margin.top + margin.bottom)
 
-	const chart = canvas
-		.append("g")
-		.attr("transform", `translate(${margin.left},${margin.top})`)
+	const chart = canvas.append("g").attr("transform", `translate(${margin.left},${margin.top})`)
 
 	let data = prepareQuotesForD3({ quotes: quotes })
 
 	/** Simplify the data for 7d */
 	if (props.event.measurePeriod == 604800) {
 		const lastQuote = data[data.length - 1]
-		data = data.filter(
-			(quote) => DateTime.fromJSDate(quote.date).minute % 60 == 0,
-		)
+		data = data.filter((quote) => DateTime.fromJSDate(quote.date).minute % 60 == 0)
 		data.push(lastQuote)
 	}
 
@@ -155,12 +136,7 @@ const draw = () => {
 		},
 	]
 
-	for (
-		let index = 1;
-		index <=
-		props.event.measurePeriod / 60 + chartEars.hour * 60 + chartEars.minute;
-		index++
-	) {
+	for (let index = 1; index <= props.event.measurePeriod / 60 + chartEars.hour * 60 + chartEars.minute; index++) {
 		eventPeriod.push({
 			date: DateTime.fromJSDate(eventPeriod[eventPeriod.length - 1].date)
 				.plus({ minute: 1 })
@@ -178,26 +154,14 @@ const draw = () => {
 		.range([height, 10])
 
 	/** Price line */
-	startData.value = data.find(
-		(d) =>
-			new Date(d.date).getTime() ==
-			new Date(props.event.betsCloseTime).getTime(),
-	)
+	startData.value = data.find((d) => new Date(d.date).getTime() == new Date(props.event.betsCloseTime).getTime())
 
 	if (startData.value) {
 		const startLine = canvas
 			.append("g")
-			.attr(
-				"transform",
-				`translate(${scale.x(new Date(props.event.betsCloseTime))}, ${
-					scale.y(startData.value.value) + margin.top
-				})`,
-			)
+			.attr("transform", `translate(${scale.x(new Date(props.event.betsCloseTime))}, ${scale.y(startData.value.value) + margin.top})`)
 
-		startLine
-			.append("line")
-			.attr("x1", `100%`)
-			.attr("class", classes.start_price_line)
+		startLine.append("line").attr("x1", `100%`).attr("class", classes.start_price_line)
 	}
 
 	/** Ticks */
@@ -211,29 +175,20 @@ const draw = () => {
 			.attr("data-value", DateTime.fromISO(tick).ts)
 
 		if (
-			DateTime.fromISO(props.event.betsCloseTime).ordinal ==
-				DateTime.fromJSDate(tick).ordinal &&
-			DateTime.fromISO(props.event.betsCloseTime).hour ==
-				DateTime.fromJSDate(tick).hour &&
-			DateTime.fromISO(props.event.betsCloseTime).minute ==
-				DateTime.fromJSDate(tick).minute
+			DateTime.fromISO(props.event.betsCloseTime).ordinal == DateTime.fromJSDate(tick).ordinal &&
+			DateTime.fromISO(props.event.betsCloseTime).hour == DateTime.fromJSDate(tick).hour &&
+			DateTime.fromISO(props.event.betsCloseTime).minute == DateTime.fromJSDate(tick).minute
 		) {
 			tickG.attr("id", "sector_start")
 			const eventStartDt = DateTime.fromISO(props.event.betsCloseTime)
 
 			tickG.attr("class", classes.start)
 
-			const startLine = tickG
-				.append("line")
-				.attr("y2", 200)
-				.attr("class", classes.time_line)
+			const startLine = tickG.append("line").attr("y2", 200).attr("class", classes.time_line)
 			startLine.attr("y1", 24)
 
 			tickG.append("text").attr("y", 0).text(`Start`)
-			tickG
-				.append("text")
-				.attr("y", 12)
-				.text(eventStartDt.toFormat("H:mm"))
+			tickG.append("text").attr("y", 12).text(eventStartDt.toFormat("H:mm"))
 			tickG.append("text").attr("y", 220).text(format(tick))
 		} else if (
 			DateTime.fromJSDate(tick).ordinal ==
@@ -244,43 +199,27 @@ const draw = () => {
 				DateTime.fromISO(props.event.betsCloseTime).plus({
 					hour: props.event.measurePeriod / 3600,
 				}).hour &&
-			DateTime.fromJSDate(tick).minute ==
-				DateTime.fromISO(props.event.betsCloseTime).minute
+			DateTime.fromJSDate(tick).minute == DateTime.fromISO(props.event.betsCloseTime).minute
 		) {
-			const eventFinishDt = DateTime.fromISO(
-				props.event.betsCloseTime,
-			).plus({
+			const eventFinishDt = DateTime.fromISO(props.event.betsCloseTime).plus({
 				seconds: props.event.measurePeriod,
 			})
 
 			tickG.attr("class", classes.start)
 
-			const finishLine = tickG
-				.append("line")
-				.attr("y2", 200)
-				.attr("class", classes.time_line)
+			const finishLine = tickG.append("line").attr("y2", 200).attr("class", classes.time_line)
 			finishLine.attr("y1", 24)
 
 			tickG.append("text").attr("y", 0).text(`Finish`)
-			tickG
-				.append("text")
-				.attr("y", 12)
-				.text(eventFinishDt.toFormat("H:mm"))
+			tickG.append("text").attr("y", 12).text(eventFinishDt.toFormat("H:mm"))
 			tickG.append("text").attr("y", 220).text(format(tick))
 		} else {
-			tickG
-				.append("line")
-				.attr("y2", 200)
-				.attr("class", classes.time_line)
+			tickG.append("line").attr("y2", 200).attr("class", classes.time_line)
 
-			if (![0, 15, 30, 45].includes(DateTime.fromJSDate(tick).minute))
-				return
+			if (![0, 15, 30, 45].includes(DateTime.fromJSDate(tick).minute)) return
 
 			if (format(tick) == "00:00") {
-				tickG
-					.append("text")
-					.attr("y", 220)
-					.text(DateTime.fromJSDate(tick).toFormat("LLL dd"))
+				tickG.append("text").attr("y", 220).text(DateTime.fromJSDate(tick).toFormat("LLL dd"))
 			} else {
 				tickG.append("text").attr("y", 220).text(format(tick))
 			}
@@ -295,22 +234,14 @@ const draw = () => {
 		const eventStartDt = DateTime.fromISO(props.event.betsCloseTime)
 		const startTickValue = scale.x(eventStartDt.ts)
 
-		const startTickG = canvas
-			.append("g")
-			.attr("transform", `translate(${startTickValue}, 12)`)
+		const startTickG = canvas.append("g").attr("transform", `translate(${startTickValue}, 12)`)
 		startTickG.attr("class", classes.start)
 
-		const startLine = startTickG
-			.append("line")
-			.attr("y2", 200)
-			.attr("class", classes.time_line)
+		const startLine = startTickG.append("line").attr("y2", 200).attr("class", classes.time_line)
 		startLine.attr("y1", 24)
 
 		startTickG.append("text").attr("y", 0).text(`Start`)
-		startTickG
-			.append("text")
-			.attr("y", 12)
-			.text(eventStartDt.toFormat("H:mm"))
+		startTickG.append("text").attr("y", 12).text(eventStartDt.toFormat("H:mm"))
 
 		/**
 		 * Finish
@@ -320,30 +251,18 @@ const draw = () => {
 		})
 		const finishTickValue = scale.x(eventFinishDt)
 
-		const finishTickG = canvas
-			.append("g")
-			.attr("transform", `translate(${finishTickValue}, 12)`)
+		const finishTickG = canvas.append("g").attr("transform", `translate(${finishTickValue}, 12)`)
 		finishTickG.attr("class", classes.start)
 
-		const finishLine = finishTickG
-			.append("line")
-			.attr("y2", 200)
-			.attr("class", classes.time_line)
+		const finishLine = finishTickG.append("line").attr("y2", 200).attr("class", classes.time_line)
 		finishLine.attr("y1", 24)
 
 		finishTickG.append("text").attr("y", 0).text(`Finish`)
-		finishTickG
-			.append("text")
-			.attr("y", 12)
-			.text(eventFinishDt.toFormat("H:mm"))
+		finishTickG.append("text").attr("y", 12).text(eventFinishDt.toFormat("H:mm"))
 	}
 
 	/** Draw chart Before start */
-	const dataBeforeStart = data.filter(
-		(quote) =>
-			DateTime.fromJSDate(quote.date).ts <=
-			DateTime.fromISO(props.event.betsCloseTime).ts,
-	)
+	const dataBeforeStart = data.filter((quote) => DateTime.fromJSDate(quote.date).ts <= DateTime.fromISO(props.event.betsCloseTime).ts)
 
 	chart
 		.append("path")
@@ -360,20 +279,14 @@ const draw = () => {
 		)
 
 	/** Draw chart After start */
-	const dataAfterStart = data.filter(
-		(quote) =>
-			DateTime.fromJSDate(quote.date).ts >=
-			DateTime.fromISO(props.event.betsCloseTime).ts,
-	)
+	const dataAfterStart = data.filter((quote) => DateTime.fromJSDate(quote.date).ts >= DateTime.fromISO(props.event.betsCloseTime).ts)
 	chart
 		.append("path")
 		.datum(dataAfterStart)
 		.attr("fill", "none")
 		.attr(
 			"stroke",
-			(priceDynamics.value > 0 && "#1aa168") ||
-				(priceDynamics.value < 0 && "#e05c43") ||
-				(priceDynamics.value == 0 && "#707070"),
+			(priceDynamics.value > 0 && "#1aa168") || (priceDynamics.value < 0 && "#e05c43") || (priceDynamics.value == 0 && "#707070"),
 		)
 		.attr("stroke-width", 1.5)
 		.attr(
@@ -385,11 +298,7 @@ const draw = () => {
 		)
 
 	/** Circle - Current Price */
-	const currentData = data.find(
-		(d) =>
-			new Date(d.date).getTime() ==
-			new Date(quotes[0].timestamp).getTime(),
-	)
+	const currentData = data.find((d) => new Date(d.date).getTime() == new Date(quotes[0].timestamp).getTime())
 
 	if (currentData) {
 		chart
@@ -404,10 +313,7 @@ const draw = () => {
 			.append("line")
 			.attr("x1", `100%`)
 			.attr("class", classes.current_price_line)
-			.attr(
-				"transform",
-				`translate(0, ${scale.y(currentData.value) + 20})`,
-			)
+			.attr("transform", `translate(0, ${scale.y(currentData.value) + 20})`)
 	}
 
 	/** animated circle */
@@ -485,9 +391,7 @@ const getQuotes = async (tsGt, tsLt, ears) => {
 const fillQuotes = async (tsGt) => {
 	if (!symbol.quotes.length) return
 
-	const lastQuoteDt = DateTime.fromISO(
-		symbol.quotes[symbol.quotes.length - 1].timestamp,
-	)
+	const lastQuoteDt = DateTime.fromISO(symbol.quotes[symbol.quotes.length - 1].timestamp)
 
 	if (lastQuoteDt.ts !== tsGt.ts) {
 		const rawQuotes = await getQuotes(tsGt, lastQuoteDt)
@@ -498,10 +402,7 @@ const fillQuotes = async (tsGt) => {
 
 		symbol.quotes = [...symbol.quotes, ...newQuotes]
 
-		if (
-			DateTime.fromISO(newQuotes[newQuotes.length - 1].timestamp).ts !==
-			tsGt.ts
-		) {
+		if (DateTime.fromISO(newQuotes[newQuotes.length - 1].timestamp).ts !== tsGt.ts) {
 			await fillQuotes(tsGt)
 		}
 	}
@@ -600,12 +501,7 @@ onMounted(async () => {
 						return
 					}
 
-					if (
-						!symbol.quotes.some(
-							(quote) => quote.timestamp == newQuote.timestamp,
-						) &&
-						symbol.quotes.length
-					) {
+					if (!symbol.quotes.some((quote) => quote.timestamp == newQuote.timestamp) && symbol.quotes.length) {
 						symbol.quotes.unshift(newQuote)
 
 						draw()
@@ -616,10 +512,7 @@ onMounted(async () => {
 	}
 })
 onBeforeUnmount(() => {
-	if (
-		subscription.value.hasOwnProperty("_state") &&
-		!subscription.value?.closed
-	) {
+	if (subscription.value.hasOwnProperty("_state") && !subscription.value?.closed) {
 		subscription.value.unsubscribe()
 	}
 
@@ -629,56 +522,30 @@ onBeforeUnmount(() => {
 
 <template>
 	<div :class="$style.wrapper">
-		<Flex
-			v-if="!symbol.isQuotesLoaded"
-			align="center"
-			justify="center"
-			gap="12"
-			:class="$.loading_block"
-		>
+		<Flex v-if="!symbol.isQuotesLoaded" align="center" justify="center" gap="12" :class="$.loading_block">
 			<LoadingDots />
 			<Text size="13" weight="500" color="tertiary">Chart loading</Text>
 		</Flex>
 
-		<Banner
-			v-else-if="symbol.isQuotesLoaded && !symbol.quotes.length"
-			icon="help"
-			color="gray"
-		>
-			Quotes for the event are not yet available, please wait for the
-			pre-launch period
+		<Banner v-else-if="symbol.isQuotesLoaded && !symbol.quotes.length" icon="help" color="gray">
+			Quotes for the event are not yet available, please wait for the pre-launch period
 		</Banner>
 
 		<template v-else>
 			<!-- Chart -->
-			<div
-				@mousemove="onMouseMove"
-				@mouseleave="onMouseLeave"
-				id="chart"
-				:class="$style.chart"
-			/>
+			<div @mousemove="onMouseMove" @mouseleave="onMouseLeave" id="chart" :class="$style.chart" />
 
 			<!-- Elements -->
 			<div v-if="scale.x" :class="$style.price_axis">
 				<!-- Current Price -->
 				<div
 					v-if="symbol.quotes[0]"
-					:class="[
-						$style.price_badge,
-						$style.current,
-						event.status === 'FINISHED' && $style.finished,
-					]"
+					:class="[$style.price_badge, $style.current, event.status === 'FINISHED' && $style.finished]"
 					:style="{
-						top: `${
-							scale.y(symbol.quotes[0].price) + 20 - 25 / 2
-						}px`,
+						top: `${scale.y(symbol.quotes[0].price) + 20 - 25 / 2}px`,
 					}"
 				>
-					<Icon
-						:name="event.status === 'FINISHED' ? 'flag' : 'bolt'"
-						size="10"
-						color="blue"
-					/>
+					<Icon :name="event.status === 'FINISHED' ? 'flag' : 'bolt'" size="10" color="blue" />
 					$
 					{{ numberWithSymbol(symbol.quotes[0].price, ",") }}
 				</div>
