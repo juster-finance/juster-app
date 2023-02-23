@@ -1,12 +1,12 @@
 import { defineStore } from "pinia"
 
 export const useDocsStore = defineStore({
-    id: "docs",
+	id: "docs",
 
-    state() {
-        return {
-            sections: {},
-            article: {},
-        }
-    },
+	state() {
+		return {
+			sections: {},
+			post: {},
+		}
+	},
 })

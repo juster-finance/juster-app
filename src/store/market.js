@@ -1,68 +1,72 @@
 import { defineStore } from "pinia"
-import { cloneDeep } from "lodash"
 
 export const useMarketStore = defineStore({
-    id: "market",
+	id: "market",
 
-    state() {
-        return {
-            isMarketsLoaded: false,
+	state() {
+		return {
+			isMarketsLoaded: false,
 
-            events: [],
+			events: [],
 
-            markets: {
-                "BTC-USD": {
-                    events: [],
-                    quotes: [],
-                    historyPrice: 0,
-                },
-                "ETH-USD": {
-                    events: [],
-                    quotes: [],
-                    historyPrice: 0,
-                },
-                "XTZ-USD": {
-                    events: [],
-                    quotes: [],
-                    historyPrice: 0,
-                },
-            },
-        }
-    },
-    actions: {
-        setMarket({ target, symbol }) {
-            this.markets[target] = { ...this.markets[target], ...symbol }
-        },
+			pools: [],
+			lines: [],
 
-        setQuotes({ target, quotes }) {
-            this.markets[target].quotes = [...quotes]
-        },
-        clearQuotes() {
-            Object.keys(this.markets).forEach(symbol => {
-                this.markets[symbol].quotes = []
-            })
-        },
+			markets: {
+				"BTC-USD": {
+					events: [],
+					quotes: [],
+					historyPrice: 0,
+				},
+				"ETH-USD": {
+					events: [],
+					quotes: [],
+					historyPrice: 0,
+				},
+				"XTZ-USD": {
+					events: [],
+					quotes: [],
+					historyPrice: 0,
+				},
+			},
+		}
+	},
+	actions: {
+		setMarket({ target, symbol }) {
+			this.markets[target] = { ...this.markets[target], ...symbol }
+		},
 
-        setHistoryPrice({ target, price }) {
-            this.markets[target].historyPrice = price
-        },
+		setQuotes({ target, quotes }) {
+			this.markets[target].quotes = [...quotes]
+		},
+		clearQuotes() {
+			Object.keys(this.markets).forEach((symbol) => {
+				this.markets[symbol].quotes = []
+			})
+		},
 
-        updEvent(newEvent) {
-            let event = this.events.find(event => event.id == newEvent.id)
-            const indexOfEvent = this.events.indexOf(event)
+		setHistoryPrice({ target, price }) {
+			this.markets[target].historyPrice = price
+		},
 
-            if (event.status !== newEvent.status) {
-                this.events.splice(indexOfEvent, 1)
-            } else {
-                this.events[indexOfEvent] = { ...event, ...newEvent }
-            }
-        },
+		updEvent(newEvent) {
+			let event = this.events.find((event) => event.id == newEvent.id)
+			const indexOfEvent = this.events.indexOf(event)
 
-        updateQuotes({ target, quote }) {
-            if (quote.timestamp == this.markets[target].quotes[0].timestamp)
-                return
+			if (!event) console.warn("market:updEvent -> event not found")
 
-            this.markets[target].quotes.unshift(quote)
-        },
-    },
+			if (event?.status !== newEvent.status) {
+				this.events.splice(indexOfEvent, 1)
+			} else {
+				this.events[indexOfEvent] = { ...event, ...newEvent }
+			}
+		},
+
+		updateQuotes({ target, quote }) {
+			if (quote.timestamp == this.markets[target].quotes[0].timestamp)
+				return
+
+			this.markets[target].quotes.unshift(quote)
+		},
+	},
 })

@@ -1,11 +1,14 @@
-<script>
-import { defineComponent, onMounted } from "vue"
+<script setup>
+/**
+ * Vendor
+ */
+import { ref, onMounted } from "vue"
 import { useMeta } from "vue-meta"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
+import Button from "@ui/Button.vue"
 
 /**
  * API
@@ -15,75 +18,52 @@ import { fetchReleases } from "@/api/sanity"
 /**
  * Local
  */
-import ReleaseCard from "./ReleaseCard"
+import ReleaseCard from "./ReleaseCard.vue"
 
-/**
- * Store
- */
-import { useReleasesStore } from "@/store/releases"
+const releases = ref([])
 
-export default defineComponent({
-	name: "ReleasesBase",
+/** Meta */
+useMeta({
+	title: "Releases",
+	description: "New updates and improvements to Juster.",
+})
 
-	setup() {
-		/** Meta */
-		useMeta({
-			title: "Releases",
-			description: "New updates and improvements to Juster.",
-		})
-
-		const releasesStore = useReleasesStore()
-
-		onMounted(async () => {
-			releasesStore.all = await fetchReleases()
-		})
-
-		return {
-			releasesStore,
-		}
-	},
-
-	components: {
-		Button,
-		ReleaseCard,
-	},
+onMounted(async () => {
+	releases.value = await fetchReleases()
 })
 </script>
 
 <template>
 	<div :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template #title="{ content }">{{ content }} • Juster</template>
 		</metainfo>
 
 		<div :class="$style.base">
-			<h1 :class="$style.title">Releases.</h1>
+			<h1 :class="$style.title">What's New</h1>
 			<div :class="$style.description">
 				Join our Discord or Twitter to keep up with new updates
 			</div>
 
 			<div :class="$style.buttons">
 				<a href="https://discord.gg/FeGDCkHhnB" target="_blank">
-					<Button type="secondary" size="small"
-						><Icon name="discord" size="16" />Join our Discord
-						Server</Button
-					></a
-				>
+					<Button type="secondary" size="small">
+						<Icon name="discord" size="16" />Discord Server
+					</Button>
+				</a>
 				<a href="https://twitter.com/Juster_fi" target="_blank">
-					<Button type="secondary" size="small"
-						><Icon name="twitter" size="16" />Read our
-						Twitter</Button
-					>
+					<Button type="secondary" size="small">
+						<Icon name="twitter" size="16" />Twitter
+					</Button>
 				</a>
 			</div>
 
 			<div :class="$style.releases">
 				<ReleaseCard
-					v-for="release in releasesStore.all"
+					v-for="(release, idx) in releases"
 					:key="release._id"
 					:release="release"
+					:idx="idx"
 					:class="$style.card"
 				/>
 			</div>
@@ -100,24 +80,23 @@ export default defineComponent({
 .base {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 
 	max-width: 700px;
 }
 
 .title {
-	font-size: 50px;
+	font-size: 42px;
 	line-height: 1;
 	font-weight: 600;
 	color: var(--text-primary);
 
-	margin-top: 40px;
-	margin-bottom: 32px;
+	margin-top: 2em;
+	margin-bottom: 1em;
 }
 
 .description {
 	font-size: 16px;
-	line-height: 1;
+	line-height: 1.6;
 	font-weight: 500;
 	color: var(--text-secondary);
 
@@ -129,6 +108,22 @@ export default defineComponent({
 	align-items: center;
 	gap: 8px;
 
-	margin-bottom: 60px;
+	margin-bottom: 80px;
+}
+
+.releases {
+	display: flex;
+	flex-direction: column;
+	gap: 80px;
+}
+
+@media (max-width: 700px) {
+	.title {
+		font-size: 24px;
+	}
+
+	.description {
+		font-size: 14px;
+	}
 }
 </style>

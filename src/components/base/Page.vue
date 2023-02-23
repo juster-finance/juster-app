@@ -1,39 +1,44 @@
-<script>
-import { defineComponent } from "vue"
-
-export default defineComponent({
-    name: "Page",
+<script setup>
+defineProps({
+	width: {
+		type: [String, Number],
+		default: 1250,
+	},
 })
 </script>
 
 <template>
-    <div :class="$style.wrapper">
-        <div :class="$style.content">
-            <slot />
-        </div>
-    </div>
+	<div :class="$style.wrapper">
+		<div
+			:class="$style.content"
+			:style="{
+				maxWidth: `${width}px`,
+			}"
+		>
+			<slot />
+		</div>
+	</div>
 </template>
 
 <style module>
 .wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0 32px 100px 32px;
-    padding-top: 40px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0 32px 80px 32px;
+	padding-top: 40px;
 
-    flex: 1;
+	flex: 1;
 }
 
 .content {
-    width: 100%;
-    max-width: 1250px;
+	width: 100%;
 }
 
 @media (max-width: 700px) {
-    .wrapper {
-        margin: 0 24px 100px 24px;
-        padding-top: 24px;
-    }
+	.wrapper {
+		margin: 0 16px 80px 16px;
+		padding-top: 24px;
+	}
 }
 </style>

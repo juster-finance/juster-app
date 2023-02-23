@@ -1,34 +1,49 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { ref, reactive, watch, computed, onMounted, onUnmounted } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
 import { useRouter } from "vue-router"
-import { cloneDeep } from "lodash"
+import cloneDeep from "lodash.clonedeep"
 
 /**
  * UI
  */
-import Breadcrumbs from "@/components/ui/Breadcrumbs"
-import Button from "@/components/ui/Button"
-import Banner from "@/components/ui/Banner"
-import Pagination from "@/components/ui/Pagination"
+import Breadcrumbs from "@ui/Breadcrumbs.vue"
+import Button from "@ui/Button.vue"
+import Banner from "@ui/Banner.vue"
+import Pagination from "@ui/Pagination.vue"
+import {
+	Dropdown,
+	DropdownItem,
+	DropdownTitle,
+	DropdownDivider,
+} from "@ui/Dropdown"
 
 /**
  * Local
  */
-import EventChart from "./EventChart"
-import EventGeneralCard from "./EventGeneralCard"
-import EventPriceCard from "./EventPriceCard"
-import EventPoolCard from "./EventPoolCard"
-import EventPersonalStats from "./EventPersonalStats"
+import EventChart from "./EventChart.vue"
+import EventGeneralCard from "./EventGeneralCard.vue"
+import EventPriceCard from "./EventPriceCard.vue"
+import EventAnalyticsCard from "./EventAnalyticsCard.vue"
+import EventPoolCard from "./EventPoolCard.vue"
+import EventPersonalStats from "./EventPersonalStats.vue"
 
-import BetCard from "@/components/modules/events/BetCard"
-import DepositCard from "@/components/modules/events/DepositCard"
+import BetCard from "@modules/events/BetCard.vue"
+import DepositCard from "@modules/events/DepositCard.vue"
 
-import ParticipantsModal from "@/components/local/modals/ParticipantsModal"
-import LiquidityModal from "@/components/local/modals/position/LiquidityModal"
-import BetModal from "@/components/local/modals/position/BetModal"
-import EventDetailsModal from "@/components/local/modals/EventDetailsModal"
+/**
+ * Modals
+ */
+import ParticipantsModal from "@local/modals/ParticipantsModal.vue"
+import LiquidityModal from "@local/modals/position/LiquidityModal.vue"
+import StakeModal from "@local/modals/position/StakeModal.vue"
+import ConfirmTransactionModal from "@local/modals/ConfirmTransactionModal.vue"
+import EventDetailsModal from "@local/modals/EventDetailsModal.vue"
+import NotifyMeModal from "@local/modals/NotifyMeModal.vue"
 
 /**
  * Composable
@@ -44,19 +59,35 @@ import { fetchEventById, fetchEventParticipants } from "@/api/events"
 /**
  * Services
  */
-import { numberWithSymbol } from "@/services/utils/amounts"
-import { capitalizeFirstLetter } from "@/services/utils/global"
-import { juster, analytics } from "@/services/sdk"
+import { numberWithSymbol } from "@utils/amounts"
+import { capitalizeFirstLetter, toClipboard } from "@utils/misc"
+import { juster, analytics, currentNetwork } from "@sdk"
+import { supportedMarkets, verifiedMakers } from "@config"
 
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useMarketStore } from "@store/market"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
+import { useApplicationCacheStore } from "@store/cache"
+
+/**
+ * gql
+ */
+import { event as eventModel } from "@/graphql/models"
+
+/** Meta */
+const meta = useMeta({
+	title: `Event`,
+	description:
+		"Available markets for events, for providing liquidity and accepting stakes from users",
+})
+
 const marketStore = useMarketStore()
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
+const cacheStore = useApplicationCacheStore()
 
 const { updateWithdrawals } = useMarket()
 
@@ -74,8 +105,10 @@ const breadcrumbs = reactive([
  */
 const showBetModal = ref(false)
 const showLiquidityModal = ref(false)
+const showConfirmTransactionModal = ref(false)
 const showParticipantsModal = ref(false)
 const showEventDetailsModal = ref(false)
+const showNotifyMeModal = ref(false)
 
 /**
  * Filters
@@ -98,12 +131,17 @@ const getEvent = async () => {
 	const { id: eventId } = router.currentRoute.value.params
 	event.value = await fetchEventById({ id: eventId })
 
+	/** meta */
+	meta.meta.title = `Price Event - ${
+		supportedMarkets[event.value.currencyPair.symbol].target
+	} (#${numberWithSymbol(event.value.id, ",")})`
+
 	if (!event.value) {
 		router.push("/events")
 	} else {
 		/** breadcrumbs */
 		breadcrumbs.push({
-			name: `Event #${event.value.id}`,
+			name: `Event #${numberWithSymbol(event.value.id, ",")}`,
 			path: `/events/${event.value.id}`,
 		})
 	}
@@ -128,6 +166,7 @@ const {
 	countdownText: startCountdownText,
 	status: startStatus,
 	stop: destroyStartCountdown,
+	start: startStartCountdown,
 } = useCountdown(startDt)
 
 /** Countdown setup: Time to finish */
@@ -142,6 +181,7 @@ const {
 	status: finishStatus,
 	time: finishTime,
 	stop: destroyFinishCountdown,
+	start: startFinishCountdown,
 } = useCountdown(finishDt)
 
 const price = computed(() => {
@@ -202,11 +242,13 @@ const userBets = computed(() =>
 
 const wonText = computed(() => {
 	if (userBets.value.every((bet) => bet.side == event.value.winnerBets)) {
-		return "All of your bets won were in the winning direction"
+		return "All of your stakes won were in the winning direction"
 	} else if (
 		userBets.value.some((bet) => bet.side == event.value.winnerBets)
 	) {
-		return "One or more (not all) of your bets were in the winning direction"
+		return "One or more (not all) of your stakes were in the winning direction"
+	} else {
+		return ""
 	}
 })
 
@@ -240,10 +282,7 @@ const paginatedBets = computed(() =>
 
 const pendingBet = ref(null)
 
-const preselectedSide = ref("Rise")
 const handleJoin = (target) => {
-	preselectedSide.value = capitalizeFirstLetter(target)
-
 	/** disable Bet / Liquidity right after betsCloseTime */
 	if (
 		startStatus.value == "Finished" ||
@@ -252,6 +291,8 @@ const handleJoin = (target) => {
 		return
 
 	analytics.log("showBetModal", { where: "event_base" })
+
+	cacheStore.submissions.side = target
 
 	showBetModal.value = true
 }
@@ -262,11 +303,30 @@ const handleBet = (bet) => {
 }
 
 const handleLiquidity = () => {
-	if (event.value.status !== "NEW") return
+	if (event.value.status !== "NEW" || !accountStore.isLoggined) return
 
 	showLiquidityModal.value = true
 
 	analytics.log("showLiquidityModal", { where: "event_base" })
+}
+
+const handleContinue = () => {
+	showBetModal.value = false
+	showConfirmTransactionModal.value = true
+}
+const handleCancelTransaction = () => {
+	showConfirmTransactionModal.value = false
+	showBetModal.value = true
+}
+const handleConfirmTransaction = () => {
+	showConfirmTransactionModal.value = false
+	showBetModal.value = true
+
+	cacheStore.submissions.isTransactionConfirmed = true
+}
+
+const handleBetModalClose = () => {
+	showBetModal.value = false
 }
 
 const isWithdrawing = ref(false)
@@ -328,6 +388,51 @@ const handleParticipants = () => {
 	analytics.log("showParticipantsModal", { where: "event_base" })
 }
 
+const copy = (target) => {
+	if (target == "id") {
+		notificationsStore.create({
+			notification: {
+				icon: "copy",
+				title: "Event ID copied to clipboard",
+				autoDestroy: true,
+				badges: [
+					{
+						secondaryText: "ID: ",
+						tertiaryText: event.value.id,
+						icon: "hash",
+					},
+				],
+			},
+		})
+
+		toClipboard(event.value.id)
+	}
+	if (target == "url") {
+		notificationsStore.create({
+			notification: {
+				icon: "copy",
+				title: "Event URL copied to clipboard",
+				autoDestroy: true,
+				badges: [
+					{
+						secondaryText: `app.juster.fi${location.pathname}`,
+						icon: "copy",
+					},
+				],
+
+				actions: [
+					{
+						name: "Open in new tab",
+						callback: () => window.open(location, "_blank"),
+					},
+				],
+			},
+		})
+
+		toClipboard(location)
+	}
+}
+
 watch(event, async () => {
 	await getEvent()
 
@@ -357,6 +462,9 @@ const subToDeposits = ref({})
 onMounted(async () => {
 	await getEvent()
 
+	startStartCountdown()
+	startFinishCountdown()
+
 	/** Subscribe to event, TODO: refactor */
 	subToEvent.value = await juster.gql
 		.subscription({
@@ -365,45 +473,7 @@ onMounted(async () => {
 					where: { id: { _eq: event.value.id } },
 				},
 				{
-					id: true,
-					status: true,
-					betsCloseTime: true,
-					creatorId: true,
-					poolAboveEq: true,
-					poolBelow: true,
-					totalBetsAmount: true,
-					totalLiquidityProvided: true,
-					totalLiquidityShares: true,
-					totalValueLocked: true,
-					liquidityPercent: true,
-					measurePeriod: true,
-					closedOracleTime: true,
-					createdTime: true,
-					startRate: true,
-					closedRate: true,
-					winnerBets: true,
-					targetDynamics: true,
-					currencyPair: {
-						id: true,
-						symbol: true,
-					},
-					bets: {
-						id: true,
-						side: true,
-						reward: true,
-						amount: true,
-						createdTime: true,
-						userId: true,
-					},
-					deposits: {
-						amountAboveEq: true,
-						amountBelow: true,
-						eventId: true,
-						id: true,
-						userId: true,
-						createdTime: true,
-						shares: true,
-					},
+					...eventModel,
 				},
 			],
 		})
@@ -457,13 +527,13 @@ onMounted(async () => {
 
 onUnmounted(() => {
 	if (
-		subToEvent.value.hasOwnProperty("_state") &&
+		Object.prototype.hasOwnProperty.call(subToEvent.value, "_state") &&
 		!subToEvent.value?.closed
 	) {
 		subToEvent.value.unsubscribe()
 	}
 	if (
-		subToDeposits.value.hasOwnProperty("_state") &&
+		Object.prototype.hasOwnProperty.call(subToDeposits.value, "_state") &&
 		!subToDeposits.value?.closed
 	) {
 		subToDeposits.value.unsubscribe()
@@ -479,36 +549,32 @@ onUnmounted(() => {
 	destroyStartCountdown()
 	destroyFinishCountdown()
 })
-
-/** Meta */
-const { meta } = useMeta({
-	title: `Event`,
-	description:
-		"Available markets for events, for providing liquidity and accepting bets from users",
-})
 </script>
 
 <template>
 	<div :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template #title="{ content }"> {{ content }} • Juster </template>
 		</metainfo>
 
-		<BetModal
-			v-if="event"
+		<StakeModal
 			:show="showBetModal"
 			:event="event"
-			:preselectedSide="preselectedSide"
 			@onBet="handleBet"
-			@onClose="showBetModal = false"
+			@onContinue="handleContinue"
+			@onClose="handleBetModalClose"
 		/>
 		<LiquidityModal
 			v-if="event"
 			:show="showLiquidityModal"
 			:event="event"
 			@onClose="showLiquidityModal = false"
+		/>
+		<ConfirmTransactionModal
+			:show="showConfirmTransactionModal"
+			@onCancel="handleCancelTransaction"
+			@onConfirm="handleConfirmTransaction"
+			@onClose="showConfirmTransactionModal = false"
 		/>
 		<ParticipantsModal
 			v-if="event"
@@ -522,227 +588,452 @@ const { meta } = useMeta({
 			:event="event"
 			@onClose="showEventDetailsModal = false"
 		/>
+		<NotifyMeModal
+			:show="showNotifyMeModal"
+			@onClose="showNotifyMeModal = false"
+		/>
 
 		<Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-		<div v-if="event" :class="$style.container">
-			<div :class="$style.base">
-				<EventChart v-if="event" :event="event" />
-
-				<div v-if="accountStore.pkh" :class="$style.block">
-					<div :class="$style.title">Personal stats</div>
-					<div :class="$style.description">
-						Aggregated data for all your positions for this event
-					</div>
-
-					<Banner
-						v-if="hasWonBet"
-						icon="checkcircle"
-						color="green"
-						:class="$style.banner"
-						>{{ wonText }}</Banner
-					>
-
-					<EventPersonalStats
-						:event="event"
-						:position="userPosition"
-						:userDeposits="userDeposits"
-						:userBets="userBets"
-					/>
-				</div>
-
-				<div :class="$style.block">
-					<div :class="$style.title">Bets</div>
-					<div :class="$style.description">
-						All the bets placed for this event
-					</div>
-
-					<div :class="$style.filters">
-						<div
-							@click="
-								handleSelectFilter({
-									target: 'bets',
-									value: 'all',
-								})
-							"
-							:class="[
-								$style.filter,
-								filters.bets == 'all' && $style.active,
-							]"
-						>
-							All bets
-						</div>
-						<div :class="$style.dot" />
-						<div
-							@click="
-								handleSelectFilter({
-									target: 'bets',
-									value: 'my',
-								})
-							"
-							:class="[
-								$style.filter,
-								filters.bets == 'my' && $style.active,
-							]"
-						>
-							My bets
-						</div>
-					</div>
-
-					<!-- todo: new component BetsTable -->
-					<div v-if="filteredBets.length" :class="$style.columns">
-						<div :class="$style.column">TYPE</div>
-						<div :class="$style.column">SIDE</div>
-						<div :class="$style.column">AMOUNT</div>
-						<div :class="$style.column">
-							{{
-								(event.status == "CANCELED" && "REFUND") ||
-								(["NEW", "STARTED"].includes(event.status) &&
-									"POTENTIAL") ||
-								(event.status == "FINISHED" && "PROFIT")
-							}}
-						</div>
-					</div>
-
-					<div
-						v-if="pendingBet || filteredBets.length"
-						:class="$style.bets"
-					>
-						<BetCard
-							v-if="pendingBet"
-							:bet="pendingBet"
-							:event="event"
-							pending
-						/>
-						<BetCard
-							v-for="bet in paginatedBets"
-							:event="event"
-							:key="bet.id"
-							:bet="bet"
-						/>
-					</div>
-
-					<Banner v-else icon="help" color="gray">{{
-						filters.bets == "all"
-							? `Still no bets for this event, maybe yours will be the first?`
-							: `If you have placed a bet, but it is not in this list yet — please wait for the transaction confirmation`
-					}}</Banner>
-
-					<Pagination
-						v-if="filteredBets.length > 3"
-						v-model="selectedPageForBets"
-						:total="filteredBets.length"
-						:limit="3"
-						:class="$style.pagination"
-					/>
-				</div>
-
-				<div :class="$style.block">
-					<div :class="$style.title">Liquidity</div>
-					<div :class="$style.description">
-						All the liquidity provided for this event
-					</div>
-
-					<div :class="$style.filters">
-						<div
-							@click="
-								handleSelectFilter({
-									target: 'liquidity',
-									value: 'all',
-								})
-							"
-							:class="[
-								$style.filter,
-								filters.liquidity == 'all' && $style.active,
-							]"
-						>
-							All liquidity
-						</div>
-						<div :class="$style.dot" />
-
-						<div
-							@click="
-								handleSelectFilter({
-									target: 'liquidity',
-									value: 'my',
-								})
-							"
-							:class="[
-								$style.filter,
-								filters.liquidity == 'my' && $style.active,
-							]"
-						>
-							My liquidity
-						</div>
-					</div>
-
-					<div v-if="filteredDeposits.length" :class="$style.columns">
-						<div :class="$style.column">TYPE</div>
-						<div :class="$style.column">RISE</div>
-						<div :class="$style.column">FALL</div>
-
-						<div :class="$style.column">RETURN</div>
-					</div>
-					<div v-if="filteredDeposits.length" :class="$style.bets">
-						<DepositCard
-							v-for="deposit in paginatedDeposits"
-							:key="deposit.id"
-							:deposit="deposit"
-							:event="event"
-						/>
-					</div>
-
-					<Banner v-else icon="help" color="gray">{{
-						filters.liquidity == "all"
-							? `This event has not yet received initial liquidity, please wait for a few minutes`
-							: `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
-					}}</Banner>
-
-					<Pagination
-						v-if="filteredDeposits.length > 3"
-						v-model="selectedPageForDeposits"
-						:total="filteredDeposits.length"
-						:limit="3"
-						:class="$style.pagination"
-					/>
-				</div>
-			</div>
-
-			<div v-if="event" :class="$style.side">
-				<EventGeneralCard
-					:event="event"
-					:startStatus="startStatus"
-					:finishStatus="finishStatus"
-					:startCountdown="startCountdownText"
-					:finishCountdown="finishCountdownText"
-					:price="price"
-					:isWon="hasWonBet"
-					:positionForWithdraw="positionForWithdraw"
-					:isWithdrawing="isWithdrawing"
-					@openParticipants="handleParticipants"
-					@onBet="handleJoin"
-					@onWithdraw="handleWithdraw"
-				/>
-
-				<EventPriceCard
-					v-if="event.status !== 'CANCELED'"
-					:event="event"
-					:price="price"
-					:finishTime="finishTime"
-				/>
-
-				<EventPoolCard :event="event" @onLiquidity="handleLiquidity" />
-
-				<Button
-					@click="showEventDetailsModal = true"
-					type="secondary"
-					size="small"
-					block
-					:class="$style.details_btn"
-					><Icon name="menu" size="12" />View event details</Button
+		<Transition name="slide">
+			<div v-if="event" :class="$style.container">
+				<Flex
+					v-if="event"
+					direction="column"
+					gap="24"
+					:class="$style.side"
 				>
+					<EventGeneralCard
+						:event="event"
+						:start-status="startStatus"
+						:finish-status="finishStatus"
+						:start-countdown="startCountdownText"
+						:finish-countdown="finishCountdownText"
+						:price="price"
+						:is-won="hasWonBet"
+						:position-for-withdraw="positionForWithdraw"
+						:is-withdrawing="isWithdrawing"
+						@openParticipants="handleParticipants"
+						@onBet="handleJoin"
+						@onWithdraw="handleWithdraw"
+					/>
+
+					<EventPriceCard
+						v-if="event.status !== 'CANCELED'"
+						:event="event"
+						:price="price"
+						:finish-time="finishTime"
+					/>
+
+					<EventPoolCard
+						:event="event"
+						@onLiquidity="handleLiquidity"
+					/>
+
+					<EventAnalyticsCard :event="event" />
+
+					<div :class="$style.event_footer">
+						<div :class="$style.metadata">
+							<span
+								>Price Event —
+								{{
+									supportedMarkets[event.currencyPair.symbol]
+										.target
+								}}
+								(#{{ numberWithSymbol(event.id, ",") }})
+
+								<Icon
+									v-if="
+										verifiedMakers[currentNetwork].includes(
+											event.creatorId,
+										)
+									"
+									name="verified"
+									size="13"
+									color="green"
+							/></span>
+
+							<Flex
+								v-if="
+									verifiedMakers[currentNetwork].includes(
+										event.creatorId,
+									)
+								"
+								align="center"
+								gap="8"
+							>
+								<Flex align="center" gap="4">
+									<Text
+										size="12"
+										weight="600"
+										color="tertiary"
+									>
+										Recurring
+									</Text>
+								</Flex>
+								<Text size="11" weight="500" color="support">
+									✦
+								</Text>
+								<Text size="12" weight="600" color="tertiary">
+									Initial Liquidity Included
+								</Text>
+							</Flex>
+							<Flex v-else align="center" gap="8">
+								<Flex align="center" gap="4">
+									<Icon
+										name="warning"
+										size="12"
+										color="yellow"
+									/>
+									<Text
+										size="12"
+										weight="600"
+										color="tertiary"
+									>
+										Custom
+									</Text>
+								</Flex>
+								<Text size="11" weight="500" color="support">
+									✦
+								</Text>
+								<Text size="12" weight="600" color="tertiary">
+									Unknown state of Liquidity
+								</Text>
+							</Flex>
+						</div>
+
+						<Dropdown side="top">
+							<template #trigger>
+								<Button type="secondary" size="small"
+									><Icon name="dots" size="12" /> More</Button
+								>
+							</template>
+
+							<template #dropdown>
+								<!-- <DropdownItem @click="showNotifyMeModal = true">
+									<Icon name="notifications" size="16" />
+									Notify Me
+								</DropdownItem> -->
+								<DropdownItem
+									@click="handleLiquidity"
+									:disabled="!accountStore.isLoggined"
+								>
+									<Icon name="liquidity" size="16" />
+									Direct Deposit
+								</DropdownItem>
+
+								<DropdownDivider />
+
+								<!-- <DropdownTitle>Customization</DropdownTitle>
+								<DropdownItem @click="handleSwitch('mainnet')">
+									<Icon name="collection" size="16" />
+									Presets
+								</DropdownItem>
+
+								<DropdownItem @click="handleSwitch('testnet')">
+									<Icon name="settings" size="16" />
+									View Options
+								</DropdownItem>
+
+								<DropdownItem @click="handleSwitch('testnet')">
+									<Icon name="layers" size="16" />
+									Configure Blocks
+								</DropdownItem>
+
+								<DropdownDivider /> -->
+
+								<DropdownItem @click="copy('id')">
+									<Icon name="copy" size="16" />
+									Copy ID
+								</DropdownItem>
+
+								<DropdownItem @click="copy('url')">
+									<Icon name="copy" size="16" />
+									Copy URL
+								</DropdownItem>
+
+								<DropdownDivider />
+
+								<DropdownTitle>Other</DropdownTitle>
+
+								<DropdownItem
+									@click="showEventDetailsModal = true"
+								>
+									<Icon name="menu" size="16" />
+									View all params
+								</DropdownItem>
+							</template>
+						</Dropdown>
+					</div>
+				</Flex>
+
+				<Flex direction="column" gap="40" :class="$style.base">
+					<EventChart v-if="event" :event="event" />
+
+					<Flex direction="column" gap="24" v-if="accountStore.pkh">
+						<Flex direction="column" gap="8">
+							<Text size="16" weight="600" color="primary">
+								My Statistics
+							</Text>
+							<Text size="14" weight="500" color="tertiary">
+								Aggregated data for all your positions
+							</Text>
+						</Flex>
+
+						<Flex direction="column" gap="8">
+							<Banner
+								v-if="hasWonBet"
+								icon="checkcircle"
+								color="green"
+							>
+								{{ wonText }}
+							</Banner>
+
+							<EventPersonalStats
+								:event="event"
+								:position="userPosition"
+								:user-deposits="userDeposits"
+								:user-bets="userBets"
+							/>
+						</Flex>
+					</Flex>
+
+					<Flex direction="column" gap="24">
+						<Flex justify="between">
+							<Flex direction="column" gap="8">
+								<Text size="16" weight="600" color="primary">
+									Stakes
+								</Text>
+								<Text size="14" weight="500" color="tertiary">
+									All stakes from users for this event
+								</Text>
+							</Flex>
+
+							<div :class="$style.filters">
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'bets',
+											value: 'all',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.bets == 'all' && $style.active,
+									]"
+								>
+									All
+								</div>
+								<span>/</span>
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'bets',
+											value: 'my',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.bets == 'my' && $style.active,
+									]"
+								>
+									Only me
+								</div>
+							</div>
+						</Flex>
+
+						<Flex
+							v-if="pendingBet || filteredBets.length"
+							direction="column"
+							gap="8"
+						>
+							<Flex
+								v-if="filteredBets.length"
+								align="center"
+								:class="$style.columns"
+							>
+								<Text
+									size="12"
+									color="support"
+									weight="700"
+									:class="$style.column"
+									>TYPE</Text
+								>
+								<Text
+									size="12"
+									color="support"
+									weight="700"
+									:class="$style.column"
+									>SIDE</Text
+								>
+								<Text
+									size="12"
+									color="support"
+									weight="700"
+									:class="$style.column"
+									>AMOUNT</Text
+								>
+								<Text
+									size="12"
+									color="support"
+									weight="700"
+									:class="$style.column"
+								>
+									{{
+										(event.status == "CANCELED" &&
+											"REFUND") ||
+										(["NEW", "STARTED"].includes(
+											event.status,
+										) &&
+											"POTENTIAL") ||
+										(event.status == "FINISHED" && "PROFIT")
+									}}
+								</Text>
+							</Flex>
+							<Flex direction="column" gap="8">
+								<BetCard
+									v-if="pendingBet"
+									:bet="pendingBet"
+									:event="event"
+									pending
+								/>
+								<BetCard
+									v-for="bet in paginatedBets"
+									:event="event"
+									:key="bet.id"
+									:bet="bet"
+								/>
+							</Flex>
+						</Flex>
+
+						<Banner v-else icon="help" color="gray">{{
+							filters.bets == "all"
+								? `Still no stakes for this event, maybe yours will be the first?`
+								: `If you have placed a stake, but it is not in this list yet — please wait for the transaction confirmation`
+						}}</Banner>
+
+						<Pagination
+							v-if="filteredBets.length > 3"
+							v-model="selectedPageForBets"
+							:total="filteredBets.length"
+							:limit="3"
+							:class="$style.pagination"
+						/>
+					</Flex>
+
+					<Flex direction="column" gap="24">
+						<Flex justify="between">
+							<Flex direction="column" gap="8">
+								<Text size="16" weight="600" color="primary">
+									Liquidity
+								</Text>
+								<Text size="14" weight="500" color="tertiary">
+									Provided to maintain this event
+								</Text>
+							</Flex>
+
+							<div :class="$style.filters">
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'liquidity',
+											value: 'all',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.liquidity == 'all' &&
+											$style.active,
+									]"
+								>
+									All
+								</div>
+								<span>/</span>
+								<div
+									@click="
+										handleSelectFilter({
+											target: 'liquidity',
+											value: 'my',
+										})
+									"
+									:class="[
+										$style.filter,
+										filters.liquidity == 'my' &&
+											$style.active,
+									]"
+								>
+									Only me
+								</div>
+							</div>
+						</Flex>
+
+						<Flex
+							v-if="filteredDeposits.length"
+							direction="column"
+							gap="8"
+						>
+							<Flex align="center" :class="$style.columns">
+								<Text
+									size="12"
+									weight="700"
+									color="support"
+									:class="$style.column"
+									>TYPE
+								</Text>
+								<Text
+									size="12"
+									weight="700"
+									color="support"
+									:class="$style.column"
+									>RISE</Text
+								>
+								<Text
+									size="12"
+									weight="700"
+									color="support"
+									:class="$style.column"
+									>FALL</Text
+								>
+
+								<Text
+									size="12"
+									weight="700"
+									color="support"
+									:class="$style.column"
+									>RETURN</Text
+								>
+							</Flex>
+							<Flex
+								v-if="filteredDeposits.length"
+								direction="column"
+								gap="8"
+							>
+								<DepositCard
+									v-for="deposit in paginatedDeposits"
+									:key="deposit.id"
+									:deposit="deposit"
+									:event="event"
+								/>
+							</Flex>
+						</Flex>
+
+						<Banner v-else icon="help" color="gray">{{
+							filters.liquidity == "all"
+								? `This event has not yet received initial liquidity, please wait for a few minutes`
+								: `If you have provided liquidity, but it is not reflected in this list yet — please wait for the transaction confirmation`
+						}}</Banner>
+
+						<Pagination
+							v-if="filteredDeposits.length > 3"
+							v-model="selectedPageForDeposits"
+							:total="filteredDeposits.length"
+							:limit="3"
+							:class="$style.pagination"
+						/>
+					</Flex>
+				</Flex>
 			</div>
-		</div>
+		</Transition>
 	</div>
 </template>
 
@@ -756,7 +1047,7 @@ const { meta } = useMeta({
 
 .container {
 	display: flex;
-	gap: 32px;
+	gap: 40px;
 }
 
 .base {
@@ -764,160 +1055,22 @@ const { meta } = useMeta({
 }
 
 .side {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-
-	min-width: 384px;
-	max-width: 384px;
-}
-
-.banner {
-	margin-bottom: 16px;
-}
-
-.header_badge span {
-	color: var(--text-tertiary);
-}
-
-.event {
-	background: var(--card-bg);
-	border-radius: 8px;
-	border: 1px solid var(--border);
-	padding: 20px 0 20px 0;
-	flex: 1;
-
-	margin-bottom: 8px;
+	min-width: 450px;
+	max-width: 450px;
+	height: fit-content;
 }
 
 .header {
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
-
-	padding: 0 20px;
 }
 
 .info {
 	display: flex;
 	flex-direction: column;
-}
 
-.name {
-	display: flex;
-	align-items: center;
-
-	margin-bottom: 12px;
-}
-
-.symbol_image {
-	position: relative;
-
-	margin-right: 10px;
-}
-
-.symbol_image svg {
-	position: absolute;
-	top: -4px;
-	right: -4px;
-
-	background: var(--card-bg);
-	border-radius: 50%;
-}
-
-.symbol_image svg.higher {
-	fill: var(--green);
-}
-
-.symbol_image svg.lower {
-	fill: var(--red);
-	transform: rotate(180deg);
-}
-
-.symbol_image img {
-	width: 24px;
-	height: 24px;
-	border-radius: 6px;
-	opacity: 0.7;
-}
-
-.name span {
-	color: var(--text-tertiary);
-
-	margin-left: 6px;
-}
-
-.labels {
-	display: flex;
-	gap: 6px;
-}
-
-.divider {
-	width: 100%;
-	border: 1px solid var(--border);
-
-	margin: 20px 0;
-}
-
-.actions {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-}
-
-.block {
-	position: relative;
-
-	margin-top: 40px;
-}
-
-.block .title {
-	font-size: 17px;
-	line-height: 1.2;
-	font-weight: 500;
-	color: var(--text-primary);
-
-	margin-bottom: 8px;
-}
-
-.block .description {
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-tertiary);
-
-	margin-bottom: 24px;
-}
-
-.empty {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-
-	font-size: 14px;
-	line-height: 1.6;
-	color: var(--text-tertiary);
-	fill: var(--text-tertiary);
-}
-
-.columns {
-	display: flex;
-	align-items: center;
-
-	padding: 0 16px;
-	margin-bottom: 8px;
-}
-
-.column {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 700;
-	color: var(--text-tertiary);
-	fill: var(--text-tertiary);
+	margin-right: 16px;
 }
 
 .column:nth-child(1) {
@@ -936,25 +1089,19 @@ const { meta } = useMeta({
 	flex: 1;
 }
 
-.bets {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-}
-
 .details_btn {
-	margin-top: 8px;
+	margin: 8px 0 32px 0;
 }
 
 .filters {
-	position: absolute;
+	/* position: absolute;
 	top: 0;
-	right: 0;
+	right: 0; */
 
 	width: max-content;
 	display: flex;
 	align-items: center;
-	gap: 14px;
+	gap: 12px;
 
 	border-radius: 6px;
 	background: var(--btn-secondary-bg);
@@ -962,11 +1109,12 @@ const { meta } = useMeta({
 	padding: 0 12px;
 }
 
-.filters .dot {
-	width: 4px;
-	height: 4px;
-	border-radius: 50%;
-	background: var(--opacity-10);
+.filters span {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--text-tertiary);
+
+	opacity: 0.5;
 }
 
 .filter {
@@ -980,6 +1128,7 @@ const { meta } = useMeta({
 	font-weight: 600;
 	color: var(--text-tertiary);
 	fill: var(--text-tertiary);
+	white-space: nowrap;
 
 	transition: all 0.2s ease;
 }
@@ -996,5 +1145,55 @@ const { meta } = useMeta({
 
 .pagination {
 	margin-top: 16px;
+}
+
+.event_footer {
+	display: flex;
+	justify-content: space-between;
+
+	margin-top: 16px;
+	margin-bottom: 32px;
+}
+
+.metadata {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.metadata span:nth-child(1) {
+	font-size: 13px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-secondary);
+	fill: var(--text-secondary);
+
+	display: flex;
+	gap: 4px;
+}
+
+.metadata span:nth-child(2) {
+	font-size: 12px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-tertiary);
+}
+
+@media (max-width: 940px) {
+	.container {
+		flex-direction: column;
+		gap: 40px;
+	}
+
+	.side {
+		max-width: initial;
+		min-width: initial;
+	}
+}
+
+@media (max-width: 650px) {
+	.columns {
+		display: none;
+	}
 }
 </style>

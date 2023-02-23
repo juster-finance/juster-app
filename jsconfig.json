@@ -1,12 +1,29 @@
 {
-    "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "~/*": ["./src/*"],
-            "@/*": ["./src/*"],
-            "~~/*": ["./src/*"],
-            "@@/*": ["./src/*"]
-        }
-    },
-    "exclude": ["node_modules", "dist"]
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"~/*": ["./src/*"],
+			"@/*": ["./src/*"],
+			"~~/*": ["./src/*"],
+			"@@/*": ["./src/*"],
+
+			"@ui": ["./src/components/ui/*"],
+			"@base": ["./src/components/base/*"],
+			"@views": ["./src/views/*"],
+			"@local": ["./src/components/local/*"],
+			"@layout": ["./src/components/layout/*"],
+			"@modals": ["./src/components/local/modals/*"],
+			"@modules": ["./src/components/modules/*"],
+			"@sanity": ["./src/components/sanity/*"],
+			"@typography": ["./src/components/typography/*"],
+			"@api": ["./src/api/*"],
+			"@config": ["./src/services/config"],
+			"@sdk": ["./src/services/sdk/*"],
+			"@utils": ["./src/services/utils/*"],
+			"@store": ["./src/store/*"]
+		},
+		"jsx": "preserve",
+		"lib": ["dom"]
+	},
+	"exclude": ["node_modules", "dist"]
 }

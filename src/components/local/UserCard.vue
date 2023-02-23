@@ -1,28 +1,31 @@
 <script setup>
 /**
+ * Vendor
+ */
+import { useRouter } from "vue-router"
+
+/**
  * UI
  */
-import Button from "@/components/ui/Button"
-import {
-	Dropdown,
-	DropdownItem,
-	DropdownDivider,
-} from "@/components/ui/Dropdown"
+import Button from "@ui/Button.vue"
+import { Dropdown, DropdownItem, DropdownDivider } from "@ui/Dropdown"
 
 /**
  * Services
  */
-import { currentNetwork } from "@/services/sdk"
-import { toClipboard } from "@/services/utils/global"
-import { verifiedMakers } from "@/services/config"
+import { currentNetwork } from "@sdk"
+import { toClipboard, shorten } from "@utils/misc"
+import { verifiedMakers } from "@config"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
 
-const props = defineProps({ user: { type: Object } })
+const router = useRouter()
+
+const props = defineProps({ user: { type: Object, default: () => {} } })
 
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
@@ -31,10 +34,16 @@ const handleCopy = (target) => {
 	if (target == "address") {
 		notificationsStore.create({
 			notification: {
-				type: "success",
+				icon: "copy",
 				title: "User address copied to clipboard",
-				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
+
+				badges: [
+					{
+						icon: "user",
+						secondaryText: shorten(props.user.userId, 10, 6),
+					},
+				],
 			},
 		})
 		toClipboard(props.user.userId)
@@ -42,10 +51,20 @@ const handleCopy = (target) => {
 	if (target == "url") {
 		notificationsStore.create({
 			notification: {
-				type: "success",
+				icon: "copy",
 				title: "Profile URL copied to clipboard",
-				description: "Use Ctrl+V to paste",
 				autoDestroy: true,
+
+				actions: [
+					{
+						name: "Open in new tab",
+						callback: () =>
+							window.open(
+								`https://app.juster.fi/profile/${props.user.userId}`,
+								"_blank",
+							),
+					},
+				],
 			},
 		})
 		toClipboard(`https://app.juster.fi/profile/${props.user.userId}`)
@@ -64,19 +83,9 @@ const handleCopy = (target) => {
 				/>
 				<Icon
 					v-else
-					name="logo_symbol"
-					size="24"
+					:name="user.creator ? 'bolt' : 'server'"
+					size="20"
 					:class="$style.logo_icon"
-				/>
-
-				<Icon
-					v-if="
-						user.creator ||
-						verifiedMakers[currentNetwork].includes(user.userId)
-					"
-					name="verified"
-					size="14"
-					:class="$style.verified_icon"
 				/>
 			</div>
 
@@ -88,7 +97,7 @@ const handleCopy = (target) => {
 							verifiedMakers[currentNetwork].includes(user.userId)
 						"
 					>
-						Juster
+						{{ user.creator ? "Event Maker" : "Liquidity Pool" }}
 					</template>
 					<!-- User -->
 					<template v-else-if="user.userId !== accountStore.pkh">
@@ -100,10 +109,9 @@ const handleCopy = (target) => {
 						}}
 					</template>
 					<template v-else>You</template>
-
-					<Icon name="copy" size="14" />
 				</div>
 
+				<!-- Description -->
 				<div
 					v-if="
 						user.shares &&
@@ -120,41 +128,40 @@ const handleCopy = (target) => {
 						Liquidity:
 						<span
 							>{{
-								(
-									user.liquidityProvidedBelow +
-									user.liquidityProvidedAboveEq
-								).toFixed(2)
+								user.liquidityProvidedBelow.toFixed(2)
 							}}
 							ꜩ</span
 						>
 					</div>
 				</div>
+				<div v-else-if="user.creator" :class="$style.params">
+					<div :class="$style.param">Smart Contract</div>
+					<div :class="$style.dot" />
+					<div :class="$style.param">Recurring Events</div>
+				</div>
 			</div>
 		</div>
 
 		<Dropdown>
-			<template v-slot:trigger>
+			<template #trigger>
 				<Button type="tertiary" size="small" icon="dots" />
 			</template>
 
-			<template v-slot:dropdown>
-				<router-link :to="`/profile/${user.userId}`">
-					<DropdownItem
-						><Icon name="open" size="16" />Open User
-						profile</DropdownItem
-					>
+			<template #dropdown>
+				<DropdownItem @click="router.push(`/profile/${user.userId}`)">
+					<Icon name="user" size="16" />User profile
+				</DropdownItem>
 
-					<DropdownDivider />
-				</router-link>
+				<DropdownDivider />
 
 				<a
 					:href="`https://${
-						currentNetwork == 'mainnet' ? '' : 'ithacanet.'
+						currentNetwork === 'mainnet' ? '' : 'ghostnet.'
 					}tzkt.io/${user.userId}`"
 					target="_blank"
 				>
-					<DropdownItem
-						><Icon name="open" size="16" />View on TzKT
+					<DropdownItem>
+						<Icon name="database" size="16" />View on TzKT
 					</DropdownItem>
 				</a>
 
@@ -179,7 +186,7 @@ const handleCopy = (target) => {
 
 	border-radius: 8px;
 	background: rgba(255, 255, 255, 0.05);
-	min-height: 50px;
+	min-height: 56px;
 	padding: 0 10px;
 }
 
@@ -197,7 +204,8 @@ const handleCopy = (target) => {
 
 	width: 32px;
 	height: 32px;
-	border-radius: 50%;
+	background: var(--modal-bg);
+	border-radius: 8px;
 }
 
 .verified_icon {
@@ -213,19 +221,19 @@ const handleCopy = (target) => {
 .logo_icon {
 	padding: 2px;
 
-	fill: var(--text-secondary);
+	fill: var(--brand);
 }
 
 .avatar img {
-	width: 28px;
-	height: 28px;
+	width: 20px;
+	height: 20px;
 	border-radius: 50%;
 }
 
 .base {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 6px;
 }
 
 .address {
@@ -263,6 +271,6 @@ const handleCopy = (target) => {
 	width: 4px;
 	height: 4px;
 	border-radius: 50%;
-	background: var(--border);
+	background: var(--text-tertiary);
 }
 </style>

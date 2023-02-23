@@ -10,37 +10,42 @@ import {
 } from "vue"
 import { DateTime } from "luxon"
 import { useMeta } from "vue-meta"
-import { cloneDeep } from "lodash"
+import cloneDeep from "lodash.clonedeep"
 
 /**
  * Services
  */
-import { juster, analytics, currentNetwork } from "@/services/sdk"
-import { verifiedMakers } from "@/services/config"
+import { juster, analytics, currentNetwork } from "@sdk"
+import { verifiedMakers } from "@config"
 
 /**
  * API
  */
-import { fetchAllEvents } from "@/api/events"
+import { fetchEventsByStatus } from "@/api/events"
 
 /**
  * UI
  */
-import Pagination from "@/components/ui/Pagination"
-import Breadcrumbs from "@/components/ui/Breadcrumbs"
-import Banner from "@/components/ui/Banner"
-import Button from "@/components/ui/Button"
+import Pagination from "@ui/Pagination.vue"
+import Breadcrumbs from "@ui/Breadcrumbs.vue"
+import Banner from "@ui/Banner.vue"
+import Button from "@ui/Button.vue"
 
 /**
  * Local
  */
-import EventsFilters from "./EventsFilters"
-import { EventCard, EventCardLoading } from "@/components/local/EventCard"
+import EventsFilters from "./EventsFilters.vue"
+import { EventCard, EventCardLoading } from "@local/EventCard"
+
+/**
+ * gql
+ */
+import { event as eventModel } from "@/graphql/models"
 
 /**
  * Store
  */
-import { useMarketStore } from "@/store/market"
+import { useMarketStore } from "@store/market"
 
 const defaultFilters = {
 	symbols: [
@@ -81,7 +86,7 @@ const defaultFilters = {
 		{
 			name: "New",
 			icon: "event_new",
-			color: "green",
+			color: "purple",
 			active: true,
 		},
 		{
@@ -93,13 +98,13 @@ const defaultFilters = {
 		{
 			name: "Finished",
 			icon: "checkcircle",
-			color: "gray",
+			color: "green",
 			active: false,
 		},
 		{
 			name: "Canceled",
 			icon: "stop",
-			color: "orange",
+			color: "gray",
 			active: false,
 		},
 	],
@@ -149,11 +154,16 @@ const marketStore = useMarketStore()
 
 const subscription = ref(null)
 
-const isAllEventsLoaded = ref(false)
+const isNewEventsLoaded = ref(false)
+const isFinishedEventsLoaded = ref(false)
 
 const currentPage = ref(1)
 
 let filters = ref(cloneDeep(defaultFilters))
+
+const isFinishedEventsToggled = computed(() =>
+	filters.value.statuses.find((s) => s.name === "Finished" && s.active),
+)
 
 const showFilters = ref(false)
 
@@ -210,11 +220,6 @@ const handleManageParticipant = ({ address, action }) => {
 }
 
 /** Events */
-const availableEvents = computed(() => {
-	return marketStore.events.filter((event) =>
-		["NEW", "STARTED", "FINISHED"].includes(event.status),
-	)
-})
 const filteredEvents = computed(() => {
 	let events = cloneDeep(marketStore.events)
 
@@ -355,13 +360,25 @@ const filteredEvents = computed(() => {
 onMounted(async () => {
 	analytics.log("onPage", { name: "AllEvents" })
 
-	let allNewEvents = await fetchAllEvents()
+	let newEvents = await fetchEventsByStatus({ status: "NEW" })
+	isNewEventsLoaded.value = true
+	marketStore.events = cloneDeep(newEvents)
 
-	isAllEventsLoaded.value = true
+	let runningEvents = await fetchEventsByStatus({ status: "STARTED" })
+	marketStore.events = [...marketStore.events, ...cloneDeep(runningEvents)]
 
-	marketStore.events = cloneDeep(allNewEvents)
+	let finishedEvents = await fetchEventsByStatus({ status: "FINISHED" })
+	isFinishedEventsLoaded.value = true
+	marketStore.events = [
+		...marketStore.events,
+		...cloneDeep(finishedEvents).sort(
+			(a, b) =>
+				DateTime.fromISO(b.createdTime).ts -
+				DateTime.fromISO(a.createdTime).ts,
+		),
+	]
 
-	// subscribe to new events
+	// Sub to New Events
 	subscription.value = await juster.gql
 		.subscription({
 			event: [
@@ -371,45 +388,7 @@ onMounted(async () => {
 					},
 				},
 				{
-					id: true,
-					status: true,
-					betsCloseTime: true,
-					creatorId: true,
-					currencyPair: {
-						symbol: true,
-						id: true,
-					},
-					poolAboveEq: true,
-					poolBelow: true,
-					totalBetsAmount: true,
-					totalLiquidityProvided: true,
-					totalLiquidityShares: true,
-					totalValueLocked: true,
-					liquidityPercent: true,
-					measurePeriod: true,
-					closedOracleTime: true,
-					createdTime: true,
-					startRate: true,
-					closedRate: true,
-					winnerBets: true,
-					targetDynamics: true,
-					bets: {
-						id: true,
-						side: true,
-						reward: true,
-						amount: true,
-						createdTime: true,
-						userId: true,
-					},
-					deposits: {
-						amountAboveEq: true,
-						amountBelow: true,
-						eventId: true,
-						id: true,
-						userId: true,
-						createdTime: true,
-						shares: true,
-					},
+					...eventModel,
 				},
 			],
 		})
@@ -440,7 +419,7 @@ onBeforeUnmount(() => {
 onUnmounted(() => {
 	if (
 		subscription.value &&
-		subscription.value.hasOwnProperty("_state") &&
+		Object.prototype.hasOwnProperty.call(subscription.value, "_state") &&
 		!subscription.value?.closed
 	) {
 		subscription.value.unsubscribe()
@@ -448,7 +427,7 @@ onUnmounted(() => {
 })
 
 /** Meta */
-const { meta } = useMeta({
+useMeta({
 	title: `All events`,
 	description: "All available events",
 })
@@ -457,79 +436,107 @@ const { meta } = useMeta({
 <template>
 	<div :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template #title="{ content }">{{ content }} • Juster</template>
 		</metainfo>
 
 		<Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
 
-		<h1>All events</h1>
-		<div :class="$style.description">
-			List of all new, running, and past events with customizable
-			filtering
-		</div>
+		<Flex direction="column" gap="32">
+			<Flex direction="column" gap="8">
+				<h1>All events</h1>
+				<Text size="14" height="16" weight="500" color="tertiary">
+					List of all new, running, and past events with customizable
+					filtering
+				</Text>
+			</Flex>
 
-		<Button
-			@click="showFilters = !showFilters"
-			type="secondary"
-			size="small"
-			block
-			:class="$style.show_filters_btn"
-			><Icon name="filter" size="14" />
-			{{ showFilters ? "Hide" : "Show" }} Filters</Button
-		>
+			<Button
+				@click="showFilters = !showFilters"
+				type="secondary"
+				size="small"
+				block
+				:class="$style.show_filters_btn"
+				><Icon name="filter" size="14" />
+				{{ showFilters ? "Hide" : "Show" }} Filters</Button
+			>
 
-		<div :class="$style.container">
-			<EventsFilters
-				:filters="filters"
-				:liquidityFilters="liquidityFilters"
-				:events="marketStore.events"
-				:filteredEventsCount="filteredEvents.length"
-				@onNewMin="handleNewMin"
-				@onNewMax="handleNewMax"
-				@onSelect="handleSelect"
-				@onReset="handleResetFilters"
-				@onManageParticipant="handleManageParticipant"
-				:class="[$style.filters_block, showFilters && $style.show]"
-			/>
-
-			<div :class="$style.events_base">
-				<div v-if="filteredEvents.length" :class="$style.events">
-					<EventCard
-						v-for="event in filteredEvents.slice(
-							(currentPage - 1) * 6,
-							currentPage * 6,
-						)"
-						:key="event.id"
-						:event="event"
-					/>
-				</div>
-
-				<div v-else-if="!isAllEventsLoaded" :class="$style.events">
-					<EventCardLoading />
-					<EventCardLoading />
-					<EventCardLoading />
-				</div>
-
-				<Banner
-					v-else-if="!filteredEvents.length && isAllEventsLoaded"
-					icon="help"
-					color="gray"
-					size="small"
-				>
-					No events with the selected filters were found
-				</Banner>
-
-				<Pagination
-					v-if="filteredEvents.length > 6"
-					v-model="currentPage"
-					:total="filteredEvents.length"
-					:limit="6"
-					:class="$style.pagination"
+			<Flex gap="40" :class="$style.container">
+				<EventsFilters
+					:filters="filters"
+					:liquidity-filters="liquidityFilters"
+					:events="marketStore.events"
+					:filtered-events-count="filteredEvents.length"
+					@onNewMin="handleNewMin"
+					@onNewMax="handleNewMax"
+					@onSelect="handleSelect"
+					@onReset="handleResetFilters"
+					@onManageParticipant="handleManageParticipant"
+					:class="[$style.filters_block, showFilters && $style.show]"
 				/>
-			</div>
-		</div>
+
+				<div :class="$style.events_base">
+					<Banner
+						v-if="
+							!isFinishedEventsLoaded && isFinishedEventsToggled
+						"
+						loading
+						color="gray"
+						size="small"
+					>
+						Last thousand finished events is loading
+					</Banner>
+
+					<transition name="fastfade" mode="out-in">
+						<Flex
+							v-if="filteredEvents.length"
+							direction="column"
+							gap="16"
+						>
+							<div :class="$style.events">
+								<EventCard
+									v-for="event in filteredEvents.slice(
+										(currentPage - 1) * 6,
+										currentPage * 6,
+									)"
+									:key="event.id"
+									:event="event"
+								/>
+							</div>
+
+							<Pagination
+								v-if="filteredEvents.length > 6"
+								v-model="currentPage"
+								:total="filteredEvents.length"
+								:limit="6"
+								:class="$style.pagination"
+							/>
+						</Flex>
+
+						<div
+							v-else-if="!isNewEventsLoaded"
+							:class="$style.events"
+						>
+							<EventCardLoading />
+							<EventCardLoading />
+							<EventCardLoading />
+						</div>
+
+						<Banner
+							v-else-if="
+								!filteredEvents.length &&
+								isNewEventsLoaded &&
+								isFinishedEventsLoaded
+							"
+							icon="help"
+							color="gray"
+							size="small"
+						>
+							No events with the selected filters were found
+						</Banner>
+					</transition>
+				</div>
+			</Flex>
+		</Flex>
 	</div>
 </template>
 
@@ -553,13 +560,6 @@ const { meta } = useMeta({
 
 .show_filters_btn {
 	display: none;
-
-	margin-bottom: 24px;
-}
-
-.container {
-	display: flex;
-	gap: 40px;
 }
 
 .filters_block {

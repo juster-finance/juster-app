@@ -1,3 +1,4 @@
+/* eslint-disable vue/multi-word-component-names */
 import { createApp, h } from "vue"
 import { createMetaManager } from "vue-meta"
 import { createPinia } from "pinia"
@@ -5,15 +6,18 @@ import { createPinia } from "pinia"
 /** Analytics */
 import VueGtag from "vue-gtag"
 import amplitude from "amplitude-js"
-amplitude.getInstance().init("a515d3d1969a8f25c340476842b19836")
+amplitude.getInstance().init(import.meta.env.VITE_AMPLITUDE)
 
-import "@/services/sdk"
+import "@sdk"
+
+import { initFlags } from "@/services/flags"
+initFlags()
 
 import App from "./App.vue"
 import router from "./router"
 
 const app = createApp({
-    render: () => h(App),
+	render: () => h(App),
 })
 
 /**
@@ -32,7 +36,11 @@ app.provide("amplitude", amplitude.getInstance())
 /**
  * Global components
  */
-import Icon from "@/components/icons/Icon"
+import Icon from "@/components/icons/Icon.vue"
+import Flex from "@layout/Flex.vue"
+import Text from "@typography/Text.vue"
 app.component("Icon", Icon)
+app.component("Flex", Flex)
+app.component("Text", Text)
 
 app.mount("#app")

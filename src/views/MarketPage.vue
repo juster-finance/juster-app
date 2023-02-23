@@ -4,28 +4,28 @@ import { defineComponent } from "vue"
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import MarketBase from "@/components/modules/symbols/MarketBase"
+import MarketBase from "@modules/symbols/MarketBase.vue"
 
 export default defineComponent({
-    name: "MarketPage",
+	name: "MarketPage",
 
-    components: { Page, MarketBase },
+	components: { Page, MarketBase },
 })
 </script>
 
 <template>
-    <Page>
-        <MarketBase />
-    </Page>
+	<Page>
+		<MarketBase />
+	</Page>
 </template>
 
 <style module>
 .wrapper {
-    max-width: 1250px;
+	max-width: 1250px;
 }
 </style>

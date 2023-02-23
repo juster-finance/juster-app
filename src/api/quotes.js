@@ -1,86 +1,120 @@
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster } from "@sdk"
 
 /**
- * GQL: Queries
+ * Models
  */
+
 import {
-    getQuotesByMarket,
-    getQuoteByTimestamp,
-    getQuoteByRange,
-    getTVLByEventId,
-} from "@/graphql/queries/quotes"
+	quotesWma as quotesWmaModel,
+	totalValueLocked as totalValueLockedModel,
+} from "@/graphql/models"
 
 export const fetchQuotesByMarket = async ({ id, limit, offset }) => {
-    try {
-        if (!id || !limit)
-            throw new Error(
-                `${(id == undefined && "ID") ||
-                    (limit == undefined && "limit")} is required`,
-            )
-        if (typeof id !== "number") throw new Error("ID must be a Number")
-        if (typeof limit !== "number") throw new Error("Limit must be a Number")
+	try {
+		if (!id || !limit)
+			throw new Error(
+				`${
+					(id == undefined && "ID") || (limit == undefined && "limit")
+				} is required`,
+			)
+		if (typeof id !== "number") throw new Error("ID must be a Number")
+		if (typeof limit !== "number") throw new Error("Limit must be a Number")
 
-        const { data } = await juster.apollo.query({
-            query: getQuotesByMarket,
-            variables: { id, limit, offset },
-        })
-        return data.quotesWma
-    } catch (error) {
-        console.error(
-            `Error during fetching quotes by id \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+		const { quotesWma } = await juster.gql.query({
+			quotesWma: [
+				{
+					where: {
+						currencyPairId: {
+							_eq: id,
+						},
+					},
+					order_by: {
+						timestamp: "desc",
+					},
+					limit: limit,
+					offset: offset,
+				},
+				quotesWmaModel,
+			],
+		})
+		return quotesWma
+	} catch (error) {
+		console.error(
+			`Error during fetching quotes by id \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }
 
 export const fetchQuoteByRange = async ({ id, tsGt, tsLt }) => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getQuoteByRange,
-            variables: { id, tsGt, tsLt },
-        })
+	try {
+		const { quotesWma } = await juster.gql.query({
+			quotesWma: [
+				{
+					where: {
+						timestamp: { _gte: tsGt, _lte: tsLt },
+						currencyPairId: { _eq: id },
+					},
+					order_by: { timestamp: "desc" },
+				},
+				quotesWmaModel,
+			],
+		})
 
-        return data.quotesWma
-    } catch (error) {
-        console.error(
-            `Error during fetching quote by range ts & id \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+		return quotesWma
+	} catch (error) {
+		console.error(
+			`Error during fetching quote by range ts & id \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }
 
 export const fetchQuoteByTimestamp = async ({ id, ts }) => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getQuoteByTimestamp,
-            variables: { id, ts },
-        })
+	try {
+		const { quotesWma } = await juster.gql.query({
+			quotesWma: [
+				{
+					where: {
+						currencyPairId: { _eq: id },
+						timestamp: { _eq: ts },
+					},
+					order_by: { timestamp: "desc" },
+					limit: 1,
+				},
+				quotesWmaModel,
+			],
+		})
 
-        return data.quotesWma
-    } catch (error) {
-        console.error(
-            `Error during fetching quote by ts & id \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+		return quotesWma
+	} catch (error) {
+		console.error(
+			`Error during fetching quote by ts & id \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }
 
 /** TVL */
 export const fetchEventTVL = async ({ id }) => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getTVLByEventId,
-            variables: { id },
-        })
+	try {
+		const { totalValueLocked } = await juster.gql.query({
+			totalValueLockedModel: [
+				{
+					where: { eventId: { _eq: id } },
+				},
+				totalValueLockedModel,
+			],
+		})
 
-        return data.totalValueLocked
-    } catch (error) {
-        console.error(
-            `Error during fetching tvl by event id \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+		return totalValueLocked
+	} catch (error) {
+		console.error(
+			`Error during fetching tvl by event id \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }

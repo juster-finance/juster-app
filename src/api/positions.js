@@ -1,46 +1,68 @@
-import { cloneDeep } from "lodash"
+import cloneDeep from "lodash.clonedeep"
 
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster } from "@sdk"
 
 /**
- * GQL: Queries
+ * Models
  */
-import {
-    getAllUserPositions,
-    getUserPositionsForWithdrawal,
-} from "@/graphql/queries/positions"
+import { position as positionModel } from "@/graphql/models"
 
 export const fetchAllUserPositions = async ({ address }) => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getAllUserPositions,
-            variables: { address },
-        })
+	try {
+		const { position } = await juster.gql.query({
+			position: [
+				{
+					where: {
+						userId: {
+							_eq: address,
+						},
+					},
+					order_by: {
+						id: "desc",
+					},
+				},
+				positionModel,
+			],
+		})
 
-        return data.position
-    } catch (error) {
-        console.error(
-            `Error during fetching all user positions \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+		return position
+	} catch (error) {
+		console.error(
+			`Error during fetching all user positions \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }
 
 export const fetchUserPositionsForWithdraw = async ({ address }) => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getUserPositionsForWithdrawal,
-            variables: { address },
-        })
+	try {
+		const { position } = await juster.gql.query({
+			position: [
+				{
+					where: {
+						userId: {
+							_eq: address,
+						},
+						withdrawn: { _eq: false },
+						value: { _neq: 0 },
+						event: { status: { _eq: "FINISHED" } },
+					},
+					order_by: {
+						id: "desc",
+					},
+				},
+				positionModel,
+			],
+		})
 
-        return cloneDeep(data.position)
-    } catch (error) {
-        console.error(
-            `Error during fetching user positions \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+		return cloneDeep(position)
+	} catch (error) {
+		console.error(
+			`Error during fetching user positions \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }

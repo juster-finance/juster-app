@@ -1,204 +1,125 @@
-<script>
-import { defineComponent, ref, toRefs, computed } from "vue"
-import { DateTime } from "luxon"
-import Markdown from "markdown-it"
-
+<script setup>
 /**
- * UI
+ * Vendor
  */
-import Button from "@/components/ui/Button"
+import { DateTime } from "luxon"
 
 /**
  * Services
  */
-import { toClipboard } from "@/services/utils/global"
+import { getSanityImageUrl } from "@/services/sanity"
 
 /**
- * Store
+ * Modules
  */
-import { useNotificationsStore } from "@/store/notifications"
+import ArticleContent from "@modules/docs/ArticleContent.vue"
 
-export default defineComponent({
-    name: "ReleaseCard",
-    props: { release: Object },
-
-    setup(props) {
-        const { release } = toRefs(props)
-
-        const notificationsStore = useNotificationsStore()
-
-        const md = ref(null)
-        md.value = new Markdown({ html: true })
-
-        const firstParagraphRegex = /\<p>(.*?)\<\/p>/
-        const content = computed(
-            () =>
-                firstParagraphRegex.exec(
-                    md.value.render(release.value.Body),
-                )[0],
-        )
-
-        const copyURL = () => {
-            toClipboard(
-                `https://app.juster.fi/releases/${release.value.slug.current}`,
-            )
-
-            notificationsStore.create({
-                notification: {
-                    type: "success",
-                    title: "Release URL copied to clipboard",
-                    description: "Use Ctrl+V to paste",
-                    autoDestroy: true,
-                },
-            })
-        }
-
-        const openGithub = () => {
-            window
-                .open("https://github.com/juster-finance/juster-app", "_blank")
-                .focus()
-        }
-
-        return { content, DateTime, copyURL, openGithub }
-    },
-
-    components: { Button },
-})
+const props = defineProps({ release: { type: Object }, idx: Number })
 </script>
 
 <template>
-    <router-link
-        :to="`/releases/${release.slug.current}`"
-        :class="$style.wrapper"
-    >
-        <div :class="$style.when">
-            {{
-                DateTime.fromISO(release._updatedAt, {
-                    locale: "en",
-                }).toRelative()
-            }}
-        </div>
+	<Flex direction="column" gap="10">
+		<div :class="$style.card">
+			<div :class="$style.timeline">
+				<div :class="$style.moment">
+					{{
+						DateTime.fromISO(release._createdAt, {
+							locale: "en",
+						}).toRelative()
+					}}
+					<div :class="[$style.dot, idx === 0 && $style.orange]" />
+				</div>
 
-        <div>
-            <div :class="$style.card">
-                <h2 :class="$style.title">{{ release.title }}</h2>
+				<div :class="$style.line" />
+			</div>
 
-                <div :class="$style.badges">
-                    <div :class="$style.badge">By <span>Juster</span></div>
+			<img
+				:src="getSanityImageUrl(release.poster)"
+				:class="$style.cover"
+			/>
 
-                    <div :class="$style.dot" />
+			<ArticleContent :content="release.content" />
 
-                    <div :class="$style.badge"><span>Minor</span> Update</div>
-                </div>
-
-                <div v-html="content" :class="$style.body_preview"></div>
-
-                <div :class="$style.buttons">
-                    <router-link :to="`/releases/${release.slug.current}`">
-                        <Button type="secondary" size="small">
-                            <Icon name="document" size="16" />View all changes
-                        </Button>
-                    </router-link>
-
-                    <Button
-                        @click.prevent="openGithub"
-                        type="secondary"
-                        size="small"
-                    >
-                        <Icon name="github" size="16" /> View on Github
-                    </Button>
-
-                    <Button
-                        @click.prevent="copyURL"
-                        type="tertiary"
-                        size="small"
-                    >
-                        <Icon name="back" size="16" /> Share
-                    </Button>
-                </div>
-            </div>
-        </div>
-    </router-link>
+			<Text size="12" weight="500" color="tertiary">
+				{{
+					DateTime.fromISO(release._createdAt, {
+						locale: "en",
+					}).toRelative()
+				}}
+			</Text>
+		</div>
+	</Flex>
 </template>
 
 <style module>
-.wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.when {
-    font-size: 11px;
-    line-height: 1.1;
-    font-weight: 700;
-    color: var(--text-tertiary);
-
-    text-transform: uppercase;
-}
-
 .card {
-    width: 700px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    padding: 32px;
-    box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.3);
+	width: 100%;
 
-    transition: box-shadow 0.2s ease;
+	position: relative;
 }
 
-.card:hover {
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+.cover {
+	width: 100%;
+	aspect-ratio: 16/9;
+	margin-bottom: 50px;
+
+	background: rgba(255, 255, 255, 0.03);
+
+	border-radius: 16px;
 }
 
-.title {
-    font-size: 24px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+.timeline {
+	position: absolute;
 
-    margin-bottom: 16px;
+	top: 0;
+	right: 760px;
+
+	display: flex;
+	align-items: flex-end;
+	flex-direction: column;
 }
 
-.badges {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.moment {
+	display: flex;
+	align-items: center;
+	gap: 16px;
 
-    margin-bottom: 16px;
-}
-
-.badge {
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-tertiary);
-}
-
-.badge span {
-    color: var(--text-secondary);
+	font-size: 13px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-tertiary);
+	white-space: nowrap;
 }
 
 .dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--text-tertiary);
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--border);
 }
 
-.body_preview {
-    font-size: 14px;
-    line-height: 1.6;
-    font-weight: 400;
-    color: var(--text-tertiary);
-
-    margin-bottom: 24px;
+.dot.orange {
+	background: var(--orange);
+	box-shadow: 0px 0px 15px var(--orange);
 }
 
-.buttons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.line {
+	width: 1px;
+	height: 500px;
+	background: linear-gradient(var(--border), transparent);
+
+	margin-right: 5px;
+}
+
+@media (max-width: 1100px) {
+	.timeline {
+		display: none;
+	}
+}
+
+@media (max-width: 700px) {
+	.cover {
+		margin-bottom: 0;
+	}
 }
 </style>

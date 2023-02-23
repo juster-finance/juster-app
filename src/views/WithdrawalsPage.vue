@@ -1,25 +1,17 @@
-<script>
-import { defineComponent } from "vue"
-
+<script setup>
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import WithdrawalsBase from "@/components/modules/profile/WithdrawalsBase"
-
-export default defineComponent({
-    name: "WithdrawalsPage",
-
-    components: { Page, WithdrawalsBase },
-})
+import WithdrawalsBase from "@modules/profile/WithdrawalsBase.vue"
 </script>
 
 <template>
-    <Page>
-        <WithdrawalsBase />
-    </Page>
+	<Page>
+		<WithdrawalsBase />
+	</Page>
 </template>

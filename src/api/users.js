@@ -1,73 +1,106 @@
 /**
  * Services
  */
-import { juster } from "@/services/sdk"
+import { juster } from "@sdk"
 
 /**
- * GQL: Queries
+ * Models
  */
 import {
-    getUser,
-    getUserWithdrawals,
-    getTopBettors,
-    getTopLiquidityProviders,
-} from "@/graphql/queries/users"
+	user as userModel,
+	miniUser as miniUserModel,
+	userWithdrawal as userWithdrawalModel,
+	userWithBets as userWithBetsModel,
+	userWithReward as userWithRewardModel,
+} from "@/graphql/models"
 
 export const fetchUser = async ({ address }) => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getUser,
-            variables: { address },
-        })
-        return data.user[0]
-    } catch (error) {
-        console.error(
-            `Error during fetching user \n\n ${error.name}: ${error.message}`,
-        )
-        return {}
-    }
+	try {
+		const { user } = await juster.gql.query({
+			user: [
+				{
+					where: { address: { _eq: address } },
+				},
+				userModel,
+			],
+		})
+		return user[0]
+	} catch (error) {
+		console.error(
+			`Error during fetching user \n\n ${error.name}: ${error.message}`,
+		)
+		return {}
+	}
+}
+
+export const fetchAllUsers = async () => {
+	try {
+		const { user } = await juster.gql.query({
+			user: miniUserModel,
+		})
+		return user
+	} catch (error) {
+		console.error(
+			`Error during fetching all users \n\n ${error.name}: ${error.message}`,
+		)
+		return {}
+	}
 }
 
 export const fetchUserWithdrawals = async ({ address }) => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getUserWithdrawals,
-            variables: { address },
-        })
+	try {
+		const { withdrawal } = await juster.gql.query({
+			withdrawal: [
+				{
+					where: { userId: { _eq: address } },
+					order_by: { id: "desc" },
+				},
+				userWithdrawalModel,
+			],
+		})
 
-        return data.withdrawal
-    } catch (error) {
-        console.error(
-            `Error during fetching user withdrawals \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+		return withdrawal
+	} catch (error) {
+		console.error(
+			`Error during fetching user withdrawals \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }
 
 export const fetchTopLiquidityProviders = async () => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getTopLiquidityProviders,
-        })
-        return data.user
-    } catch (error) {
-        console.error(
-            `Error during fetching top liquidity providers \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+	try {
+		const { user } = await juster.gql.query({
+			user: [
+				{ order_by: { totalProviderReward: "desc" }, limit: 5 },
+				userWithRewardModel,
+			],
+		})
+		return user
+	} catch (error) {
+		console.error(
+			`Error during fetching top liquidity providers \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }
 
 export const fetchTopBettors = async () => {
-    try {
-        const { data } = await juster.apollo.query({
-            query: getTopBettors,
-        })
-        return data.user
-    } catch (error) {
-        console.error(
-            `Error during fetching top bettors \n\n ${error.name}: ${error.message}`,
-        )
-        return []
-    }
+	try {
+		const { user } = await juster.gql.query({
+			user: [
+				{
+					order_by: { totalBetsCount: "desc" },
+					limit: 5,
+				},
+				userWithBetsModel,
+			],
+		})
+		return user
+	} catch (error) {
+		console.error(
+			`Error during fetching top bettors \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
 }

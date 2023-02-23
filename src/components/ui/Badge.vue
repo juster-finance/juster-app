@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps({
+defineProps({
 	size: { type: String, default: "small" },
 	color: { type: String, default: "gray" },
 })
@@ -17,7 +17,7 @@ const props = defineProps({
 	align-items: center;
 	gap: 6px;
 
-	border-radius: 6px;
+	border-radius: 5px;
 
 	font-weight: 600;
 	white-space: nowrap;
@@ -49,38 +49,62 @@ const props = defineProps({
  */
 
 .wrapper.green {
-	color: var(--green);
+	color: var(--text-secondary);
 	fill: var(--green);
-	background: rgba(26, 161, 104, 0.15);
+	background: linear-gradient(
+		rgba(26, 161, 104, 0.06),
+		rgba(26, 161, 104, 0.16)
+	);
+
+	box-shadow: 0 0 0 2px rgba(26, 161, 104, 0.4);
 }
 
 .wrapper.yellow {
-	color: var(--yellow);
+	color: var(--text-secondary);
 	fill: var(--yellow);
-	background: rgba(245, 183, 43, 0.15);
+	background: linear-gradient(
+		rgba(245, 183, 43, 0.04),
+		rgba(245, 183, 43, 0.16)
+	);
+
+	box-shadow: 0 0 0 2px rgba(245, 183, 43, 0.2);
 }
 
 .wrapper.red {
-	color: var(--red);
+	color: var(--text-secondary);
 	fill: var(--red);
-	background: rgba(224, 92, 67, 0.15);
+	background: rgba(255, 255, 255, 0.05);
+
+	box-shadow: 0 0 0 2px rgba(224, 92, 67, 0.5);
 }
 
 .wrapper.gray {
 	color: var(--text-secondary);
 	fill: var(--text-secondary);
-	background: rgba(255, 255, 255, 0.05);
+	background: linear-gradient(
+		rgba(255, 255, 255, 0.04),
+		rgba(255, 255, 255, 0.1)
+	);
+
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .wrapper.orange {
-	color: var(--orange);
+	color: var(--text-secondary);
 	fill: var(--orange);
-	background: rgba(239, 132, 86, 0.15);
+	background: rgba(239, 132, 86, 0.08);
+
+	box-shadow: 0 0 0 2px rgba(239, 132, 86, 0.3);
 }
 
 .wrapper.purple {
-	color: var(--purple);
+	color: var(--text-secondary);
 	fill: var(--purple);
-	background: rgba(133, 90, 209, 0.15);
+	background: linear-gradient(
+		rgba(133, 90, 209, 0.04),
+		rgba(133, 90, 209, 0.16)
+	);
+
+	box-shadow: 0 0 0 2px rgba(133, 90, 209, 0.3);
 }
 </style>

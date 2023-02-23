@@ -1,47 +1,55 @@
 <script>
-import { defineComponent, ref, reactive, computed, toRefs, watch, nextTick } from 'vue'
-import BigNumber from 'bignumber.js'
-import { DateTime } from 'luxon'
+import {
+	defineComponent,
+	ref,
+	reactive,
+	computed,
+	toRefs,
+	watch,
+	nextTick,
+} from "vue"
+import BigNumber from "bignumber.js"
+import { DateTime } from "luxon"
 
 /**
  * Services
  */
-import { juster, currentNetwork, analytics } from '@/services/sdk'
-import { verifiedMakers } from '@/services/config'
+import { juster, currentNetwork, analytics } from "@sdk"
+import { verifiedMakers } from "@config"
 
 /**
  * Local
  */
-import SplittedPool from '@/components/local/SplittedPool'
-import SlippageSelector from '@/components/local/SlippageSelector'
+import SplittedPool from "@local/SplittedPool.vue"
+import SlippageSelector from "@local/SlippageSelector.vue"
 
-import PositionDirection from './PositionDirection'
+import PositionDirection from "./PositionDirection.vue"
 
 /**
  * UI
  */
-import Modal from '@/components/ui/Modal'
-import Input from '@/components/ui/Input'
-import Stat from '@/components/ui/Stat'
-import Button from '@/components/ui/Button'
-import Spin from '@/components/ui/Spin'
-import Banner from '@/components/ui/Banner'
+import Modal from "@ui/Modal.vue"
+import Input from "@ui/Input.vue"
+import Stat from "@ui/Stat.vue"
+import Button from "@ui/Button.vue"
+import Spin from "@ui/Spin.vue"
+import Banner from "@ui/Banner.vue"
 
 /**
  * Store
  */
-import { useAccountStore } from '@/store/account'
-import { useNotificationsStore } from '@/store/notifications'
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
 
 /**
  * Composable
  */
-import { useCountdown } from '@/composable/date'
+import { useCountdown } from "@/composable/date"
 
 export default defineComponent({
-	name: 'LiquidityModal',
+	name: "LiquidityModal",
 	props: { show: Boolean, event: Object },
-	emits: ['onClose'],
+	emits: ["onClose"],
 
 	setup(props, context) {
 		const { event, show } = toRefs(props)
@@ -52,11 +60,18 @@ export default defineComponent({
 		const amountInput = ref(null)
 
 		/** Countdown setup */
-		const eventStartTime = computed(() => new Date(event.value?.betsCloseTime).getTime())
-		const { countdownText, status: countdownStatus, stop } = useCountdown(eventStartTime)
+		const eventStartTime = computed(() =>
+			new Date(event.value?.betsCloseTime).getTime(),
+		)
+		const {
+			countdownText,
+			status: countdownStatus,
+			stop,
+			start,
+		} = useCountdown(eventStartTime)
 
 		/** User inputs */
-		const amount = reactive({ value: 0, error: '' })
+		const amount = reactive({ value: 0, error: "" })
 		const slippage = ref(2.5)
 
 		const sendingLiquidity = ref(false)
@@ -71,13 +86,20 @@ export default defineComponent({
 			}
 		})
 		const shares = computed(() => {
-			const bigPool = Math.max(event.value.poolBelow, event.value.poolAboveEq)
+			const bigPool = Math.max(
+				event.value.poolBelow,
+				event.value.poolAboveEq,
+			)
 
-			return (event.value.totalLiquidityShares * (!amount.value ? 0 : amount.value)) / bigPool
+			return (
+				(event.value.totalLiquidityShares *
+					(!amount.value ? 0 : amount.value)) /
+				bigPool
+			)
 		})
 
 		const onKeydown = (e) => {
-			if (e.code == 'Enter') {
+			if (e.code == "Enter") {
 				e.preventDefault()
 				handleProvideLiquidity()
 			}
@@ -90,42 +112,53 @@ export default defineComponent({
 
 				stop()
 
-				document.removeEventListener('keydown', onKeydown)
+				document.removeEventListener("keydown", onKeydown)
 
 				showHint.confirmationDelay = false
 				showHint.aborted = false
 			} else {
+				start()
+
 				accountStore.updateBalance()
 
-				document.addEventListener('keydown', onKeydown)
+				document.addEventListener("keydown", onKeydown)
 
 				/** auto-focus input */
 				nextTick(() => {
-					amountInput.value.$el.querySelector('input').focus()
+					if (accountStore.isLoggined)
+						amountInput.value.$el.querySelector("input").focus()
 				})
 			}
 		})
 
 		watch(amount, () => {
-			if (!amount.value) amount.value = ''
+			if (!amount.value) amount.value = ""
 		})
 
 		// eslint-disable-next-line vue/return-in-computed-property
 		const buttonState = computed(() => {
 			if (accountStore.pendingTransaction.awaiting) {
 				return {
-					text: 'Previous transaction in process',
+					text: "Previous transaction in process",
 					disabled: true,
 				}
 			}
 
-			if (countdownStatus.value !== 'In progress') return { text: 'Acceptance of bets is closed', disabled: true }
-			if (sendingLiquidity.value) return { text: 'Awaiting confirmation..', disabled: true }
+			if (countdownStatus.value !== "In progress")
+				return {
+					text: "Acceptance of stakes is closed",
+					disabled: true,
+				}
+			if (sendingLiquidity.value)
+				return { text: "Awaiting confirmation..", disabled: true }
 
-			if (amount.value > accountStore.balance) return { text: 'Insufficient funds', disabled: true }
+			if (amount.value > accountStore.balance)
+				return { text: "Insufficient funds", disabled: true }
 
-			if (!amount.value) return { text: 'Select the liquidity amount', disabled: true }
-			if (amount.value) return { text: 'Provide liquidity', disabled: false }
+			if (!amount.value)
+				return { text: "Select the liquidity amount", disabled: true }
+			if (amount.value)
+				return { text: "Provide liquidity", disabled: false }
 		})
 
 		const showHint = reactive({
@@ -148,7 +181,7 @@ export default defineComponent({
 					new BigNumber(event.value.poolAboveEq),
 					new BigNumber(event.value.poolBelow),
 					new BigNumber(slippage.value / 100),
-					new BigNumber(amount.value)
+					new BigNumber(amount.value),
 				)
 				.then((op) => {
 					/** Pending transaction label */
@@ -174,28 +207,31 @@ export default defineComponent({
 					setTimeout(() => {
 						notificationsStore.create({
 							notification: {
-								type: 'success',
-								title: 'Your liquidity has been accepted',
-								description: 'We need to process your bet, it will take 15-30 seconds',
+								type: "success",
+								title: "Your liquidity has been accepted",
+								description:
+									"We need to process your bet, it will take 15-30 seconds",
 								autoDestroy: true,
 							},
 						})
 					}, 700)
 
 					/** analytics */
-					analytics.log('onLiquidity', {
+					analytics.log("onLiquidity", {
 						eventId: event.value.id,
 						amount: amount.value,
-						tts: DateTime.fromISO(event.value.betsCloseTime).ts - DateTime.now().ts,
+						tts:
+							DateTime.fromISO(event.value.betsCloseTime).ts -
+							DateTime.now().ts,
 					})
 
-					context.emit('onClose')
+					context.emit("onClose")
 				})
 				.catch((err) => {
 					sendingLiquidity.value = false
 					showHint.confirmationDelay = false
 
-					if (err.title == 'Aborted') showHint.aborted = true
+					if (err.title == "Aborted") showHint.aborted = true
 				})
 		}
 
@@ -206,7 +242,7 @@ export default defineComponent({
 				accountStore.setPkh(pkh)
 			})
 
-			context.emit('onClose')
+			context.emit("onClose")
 		}
 
 		return {
@@ -228,7 +264,7 @@ export default defineComponent({
 		}
 	},
 
-	emits: ['onClose'],
+	emits: ["onClose"],
 	components: {
 		Modal,
 		Input,
@@ -244,22 +280,46 @@ export default defineComponent({
 </script>
 
 <template>
-	<Modal :show="show" width="500" closable @onClose="$emit('onClose')">
-		<template v-if="accountStore.isLoggined">
-			<div :class="$style.title">Providing liquidity</div>
+	<Modal :show="show" width="500" new closable @onClose="$emit('onClose')">
+		<Flex align="center" justify="between" :class="$style.head">
+			<Flex align="center" gap="8">
+				<Icon name="server" size="16" color="secondary" />
 
+				<Text
+					@click="emit('onBack')"
+					size="14"
+					weight="600"
+					color="primary"
+				>
+					Deposit Liquidity
+				</Text>
+			</Flex>
+
+			<Icon
+				@click="$emit('onClose')"
+				name="close"
+				size="16"
+				color="tertiary"
+				:class="$style.close_icon"
+			/>
+		</Flex>
+
+		<Flex direction="column" gap="32" :class="$style.base">
 			<Banner
 				v-if="currentNetwork !== 'mainnet'"
 				icon="hammer"
 				color="yellow"
 				size="small"
 				center
-				:class="$style.banner"
 			>
-				The transaction takes place on the Ithacanet
+				The transaction takes place on the Test Network
 			</Banner>
 
-			<PositionDirection :event="event" :amount="amount" :countdown="countdownText" :class="$style.direction" />
+			<PositionDirection
+				:event="event"
+				:amount="amount"
+				:countdown="countdownText"
+			/>
 
 			<Input
 				ref="amountInput"
@@ -269,17 +329,20 @@ export default defineComponent({
 				placeholder="Liquidity amount"
 				subtext="ꜩ"
 				v-model="amount.value"
-				:error="amount.error"
-				@clearError="amount.error = ''"
-				:class="$style.amount_input"
 			/>
 
-			<SplittedPool :event="event" :amount="amount.value" side="Liquidity" :class="$style.pool" />
+			<SplittedPool
+				:event="event"
+				:amount="amount.value"
+				side="Liquidity"
+			/>
 
-			<SlippageSelector v-model="slippage" :class="$style.slippage_block" />
+			<SlippageSelector v-model="slippage" />
 
 			<div :class="$style.stats">
-				<Stat name="Reward for providing">{{ (event.liquidityPercent * 100).toFixed(0) }}%</Stat>
+				<Stat name="Payout for providing"
+					>{{ (event.liquidityPercent * 100).toFixed(0) }}%</Stat
+				>
 
 				<Stat v-if="liquidityRatio" name="Ratio">
 					<Icon name="close" size="14" :class="$style.ratio_icon" />
@@ -293,7 +356,6 @@ export default defineComponent({
 				icon="warning"
 				color="red"
 				size="small"
-				:class="$style.banner"
 			>
 				This event is Custom, its behavior may depend on the parameters
 			</Banner>
@@ -307,7 +369,11 @@ export default defineComponent({
 				:disabled="buttonState.disabled"
 			>
 				<Spin v-if="sendingLiquidity" size="16" />
-				<Icon v-else :name="!buttonState.disabled ? 'bolt' : 'lock'" size="16" />
+				<Icon
+					v-else
+					:name="!buttonState.disabled ? 'bolt' : 'lock'"
+					size="16"
+				/>
 				{{ buttonState.text }}
 			</Button>
 
@@ -323,18 +389,7 @@ export default defineComponent({
 					>Read about possible solutions</a
 				>
 			</div>
-		</template>
-
-		<template v-else>
-			<div :class="$style.title">Providing liquidity</div>
-			<div :class="$style.description">
-				You need to connect your wallet (with Beacon) to place liquidity and make bets
-			</div>
-
-			<Button @click="handleLogin" size="large" type="primary" block>
-				<Icon name="login" size="16" />Sign in to continue
-			</Button>
-		</template>
+		</Flex>
 	</Modal>
 </template>
 
@@ -342,46 +397,24 @@ export default defineComponent({
 .wrapper {
 }
 
-.title {
-	font-size: 20px;
-	font-weight: 600;
-	line-height: 1.2;
-	color: var(--text-primary);
+.head {
+	height: 56px;
 
-	margin-bottom: 24px;
+	padding: 0 20px;
 }
 
-.direction {
-	margin-bottom: 32px;
+.close_icon {
+	cursor: pointer;
 }
 
-.description {
-	font-size: 14px;
-	line-height: 1.6;
-	font-weight: 500;
-	color: var(--text-tertiary);
-
-	margin-bottom: 24px;
-}
-
-.amount_input {
-	margin-bottom: 24px;
-}
-
-.pool {
-	margin-bottom: 24px;
+.base {
+	padding: 8px 20px 20px 20px;
 }
 
 .stats {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-
-	margin-bottom: 24px;
-}
-
-.slippage_block {
-	margin-bottom: 24px;
 }
 
 .ratio_icon {
@@ -394,15 +427,9 @@ export default defineComponent({
 	font-weight: 500;
 	color: var(--text-tertiary);
 	text-align: center;
-
-	margin-top: 12px;
 }
 
 .hint a {
 	color: var(--text-blue);
-}
-
-.banner {
-	margin-bottom: 24px;
 }
 </style>

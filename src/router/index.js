@@ -1,181 +1,341 @@
+/**
+ * Vendor
+ */
 import { createRouter, createWebHistory } from "vue-router"
-import { useAccountStore } from "@/store/account"
+
+/**
+ * Store
+ */
+import { useAppStore } from "@store/app"
+import { useAccountStore } from "@store/account"
 
 const routes = [
-    {
-        path: "/explore",
-        redirect: "/",
-    },
-    {
-        path: "/error",
-        name: "error",
-        component: () =>
-            import(/* webpackChunkName: "error" */ "@/views/ErrorPage"),
-    },
-    {
-        path: "/:pathMatch(.*)*",
-        redirect: "/error",
-    },
+	{
+		path: "/explore",
+		redirect: "/",
+	},
+	{
+		path: "/error",
+		name: "error",
+		component: () => import("@views/ErrorPage.vue"),
+	},
+	{
+		path: "/:pathMatch(.*)*",
+		redirect: "/error",
+	},
 
-    {
-        path: "/landing",
-        name: "Landing",
-        component: () =>
-            import(/* webpackChunkName: "landing" */ "@/views/LandingPage"),
-    },
-    {
-        path: "/launch",
-        name: "Launch",
-        component: () =>
-            import(/* webpackChunkName: "launch" */ "@/views/LaunchPage"),
-    },
+	{
+		path: "/connect",
+		name: "Connect",
+		component: () => import("@views/ConnectPage.vue"),
+	},
+	{
+		path: "/landing",
+		name: "Landing",
+		component: () => import("@views/LandingPage.vue"),
+	},
+	{
+		path: "/launch",
+		name: "Launch",
+		component: () => import("@views/LaunchPage.vue"),
+	},
 
-    {
-        path: "/",
-        name: "Explore",
-        component: () =>
-            import(/* webpackChunkName: "explore" */ "@/views/ExplorePage"),
-    },
+	{
+		path: "/",
+		name: "Explore",
+		component: () => import("@views/ExplorePage.vue"),
+	},
 
-    {
-        path: "/events",
-        name: "Events",
-        component: () =>
-            import(/* webpackChunkName: "events" */ "@/views/EventsPage"),
-    },
-    {
-        path: "/events/top",
-        name: "TopEvents",
-        component: () =>
-            import(/* webpackChunkName: "topevents" */ "@/views/TopEventsPage"),
-    },
-    {
-        path: "/events/:id",
-        name: "Event",
-        component: () =>
-            import(/* webpackChunkName: "event" */ "@/views/EventPage"),
-    },
+	{
+		path: "/events",
+		name: "Events",
+		component: () => import("@views/EventsPage.vue"),
+	},
+	{
+		path: "/events/top",
+		name: "TopEvents",
+		component: () => import("@views/TopEventsPage.vue"),
+	},
+	{
+		path: "/events/:id",
+		name: "Event",
+		component: () => import("@views/EventPage.vue"),
+	},
 
-    {
-        path: "/markets",
-        name: "Markets",
-        component: () =>
-            import(/* webpackChunkName: "markets" */ "@/views/MarketsPage"),
-    },
-    {
-        path: "/markets/:name",
-        name: "Market",
-        component: () =>
-            import(/* webpackChunkName: "market" */ "@/views/MarketPage"),
-    },
+	{
+		path: "/markets",
+		name: "Markets",
+		component: () => import("@views/MarketsPage.vue"),
+	},
+	{
+		path: "/markets/:name",
+		name: "Market",
+		component: () => import("@views/MarketPage.vue"),
+	},
 
-    {
-        path: "/rating",
-        name: "Rating",
-        component: () =>
-            import(/* webpackChunkName: "rating" */ "@/views/LeaderboardPage"),
-    },
-    {
-        path: "/profile",
-        name: "MyProfile",
-        beforeEnter: (to, from, next) => {
-            const accountStore = useAccountStore()
+	// Pools
+	{
+		path: "/pools",
+		name: "Liquidity Pools",
+		component: () => import("@views/PoolsPage.vue"),
+	},
+	{
+		path: "/pools/:address",
+		name: "Liquidity Pool",
+		component: () => import("@views/PoolPage.vue"),
+	},
+	{
+		path: "/pools/list",
+		name: "Raw Pools",
+		component: () => import("@views/RawPoolsPage.vue"),
+	},
+	{
+		path: "/pools/positions",
+		name: "Raw Positions",
+		component: () => import("@views/RawPositionsPage.vue"),
+	},
 
-            if (to.params.address) {
-                next()
-                return
-            }
+	// Settings
+	{
+		path: "/settings",
+		name: "Settings",
+		component: () => import("@views/SettingsPage.vue"),
+		beforeEnter: (to, from, next) => {
+			const accountStore = useAccountStore()
 
-            if (accountStore.isLoggined) {
-                next()
-            } else {
-                next({ name: "Explore" })
-            }
-        },
-        component: () =>
-            import(/* webpackChunkName: "myprofile" */ "@/views/ProfilePage"),
-        children: [
-            {
-                path: ":address",
-                name: "Profile",
-                component: () =>
-                    import(
-                        /* webpackChunkName: "profile" */ "@/views/ProfilePage"
-                    ),
-            },
-        ],
-    },
-    {
-        path: "/withdrawals",
-        name: "Withdrawals",
-        beforeEnter: (to, from, next) => {
-            const accountStore = useAccountStore()
-            if (accountStore.isLoggined) {
-                next()
-            } else {
-                next({ name: "Explore" })
-            }
-        },
-        component: () =>
-            import(
-                /* webpackChunkName: "withdrawals" */ "@/views/WithdrawalsPage"
-            ),
-    },
+			next({ name: "Explore" })
 
-    {
-        path: "/terms",
-        name: "Terms",
-        component: () =>
-            import(/* webpackChunkName: "terms" */ "@/views/Other/TermsPage"),
-    },
-    {
-        path: "/policy",
-        name: "Policy",
-        component: () =>
-            import(/* webpackChunkName: "policy" */ "@/views/Other/PolicyPage"),
-    },
-    {
-        path: "/sitemap",
-        name: "Sitemap",
-        component: () =>
-            import(
-                /* webpackChunkName: "sitemap" */ "@/views/Other/SitemapPage"
-            ),
-    },
+			// if (accountStore.isLoggined) {
+			// 	next()
+			// } else {
+			// 	next({ name: "Explore" })
+			// }
+		},
+		redirect: "/settings/account/",
+		children: [
+			// General Settings
+			{
+				name: "AccountSettings",
+				path: "account",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/AccountSettings.vue"
+					),
+			},
+			{
+				name: "ApplicationSettings",
+				path: "application",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/ApplicationSettings.vue"
+					),
+			},
+			{
+				name: "WalletSettings",
+				path: "wallet",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/WalletSettings.vue"
+					),
+			},
+			// Appearance Settings
+			{
+				name: "DisplaySettings",
+				path: "display",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/DisplaySettings.vue"
+					),
+			},
+			{
+				name: "AmountsSettings",
+				path: "amounts",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/AmountsSettings.vue"
+					),
+			},
+			{
+				name: "ThemeSettings",
+				path: "theme",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/ThemeSettings.vue"
+					),
+			},
+			// Accessibility Settings
+			{
+				name: "SearchSettings",
+				path: "search",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/SearchSettings.vue"
+					),
+			},
+			{
+				name: "EffectsSettings",
+				path: "effects",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/EffectsSettings.vue"
+					),
+			},
+			{
+				name: "ShortcutsSettings",
+				path: "shortcuts",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/ShortcutsSettings.vue"
+					),
+			},
+			// Other Settings
+			{
+				name: "AdvancedSettings",
+				path: "advanced",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/AdvancedSettings.vue"
+					),
+			},
+			{
+				name: "DebuggingSettings",
+				path: "debugging",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/DebuggingSettings.vue"
+					),
+			},
+			{
+				name: "ResetsSettings",
+				path: "resets",
+				component: () =>
+					import(
+						"@/components/modules/settings/pages/ResetsSettings.vue"
+					),
+			},
+		],
+	},
 
-    {
-        path: "/docs",
-        name: "Docs",
-        component: () =>
-            import(/* webpackChunkName: "docs" */ "@/views/DocsPage"),
-        children: [
-            {
-                path: ":slug",
-                name: "Doc",
-                component: () =>
-                    import(/* webpackChunkName: "doc" */ "@/views/DocPage"),
-            },
-        ],
-    },
+	{
+		path: "/rating",
+		name: "Rating",
+		component: () => import("@views/LeaderboardPage.vue"),
+	},
 
-    /** Releases */
-    {
-        path: "/releases",
-        name: "Releases",
-        component: () =>
-            import(/* webpackChunkName: "releases" */ "@/views/ReleasesPage"),
-    },
-    {
-        path: "/releases/:slug",
-        name: "Release",
-        component: () =>
-            import(/* webpackChunkName: "release" */ "@/views/ReleasePage"),
-    },
+	{
+		path: "/welcome",
+		name: "Welcome",
+		component: () => import("@views/WelcomePage.vue"),
+		beforeEnter: (to, from, next) => {
+			const accountStore = useAccountStore()
+
+			if (!accountStore.pkh.length) {
+				next({ name: "Explore" })
+			} else {
+				next()
+			}
+		},
+	},
+	{
+		path: "/profile",
+		name: "MyProfile",
+		beforeEnter: (to, from, next) => {
+			const accountStore = useAccountStore()
+
+			if (to.params.address) {
+				next()
+				return
+			}
+
+			if (accountStore.isLoggined) {
+				next()
+			} else {
+				next({ name: "Explore" })
+			}
+		},
+		component: () => import("@views/ProfilePage.vue"),
+		children: [
+			{
+				path: ":address",
+				name: "Profile",
+				component: () => import("@views/ProfilePage.vue"),
+			},
+		],
+	},
+	{
+		path: "/withdrawals",
+		name: "Withdrawals",
+		beforeEnter: (to, from, next) => {
+			const accountStore = useAccountStore()
+			if (accountStore.isLoggined) {
+				next()
+			} else {
+				next({ name: "Explore" })
+			}
+		},
+		component: () => import("@views/WithdrawalsPage.vue"),
+	},
+
+	{
+		path: "/blog",
+		name: "Blog",
+		component: () => import("@views/Other/BlogPage.vue"),
+	},
+	{
+		path: "/blog/:slug",
+		name: "Article",
+		component: () => import("@views/Other/ArticlePage.vue"),
+	},
+
+	{
+		path: "/terms",
+		name: "Terms",
+		component: () => import("@views/Other/TermsPage.vue"),
+	},
+	{
+		path: "/policy",
+		name: "Policy",
+		component: () => import("@views/Other/PolicyPage.vue"),
+	},
+	{
+		path: "/sitemap",
+		name: "Sitemap",
+		component: () => import("@views/Other/SitemapPage.vue"),
+	},
+
+	{
+		path: "/docs",
+		name: "Docs",
+		component: () => import("@views/DocsPage.vue"),
+		redirect: "/docs/discover",
+		children: [
+			{
+				path: ":slug",
+				name: "Doc",
+				component: () => import("@modules/docs/DocBase.vue"),
+			},
+		],
+	},
+
+	/** Releases */
+	{
+		path: "/releases",
+		name: "Releases",
+		component: () => import("@views/ReleasesPage.vue"),
+	},
 ]
 
 const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
-    routes,
+	history: createWebHistory(import.meta.env.BASE_URL),
+	routes,
+})
+
+router.beforeEach((target, prev, next) => {
+	const appStore = useAppStore()
+
+	if (prev.name) appStore.prevRoute = prev
+
+	next()
 })
 
 export default router

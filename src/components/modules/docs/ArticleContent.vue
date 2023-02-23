@@ -1,33 +1,60 @@
-<script>
-import { computed, defineComponent, toRefs, ref } from "vue"
+<script setup>
+/**
+ * Vendor
+ */
+import { reactive } from "vue"
 
-import Markdown from "markdown-it"
+/**
+ * Sanity Components
+ */
+import Blockquote from "@sanity/Blockquote.vue"
+import Image from "@sanity/Image.vue"
+import Banner from "@sanity/Banner.vue"
+import Collapse from "@sanity/Collapse.vue"
+import Link from "@sanity/Link.vue"
+import Code from "@sanity/Code.vue"
+import CodeBlock from "@sanity/CodeBlock.vue"
+import List from "@sanity/List.vue"
+import ListItem from "@sanity/ListItem.vue"
+import HeaderAnchor from "./HeaderAnchor.vue"
 
-export default defineComponent({
-    name: "ArticleContent",
-    props: {
-        source: {
-            type: String,
-            required: true,
-        },
-    },
+/**
+ * Utils
+ */
+import PortableText from "@utils/render.js"
 
-    setup(props) {
-        const { source } = toRefs(props)
+const props = defineProps({
+	title: String,
+	content: Array,
+})
 
-        const md = ref(null)
-
-        md.value = new Markdown({ html: true })
-
-        const content = computed(() => md.value.render(source.value))
-
-        return { content }
-    },
+const serializers = reactive({
+	types: {
+		image: Image,
+		banner: Banner,
+		collapse: Collapse,
+		codeBlock: CodeBlock,
+	},
+	styles: {
+		blockquote: Blockquote,
+		h2: HeaderAnchor,
+		h3: HeaderAnchor,
+		h4: HeaderAnchor,
+	},
+	marks: {
+		code: Code,
+		link: Link,
+	},
+	list: List,
+	listItem: ListItem,
 })
 </script>
 
 <template>
-    <div v-html="content" :class="$style.wrapper" />
+	<div :class="$style.wrapper">
+		<h1 v-if="title">{{ title }}</h1>
+		<PortableText :blocks="content" :serializers="serializers" />
+	</div>
 </template>
 
 <style module>
@@ -35,79 +62,45 @@ export default defineComponent({
 }
 
 .wrapper h1 {
-    margin-bottom: 24px;
+	margin: 0 0 1em 0;
 }
 
 .wrapper h2 {
-    cursor: pointer;
-    margin-bottom: 24px;
+	margin: 2em 0 1em 0;
 }
 
-.wrapper h2::after {
-    content: "";
-    position: relative;
-    top: 2px;
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    background: url("~@/assets/icons/anchor.svg") no-repeat;
-    background-size: 100% 100%;
-    margin-left: 8px;
-    opacity: 0;
-
-    transition: opacity 0.2s ease;
+.wrapper h3 {
+	margin: 2em 0 1em 0;
 }
 
-.wrapper h2:hover::after {
-    opacity: 0.5;
+.wrapper h4 {
+	margin: 2em 0 1em 0;
 }
 
 .wrapper p {
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--text-secondary);
+	font-size: 16px;
+	line-height: 1.6;
+	color: var(--text-secondary);
 
-    margin-bottom: 40px;
+	margin: 0.8em 0 1.2em 0;
 }
 
 .wrapper blockquote p {
-    font-size: 14px;
-    color: var(--text-tertiary);
+	font-size: 14x;
+	color: var(--text-tertiary);
 }
 
 .wrapper blockquote p strong {
-    color: var(--text-primary);
-    font-weight: 500;
+	color: var(--text-primary);
+	font-weight: 500;
 }
 
-.wrapper ul {
-    padding-inline-start: 20px;
-
-    margin-bottom: 24px;
+.wrapper p a {
+	color: var(--text-blue);
 }
 
-.wrapper ul li {
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--text-secondary);
-
-    list-style-type: "—";
-    padding-inline-start: 1ch;
-
-    margin-bottom: 4px;
-}
-
-.wrapper ol {
-    padding-inline-start: 20px;
-
-    margin-bottom: 24px;
-}
-
-.wrapper ol li {
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--text-secondary);
-
-    margin-bottom: 4px;
+.wrapper strong {
+	color: var(--text-primary);
+	font-weight: 600;
 }
 </style>

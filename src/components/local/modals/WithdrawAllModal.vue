@@ -1,29 +1,33 @@
 <script>
+/**
+ * Vendor
+ */
 import { computed, defineComponent, ref, toRefs, watch } from "vue"
 
 /**
  * UI
  */
-import Modal from "@/components/ui/Modal"
-import Button from "@/components/ui/Button"
-import Spin from "@/components/ui/Spin"
-import Checkbox from "@/components/ui/Checkbox"
+import Modal from "@ui/Modal.vue"
+import Button from "@ui/Button.vue"
+import LoadingBar from "@ui/LoadingBar.vue"
+import Checkbox from "@ui/Checkbox.vue"
 
 /**
  * Store
  */
-import { useNotificationsStore } from "@/store/notifications"
-import { useAccountStore } from "@/store/account"
+import { useNotificationsStore } from "@store/notifications"
+import { useAccountStore } from "@store/account"
 
 /**
  * SDK
  */
-import { withdrawAll } from "@/services/sdk"
+import { withdrawAll } from "@sdk"
 
 /**
  * Services
  */
-import { supportedMarkets } from "@/services/config"
+import { supportedMarkets } from "@config"
+import { numberWithSymbol } from "@utils/amounts"
 
 export default defineComponent({
 	name: "WithdrawAllModal",
@@ -61,14 +65,18 @@ export default defineComponent({
 
 			if (awaitingConfirmation.value)
 				return {
-					text: "Awaiting confirmation..",
+					text: "",
 					disabled: true,
 				}
 
 			return {
-				text: `Withdraw ${selectedPositions.value
-					.reduce((acc, curr) => acc + curr.value, 0)
-					.toFixed(2)} ꜩ`,
+				text: `Withdraw ${numberWithSymbol(
+					selectedPositions.value.reduce(
+						(acc, curr) => acc + curr.value,
+						0,
+					),
+					",",
+				)} ꜩ`,
 				disabled: false,
 			}
 		})
@@ -133,6 +141,13 @@ export default defineComponent({
 			}
 		}
 
+		const getSideIcon = (side) => {
+			return new URL(
+				`../../../assets/icons/${side}_won.svg`,
+				import.meta.url,
+			).href
+		}
+
 		watch(show, () => {
 			if (!show.value) {
 				selectedPositionsIds.value = []
@@ -147,6 +162,7 @@ export default defineComponent({
 			selectedPositions,
 			isAllSelected,
 			awaitingConfirmation,
+			getSideIcon,
 			handleSelectPosition,
 			handleSelectAllPositions,
 			handleUnselectAllPositions,
@@ -158,92 +174,127 @@ export default defineComponent({
 	components: {
 		Modal,
 		Button,
-		Spin,
+		LoadingBar,
 		Checkbox,
 	},
 })
 </script>
 
 <template>
-	<Modal :show="show" width="500" closable @onClose="$emit('onClose')">
-		<div :class="$style.title">Withdraw all</div>
-		<div :class="$style.description">
-			Here you can send a batch request to withdraw all your funds
-		</div>
+	<Modal :show="show" width="500" new closable @onClose="$emit('onClose')">
+		<Flex align="center" justify="between" :class="$style.head">
+			<Flex align="center" gap="8">
+				<Icon name="coins" size="16" color="secondary" />
 
-		<div :class="$style.subtitle">
-			<span>Select positions to withdraw</span>
+				<Text
+					size="14"
+					weight="600"
+					color="primary"
+					:class="$style.head_btn"
+				>
+					Withdraw all
+				</Text>
+			</Flex>
 
-			<span v-if="!isAllSelected" @click="handleSelectAllPositions"
-				>Select all ({{
-					positions.filter((pos) => pos.value).length
-				}})</span
-			>
-			<span v-else @click="handleUnselectAllPositions"
-				>Unselect all ({{
-					positions.filter((pos) => pos.value).length
-				}})</span
-			>
-		</div>
+			<Icon
+				@click="$emit('onClose')"
+				name="close"
+				size="16"
+				color="tertiary"
+				:class="$style.close_icon"
+			/>
+		</Flex>
 
-		<div :class="$style.positions">
-			<div
-				v-for="position in positions.filter((pos) => pos.value)"
-				:key="position.id"
-				@click="handleSelectPosition(position)"
-				:class="$style.position"
-			>
-				<Checkbox
-					:forceChecked="selectedPositionsIds.includes(position.id)"
-				/>
+		<Flex direction="column" gap="32" :class="$style.base">
+			<Text size="13" weight="500" color="tertiary" height="16">
+				Send a batch request to withdraw all your funds
+			</Text>
 
-				<div :class="$style.base">
-					<div :class="$style.name">
-						<img
-							v-if="position.event.winnerBets == 'ABOVE_EQ'"
-							:src="require('@/assets/icons/higher_won.svg')"
-							alt="won_side_icon"
+			<Flex direction="column" gap="16">
+				<div :class="$style.subtitle">
+					<span>Select positions to withdraw</span>
+
+					<span
+						v-if="!isAllSelected"
+						@click="handleSelectAllPositions"
+						>Select all ({{
+							positions.filter((pos) => pos.value).length
+						}})</span
+					>
+					<span v-else @click="handleUnselectAllPositions"
+						>Unselect all ({{
+							positions.filter((pos) => pos.value).length
+						}})</span
+					>
+				</div>
+
+				<div v-if="positions.length" :class="$style.positions">
+					<div
+						v-for="position in positions.filter((pos) => pos.value)"
+						:key="position.id"
+						@click="handleSelectPosition(position)"
+						:class="$style.position"
+					>
+						<Checkbox
+							:forceChecked="
+								selectedPositionsIds.includes(position.id)
+							"
 						/>
-						<img
-							v-else
-							:src="require('@/assets/icons/lower_won.svg')"
-							alt="won_side_icon"
-						/>
-						<span>{{
-							supportedMarkets[position.event.currencyPair.symbol]
-						}}</span>
-						price event
-					</div>
-					<div :class="$style.subname">
-						Event ID: {{ position.event.id }}, Amount:&nbsp;<span>{{
-							position.value.toFixed(2)
-						}}</span
-						>&nbsp;ꜩ
+
+						<Flex direction="column" gap="8">
+							<div :class="$style.name">
+								<Icon
+									v-if="
+										position.event.winnerBets == 'ABOVE_EQ'
+									"
+									name="higher"
+									size="16"
+									color="green"
+								/>
+								<Icon
+									v-else
+									name="lower"
+									size="16"
+									color="tertiary"
+								/>
+
+								<span>{{
+									supportedMarkets[
+										position.event.currencyPair.symbol
+									].description
+								}}</span>
+
+								price event
+							</div>
+							<div :class="$style.subname">
+								Event: #{{ position.event.id }},
+								amount:&nbsp;<span>{{
+									position.value.toFixed(2)
+								}}</span
+								>&nbsp;ꜩ
+							</div>
+						</Flex>
 					</div>
 				</div>
-			</div>
-		</div>
+			</Flex>
 
-		<div :class="$style.hint">
-			Please note that a response about successful withdrawal will come
-			when all operations are completed (this may take some time).
-			<a
-				href="https://juster.notion.site/Withdraw-all-funds-77d8592c238947b497a54f8f3617feb3"
-				target="_blank"
-				>Learn more</a
+			<Button
+				@click="handleWithdrawAll"
+				:type="buttonState.disabled ? 'secondary' : 'success'"
+				size="large"
+				:disabled="buttonState.disabled"
+				:loading="awaitingConfirmation"
+				block
 			>
-		</div>
-
-		<Button
-			@click="handleWithdrawAll"
-			:type="buttonState.disabled ? 'secondary' : 'success'"
-			size="large"
-			:disabled="buttonState.disabled"
-			:loading="awaitingConfirmation"
-			block
-			><Icon v-if="!awaitingConfirmation" name="crown" size="16" />
-			<Spin v-else size="16" />{{ buttonState.text }}</Button
-		>
+				<Icon
+					v-if="!awaitingConfirmation && !buttonState.disabled"
+					name="coins"
+					size="16"
+				/>
+				<LoadingBar v-else-if="awaitingConfirmation" size="16" />
+				{{ buttonState.text }}
+			</Button>
+		</Flex>
 	</Modal>
 </template>
 
@@ -251,22 +302,18 @@ export default defineComponent({
 .wrapper {
 }
 
-.title {
-	font-size: 20px;
-	font-weight: 600;
-	line-height: 1.2;
-	color: var(--text-primary);
+.head {
+	height: 56px;
 
-	margin-bottom: 16px;
+	padding: 0 20px;
 }
 
-.description {
-	font-size: 14px;
-	line-height: 1.6;
-	font-weight: 600;
-	color: var(--text-tertiary);
+.base {
+	padding: 0px 20px 20px 20px;
+}
 
-	margin-bottom: 32px;
+.close_icon {
+	cursor: pointer;
 }
 
 .subtitle {
@@ -277,8 +324,6 @@ export default defineComponent({
 	line-height: 1;
 	font-weight: 600;
 	color: var(--text-secondary);
-
-	margin-bottom: 16px;
 }
 
 .subtitle span:nth-child(2) {
@@ -299,15 +344,10 @@ export default defineComponent({
 	display: flex;
 	gap: 14px;
 
+	cursor: pointer;
 	border-radius: 8px;
-	border: 1px solid var(--border);
+	background: rgba(255, 255, 255, 0.05);
 	padding: 16px;
-}
-
-.base {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
 }
 
 .name {
@@ -341,18 +381,5 @@ export default defineComponent({
 
 .subname span {
 	color: var(--text-primary);
-}
-
-.hint {
-	font-size: 12px;
-	line-height: 1.6;
-	font-weight: 500;
-	color: var(--text-tertiary);
-
-	margin: 8px 0 32px 0;
-}
-
-.hint a {
-	color: var(--text-blue);
 }
 </style>

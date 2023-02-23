@@ -1,31 +1,23 @@
-<script>
-import { defineComponent } from "vue"
-
+<script setup>
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * Module
  */
-import DocBase from "@/components/modules/docs/DocBase"
-
-export default defineComponent({
-    name: "DocPage",
-
-    components: { Page, DocBase },
-})
+import DocBase from "@modules/docs/DocBase.vue"
 </script>
 
 <template>
-    <Page style="padding: 0; margin-bottom: 0">
-        <DocBase />
-    </Page>
+	<Page style="padding: 0; margin-bottom: 0">
+		<DocBase />
+	</Page>
 </template>
 
 <style module>
 .wrapper {
-    max-width: 1250px;
+	max-width: 1250px;
 }
 </style>

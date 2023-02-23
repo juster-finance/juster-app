@@ -1,4 +1,7 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { computed, onBeforeUnmount, onMounted, reactive } from "vue"
 import { useRouter } from "vue-router"
 import axios from "axios"
@@ -7,26 +10,22 @@ import { DateTime } from "luxon"
 /**
  * Services
  */
-import { juster, switchNetwork, currentNetwork } from "@/services/sdk"
-import { capitalizeFirstLetter } from "@/services/utils/global"
-
-/**
- * Constants
- */
-import { Networks } from "@/services/constants"
-
-/**
- * Store
- */
-import { useMarketStore } from "@/store/market"
-const marketStore = useMarketStore()
+import { juster, switchNetwork, currentNetwork } from "@sdk"
+import { capitalizeFirstLetter } from "@utils/misc"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Tooltip from "@/components/ui/Tooltip"
-import { Dropdown, DropdownItem, DropdownTitle } from "@/components/ui/Dropdown"
+import Button from "@ui/Button.vue"
+import Tooltip from "@ui/Tooltip.vue"
+import { Dropdown, DropdownItem, DropdownTitle } from "@ui/Dropdown"
+
+/**
+ * Store
+ */
+import { useMarketStore } from "@store/market"
+
+const marketStore = useMarketStore()
 
 const router = useRouter()
 
@@ -53,27 +52,23 @@ const statusBlock = computed(() => {
 		status.network === STATUSES.GOOD &&
 		status.quotes == STATUSES.GOOD
 	) {
-		return { text: "All systems online", color: "green" }
+		return { text: "Stable", color: "green" }
 	} else if (
 		status.dipdup === STATUSES.DELAYED &&
 		status.network === STATUSES.DELAYED &&
 		status.quotes == STATUSES.DELAYED
 	) {
-		return { text: "All systems delayed", color: "red" }
-	} else if (
-		status.dipdup !== STATUSES.GOOD ||
-		status.network !== STATUSES.GOOD ||
-		status.quotes !== STATUSES.GOOD
-	) {
-		return { text: "Some systems delayed", color: "yellow" }
+		return { text: "Everything delayed", color: "red" }
+	} else {
+		return { text: "Systems delayed", color: "yellow" }
 	}
 })
 
 const checkDipdup = async () => {
 	const urlToCheck =
 		currentNetwork.value == "mainnet"
-			? "https://juster.dipdup.net/api/rest/dipdupHead?name=https://api.tzkt.io"
-			: "https://api.ithacanet.juster.fi/api/rest/dipdupHead?name=https://api.ithacanet.tzkt.io"
+			? "https://juster.dipdup.net/api/rest/dipdupHead?name=https://tzkt-mainnet.dipdup.net"
+			: "https://api.ithacanet-pool.juster.fi/api/rest/dipdupHead?name=https://api.ghostnet.tzkt.io"
 	const {
 		data: { dipdupHeadByPk },
 	} = await axios.get(urlToCheck)
@@ -83,7 +78,7 @@ const checkDipdup = async () => {
 		.diff(dipdupDt, ["minutes", "seconds"])
 		.toObject()
 
-	if (dipdupDiff.minutes >= 1) {
+	if (dipdupDiff.minutes >= 3) {
 		status.dipdup = STATUSES.DELAYED
 	} else {
 		status.dipdup = STATUSES.GOOD
@@ -93,7 +88,7 @@ const checkDipdup = async () => {
 const checkNetwork = async () => {
 	const { data } = await axios.get(
 		`https://rpc.tzkt.io/${
-			currentNetwork.value == "mainnet" ? "mainnet" : "ithacanet"
+			currentNetwork.value == "mainnet" ? "mainnet" : "ghostnet"
 		}/chains/main/blocks/head/header`,
 	)
 
@@ -119,7 +114,7 @@ const checkQuotes = () => {
 		)
 		.toObject()
 
-	if (quotesDiff.minutes >= 3) {
+	if (quotesDiff.minutes >= 10) {
 		status.quotes = STATUSES.DELAYED
 	} else {
 		status.quotes = STATUSES.GOOD
@@ -128,7 +123,7 @@ const checkQuotes = () => {
 
 const handleSwitch = (network) => {
 	juster.sdk._provider.client.clearActiveAccount().then(async () => {
-		switchNetwork(network)
+		switchNetwork(network, router)
 	})
 }
 
@@ -175,6 +170,9 @@ onBeforeUnmount(() => {
 						<router-link to="/markets" :class="$style.link"
 							>Markets</router-link
 						>
+						<router-link to="/pools" :class="$style.link">
+							Liquidity Pools
+						</router-link>
 					</div>
 
 					<div :class="$style.column">
@@ -208,28 +206,34 @@ onBeforeUnmount(() => {
 			<div :class="$style.bottom">
 				<div :class="$style.block">
 					<div :class="$style.left">
-						<Tooltip position="top">
-							<a href="https://status.juster.fi" target="_blank">
-								<Button
-									type="secondary"
-									size="small"
-									:class="[
-										$style.footer_btn,
-										$style[statusBlock.color],
-									]"
-								>
-									<Icon name="bolt" size="12" />{{
-										statusBlock.text
-									}}
-								</Button>
-							</a>
+						<Tooltip placement="top">
+							<Button
+								type="secondary"
+								size="small"
+								link="https://status.juster.fi"
+								:class="[
+									$style.footer_btn,
+									$style[statusBlock.color],
+								]"
+							>
+								<Icon
+									:name="
+										(statusBlock.color === 'green' &&
+											'checkcircle') ||
+										'warning'
+									"
+									size="14"
+									:class="$style"
+								/>
+								{{ statusBlock.text }}
+							</Button>
 
-							<template #content
-								><span>DipDup:</span> {{ status.dipdup
+							<template #content>
+								<span>DipDup:</span> {{ status.dipdup
 								}}<br /><span>Network:</span> {{ status.network
 								}}<br /><span>Quotes:</span>
-								{{ status.quotes }}</template
-							>
+								{{ status.quotes }}
+							</template>
 						</Tooltip>
 
 						<Dropdown side="top">
@@ -237,15 +241,21 @@ onBeforeUnmount(() => {
 								<Button
 									type="secondary"
 									size="small"
-									:class="[
-										$style.footer_btn,
-										currentNetwork == 'mainnet'
-											? $style.green
-											: $style.yellow,
-									]"
+									:class="[$style.footer_btn]"
+									data-cy="network-dropdown"
 								>
-									<Icon name="network" size="12" />{{
-										capitalizeFirstLetter(currentNetwork)
+									<Icon
+										:name="
+											currentNetwork === 'testnet'
+												? 'hammer'
+												: 'explorer'
+										"
+										size="12"
+									/>
+									{{
+										currentNetwork === "mainnet"
+											? "Main Network"
+											: "Test Network"
 									}}
 									<Icon name="arrow" size="12" />
 								</Button>
@@ -253,85 +263,122 @@ onBeforeUnmount(() => {
 
 							<template #dropdown>
 								<DropdownTitle>Network</DropdownTitle>
-								<DropdownItem @click="handleSwitch('mainnet')"
+								<DropdownItem
+									@click="handleSwitch('mainnet')"
+									:data-active="
+										currentNetwork === 'mainnet' && true
+									"
 									><Icon
 										:name="
-											currentNetwork == 'mainnet'
-												? 'checkcircle'
-												: 'network'
+											currentNetwork === 'mainnet'
+												? 'check'
+												: 'dot'
 										"
-										size="12"
-									/>Mainnet</DropdownItem
+										size="16"
+									/>
+									Main Network
+								</DropdownItem>
+								<DropdownItem
+									@click="handleSwitch('testnet')"
+									:data-active="
+										currentNetwork === 'testnet' && true
+									"
 								>
-								<DropdownItem @click="handleSwitch('testnet')"
-									><Icon
+									<Icon
 										:name="
-											currentNetwork == 'ithacanet'
-												? 'checkcircle'
-												: 'network'
+											currentNetwork === 'testnet'
+												? 'check'
+												: 'dot'
 										"
-										size="12"
-									/>Ithacanet</DropdownItem
-								>
+										size="16"
+									/>
+									Test Network
+								</DropdownItem>
 							</template>
 						</Dropdown>
 					</div>
 
 					<div :class="$style.right">
-						<a
-							href="https://discord.gg/FeGDCkHhnB"
-							target="_blank"
-							rel="nofolow noreferrer"
+						<Button
+							type="secondary"
+							size="small"
+							link="https://discord.gg/FeGDCkHhnB"
+							:class="$style.footer_btn"
 						>
-							<Button
-								type="secondary"
-								size="small"
-								:class="$style.footer_btn"
-							>
-								Discord <Icon name="arrowrighttop" size="16" />
-							</Button>
-						</a>
-						<a
-							href="https://twitter.com/Juster_fi"
-							target="_blank"
-							rel="nofolow noreferrer"
+							Discord
+							<Icon
+								name="arrowrighttop"
+								size="16"
+								color="tertiary"
+							/>
+						</Button>
+						<Button
+							type="secondary"
+							size="small"
+							link="https://twitter.com/Juster_fi"
+							:class="$style.footer_btn"
 						>
-							<Button
-								type="secondary"
-								size="small"
-								:class="$style.footer_btn"
-							>
-								Twitter <Icon name="arrowrighttop" size="16" />
-							</Button>
-						</a>
-						<a
-							href="https://github.com/juster-finance"
-							target="_blank"
-							rel="nofolow noreferrer"
+							Twitter
+							<Icon
+								name="arrowrighttop"
+								size="16"
+								color="tertiary"
+							/>
+						</Button>
+						<Button
+							type="secondary"
+							size="small"
+							link="https://github.com/juster-finance"
+							:class="$style.footer_btn"
 						>
-							<Button
-								type="secondary"
-								size="small"
-								:class="$style.footer_btn"
-							>
-								GitHub <Icon name="arrowrighttop" size="16" />
-							</Button>
-						</a>
+							GitHub
+							<Icon
+								name="arrowrighttop"
+								size="16"
+								color="tertiary"
+							/>
+						</Button>
 					</div>
 				</div>
 
-				<div :class="$style.block">
-					<div :class="$style.copyrights">
-						<div :class="$style.year">© 2022</div>
-						<span>Juster 1.0.</span> Market data provided by
-						Coinbase Harbinger
-					</div>
+				<Flex justify="between" :class="$style.copyrights">
+					<Flex align="center" wrap="wrap" :class="$style.line">
+						<Text size="14" weight="500" color="tertiary">
+							© {{ DateTime.now().year }}&nbsp;&nbsp;
+						</Text>
+						<Text size="11" color="support">✦</Text>
+						<Text size="14" weight="500" color="secondary">
+							&nbsp;&nbsp;Juster 1.1&nbsp;
+						</Text>
+						<Text size="14" weight="500" color="tertiary">
+							Market data provided by&nbsp;
+						</Text>
+						<a
+							href="https://tzkt.io/KT1AdbYiPYb5hDuEuVrfxmFehtnBCXv4Np7r/operations/"
+							target="_blank"
+						>
+							<Text size="14" weight="500" color="secondary">
+								Harbinger Oracle
+							</Text>
+						</a>
+					</Flex>
 
-					<div :class="$style.warning">
-						Participation in gambling is prohibited for persons
-						under the age of 21+
-					</div>
-				</div>
+					<Flex
+						direction="column"
+						gap="8"
+						align="end"
+						:class="$style.line"
+					>
+						<Text size="12" weight="500" color="support">
+							Participation in gambling is prohibited for persons
+							under the age of 21+
+						</Text>
+						<Text size="12" weight="500" color="support">
+							Check your country's restrictions before using the
+							application
+						</Text>
+					</Flex>
+				</Flex>
 			</div>
 		</div>
 	</div>
@@ -366,7 +413,7 @@ onBeforeUnmount(() => {
 	align-items: center;
 	gap: 12px;
 
-	fill: var(--text-primary);
+	fill: var(--text-support);
 }
 
 .columns {
@@ -399,6 +446,11 @@ onBeforeUnmount(() => {
 	color: var(--text-primary);
 }
 
+.link:focus {
+	box-shadow: 0 0 0 transparent;
+	color: var(--text-primary);
+}
+
 .bottom {
 	display: flex;
 	flex-direction: column;
@@ -424,42 +476,16 @@ onBeforeUnmount(() => {
 	color: var(--text-secondary);
 }
 
-.footer_btn.green svg:first-child {
+.footer_btn.green svg {
 	fill: var(--green);
 }
 
-.footer_btn.yellow svg:first-child {
+.footer_btn.yellow svg {
 	fill: var(--yellow);
 }
 
-.footer_btn.red svg:first-child {
+.footer_btn.red svg {
 	fill: var(--red);
-}
-
-.copyrights {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--text-tertiary);
-	white-space: nowrap;
-}
-
-.copyrights span {
-	color: var(--text-secondary);
-}
-
-.year {
-	font-weight: 500;
-}
-
-.warning {
-	font-size: 12px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-tertiary);
 }
 
 @media (max-width: 900px) {
@@ -472,6 +498,23 @@ onBeforeUnmount(() => {
 		flex-direction: column;
 		gap: 24px;
 	}
+
+	.copyrights {
+		flex-wrap: wrap;
+		justify-content: center;
+
+		gap: 24px;
+	}
+
+	.line {
+		align-items: center;
+		justify-content: center;
+	}
+
+	.line * {
+		text-align: center;
+		line-height: 1.6;
+	}
 }
 
 @media (max-width: 700px) {
@@ -482,16 +525,6 @@ onBeforeUnmount(() => {
 
 	.column {
 		align-items: center;
-	}
-
-	.copyrights {
-		flex-wrap: wrap;
-		justify-content: center;
-	}
-
-	.warning {
-		text-align: center;
-		line-height: 1.6;
 	}
 }
 </style>

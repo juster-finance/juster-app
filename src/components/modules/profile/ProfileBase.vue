@@ -6,21 +6,21 @@ import { useMeta } from "vue-meta"
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Tooltip from "@/components/ui/Tooltip"
-import Pagination from "@/components/ui/Pagination"
+import Button from "@ui/Button.vue"
+import Tooltip from "@ui/Tooltip.vue"
+import Pagination from "@ui/Pagination.vue"
 
 /**
  * Local
  */
-import { EventCard } from "@/components/local/EventCard"
+import { EventCard } from "@local/EventCard"
 
 /**
  * Services
  */
-import { currentNetwork, fetchBalance } from "@/services/sdk"
-import { toClipboard } from "@/services/utils/global"
-import { abbreviateNumber } from "@/services/utils/amounts"
+import { currentNetwork, fetchBalance } from "@sdk"
+import { toClipboard } from "@utils/misc"
+import { abbreviateNumber } from "@utils/amounts"
 
 /**
  * API
@@ -31,8 +31,8 @@ import { fetchAllUserPositions } from "@/api/positions"
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
-import { useNotificationsStore } from "@/store/notifications"
+import { useAccountStore } from "@store/account"
+import { useNotificationsStore } from "@store/notifications"
 
 export default defineComponent({
 	name: "ProfileBase",
@@ -43,28 +43,17 @@ export default defineComponent({
 		const accountStore = useAccountStore()
 		const notificationsStore = useNotificationsStore()
 
-		const isMyProfile = computed(
-			() => !router.currentRoute.value.params.address,
-		)
+		const isMyProfile = computed(() => !router.currentRoute.value.params.address)
 
 		const user = ref(null)
 		const balance = ref(0)
-		const address = computed(() =>
-			isMyProfile.value
-				? accountStore.pkh
-				: router.currentRoute.value.params.address,
-		)
+		const address = computed(() => (isMyProfile.value ? accountStore.pkh : router.currentRoute.value.params.address))
 
 		const events = ref([])
 
 		/** pagination */
 		const selectedPageForEvents = ref(1)
-		const paginatedEvents = computed(() =>
-			events.value.slice(
-				(selectedPageForEvents.value - 1) * 6,
-				selectedPageForEvents.value * 6,
-			),
-		)
+		const paginatedEvents = computed(() => events.value.slice((selectedPageForEvents.value - 1) * 6, selectedPageForEvents.value * 6))
 
 		/** Balance */
 		const getUserBalance = async () => {
@@ -87,15 +76,11 @@ export default defineComponent({
 			const positions = await fetchAllUserPositions({
 				address: address.value,
 			})
-			events.value = positions
-				.map((position) => position.event)
+			events.value = positions.map((position) => position.event)
 		}
 
 		onMounted(() => {
-			if (
-				address.value.length !== 36 ||
-				(!isMyProfile.value && accountStore.pkh == address.value)
-			) {
+			if (address.value.length !== 36 || (!isMyProfile.value && accountStore.pkh == address.value)) {
 				router.push("/profile")
 				return
 			}
@@ -112,7 +97,7 @@ export default defineComponent({
 
 			notificationsStore.create({
 				notification: {
-					type: "success",
+					icon: "info",
 					title: "Copied to clipboard",
 					description: "You have copied the user's address",
 					autoDestroy: true,
@@ -153,9 +138,7 @@ export default defineComponent({
 <template>
 	<div v-if="user && isProfileLoaded" :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template v-slot:title="{ content }"> {{ content }} • Juster </template>
 		</metainfo>
 
 		<h2 :class="$style.profile_title">
@@ -165,32 +148,19 @@ export default defineComponent({
 		<div :class="$style.header">
 			<div :class="$style.profile">
 				<div :class="$style.avatar">
-					<Tooltip>
-						<img
-							:src="`https://services.tzkt.io/v1/avatars/${address}`"
-							:class="$style.image"
-							alt="avatar"
-						/>
+					<Tooltip placement="bottom">
+						<img :src="`https://services.tzkt.io/v1/avatars/${address}`" :class="$style.image" alt="avatar" />
 
-						<template v-slot:content
-							>This avatar is supported by TzKT.io</template
-						>
+						<template v-slot:content> This avatar is supported by TzKT.io </template>
 					</Tooltip>
 				</div>
 
 				<div @click="handleCopyAddress" :class="$style.username">
-					{{
-						`${address.slice(0, 8)}..${address.slice(
-							address.length - 3,
-							address.length,
-						)}`
-					}}
+					{{ `${address.slice(0, 8)}..${address.slice(address.length - 3, address.length)}` }}
 					<Icon name="copy" size="14" />
 				</div>
-				<div :class="$style.status">
-					{{ isMyProfile ? accountStore.balance : balance }}
-					ꜩ
-				</div>
+
+				<div :class="$style.status">{{ isMyProfile ? accountStore.balance : balance }} ꜩ</div>
 
 				<div :class="$style.progress">
 					<div :class="$style.head">
@@ -203,26 +173,13 @@ export default defineComponent({
 				</div>
 
 				<div :class="$style.badges">
-					<img
-						src="@/assets/badge.png"
-						:class="$style.badge"
-						alt="badge"
-					/>
-					<img
-						src="@/assets/badge.png"
-						:class="$style.badge"
-						alt="badge"
-					/>
-					<img
-						src="@/assets/badge.png"
-						:class="$style.badge"
-						alt="badge"
-					/>
-					<img
-						src="@/assets/badge.png"
-						:class="$style.badge"
-						alt="badge"
-					/>
+					<img src="@/assets/badge.png" :class="$style.badge" alt="badge" />
+
+					<img src="@/assets/badge.png" :class="$style.badge" alt="badge" />
+
+					<img src="@/assets/badge.png" :class="$style.badge" alt="badge" />
+
+					<img src="@/assets/badge.png" :class="$style.badge" alt="badge" />
 				</div>
 			</div>
 
@@ -232,20 +189,26 @@ export default defineComponent({
 				<div :class="$style.block">
 					<div :class="$style.stat">
 						<div :class="$style.key">Liquidity provided</div>
+
 						<div :class="$style.value">
 							{{ abbreviateNumber(user.totalLiquidityProvided) }}
+
 							<span>ꜩ</span>
 						</div>
 					</div>
+
 					<div :class="$style.stat">
 						<div :class="$style.key">Net return</div>
+
 						<div :class="$style.value">
 							{{ abbreviateNumber(user.totalProviderReward) }}
 							<span>ꜩ</span>
 						</div>
 					</div>
+
 					<div :class="$style.stat">
 						<div :class="$style.key">Fees collected</div>
+
 						<div :class="$style.value">
 							{{ user.totalFeesCollected.toFixed(0) }}
 							<span>ꜩ</span>
@@ -258,26 +221,33 @@ export default defineComponent({
 				<div :class="$style.block">
 					<div :class="$style.stat">
 						<div :class="$style.key">Bets value</div>
+
 						<div :class="$style.value">
 							{{ user.totalBetsAmount }}
 							<span>ꜩ</span>
 						</div>
 					</div>
+
 					<div v-if="user.totalWithdrawn" :class="$style.stat">
 						<div :class="$style.key">Withdrawn</div>
+
 						<div :class="$style.value">
 							{{ abbreviateNumber(user.totalWithdrawn) }}
 							<span>ꜩ</span>
 						</div>
 					</div>
+
 					<div :class="$style.stat">
 						<div :class="$style.key">Bets</div>
+
 						<div :class="$style.value">
 							{{ user.totalBetsCount }}
 						</div>
 					</div>
+
 					<div :class="$style.stat">
 						<div :class="$style.key">Favorite Market</div>
+
 						<div :class="$style.value">TBD</div>
 					</div>
 				</div>
@@ -286,14 +256,10 @@ export default defineComponent({
 
 				<div :class="$style.additional">
 					<div :class="$style.left">
-						<a
-							:href="`https://${
-								currentNetwork == 'mainnet' ? '' : 'ithacanet.'
-							}tzkt.io/${address}`"
-							target="_blank"
-						>
+						<a :href="`https://${currentNetwork == 'mainnet' ? '' : 'ghostnet.'}tzkt.io/${address}`" target="_blank">
 							<Button type="secondary" size="small">
-								<Icon name="open" size="14" />View on TzKT
+								<Icon name="database" size="14" />
+								View on TzKT
 							</Button>
 						</a>
 					</div>
@@ -307,18 +273,13 @@ export default defineComponent({
 			<div :class="$style.top">
 				<div>
 					<h2>My submissions</h2>
-					<div :class="$style.description">
-						List of all current and archived events
-					</div>
+
+					<div :class="$style.description">List of all current and archived events</div>
 				</div>
 			</div>
 
 			<div :class="$style.items">
-				<EventCard
-					v-for="event in paginatedEvents"
-					:key="event.id"
-					:event="event"
-				/>
+				<EventCard v-for="event in paginatedEvents" :key="event.id" :event="event" />
 			</div>
 
 			<Pagination
@@ -332,30 +293,23 @@ export default defineComponent({
 	</div>
 
 	<div v-if="!user && isProfileLoaded" :class="$style.empty_profile">
-		<img
-			:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-			:class="$style.error_avatar"
-			alt="error_avatar"
-		/>
+		<img :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`" :class="$style.error_avatar" alt="error_avatar" />
 
 		<div :class="$style.error_title">Your profile is not ready yet</div>
-		<div :class="$style.error_description">
-			Once you participate in any event, your profile will become
-			available!
-		</div>
+
+		<div :class="$style.error_description">Once you participate in any event, your profile will become available!</div>
 
 		<div :class="$style.error_buttons">
 			<router-link to="/">
 				<Button type="secondary" size="small">
-					<Icon name="spark" size="14" />Explore Juster
+					<Icon name="spark" size="14" />
+					Explore Juster
 				</Button>
 			</router-link>
 
 			<div :class="$style.error_description">or</div>
 
-			<Button @click="handleBack" type="secondary" size="small"
-				>Go back</Button
-			>
+			<Button @click="handleBack" type="secondary" size="small"> Go back </Button>
 		</div>
 	</div>
 </template>

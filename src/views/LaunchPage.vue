@@ -1,23 +1,28 @@
 <script setup>
+/** Vendor */
+import { useRouter } from "vue-router"
+
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
-import Banner from "@/components/ui/Banner"
+import Button from "@ui/Button.vue"
+import Banner from "@ui/Banner.vue"
 
 /**
  * Services
  */
-import { juster, switchNetwork } from "@/services/sdk"
+import { juster, switchNetwork } from "@sdk"
+
+const router = useRouter()
 
 const handleSwitch = () => {
 	juster.sdk._provider.client.clearActiveAccount().then(async () => {
-		switchNetwork("mainnet")
+		switchNetwork("mainnet", router)
 	})
 }
 </script>
@@ -49,7 +54,7 @@ const handleSwitch = () => {
 			</p>
 
 			<div
-				v-if="juster.sdk._network == 'ithacanet'"
+				v-if="juster.sdk._network == 'ghostnet'"
 				:class="$style.interactive_block"
 			>
 				<Banner type="warning" color="yellow" size="small" center

@@ -2,24 +2,24 @@
 /**
  * Base
  */
-import Page from "@/components/base/Page"
+import Page from "@base/Page.vue"
 
 /**
  * UI
  */
-import Button from "@/components/ui/Button"
+import Button from "@ui/Button.vue"
 
 export default {
-    name: "LandingPage",
+	name: "LandingPage",
 
-    components: { Page, Button },
+	components: { Page, Button },
 }
 </script>
 
 <template>
-    <Page :class="$style.wrapper">
-        <div :class="$style.header">
-            <!-- <a
+	<Page :class="$style.wrapper">
+		<div :class="$style.header">
+			<!-- <a
                 href="https://verbose-krill-7ef.notion.site/Juster-Roadmap-786c58fbd0a8435994d2890202c0ddbf"
                 target="_blank"
                 :class="$style.roadmap"
@@ -35,55 +35,55 @@ export default {
                 <div :class="$style.roadmap_link">View our Roadmap</div>
             </a>-->
 
-            <h1>Decentralized Betting Protocol</h1>
-            <div :class="$style.description">
-                <span>Juster</span> is an on-chain smart contract platform
-                allowing users to take part in an automated betting market by
-                creating events, providing liquidity to them, and making bets.
-            </div>
+			<h1>Decentralized Betting Protocol</h1>
+			<div :class="$style.description">
+				<span>Juster</span> is an on-chain smart contract platform
+				allowing users to take part in an automated betting market by
+				creating events, providing liquidity to them, and making bets.
+			</div>
 
-            <div :class="$style.buttons">
-                <router-link to="/">
-                    <Button type="primary" size="medium">
-                        <Icon name="spark" size="16" />Launch Juster app
-                    </Button>
-                </router-link>
-                <router-link to="/docs">
-                    <Button type="secondary" size="medium">
-                        <Icon name="book" size="16" />Read the docs
-                    </Button>
-                </router-link>
-            </div>
+			<div :class="$style.buttons">
+				<router-link to="/">
+					<Button type="primary" size="medium">
+						<Icon name="spark" size="16" />Launch Juster app
+					</Button>
+				</router-link>
+				<router-link to="/docs">
+					<Button type="secondary" size="medium">
+						<Icon name="book" size="16" />Read the docs
+					</Button>
+				</router-link>
+			</div>
 
-            <div :class="$style.promo">
-                <div :class="$style.promo_video">
-                    <iframe
-                        width="560"
-                        height="315"
-                        src="https://www.youtube.com/embed/rOYu2Qpbpdw?controls=0&modestbranding=1&rel=0"
-                        title="Juster promo"
-                        frameborder="0"
-                        allow
-                        allowfullscreen
-                    ></iframe>
-                </div>
-            </div>
+			<div :class="$style.promo">
+				<div :class="$style.promo_video">
+					<iframe
+						width="560"
+						height="315"
+						src="https://www.youtube.com/embed/rOYu2Qpbpdw?controls=0&modestbranding=1&rel=0"
+						title="Juster promo"
+						frameborder="0"
+						allow
+						allowfullscreen
+					></iframe>
+				</div>
+			</div>
 
-            <!-- <img
+			<!-- <img
                 src="@/assets/landing/app.png"
                 width="1100"
                 height="734"
                 :class="$style.app_img"
             />-->
 
-            <div :class="$style.hint">
-                <Icon name="help" size="14" />Juster is built on
-                <span>Tezos</span> blockchain and uses
-                <span>Harbinger</span> oracle price feed
-            </div>
-        </div>
+			<div :class="$style.hint">
+				<Icon name="help" size="14" />Juster is built on
+				<span>Tezos</span> blockchain and uses
+				<span>Harbinger</span> oracle price feed
+			</div>
+		</div>
 
-        <!-- <div :class="$style.block">
+		<!-- <div :class="$style.block">
             <div :class="$style.benefits">
                 <div :class="$style.benefit">
                     <img src="@/assets/landing/benefit_1.svg" />
@@ -354,358 +354,358 @@ export default {
                 >
             </div>
         </div>-->
-    </Page>
+	</Page>
 </template>
 
 <style module>
 .wrapper {
-    max-width: 1170px;
-    min-width: 1170px;
-    margin: 0 auto;
+	max-width: 1170px;
+	min-width: 1170px;
+	margin: 0 auto;
 }
 
 .wrapper h1 {
-    font-size: 48px;
-    line-height: 1.4;
-    font-weight: 600;
-    text-align: center;
+	font-size: 48px;
+	line-height: 1.4;
+	font-weight: 600;
+	text-align: center;
 
-    max-width: 800px;
+	max-width: 800px;
 
-    margin-bottom: 16px;
+	margin-bottom: 16px;
 }
 
 .header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 150px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 150px;
 }
 
 .roadmap {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-radius: 50px;
-    background: #141414;
-    border: 1px solid var(--border);
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	border-radius: 50px;
+	background: #141414;
+	border: 1px solid var(--border);
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
 
-    padding: 0 12px;
-    height: 36px;
-    margin: 60px 0 32px;
+	padding: 0 12px;
+	height: 36px;
+	margin: 60px 0 32px;
 
-    transition: border 0.2s ease;
+	transition: border 0.2s ease;
 }
 
 .roadmap:hover {
-    border: 1px solid var(--border-highlight);
+	border: 1px solid var(--border-highlight);
 }
 
 .roadmap svg {
-    fill: var(--opacity-40);
+	fill: var(--opacity-40);
 }
 
 .roadmap_name {
-    font-size: 14px;
-    line-height: 1.4;
-    font-weight: 600;
-    color: var(--text-tertiary);
+	font-size: 14px;
+	line-height: 1.4;
+	font-weight: 600;
+	color: var(--text-tertiary);
 }
 
 .roadmap_name span {
-    color: var(--text-secondary);
+	color: var(--text-secondary);
 }
 
 .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--border);
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--border);
 }
 
 .roadmap_link {
-    font-size: 14px;
-    line-height: 1.4;
-    font-weight: 600;
-    color: var(--blue);
+	font-size: 14px;
+	line-height: 1.4;
+	font-weight: 600;
+	color: var(--blue);
 }
 
 .description {
-    font-size: 18px;
-    line-height: 1.6;
-    font-weight: 400;
-    color: var(--text-tertiary);
-    text-align: center;
+	font-size: 18px;
+	line-height: 1.6;
+	font-weight: 400;
+	color: var(--text-tertiary);
+	text-align: center;
 
-    max-width: 600px;
+	max-width: 600px;
 
-    margin-bottom: 40px;
+	margin-bottom: 40px;
 }
 
 .description span {
-    color: var(--text-secondary);
+	color: var(--text-secondary);
 }
 
 .buttons {
-    display: flex;
-    gap: 16px;
+	display: flex;
+	gap: 16px;
 }
 
 .promo {
-    margin-top: 50px;
-    margin-bottom: 20px;
+	margin-top: 50px;
+	margin-bottom: 20px;
 }
 
 .promo_video {
-    position: relative;
-    padding-bottom: 56.25%;
-    background: #1b1b1b;
-    height: 0;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.7);
+	position: relative;
+	padding-bottom: 56.25%;
+	background: #1b1b1b;
+	height: 0;
+	border-radius: 5px;
+	overflow: hidden;
+	box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.7);
 }
 
 .app_img {
-    margin-top: 40px;
+	margin-top: 40px;
 }
 
 .hint {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 500;
-    color: var(--text-tertiary);
+	font-size: 12px;
+	line-height: 1;
+	font-weight: 500;
+	color: var(--text-tertiary);
 }
 
 .hint svg {
-    fill: var(--opacity-40);
+	fill: var(--opacity-40);
 
-    margin-right: 8px;
+	margin-right: 8px;
 }
 
 .hint span {
-    color: var(--text-secondary);
-    margin: 0 5px;
+	color: var(--text-secondary);
+	margin: 0 5px;
 }
 
 .block {
-    margin-bottom: 140px;
+	margin-bottom: 140px;
 }
 
 .block h2 {
-    font-size: 32px;
+	font-size: 32px;
 
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 .block p {
-    font-size: 16px;
-    line-height: 1.6;
-    font-weight: 500;
-    color: var(--text-tertiary);
+	font-size: 16px;
+	line-height: 1.6;
+	font-weight: 500;
+	color: var(--text-tertiary);
 
-    max-width: 550px;
+	max-width: 550px;
 
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 .block p:last-child {
-    margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 .block p span {
-    color: var(--text-secondary);
+	color: var(--text-secondary);
 }
 
 .benefits {
-    display: flex;
-    justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 }
 
 .benefit {
-    max-width: 260px;
+	max-width: 260px;
 }
 
 .benefit_name {
-    font-size: 16px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 16px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
 
-    margin: 16px 0 8px;
+	margin: 16px 0 8px;
 }
 
 .benefit_description {
-    font-size: 14px;
-    line-height: 1.6;
-    font-weight: 500;
-    color: var(--text-tertiary);
+	font-size: 14px;
+	line-height: 1.6;
+	font-weight: 500;
+	color: var(--text-tertiary);
 }
 
 .steps {
-    display: flex;
-    justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 
-    margin-top: 40px;
+	margin-top: 40px;
 }
 
 .step {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    padding: 20px;
-    background: var(--card-background);
-    width: 370px;
-    height: 252px;
+	border-radius: 10px;
+	border: 1px solid var(--border);
+	padding: 20px;
+	background: var(--card-background);
+	width: 370px;
+	height: 252px;
 
-    transition: border 0.2s ease;
+	transition: border 0.2s ease;
 }
 
 .step:hover {
-    border: 1px solid var(--border-highlight);
+	border: 1px solid var(--border-highlight);
 }
 
 .step_img {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 
-    height: 104px;
+	height: 104px;
 }
 
 .step_base {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 }
 
 .step_name {
-    font-size: 16px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-tertiary);
+	font-size: 16px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-tertiary);
 
-    display: flex;
-    gap: 12px;
+	display: flex;
+	gap: 12px;
 }
 
 .step_name span {
-    color: var(--text-primary);
+	color: var(--text-primary);
 }
 
 .step_description {
-    font-size: 14px;
-    line-height: 1.6;
-    font-weight: 500;
-    color: var(--text-tertiary);
+	font-size: 14px;
+	line-height: 1.6;
+	font-weight: 500;
+	color: var(--text-tertiary);
 }
 
 .step_description span {
-    color: var(--text-secondary);
+	color: var(--text-secondary);
 }
 
 .stats {
-    display: flex;
-    justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 
-    margin: 50px 0;
+	margin: 50px 0;
 }
 
 .stat {
-    position: relative;
-    max-width: 260px;
+	position: relative;
+	max-width: 260px;
 }
 
 .line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
 
-    width: 1px;
-    background: var(--border);
+	width: 1px;
+	background: var(--border);
 }
 
 .highlight {
-    width: 2px;
-    height: 24px;
-    background: var(--blue);
+	width: 2px;
+	height: 24px;
+	background: var(--blue);
 }
 
 .stat_value {
-    font-size: 24px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 24px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
 
-    margin-left: 20px;
-    margin-bottom: 8px;
+	margin-left: 20px;
+	margin-bottom: 8px;
 }
 
 .stat_value span {
-    color: var(--text-tertiary);
+	color: var(--text-tertiary);
 }
 
 .stat_description {
-    font-size: 16px;
-    line-height: 1.5;
-    font-weight: 500;
-    color: var(--text-tertiary);
+	font-size: 16px;
+	line-height: 1.5;
+	font-weight: 500;
+	color: var(--text-tertiary);
 
-    margin-left: 20px;
+	margin-left: 20px;
 }
 
 .features {
-    display: flex;
-    justify-content: space-between;
-    gap: 32px;
+	display: flex;
+	justify-content: space-between;
+	gap: 32px;
 
-    margin-bottom: 32px;
+	margin-bottom: 32px;
 }
 
 .feat {
-    height: 400px;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    background: var(--card-background);
-    padding: 24px;
-    overflow: hidden;
+	height: 400px;
+	border-radius: 16px;
+	border: 1px solid var(--border);
+	background: var(--card-background);
+	padding: 24px;
+	overflow: hidden;
 }
 
 .feat.small {
-    width: 440px;
+	width: 440px;
 }
 
 .feat.large {
-    flex: 1;
+	flex: 1;
 }
 
 .feat_subtitle {
-    font-size: 14px;
-    line-height: 1;
-    font-weight: 700;
-    color: var(--blue);
+	font-size: 14px;
+	line-height: 1;
+	font-weight: 700;
+	color: var(--blue);
 
-    margin-bottom: 16px;
+	margin-bottom: 16px;
 }
 
 .feat_title {
-    font-size: 18px;
-    line-height: 1.4;
-    font-weight: 600;
-    color: var(--text-primary);
+	font-size: 18px;
+	line-height: 1.4;
+	font-weight: 600;
+	color: var(--text-primary);
 
-    margin-bottom: 24px;
+	margin-bottom: 24px;
 }
 
 .feat_title span {
-    color: var(--text-tertiary);
+	color: var(--text-tertiary);
 }
 </style>

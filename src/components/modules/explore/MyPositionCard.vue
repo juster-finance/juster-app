@@ -1,264 +1,228 @@
 <script setup>
+/**
+ * Vendor
+ */
 import { computed } from "vue"
-import { DateTime, Duration } from "luxon"
+import { DateTime } from "luxon"
 
 /**
  * UI
  */
-import Badge from "@/components/ui/Badge"
+import Badge from "@ui/Badge.vue"
 
 /**
  * Services
  */
-import { supportedMarkets } from "@/services/config"
-import { toReadableDuration } from "@/services/utils/date"
-import { abbreviateNumber } from "@/services/utils/amounts"
+import { supportedMarkets } from "@config"
+import { toReadableDuration } from "@utils/date"
+import { abbreviateNumber } from "@utils/amounts"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
+
 const accountStore = useAccountStore()
 
 const props = defineProps({
-    event: { type: Object, required: true },
+	event: { type: Object, required: true },
 })
 
 const symbol = computed(() => props.event.currencyPair.symbol)
 
 const eventDuration = computed(() =>
-    toReadableDuration({ seconds: props.event.measurePeriod }),
+	toReadableDuration({ seconds: props.event.measurePeriod }),
 )
 
 const timing = computed(() => {
-    const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("en")
+	const eventDt = DateTime.fromISO(props.event.betsCloseTime).setLocale("en")
 
-    const endDt = eventDt.plus(props.event.measurePeriod * 1000)
+	const endDt = eventDt.plus(props.event.measurePeriod * 1000)
 
-    return {
-        start: {
-            time: eventDt.toLocaleString({
-                hour: "numeric",
-                minute: "numeric",
-            }),
-            day: eventDt.toLocaleString({
-                day: "numeric",
-            }),
-            month: eventDt.toLocaleString({ month: "short" }),
-        },
-        end: {
-            time: endDt.toLocaleString({
-                hour: "numeric",
-                minute: "numeric",
-            }),
-            day: endDt.toLocaleString({
-                day: "numeric",
-            }),
-            month: endDt.toLocaleString({ month: "short" }),
-        },
-        showDay: eventDt.ordinal < endDt.ordinal,
-    }
+	return {
+		start: {
+			time: eventDt.toLocaleString({
+				hour: "numeric",
+				minute: "numeric",
+			}),
+			day: eventDt.toLocaleString({
+				day: "numeric",
+			}),
+			month: eventDt.toLocaleString({ month: "short" }),
+		},
+		end: {
+			time: endDt.toLocaleString({
+				hour: "numeric",
+				minute: "numeric",
+			}),
+			day: endDt.toLocaleString({
+				day: "numeric",
+			}),
+			month: endDt.toLocaleString({ month: "short" }),
+		},
+		showDay: eventDt.ordinal < endDt.ordinal,
+	}
 })
 
 const value = computed(() => {
-    const bets = props.event.bets.reduce((acc, curr) => {
-        if (curr.userId == accountStore.pkh) {
-            return (acc += curr.amount)
-        } else {
-            return acc
-        }
-    }, 0)
-    const liquidity = props.event.deposits.reduce((acc, curr) => {
-        if (curr.userId == accountStore.pkh) {
-            return (acc += curr.amountAboveEq)
-        } else {
-            return acc
-        }
-    }, 0)
+	const bets = props.event.bets.reduce((acc, curr) => {
+		if (curr.userId == accountStore.pkh) {
+			return (acc += curr.amount)
+		} else {
+			return acc
+		}
+	}, 0)
+	const liquidity = props.event.deposits.reduce((acc, curr) => {
+		if (curr.userId == accountStore.pkh) {
+			return (acc += curr.amountAboveEq)
+		} else {
+			return acc
+		}
+	}, 0)
 
-    return abbreviateNumber(bets + liquidity)
+	return abbreviateNumber(bets + liquidity)
 })
 </script>
 
 <template>
-    <router-link :to="`/events/${event.id}`">
-        <div :class="$style.wrapper">
-            <div :class="$style.left">
-                <div
-                    :class="[
-                        $style.event_icon,
-                        (event.status == 'NEW' && $style.green) ||
-                            (event.status == 'STARTED' && $style.yellow),
-                    ]"
-                >
-                    <Icon
-                        :name="
-                            (event.status == 'NEW' && 'event_new') ||
-                            (event.status == 'STARTED' && 'event_active')
-                        "
-                        size="16"
-                    />
-                </div>
+	<router-link :to="`/events/${event.id}`">
+		<Flex align="center" justify="between" :class="$style.wrapper">
+			<Flex align="center" gap="16">
+				<div
+					:class="[
+						$style.event_icon,
+						(event.status == 'NEW' && $style.green) ||
+							(event.status == 'STARTED' && $style.yellow),
+					]"
+				>
+					<Icon
+						:name="
+							(event.status == 'NEW' && 'event_new') ||
+							(event.status == 'STARTED' && 'event_active')
+						"
+						size="16"
+					/>
+				</div>
 
-                <div :class="$style.info">
-                    <div :class="$style.title">
-                        <img
-                            v-if="event.winnerBets == 'ABOVE_EQ'"
-                            :src="require('@/assets/icons/higher_won.svg')"
-                            alt="won_side_icon"
-                        />
-                        <img
-                            v-else-if="event.winnerBets == 'BELOW'"
-                            :src="require('@/assets/icons/lower_won.svg')"
-                            alt="won_side_icon"
-                        />
-                        <Icon v-else name="sides" size="16" />
-                        {{
-                            supportedMarkets[symbol] &&
-                            supportedMarkets[symbol].description
-                        }}
-                        <span>price event</span>
-                    </div>
+				<Flex direction="column" justify="center" gap="8">
+					<div :class="$style.title">
+						{{
+							supportedMarkets[symbol] &&
+							supportedMarkets[symbol].description
+						}}
+					</div>
 
-                    <div :class="$style.timing">
-                        <div :class="$style.days">
-                            {{
-                                `${timing.start.day} ${
-                                    timing.showDay ? `- ${timing.end.day}` : ``
-                                } ${timing.start.month}`
-                            }}
-                        </div>
+					<div :class="$style.timing">
+						<div :class="$style.days">
+							{{
+								`${timing.start.day} ${
+									timing.showDay ? `- ${timing.end.day}` : ``
+								} ${timing.start.month}`
+							}}
+						</div>
 
-                        <div :class="$style.dot" />
+						<div :class="$style.dot" />
 
-                        <div :class="$style.hrs">
-                            {{ timing.start.time }}
-                            <span>({{ eventDuration }})</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+						<div :class="$style.hrs">
+							{{ timing.start.time }}
+							<span>({{ eventDuration }})</span>
+						</div>
+					</div>
+				</Flex>
+			</Flex>
 
-            <div :class="$style.right">
-                <Badge size="medium" color="gray"
-                    ><Icon name="wallet" size="14" /> <span>Value:</span>
-                    {{ value }} ꜩ</Badge
-                >
-            </div>
-        </div>
-    </router-link>
+			<Badge size="medium" color="gray">
+				<Icon name="coins" size="14" color="tertiary" />
+				{{ value }}<span>XTZ</span>
+			</Badge>
+		</Flex>
+	</router-link>
 </template>
 
 <style module>
 .wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+	height: 62px;
+	border-radius: 8px;
+	background: var(--card-bg);
+	box-shadow: 0 0 0 0 transparent;
 
-    height: 70px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
+	padding: 0 16px;
 
-    padding: 0 20px;
+	transition: all 0.2s ease;
 }
 
-.left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+.wrapper:hover {
+	box-shadow: 0 0 0 2px var(--border);
+}
+
+.wrapper:focus {
+	box-shadow: 0 0 0 2px var(--border);
 }
 
 .event_icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 
-    height: 32px;
-    width: 32px;
-    border-radius: 8px;
+	height: 32px;
+	width: 32px;
+	border-radius: 8px;
 }
 
 .event_icon.green {
-    fill: var(--green);
-    background: rgba(26, 161, 104, 0.1);
+	fill: var(--purple);
+	background: rgba(133, 90, 209, 0.1);
 }
 
 .event_icon.yellow {
-    fill: var(--yellow);
-    background: rgba(245, 183, 43, 0.1);
-}
-
-.info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 8px;
+	fill: var(--yellow);
+	background: rgba(245, 183, 43, 0.1);
 }
 
 .title {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 
-    height: 20px;
-
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.title img {
-    display: flex;
-
-    width: 16px;
-    height: 16px;
-
-    margin-right: 6px;
-}
-
-.title svg {
-    display: flex;
-
-    fill: var(--text-tertiary);
-
-    margin-right: 6px;
-}
-
-.title span {
-    color: var(--text-tertiary);
-
-    margin-left: 4px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--text-primary);
 }
 
 .timing {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 600;
-    color: var(--text-secondary);
+	font-size: 12px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-secondary);
 }
 
 .days {
-    color: var(--text-tertiary);
+	color: var(--text-tertiary);
 }
 
 .hrs span {
-    color: var(--text-tertiary);
+	color: var(--text-tertiary);
 }
 
 .dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--border);
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background: var(--border);
 }
 
-.right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+@media (max-width: 400px) {
+	.wrapper {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 20px;
+
+		height: initial;
+
+		padding: 16px;
+	}
 }
 </style>

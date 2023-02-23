@@ -1,14 +1,13 @@
+/**
+ * Vendor
+ */
 import { computed, reactive } from "vue"
-import { Juster } from "@juster-finance/sdk"
+import { JusterCore, JusterPool } from "@juster-finance/sdk"
 import { createClient } from "@juster-finance/gql-client"
-import {
-    ApolloClient,
-    InMemoryCache,
-    HttpLink,
-    from,
-} from "@apollo/client/core"
+import { BeaconWallet } from "@taquito/beacon-wallet"
+import { TezosToolkit } from "@taquito/taquito"
 
-import { dipdup } from "@/services/config"
+import { dipdup, rpcNodes } from "@config"
 
 /**
  * Services.Constants
@@ -18,57 +17,69 @@ import { Networks } from "@/services/constants"
 /**
  * Store
  */
-const juster = reactive({ sdk: null, gql: null, apollo: null })
+const juster = reactive({
+	sdk: null,
+	gql: null,
+	tezos: null,
+	provider: null,
 
-const currentNetwork = computed(() => juster.sdk._network)
+	pools: {},
+})
+
+const currentNetwork = computed(() => (juster.sdk._network === "mainnet" ? "mainnet" : "testnet"))
 
 /**
  * Storage "activeNetwork"
  */
 if (!localStorage.activeNetwork) {
-    localStorage.activeNetwork = Networks.MAINNET
+	localStorage.activeNetwork = Networks.MAINNET
 }
 
 /**
  * Validate "activeNetwork" (Integrity Repair)
  */
-if (
-    ![Networks.MAINNET, Networks.TESTNET].includes(localStorage.activeNetwork)
-) {
-    localStorage.activeNetwork = Networks.MAINNET
+if (![Networks.MAINNET, Networks.TESTNET].includes(localStorage.activeNetwork)) {
+	localStorage.activeNetwork = Networks.MAINNET
 }
 
-/**
- * Init
- */
-
-/** SDK */
-juster.sdk = Juster.create(localStorage.activeNetwork)
-
-/** GQL */
-juster.gql = createClient({
-    url: dipdup[currentNetwork.value].graphq,
-    subscription: { url: dipdup[currentNetwork.value].ws },
+juster.provider = new BeaconWallet({
+	name: "Juster",
+	preferredNetwork: localStorage.activeNetwork,
 })
 
-/** Apollo */
-const link = from([new HttpLink({ uri: dipdup[currentNetwork.value].graphq })])
-juster.apollo = new ApolloClient({
-    link,
-    cache: new InMemoryCache(),
-    connectToDevTools: true,
-})
+juster.tezos = new TezosToolkit(rpcNodes[localStorage.activeNetwork][0].url)
+
+const init = async () => {
+	juster.sdk = JusterCore.create(juster.tezos, juster.provider, localStorage.activeNetwork)
+
+	/** GQL */
+	juster.gql = createClient({
+		url: dipdup[currentNetwork.value].graphq,
+		subscription: { url: dipdup[currentNetwork.value].ws },
+	})
+}
+init()
+
+const initPools = (pools) => {
+	const poolAddresses = pools.map((pool) => pool.address)
+
+	poolAddresses.forEach((pool) => {
+		juster.pools[pool] = JusterPool.create(juster.tezos, juster.provider, localStorage.activeNetwork, pool)
+	})
+}
 
 /**
  * Switch between Networks
  */
-const switchNetwork = network => {
-    if (![Networks.MAINNET, Networks.TESTNET].includes(network)) return
+const switchNetwork = (network, router) => {
+	if (![Networks.MAINNET, Networks.TESTNET].includes(network)) return
 
-    /** todo (Settings): switch temporarily (without saving in LS) */
-    localStorage.activeNetwork = network
+	/** todo (Settings): switch temporarily (without saving in LS) */
+	localStorage.activeNetwork = network
 
-    location.reload()
+	init()
+
+	router.push("/")
 }
 
-export { juster, currentNetwork, switchNetwork }
+export { juster, currentNetwork, switchNetwork, initPools }

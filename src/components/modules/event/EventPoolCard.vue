@@ -1,89 +1,80 @@
 <script setup>
 /**
+ * Vendor
+ */
+import { computed } from "vue"
+import { useRouter } from "vue-router"
+
+/**
  * UI
  */
-import Button from '@/components/ui/Button'
+import Button from "@ui/Button.vue"
 
 /**
  * Local
  */
-import Pool from '@/components/local/Pool'
+import Pool from "@local/Pool.vue"
 
-defineProps({ event: { type: Object } })
-const emit = defineEmits(['onLiquidity'])
+/**
+ * Store
+ */
+import { useMarketStore } from "@store/market"
+
+const marketStore = useMarketStore()
+
+const props = defineProps({ event: { type: Object } })
+const emit = defineEmits(["onLiquidity"])
+
+const router = useRouter()
+
+const pool = computed(() =>
+	marketStore.lines.find(
+		(l) =>
+			l.currencyPairId === props.event.currencyPair.id &&
+			l.measurePeriod === props.event.measurePeriod,
+	),
+)
 </script>
 
 <template>
-	<div :class="$style.wrapper">
-		<div :class="$style.title">Liquidity</div>
+	<Flex direction="column" gap="24" :class="$style.wrapper">
+		<Flex direction="column" gap="8">
+			<Text color="primary" size="16" height="12" weight="600">
+				Pools Distribution
+			</Text>
+			<Text color="tertiary" size="14" weight="500">
+				Visualization of stakes between directions
+			</Text>
+		</Flex>
 
 		<Pool :event="event" />
 
-		<Button
-			@click="emit('onLiquidity')"
-			type="secondary"
-			size="small"
-			block
-			:disabled="event.status !== 'NEW' || event.totalLiquidityProvided == 0"
-			:class="$style.liquidity_btn"
-			><Icon name="liquidity" size="12" />Add Liquidity</Button
+		<router-link
+			v-if="marketStore.lines.length"
+			:to="`/pools/${pool.poolId}`"
 		>
-	</div>
+			<Button
+				type="secondary"
+				size="medium"
+				block
+				keybind="D+L"
+				@onKeybind="router.push('/pools')"
+				:disabled="
+					event.status !== 'NEW' || event.totalLiquidityProvided == 0
+				"
+			>
+				<Icon name="server" size="12" />Deposit Liquidity
+			</Button>
+		</router-link>
+	</Flex>
 </template>
 
 <style module>
 .wrapper {
 	border-radius: 8px;
-	border: 1px solid var(--border);
-	padding: 20px;
+	border-top: 3px solid var(--border);
 	background: var(--card-bg);
-}
 
-.title {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 500;
-	color: var(--text-primary);
-
-	margin-bottom: 20px;
-}
-
-.liquidity_btn {
-	margin-top: 16px;
-}
-
-/* Params */
-.params {
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
-
-	margin-top: 32px;
-}
-
-.param {
-	display: flex;
-	justify-content: space-between;
-
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 600;
-}
-
-.param span:nth-child(1) {
-	color: var(--text-tertiary);
-
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	fill: var(--opacity-40);
-}
-
-.param span:nth-child(2) {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
-	color: var(--text-secondary);
+	padding: 24px;
 }
 </style>

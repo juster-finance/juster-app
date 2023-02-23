@@ -1,24 +1,32 @@
 <script setup>
-import { computed } from "vue"
+import { ref, computed } from "vue"
 import { DateTime } from "luxon"
+
+/**
+ * Modals
+ */
+import OperationModal from "@local/modals/OperationModal.vue"
 
 /**
  * Services
  */
-import { currentNetwork } from "@/services/sdk"
-import { verifiedMakers } from "@/services/config"
-import { numberWithSymbol } from "@/services/utils/amounts"
+import { currentNetwork } from "@sdk"
+import { verifiedMakers } from "@config"
+import { numberWithSymbol } from "@utils/amounts"
 
 /**
  * Store
  */
-import { useAccountStore } from "@/store/account"
+import { useAccountStore } from "@store/account"
+
 const accountStore = useAccountStore()
 
 const props = defineProps({
-	deposit: { type: Object },
-	event: { type: Object },
+	deposit: { type: Object, default: () => {} },
+	event: { type: Object, default: () => {} },
 })
+
+const showOperationModal = ref(false)
 
 const aboveEqProfit = computed(() => {
 	let profit =
@@ -56,7 +64,13 @@ const returnForLiquidity = computed(() => {
 </script>
 
 <template>
-	<div :class="$style.wrapper">
+	<div @click="showOperationModal = true" :class="$style.wrapper">
+		<OperationModal
+			:show="showOperationModal"
+			:data="deposit"
+			@onClose="showOperationModal = false"
+		/>
+
 		<div :class="$style.base">
 			<div :class="$style.icon">
 				<Icon
@@ -68,7 +82,7 @@ const returnForLiquidity = computed(() => {
 				/>
 				<Icon
 					v-else
-					name="logo_symbol"
+					name="server"
 					size="16"
 					:class="$style.logo_icon"
 				/>
@@ -99,7 +113,7 @@ const returnForLiquidity = computed(() => {
 					{{ accountStore.pkh == deposit.userId ? "My" : "" }}
 					Liquidity
 				</div>
-				<div v-else :class="$style.title">Initial Liquidity</div>
+				<div v-else :class="$style.title">Liquidity Pool</div>
 
 				<div :class="$style.time">
 					{{
@@ -111,29 +125,80 @@ const returnForLiquidity = computed(() => {
 			</div>
 		</div>
 
-		<div :class="[$style.param, $style.up]">
-			<Icon name="higher" size="12" />{{
-				numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
-			}}&nbsp;<span>ꜩ</span>
+		<!-- Desktop Template -->
+		<div :class="$style.desktop">
+			<div :class="[$style.param, $style.up]">
+				<Icon name="arrow_circle_top_right" size="12" />{{
+					numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
+				}}&nbsp;<span>XTZ</span>
+			</div>
+
+			<div :class="[$style.param, $style.down]">
+				<Icon name="arrow_circle_top_right" size="12" />{{
+					numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
+				}}&nbsp;<span>XTZ</span>
+			</div>
+
+			<div
+				v-if="event.status == 'FINISHED' && returnForLiquidity"
+				:class="[$style.param]"
+			>
+				{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
+					>XTZ</span
+				>
+			</div>
+			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
+				Refund
+			</div>
+			<div v-else :class="$style.param">
+				<span>TBD</span>
+			</div>
 		</div>
 
-		<div :class="[$style.param, $style.down]">
-			<Icon name="higher" size="12" />{{
-				numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
-			}}&nbsp;<span>ꜩ</span>
-		</div>
+		<!-- Mobile Template -->
+		<div :class="$style.mobile">
+			<div :class="[$style.param, $style.up]">
+				<div :class="$style.key">Rise</div>
 
-		<div
-			v-if="event.status == 'FINISHED' && returnForLiquidity"
-			:class="[$style.param]"
-		>
-			{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>ꜩ</span>
-		</div>
-		<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
-			Refund
-		</div>
-		<div v-else :class="$style.param">
-			<span>TBD</span>
+				<div :class="$style.value">
+					<Icon name="arrow_circle_top_right" size="12" />{{
+						numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
+					}}&nbsp;<span>XTZ</span>
+				</div>
+			</div>
+
+			<div :class="[$style.param, $style.down]">
+				<div :class="$style.key">Rise</div>
+
+				<div :class="$style.value">
+					<Icon name="arrow_circle_top_right" size="12" />{{
+						numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
+					}}&nbsp;<span>XTZ</span>
+				</div>
+			</div>
+
+			<div
+				v-if="event.status == 'FINISHED' && returnForLiquidity"
+				:class="[$style.param]"
+			>
+				<div :class="$style.key">Return</div>
+
+				<div :class="$style.value">
+					{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
+						>XTZ</span
+					>
+				</div>
+			</div>
+			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
+				<div :class="$style.key">Return</div>
+
+				Refund
+			</div>
+			<div v-else :class="$style.param">
+				<div :class="$style.key">Return</div>
+
+				<span>TBD</span>
+			</div>
 		</div>
 	</div>
 </template>
@@ -145,15 +210,16 @@ const returnForLiquidity = computed(() => {
 
 	height: 60px;
 	border-radius: 8px;
-	border: 1px solid var(--border);
 	background: var(--card-bg);
+	outline: 2px solid transparent;
 	padding: 0 16px;
+	cursor: pointer;
 
-	transition: border 0.2s ease;
+	transition: outline 0.2s ease;
 }
 
 .wrapper:hover {
-	border: 1px solid var(--border-highlight);
+	outline: 2px solid var(--border);
 }
 
 .base {
@@ -189,7 +255,7 @@ const returnForLiquidity = computed(() => {
 }
 
 .logo_icon {
-	fill: var(--text-primary);
+	fill: var(--brand);
 }
 
 .info {
@@ -233,7 +299,7 @@ const returnForLiquidity = computed(() => {
 }
 
 .param.down svg {
-	transform: rotate(180deg);
+	transform: scaleY(-1);
 }
 
 .param svg {
@@ -242,5 +308,55 @@ const returnForLiquidity = computed(() => {
 
 .param span {
 	color: var(--text-tertiary);
+}
+
+.desktop {
+	display: flex;
+	align-items: center;
+	flex: 3;
+}
+
+.mobile {
+	display: none;
+
+	flex-direction: column;
+	gap: 20px;
+
+	width: 100%;
+}
+
+.key {
+	color: var(--text-tertiary);
+}
+
+.value {
+	display: flex;
+	align-items: center;
+}
+
+@media (max-width: 650px) {
+	.wrapper {
+		align-items: flex-start;
+		flex-direction: column;
+
+		padding: 16px;
+		height: initial;
+	}
+
+	.desktop {
+		display: none;
+	}
+
+	.mobile {
+		display: flex;
+	}
+
+	.base {
+		margin-bottom: 24px;
+	}
+
+	.param {
+		justify-content: space-between;
+	}
 }
 </style>
