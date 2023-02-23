@@ -39,11 +39,7 @@ import { juster } from "@sdk"
 /**
  * Models
  */
-import {
-	entryLiquidity as entryLiquidityModel,
-	poolPosition as poolPositionModel,
-	poolState as poolStateModel,
-} from "@/graphql/models"
+import { entryLiquidity as entryLiquidityModel, poolPosition as poolPositionModel, poolState as poolStateModel } from "@/graphql/models"
 
 /**
  * Store
@@ -144,13 +140,9 @@ const populatePools = async () => {
 		if (!Object.hasOwnProperty.call(pools.value, index)) return
 		const pool = pools.value[index]
 
-		poolsStates.value[pool.address] = await juster.pools[
-			pool.address
-		].getLastPoolState()
+		poolsStates.value[pool.address] = await juster.pools[pool.address].getLastPoolState()
 
-		poolsAPY.value[pool.address] = (
-			await juster.pools[pool.address].getAPY()
-		).toNumber()
+		poolsAPY.value[pool.address] = (await juster.pools[pool.address].getAPY()).toNumber()
 	}
 
 	isPopulated.value = true
@@ -188,9 +180,7 @@ const setupSubToStates = async () => {
 						...newPoolState,
 						totalLiquidity: BN(newPoolState.totalLiquidity),
 						totalShares: BN(newPoolState.totalShares),
-						withdrawableLiquidity: BN(
-							newPoolState.withdrawableLiquidity,
-						),
+						withdrawableLiquidity: BN(newPoolState.withdrawableLiquidity),
 					}
 				}
 			},
@@ -286,24 +276,15 @@ const handleManualEntryApprove = async (entry) => {
 }
 
 onUnmounted(() => {
-	if (
-		Object.prototype.hasOwnProperty.call(subEntries.value, "_state") &&
-		!subEntries.value?.closed
-	) {
+	if (Object.prototype.hasOwnProperty.call(subEntries.value, "_state") && !subEntries.value?.closed) {
 		subEntries.value.unsubscribe()
 	}
 
-	if (
-		Object.prototype.hasOwnProperty.call(subPositions.value, "_state") &&
-		!subPositions.value?.closed
-	) {
+	if (Object.prototype.hasOwnProperty.call(subPositions.value, "_state") && !subPositions.value?.closed) {
 		subPositions.value.unsubscribe()
 	}
 
-	if (
-		Object.prototype.hasOwnProperty.call(subStates.value, "_state") &&
-		!subStates.value?.closed
-	) {
+	if (Object.prototype.hasOwnProperty.call(subStates.value, "_state") && !subStates.value?.closed) {
 		subStates.value.unsubscribe()
 	}
 })
@@ -312,10 +293,7 @@ watch(
 	() => isPopulated.value,
 	() => {
 		positions.value.forEach((pos) => {
-			summaries.value[pos.poolId] = makeSummaryPosition(
-				pos,
-				poolsStates.value[pos.poolId],
-			)
+			summaries.value[pos.poolId] = makeSummaryPosition(pos, poolsStates.value[pos.poolId])
 		})
 	},
 )
@@ -341,17 +319,11 @@ const { meta } = useMeta({
 	<transition name="slide">
 		<div v-if="showAnimation" :class="$style.wrapper">
 			<metainfo>
-				<template v-slot:title="{ content }"
-					>{{ content }} • Juster</template
-				>
+				<template v-slot:title="{ content }">{{ content }} • Juster</template>
 			</metainfo>
 
 			<!-- Modals -->
-			<SharePoolModal
-				:show="showSharePoolModal"
-				:pool="selectedPool"
-				@onClose="showSharePoolModal = false"
-			/>
+			<SharePoolModal :show="showSharePoolModal" :pool="selectedPool" @onClose="showSharePoolModal = false" />
 			<PoolsModal
 				v-if="pools.length"
 				:show="showPoolsModal"
@@ -373,16 +345,10 @@ const { meta } = useMeta({
 				:show="showRequestWithdrawModal"
 				:selectedPool="selectedPool"
 				:state="poolsStates[selectedPool.address]"
-				:position="
-					positions.find((pos) => pos.poolId === selectedPool.address)
-				"
+				:position="positions.find((pos) => pos.poolId === selectedPool.address)"
 				@onClose="showRequestWithdrawModal = false"
 			/>
-			<WithdrawClaimsModal
-				:show="showWithdrawClaimsModal"
-				:positions="positions"
-				@onClose="showWithdrawClaimsModal = false"
-			/>
+			<WithdrawClaimsModal :show="showWithdrawClaimsModal" :positions="positions" @onClose="showWithdrawClaimsModal = false" />
 
 			<Flex align="center" :class="$style.head">
 				<h1 :class="$style.title">Liquidity Pools</h1>
@@ -411,27 +377,15 @@ const { meta } = useMeta({
 						:isReady="isPopulated"
 					/>
 
-					<BottomInfo
-						v-if="pools.length"
-						:pool="pools[0]"
-						:class="$style.bottom_left_block"
-					/>
+					<BottomInfo v-if="pools.length" :pool="pools[0]" :class="$style.bottom_left_block" />
 				</Flex>
 
 				<Flex direction="column" gap="24" wide :class="$style.base">
-					<PoolsStats
-						:pools="pools"
-						:poolsStates="poolsStates"
-						:poolsAPY="poolsAPY"
-					/>
+					<PoolsStats :pools="pools" :poolsStates="poolsStates" :poolsAPY="poolsAPY" />
 
-					<Block
-						v-if="flags.showGeneralPoolsWarning"
-						@onClose="handleClosePoolsWarning"
-					>
-						<span>Current APYs is approximate.</span> Values may
-						change over the next few months. Planning for long-term
-						income based on these values may differ from the actual.
+					<Block v-if="flags.showGeneralPoolsWarning" @onClose="handleClosePoolsWarning">
+						<span>Current APYs is approximate.</span> Values may change over the next few months. Planning for long-term income
+						based on these values may differ from the actual.
 					</Block>
 
 					<transition name="fade">
@@ -448,11 +402,7 @@ const { meta } = useMeta({
 						/>
 					</transition>
 
-					<BottomInfo
-						v-if="pools.length"
-						:pool="pools[0]"
-						:class="$style.bottom_right_block"
-					/>
+					<BottomInfo v-if="pools.length" :pool="pools[0]" :class="$style.bottom_right_block" />
 				</Flex>
 			</Flex>
 		</div>

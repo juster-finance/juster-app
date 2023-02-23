@@ -2,7 +2,7 @@
 /**
  * Vendor
  */
-import { onBeforeMount, onMounted } from "vue"
+import { onBeforeMount, onMounted, watch } from "vue"
 
 /**
  * Styles
@@ -29,7 +29,7 @@ import ConfirmationModal from "@local/modals/ConfirmationModal.vue"
 /**
  * Services
  */
-import { juster, initPools } from "@sdk"
+import { juster, initPools, currentNetwork } from "@sdk"
 import { fetchAllPools, fetchPoolsLines } from "@/api/pools"
 
 /**
@@ -68,11 +68,6 @@ onBeforeMount(() => {
 	})
 })
 onMounted(async () => {
-	// window.addEventListener("mousedown", (e) => alert(e))
-
-	marketStore.pools = await fetchAllPools()
-	initPools(marketStore.pools)
-
 	document.addEventListener("keydown", (e) => {
 		if (e.key === "Enter") {
 			const { activeElement } = document
@@ -81,9 +76,23 @@ onMounted(async () => {
 		}
 	})
 
-	const lines = await fetchPoolsLines()
-	marketStore.lines = lines
+	setupPools()
 })
+
+/** Network Watcher */
+watch(
+	() => currentNetwork.value,
+	() => {
+		setupPools()
+	},
+)
+
+const setupPools = async () => {
+	marketStore.pools = await fetchAllPools()
+	initPools(marketStore.pools)
+
+	marketStore.lines = await fetchPoolsLines()
+}
 
 /**
  * Setup Market (Markets & Quotes & Subscriptinos)

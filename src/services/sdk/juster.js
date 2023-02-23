@@ -26,9 +26,7 @@ const juster = reactive({
 	pools: {},
 })
 
-const currentNetwork = computed(() =>
-	juster.sdk._network === "mainnet" ? "mainnet" : "testnet",
-)
+const currentNetwork = computed(() => (juster.sdk._network === "mainnet" ? "mainnet" : "testnet"))
 
 /**
  * Storage "activeNetwork"
@@ -40,9 +38,7 @@ if (!localStorage.activeNetwork) {
 /**
  * Validate "activeNetwork" (Integrity Repair)
  */
-if (
-	![Networks.MAINNET, Networks.TESTNET].includes(localStorage.activeNetwork)
-) {
+if (![Networks.MAINNET, Networks.TESTNET].includes(localStorage.activeNetwork)) {
 	localStorage.activeNetwork = Networks.MAINNET
 }
 
@@ -54,11 +50,7 @@ juster.provider = new BeaconWallet({
 juster.tezos = new TezosToolkit(rpcNodes[localStorage.activeNetwork][0].url)
 
 const init = async () => {
-	juster.sdk = JusterCore.create(
-		juster.tezos,
-		juster.provider,
-		localStorage.activeNetwork,
-	)
+	juster.sdk = JusterCore.create(juster.tezos, juster.provider, localStorage.activeNetwork)
 
 	/** GQL */
 	juster.gql = createClient({
@@ -72,12 +64,7 @@ const initPools = (pools) => {
 	const poolAddresses = pools.map((pool) => pool.address)
 
 	poolAddresses.forEach((pool) => {
-		juster.pools[pool] = JusterPool.create(
-			juster.tezos,
-			juster.provider,
-			localStorage.activeNetwork,
-			pool,
-		)
+		juster.pools[pool] = JusterPool.create(juster.tezos, juster.provider, localStorage.activeNetwork, pool)
 	})
 }
 
