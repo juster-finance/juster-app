@@ -36,6 +36,20 @@ const props = defineProps({
 })
 const emit = defineEmits(["onBet", "onWithdraw"])
 
+const handleWithdraw = () => {
+	if (isWithdrawDisabled.value) return
+	emit("onWithdraw")
+}
+
+const isWithdrawDisabled = computed(
+	() =>
+		props.isWithdrawing ||
+		!props.isWon ||
+		(props.isWon && !props.positionForWithdraw) ||
+		!!successfulWithdrawal.value?.amount ||
+		accountStore.pendingTransaction.awaiting,
+)
+
 const ratio = computed(() => {
 	if (!props.event.poolBelow || !props.event.poolAboveEq) return 0
 
@@ -45,11 +59,7 @@ const ratio = computed(() => {
 	}
 })
 
-const successfulWithdrawal = computed(() =>
-	accountStore.withdrawals.find(
-		(withdrawal) => withdrawal.event.id == props.event.id,
-	),
-)
+const successfulWithdrawal = computed(() => accountStore.withdrawals.find((withdrawal) => withdrawal.event.id == props.event.id))
 
 const btnType = computed(() => {
 	if (props.isWithdrawing || accountStore.pendingTransaction.awaiting) {
@@ -62,23 +72,16 @@ const btnType = computed(() => {
 		return "secondary"
 	}
 })
+
+const isFinished = computed(() => {
+	return props.event.status === "FINISHED" || props.event.status === "CANCELED"
+})
 </script>
 
 <template>
 	<Flex align="center" :class="$style.wrapper">
-		<template
-			v-if="
-				large && !isWon && !positionForWithdraw && !successfulWithdrawal
-			"
-		>
-			<Flex
-				gap="4"
-				wide
-				:class="[
-					disabled && $style.disabled_btns,
-					!parseFloat(accountStore.balance) && $style.disabled_btns,
-				]"
-			>
+		<template v-if="large && !isWon && !positionForWithdraw && !successfulWithdrawal && !isFinished">
+			<Flex gap="4" wide :class="[disabled && $style.disabled_btns, !parseFloat(accountStore.balance) && $style.disabled_btns]">
 				<Button
 					@click="emit('onBet', 'Rise')"
 					type="primary"
@@ -106,14 +109,7 @@ const btnType = computed(() => {
 			</Flex>
 		</template>
 
-		<template
-			v-else-if="
-				!large &&
-				!isWon &&
-				!positionForWithdraw &&
-				!successfulWithdrawal
-			"
-		>
+		<template v-else-if="!large && !isWon && !positionForWithdraw && !successfulWithdrawal && !isFinished">
 			<div
 				@click.prevent="emit('onBet', 'Rise')"
 				:class="[
@@ -130,9 +126,7 @@ const btnType = computed(() => {
 				</div>
 
 				<div :class="$style.ratio">
-					<span v-if="ratio.rise">
-						x{{ (1 + ratio.rise).toFixed(2) }}
-					</span>
+					<span v-if="ratio.rise"> x{{ (1 + ratio.rise).toFixed(2) }} </span>
 					<span v-else>0.00</span>
 				</div>
 			</div>
@@ -149,9 +143,7 @@ const btnType = computed(() => {
 				]"
 			>
 				<div :class="$style.ratio">
-					<span v-if="ratio.fall">
-						{{ (1 + ratio.fall).toFixed(2) }}x
-					</span>
+					<span v-if="ratio.fall"> {{ (1 + ratio.fall).toFixed(2) }}x </span>
 					<span v-else>0.00</span>
 				</div>
 
@@ -163,32 +155,16 @@ const btnType = computed(() => {
 			</div>
 		</template>
 
-		<Button
-			v-else
-			@click.prevent="emit('onWithdraw')"
-			:type="btnType"
-			size="small"
-			:disabled="
-				isWithdrawing ||
-				(isWon && !positionForWithdraw) ||
-				!!successfulWithdrawal?.amount ||
-				accountStore.pendingTransaction.awaiting
-			"
-			block
-		>
-			<template v-if="successfulWithdrawal"
-				>Successfully withdrawn
-				{{ successfulWithdrawal?.amount.toFixed(2) }} XTZ</template
-			>
+		<Button v-else @click.prevent="handleWithdraw" :type="btnType" size="small" :disabled="isWithdrawDisabled" block>
+			<template v-if="successfulWithdrawal">Successfully withdrawn {{ successfulWithdrawal?.amount.toFixed(2) }} XTZ</template>
 
-			<template v-else-if="accountStore.pendingTransaction.awaiting">
-				Can`t withdraw right now
-			</template>
+			<template v-else-if="accountStore.pendingTransaction.awaiting"> Can`t withdraw right now </template>
 
 			<template v-else-if="!isWithdrawing && positionForWithdraw">
-				<Icon name="coins" size="16" />Withdraw
-				{{ numberWithSymbol(positionForWithdraw.value, ",") }} XTZ
+				<Icon name="coins" size="16" />Withdraw {{ numberWithSymbol(positionForWithdraw.value, ",") }} XTZ
 			</template>
+
+			<template v-else-if="!isWon">No funds to withdraw</template>
 
 			<template v-else> <LoadingBar /></template>
 		</Button>

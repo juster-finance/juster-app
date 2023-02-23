@@ -43,28 +43,17 @@ export default defineComponent({
 		const accountStore = useAccountStore()
 		const notificationsStore = useNotificationsStore()
 
-		const isMyProfile = computed(
-			() => !router.currentRoute.value.params.address,
-		)
+		const isMyProfile = computed(() => !router.currentRoute.value.params.address)
 
 		const user = ref(null)
 		const balance = ref(0)
-		const address = computed(() =>
-			isMyProfile.value
-				? accountStore.pkh
-				: router.currentRoute.value.params.address,
-		)
+		const address = computed(() => (isMyProfile.value ? accountStore.pkh : router.currentRoute.value.params.address))
 
 		const events = ref([])
 
 		/** pagination */
 		const selectedPageForEvents = ref(1)
-		const paginatedEvents = computed(() =>
-			events.value.slice(
-				(selectedPageForEvents.value - 1) * 6,
-				selectedPageForEvents.value * 6,
-			),
-		)
+		const paginatedEvents = computed(() => events.value.slice((selectedPageForEvents.value - 1) * 6, selectedPageForEvents.value * 6))
 
 		/** Balance */
 		const getUserBalance = async () => {
@@ -87,16 +76,11 @@ export default defineComponent({
 			const positions = await fetchAllUserPositions({
 				address: address.value,
 			})
-			events.value = positions
-				.filter((position) => position.value)
-				.map((position) => position.event)
+			events.value = positions.map((position) => position.event)
 		}
 
 		onMounted(() => {
-			if (
-				address.value.length !== 36 ||
-				(!isMyProfile.value && accountStore.pkh == address.value)
-			) {
+			if (address.value.length !== 36 || (!isMyProfile.value && accountStore.pkh == address.value)) {
 				router.push("/profile")
 				return
 			}
@@ -154,9 +138,7 @@ export default defineComponent({
 <template>
 	<div v-if="user && isProfileLoaded" :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }">
-				{{ content }} • Juster
-			</template>
+			<template v-slot:title="{ content }"> {{ content }} • Juster </template>
 		</metainfo>
 
 		<h2 :class="$style.profile_title">
@@ -167,31 +149,18 @@ export default defineComponent({
 			<div :class="$style.profile">
 				<div :class="$style.avatar">
 					<Tooltip placement="bottom">
-						<img
-							:src="`https://services.tzkt.io/v1/avatars/${address}`"
-							:class="$style.image"
-							alt="avatar"
-						/>
+						<img :src="`https://services.tzkt.io/v1/avatars/${address}`" :class="$style.image" alt="avatar" />
 
-						<template v-slot:content>
-							This avatar is supported by TzKT.io
-						</template>
+						<template v-slot:content> This avatar is supported by TzKT.io </template>
 					</Tooltip>
 				</div>
 
 				<div @click="handleCopyAddress" :class="$style.username">
-					{{
-						`${address.slice(0, 8)}..${address.slice(
-							address.length - 3,
-							address.length,
-						)}`
-					}}
+					{{ `${address.slice(0, 8)}..${address.slice(address.length - 3, address.length)}` }}
 					<Icon name="copy" size="14" />
 				</div>
 
-				<div :class="$style.status">
-					{{ isMyProfile ? accountStore.balance : balance }} ꜩ
-				</div>
+				<div :class="$style.status">{{ isMyProfile ? accountStore.balance : balance }} ꜩ</div>
 
 				<div :class="$style.progress">
 					<div :class="$style.head">
@@ -204,29 +173,13 @@ export default defineComponent({
 				</div>
 
 				<div :class="$style.badges">
-					<img
-						src="@/assets/badge.png"
-						:class="$style.badge"
-						alt="badge"
-					/>
+					<img src="@/assets/badge.png" :class="$style.badge" alt="badge" />
 
-					<img
-						src="@/assets/badge.png"
-						:class="$style.badge"
-						alt="badge"
-					/>
+					<img src="@/assets/badge.png" :class="$style.badge" alt="badge" />
 
-					<img
-						src="@/assets/badge.png"
-						:class="$style.badge"
-						alt="badge"
-					/>
+					<img src="@/assets/badge.png" :class="$style.badge" alt="badge" />
 
-					<img
-						src="@/assets/badge.png"
-						:class="$style.badge"
-						alt="badge"
-					/>
+					<img src="@/assets/badge.png" :class="$style.badge" alt="badge" />
 				</div>
 			</div>
 
@@ -303,12 +256,7 @@ export default defineComponent({
 
 				<div :class="$style.additional">
 					<div :class="$style.left">
-						<a
-							:href="`https://${
-								currentNetwork == 'mainnet' ? '' : 'ghostnet.'
-							}tzkt.io/${address}`"
-							target="_blank"
-						>
+						<a :href="`https://${currentNetwork == 'mainnet' ? '' : 'ghostnet.'}tzkt.io/${address}`" target="_blank">
 							<Button type="secondary" size="small">
 								<Icon name="database" size="14" />
 								View on TzKT
@@ -326,18 +274,12 @@ export default defineComponent({
 				<div>
 					<h2>My submissions</h2>
 
-					<div :class="$style.description">
-						List of all current and archived events
-					</div>
+					<div :class="$style.description">List of all current and archived events</div>
 				</div>
 			</div>
 
 			<div :class="$style.items">
-				<EventCard
-					v-for="event in paginatedEvents"
-					:key="event.id"
-					:event="event"
-				/>
+				<EventCard v-for="event in paginatedEvents" :key="event.id" :event="event" />
 			</div>
 
 			<Pagination
@@ -351,18 +293,11 @@ export default defineComponent({
 	</div>
 
 	<div v-if="!user && isProfileLoaded" :class="$style.empty_profile">
-		<img
-			:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-			:class="$style.error_avatar"
-			alt="error_avatar"
-		/>
+		<img :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`" :class="$style.error_avatar" alt="error_avatar" />
 
 		<div :class="$style.error_title">Your profile is not ready yet</div>
 
-		<div :class="$style.error_description">
-			Once you participate in any event, your profile will become
-			available!
-		</div>
+		<div :class="$style.error_description">Once you participate in any event, your profile will become available!</div>
 
 		<div :class="$style.error_buttons">
 			<router-link to="/">
@@ -374,9 +309,7 @@ export default defineComponent({
 
 			<div :class="$style.error_description">or</div>
 
-			<Button @click="handleBack" type="secondary" size="small">
-				Go back
-			</Button>
+			<Button @click="handleBack" type="secondary" size="small"> Go back </Button>
 		</div>
 	</div>
 </template>
