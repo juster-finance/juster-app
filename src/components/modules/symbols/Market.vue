@@ -36,10 +36,7 @@ const quotes = computed(() => {
 
 const price = computed(() => {
 	return {
-		integer: numberWithSymbol(
-			quotes.value[0].price.toString().split(".")[0],
-			",",
-		),
+		integer: numberWithSymbol(quotes.value[0].price.toString().split(".")[0], ","),
 		fraction: quotes.value[0].price.toString().split(".")[1],
 	}
 })
@@ -50,15 +47,10 @@ const change = computed(() => {
 
 	if (!props.market.historyPrice) return "Loading"
 
-	const { diff, percent, isIncreased } = calcChange(
-		quotes.value[0].price,
-		props.market.historyPrice,
-	)
+	const { diff, percent, isIncreased } = calcChange(quotes.value[0].price, props.market.historyPrice)
 	color.value = isIncreased ? "green" : "red"
 
-	return `${numberWithSymbol(diff.toFixed(2), " ")}, ${percent.toFixed(
-		2,
-	)}%, 1W`
+	return `${numberWithSymbol(diff.toFixed(2), " ")}, ${percent.toFixed(2)}%, 1W`
 })
 
 const handleJoin = () => {
@@ -67,40 +59,26 @@ const handleJoin = () => {
 </script>
 
 <template>
-	<div
-		@click="router.push(`/markets/${market.symbol}`)"
-		:class="$style.wrapper"
-	>
-		<Flex align="center" justify="between">
+	<div @click="router.push(`/markets/${market.symbol}`)" :class="$style.wrapper">
+		<Flex align="center" justify="between" :class="$style.content">
 			<div :class="$style.base">
 				<div :class="$style.name">
 					{{ market.symbol }},
-					<span>{{
-						supportedMarkets[market.symbol].description
-					}}</span>
+					<span>{{ supportedMarkets[market.symbol].description }}</span>
 				</div>
 
 				<h1 v-if="quotes.length" :class="$style.price">
-					$ {{ price.integer
-					}}<span>.{{ price.fraction.slice(0, 2) }}</span>
+					$ {{ price.integer }}<span>.{{ price.fraction.slice(0, 2) }}</span>
 				</h1>
 
-				<div :class="[$style.diff, $style[color]]">
-					<Icon
-						v-if="change !== 'Loading'"
-						name="carret"
-						size="12"
-					/>{{ change }}
-				</div>
+				<div :class="[$style.diff, $style[color]]"><Icon v-if="change !== 'Loading'" name="carret" size="12" />{{ change }}</div>
 			</div>
 
 			<div :class="$style.right">
-				<div :class="$style.actions">
-					<Button @click="handleJoin" size="medium" type="secondary">
-						<Icon name="collection" size="16" />
-						View events
-					</Button>
-				</div>
+				<Button @click="handleJoin" size="medium" type="secondary" :class="$style.btn">
+					<Icon name="collection" size="16" />
+					View events
+				</Button>
 
 				<div :class="$style.info">
 					<div :class="$style.param">
@@ -112,26 +90,14 @@ const handleJoin = () => {
 
 					<div :class="$style.param">
 						<span>TVL:</span>
-						<span
-							>{{
-								abbreviateNumber(
-									market.totalValueLocked.toFixed(0),
-								)
-							}}
-							ꜩ</span
-						>
+						<span>{{ abbreviateNumber(market.totalValueLocked.toFixed(0)) }} ꜩ</span>
 					</div>
 
 					<div :class="$style.dot" />
 
 					<div :class="$style.param">
 						<span>Volume (24h):</span>
-						<span
-							>{{
-								abbreviateNumber(market.totalVolume.toFixed(0))
-							}}
-							ꜩ</span
-						>
+						<span>{{ abbreviateNumber(market.totalVolume.toFixed(0)) }} ꜩ</span>
 					</div>
 				</div>
 			</div>
@@ -219,11 +185,6 @@ const handleJoin = () => {
 	gap: 45px;
 }
 
-.actions {
-	display: flex;
-	gap: 6px;
-}
-
 .info {
 	display: flex;
 	align-items: center;
@@ -253,5 +214,31 @@ const handleJoin = () => {
 	height: 4px;
 	border-radius: 50%;
 	background: var(--opacity-20);
+}
+
+@media (max-width: 700px) {
+	.content {
+		flex-direction: column;
+		align-items: flex-start;
+
+		gap: 40px;
+	}
+
+	.right {
+		flex-direction: column-reverse;
+		align-items: flex-start;
+		gap: 20px;
+	}
+}
+
+@media (max-width: 500px) {
+	.info {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.dot {
+		display: none;
+	}
 }
 </style>
