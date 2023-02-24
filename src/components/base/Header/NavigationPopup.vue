@@ -75,25 +75,25 @@ const communityLinks = ref([
 	{
 		icon: "feather",
 		title: "Blog",
-		description: "Everything you need is here",
+		description: "Guides & articles from the team",
 		url: "/blog",
 	},
 	{
 		icon: "asterisk",
 		title: "Releases",
-		description: "Learn the product in more detail",
+		description: "Detailed list of all changes",
 		url: "/releases",
 	},
 	{
 		icon: "discord",
 		title: "Discord",
-		description: "Explore the product path",
+		description: "Communication and discussion",
 		url: "https://discord.gg/FeGDCkHhnB",
 	},
 	{
 		icon: "twitter",
 		title: "Twitter",
-		description: "Explore our code & Contribute",
+		description: "Latest news and updates",
 		url: "https://twitter.com/Juster_fi",
 	},
 ])
