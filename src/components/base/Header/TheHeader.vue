@@ -67,33 +67,12 @@ const showMobileMenu = ref(false)
 /** hardcoded active links */
 const isActive = (linkName) => {
 	if (linkName === "Browse") {
-		if (
-			[
-				"Explore",
-				"Events",
-				"Markets",
-				"Ranking",
-				"Market",
-				"Event",
-				"Liquidity Pools",
-				"Liquidity Pool",
-			].includes(route.name)
-		)
+		if (["Explore", "Events", "Markets", "Ranking", "Market", "Event", "Liquidity Pools", "Liquidity Pool"].includes(route.name))
 			return true
 	}
 
 	if (linkName === "Resources") {
-		if (
-			[
-				"Docs",
-				"DocDiscover",
-				"DocBetting",
-				"DocLiquidity",
-				"DocWithdraw",
-				"DocRoadmap",
-			].includes(route.name)
-		)
-			return true
+		if (["Docs", "DocDiscover", "DocBetting", "DocLiquidity", "DocWithdraw", "DocRoadmap"].includes(route.name)) return true
 	}
 
 	if (linkName === "Community") {
@@ -111,107 +90,134 @@ const handleNetworkDblClick = () => {
 </script>
 
 <template>
-	<header
-		:class="[
-			$style.wrapper,
-			currentNetwork !== Networks.MAINNET && $style.testnet,
-		]"
-	>
-		<div
-			v-if="currentNetwork !== Networks.MAINNET"
-			:class="$style.testnetwork_warning"
-		>
+	<header :class="[$style.wrapper, currentNetwork !== Networks.MAINNET && $style.testnet]">
+		<div v-if="currentNetwork !== Networks.MAINNET" :class="$style.testnetwork_warning">
 			<Tooltip placement="bottom">
-				<div
-					@dblclick="handleNetworkDblClick"
-					:class="$style.testnetwork_warning__label"
-				>
-					Test network
-				</div>
+				<div @dblclick="handleNetworkDblClick" :class="$style.testnetwork_warning__label">Test network</div>
 
-				<template #content
-					>Ghostnet in use.
-					<span>Double-click to switch to Mainnet.</span></template
-				>
+				<template #content>Ghostnet in use. <span>Double-click to switch to Mainnet.</span></template>
 			</Tooltip>
 		</div>
 
 		<!-- Mobile menu -->
 		<transition name="fade">
-			<div
-				v-if="showMobileMenu"
-				@click="showMobileMenu = false"
-				:class="$style.mobile_menu"
-			>
-				<div :class="$style.mobile_menu__title">Navigation</div>
+			<div v-if="showMobileMenu" @click="showMobileMenu = false" :class="$style.mobile_menu">
+				<Flex direction="column" gap="16">
+					<Flex direction="column" gap="16">
+						<div :class="$style.mobile_menu__title">Browse</div>
 
-				<div :class="$style.mobile_menu__links">
-					<router-link to="/" :class="$style.mobile_menu__link">
-						<div :class="$style.left">
-							<Icon name="compass" size="14" />
-							<span>Browse</span>
-						</div>
+						<div :class="$style.mobile_menu__links">
+							<router-link to="/" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="compass" size="14" />
+									<span>Explore</span>
+								</div>
 
-						<div :class="$style.mobile_menu__description">
-							Top markets, ranking, etc
-						</div>
-					</router-link>
-					<router-link to="/events" :class="$style.mobile_menu__link">
-						<div :class="$style.left">
-							<Icon name="price_event" size="14" />
-							<span>Events</span>
-						</div>
+								<div :class="$style.mobile_menu__description">Events, Ranking, Stats, etc</div>
+							</router-link>
+							<router-link to="/events" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="price_event" size="14" />
+									<span>Events</span>
+								</div>
 
-						<div :class="$style.mobile_menu__description">
-							Events with filtering
-						</div>
-					</router-link>
-					<router-link to="/pools" :class="$style.mobile_menu__link">
-						<div :class="$style.left">
-							<Icon name="server" size="14" />
-							<span>Pools</span>
-						</div>
+								<div :class="$style.mobile_menu__description">All events with advanced filters</div>
+							</router-link>
+							<router-link to="/pools" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="server" size="14" />
+									<span>Pools</span>
+								</div>
 
-						<div :class="$style.mobile_menu__description">
-							Provide liquidity for events
-						</div>
-					</router-link>
-					<router-link
-						to="/docs/discover"
-						:class="$style.mobile_menu__link"
-					>
-						<div :class="$style.left">
-							<Icon name="book" size="14" />
-							<span>Documentation</span>
-						</div>
+								<div :class="$style.mobile_menu__description">Provide liquidity to events</div>
+							</router-link>
+							<router-link to="/markets" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="collection" size="14" />
+									<span>Markets</span>
+								</div>
 
-						<div :class="$style.mobile_menu__description">
-							Guides, Articles, etc
+								<div :class="$style.mobile_menu__description">All available symbols</div>
+							</router-link>
 						</div>
-					</router-link>
-					<router-link
-						to="/markets"
-						:class="$style.mobile_menu__link"
-					>
-						<div :class="$style.left">
-							<Icon name="collection" size="14" />
-							<span>Markets</span>
-						</div>
+					</Flex>
+					<div :class="$style.divider" />
+					<Flex direction="column" gap="16">
+						<div :class="$style.mobile_menu__title">Resources</div>
 
-						<div :class="$style.mobile_menu__description">
-							Currency pairs for events
+						<div :class="$style.mobile_menu__links">
+							<router-link to="/docs/discover" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="compass_1" size="14" />
+									<span>Documentation</span>
+								</div>
+
+								<div :class="$style.mobile_menu__description">Everything you need is here</div>
+							</router-link>
+							<router-link to="/docs/roadmap" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="map" size="14" />
+									<span>Roadmap</span>
+								</div>
+
+								<div :class="$style.mobile_menu__description">Explore the product path</div>
+							</router-link>
+							<a href="https://github.com/juster-finance" target="_blank" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="github" size="14" />
+									<span>Source Code</span>
+								</div>
+
+								<div :class="$style.mobile_menu__description">Explore our code & contribute</div>
+							</a>
 						</div>
-					</router-link>
-				</div>
+					</Flex>
+					<div :class="$style.divider" />
+					<Flex direction="column" gap="16">
+						<div :class="$style.mobile_menu__title">Community</div>
+
+						<div :class="$style.mobile_menu__links">
+							<router-link to="/blog" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="feather" size="14" />
+									<span>Blog</span>
+								</div>
+
+								<div :class="$style.mobile_menu__description">Guides & articles from the team</div>
+							</router-link>
+							<router-link to="/releases" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="asterisk" size="14" />
+									<span>Releases</span>
+								</div>
+
+								<div :class="$style.mobile_menu__description">Detailed list of all changes</div>
+							</router-link>
+							<a href="https://discord.gg/FeGDCkHhnB" target="_blank" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="discord" size="14" />
+									<span>Discord</span>
+								</div>
+
+								<div :class="$style.mobile_menu__description">Communication and discussion</div>
+							</a>
+							<a href="https://twitter.com/Juster_fi" target="_blank" :class="$style.mobile_menu__link">
+								<div :class="$style.left">
+									<Icon name="twitter" size="14" />
+									<span>Twitter</span>
+								</div>
+
+								<div :class="$style.mobile_menu__description">Latest news and updates</div>
+							</a>
+						</div>
+					</Flex>
+				</Flex>
 			</div>
 		</transition>
 
 		<div :class="$style.base">
 			<div :class="$style.left">
-				<div
-					@click="showMobileMenu = !showMobileMenu"
-					:class="$style.mobile_menu_icon"
-				>
+				<div @click="showMobileMenu = !showMobileMenu" :class="$style.mobile_menu_icon">
 					<Icon :name="showMobileMenu ? 'close' : 'menu'" size="16" />
 				</div>
 
@@ -234,33 +240,20 @@ const handleNetworkDblClick = () => {
 				</router-link>
 
 				<!-- Popups -->
-				<NavigationPopup
-					:active-link="activeLink"
-					@onClick="activeLink = ''"
-				/>
+				<NavigationPopup :active-link="activeLink" @onClick="activeLink = ''" />
 			</div>
 
 			<div :class="$style.right">
 				<RewardAlert :class="$style.reward_alert" />
 
 				<Flex gap="8">
-					<router-link
-						v-if="!pkh && route.path !== '/connect'"
-						to="/connect"
-					>
+					<router-link v-if="!pkh && route.path !== '/connect'" to="/connect">
 						<Button type="primary" size="small">
 							<Icon name="login" size="16" />
 							Connect Wallet
 						</Button>
 					</router-link>
-					<router-link
-						v-else-if="
-							!pkh &&
-							route.path === '/connect' &&
-							appStore.prevRoute
-						"
-						:to="appStore.prevRoute.path"
-					>
+					<router-link v-else-if="!pkh && route.path === '/connect' && appStore.prevRoute" :to="appStore.prevRoute.path">
 						<Button type="secondary" size="small">
 							<Icon name="back" size="16" />
 							Back to {{ appStore.prevRoute.name }}
@@ -269,10 +262,7 @@ const handleNetworkDblClick = () => {
 
 					<ProfileMenu v-if="pkh">
 						<div :class="$style.avatar">
-							<img
-								:src="`https://services.tzkt.io/v1/avatars/${pkh}`"
-								alt="avatar"
-							/>
+							<img :src="`https://services.tzkt.io/v1/avatars/${pkh}`" alt="avatar" />
 						</div>
 					</ProfileMenu>
 				</Flex>
@@ -480,8 +470,6 @@ const handleNetworkDblClick = () => {
 	line-height: 1.1;
 	font-weight: 600;
 	color: var(--text-secondary);
-
-	margin-bottom: 16px;
 }
 
 .mobile_menu__links {

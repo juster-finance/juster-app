@@ -20,11 +20,7 @@ import LoadingDots from "@ui/LoadingDots.vue"
  * Services
  */
 import { juster, analytics } from "@sdk"
-import {
-	sanitizeInput,
-	capitalizeFirstLetter,
-	parsePoolName,
-} from "@utils/misc"
+import { sanitizeInput, capitalizeFirstLetter, parsePoolName } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
 
 /**
@@ -71,9 +67,7 @@ const handleDeposit = async () => {
 	opConfirmationInProgress.value = true
 
 	try {
-		const op = await juster.pools[
-			props.selectedPool.address
-		].depositLiquidity(BN(amount.value))
+		const op = await juster.pools[props.selectedPool.address].depositLiquidity(BN(amount.value))
 
 		accountStore.pendingTransaction.awaiting = true
 		op.confirmation()
@@ -88,14 +82,14 @@ const handleDeposit = async () => {
 			notification: {
 				type: "success",
 				title: "Your deposit has been accepted",
-				description:
-					"We need to process your deposit, it will take ~30 seconds",
+				description: "We need to process your deposit, it will take ~30 seconds",
 				autoDestroy: true,
 			},
 		})
 
 		analytics.log("onPoolDeposit", {
 			pool: props.selectedPool.address,
+			amount: amount.value,
 		})
 
 		opConfirmationInProgress.value = false
@@ -145,8 +139,7 @@ const buttonState = computed(() => {
 			disabled: true,
 			type: "secondary",
 		}
-	if (amount.value > 0 && amount.value < 0.01)
-		return { text: "Minimum 0.01 XTZ", disabled: true, type: "secondary" }
+	if (amount.value > 0 && amount.value < 0.01) return { text: "Minimum 0.01 XTZ", disabled: true, type: "secondary" }
 	if (amount.value > accountStore.balance)
 		return {
 			text: "Insufficient funds",
@@ -154,9 +147,7 @@ const buttonState = computed(() => {
 			type: "secondary",
 		}
 	return {
-		text: `Deposit to ${parsePoolName(
-			props.selectedPool.name.replace("Juster Pool: ", ""),
-		)}`,
+		text: `Deposit to ${parsePoolName(props.selectedPool.name.replace("Juster Pool: ", ""))}`,
 		disabled: false,
 		type: "primary",
 	}
@@ -238,39 +229,16 @@ const onKeydown = (e) => {
 			<Flex align="center" gap="8">
 				<Icon name="server" size="16" color="secondary" />
 
-				<Text
-					@click="emit('onBack')"
-					size="14"
-					weight="600"
-					color="secondary"
-					:class="$style.head_btn"
-				>
-					Deposit Liquidity
-				</Text>
+				<Text @click="emit('onBack')" size="14" weight="600" color="secondary" :class="$style.head_btn"> Deposit Liquidity </Text>
 
-				<Icon
-					name="arrow"
-					size="12"
-					color="tertiary"
-					:class="$style.arrow_icon"
-				/>
+				<Icon name="arrow" size="12" color="tertiary" :class="$style.arrow_icon" />
 
 				<Text size="14" weight="600" color="primary">
-					{{
-						parsePoolName(
-							selectedPool.name.replace("Juster Pool: ", ""),
-						)
-					}}
+					{{ parsePoolName(selectedPool.name.replace("Juster Pool: ", "")) }}
 				</Text>
 			</Flex>
 
-			<Icon
-				@click="emit('onClose')"
-				name="close"
-				size="16"
-				color="tertiary"
-				:class="$style.close_icon"
-			/>
+			<Icon @click="emit('onClose')" name="close" size="16" color="tertiary" :class="$style.close_icon" />
 		</Flex>
 
 		<Flex direction="column" gap="32" :class="$style.base">
@@ -279,31 +247,18 @@ const onKeydown = (e) => {
 					<Flex align="center" gap="20">
 						<Flex direction="column" gap="8">
 							<Text size="14" weight="600" color="primary">
-								{{
-									selectedPool.name.replace(
-										"Juster Pool: ",
-										"",
-									)
-								}}
+								{{ selectedPool.name.replace("Juster Pool: ", "") }}
 							</Text>
 
 							<Flex align="center" gap="8">
 								<Flex align="center" gap="4">
-									<Icon
-										name="zap_circle"
-										size="12"
-										color="green"
-									/>
-									<Text size="12" weight="700" color="green"
-										>Active</Text
-									>
+									<Icon name="zap_circle" size="12" color="green" />
+									<Text size="12" weight="700" color="green">Active</Text>
 								</Flex>
 
 								<Text size="8" color="support">✦</Text>
 
-								<Text size="12" weight="600" color="tertiary"
-									>Pool</Text
-								>
+								<Text size="12" weight="600" color="tertiary">Pool</Text>
 							</Flex>
 						</Flex>
 					</Flex>
@@ -313,45 +268,23 @@ const onKeydown = (e) => {
 							<Flex align="center" gap="6">
 								<Icon name="coins" size="12" color="tertiary" />
 
-								<Text
-									v-if="state"
-									size="14"
-									weight="600"
-									color="primary"
-								>
-									{{
-										numberWithSymbol(
-											state.totalLiquidity,
-											",",
-										)
-									}}
+								<Text v-if="state" size="14" weight="600" color="primary">
+									{{ numberWithSymbol(state.totalLiquidity, ",") }}
 								</Text>
 								<LoadingDots v-else />
 
 								<template v-if="amount.value > 0">
-									<Text
-										size="14"
-										weight="600"
-										color="tertiary"
-									>
+									<Text size="14" weight="600" color="tertiary">
 										+
-										{{
-											numberWithSymbol(amount.value, ",")
-										}}
+										{{ numberWithSymbol(amount.value, ",") }}
 										=
 									</Text>
-									<Text
-										size="14"
-										weight="600"
-										color="secondary"
-									>
+									<Text size="14" weight="600" color="secondary">
 										{{
 											numberWithSymbol(
 												state.totalLiquidity.toNumber
-													? state.totalLiquidity.toNumber() +
-															amount.value
-													: state.totalLiquidity +
-															amount.value,
+													? state.totalLiquidity.toNumber() + amount.value
+													: state.totalLiquidity + amount.value,
 												",",
 											)
 										}}
@@ -359,9 +292,7 @@ const onKeydown = (e) => {
 								</template>
 							</Flex>
 
-							<Text size="12" weight="600" color="tertiary">
-								Total Value Locked
-							</Text>
+							<Text size="12" weight="600" color="tertiary"> Total Value Locked </Text>
 						</Flex>
 
 						<Flex direction="column" gap="8" align="end">
@@ -377,14 +308,10 @@ const onKeydown = (e) => {
 										'tertiary'
 									"
 								/>
-								<Text size="14" weight="600" color="primary">
-									{{ numberWithSymbol(apy * 100, ",") }}%
-								</Text>
+								<Text size="14" weight="600" color="primary"> {{ numberWithSymbol(apy * 100, ",") }}% </Text>
 							</Flex>
 
-							<Text size="12" weight="600" color="tertiary">
-								APY
-							</Text>
+							<Text size="12" weight="600" color="tertiary"> APY </Text>
 						</Flex>
 					</Flex>
 				</Flex>
@@ -405,50 +332,29 @@ const onKeydown = (e) => {
 					<Tooltip placement="bottom-end">
 						<Flex align="center" gap="4">
 							<Icon
-								:name="
-									balanceToAmountRatio.status !== 'bad'
-										? 'checkcircle'
-										: 'warning'
-								"
+								:name="balanceToAmountRatio.status !== 'bad' ? 'checkcircle' : 'warning'"
 								size="12"
 								:color="
-									(balanceToAmountRatio.status ===
-										'awaiting' &&
-										'tertiary') ||
-									(balanceToAmountRatio.status === 'ok' &&
-										'green') ||
-									(balanceToAmountRatio.status === 'medium' &&
-										'yellow') ||
-									(balanceToAmountRatio.status === 'bad' &&
-										'red')
+									(balanceToAmountRatio.status === 'awaiting' && 'tertiary') ||
+									(balanceToAmountRatio.status === 'ok' && 'green') ||
+									(balanceToAmountRatio.status === 'medium' && 'yellow') ||
+									(balanceToAmountRatio.status === 'bad' && 'red')
 								"
 							/>
 							<Text size="12" weight="700" color="secondary">
 								{{
-									balanceToAmountRatio.percent > 0 &&
-									balanceToAmountRatio.percent < 1
+									balanceToAmountRatio.percent > 0 && balanceToAmountRatio.percent < 1
 										? "<1"
-										: balanceToAmountRatio.percent.toFixed(
-												0,
-										  )
+										: balanceToAmountRatio.percent.toFixed(0)
 								}}%
 							</Text>
 						</Flex>
 
 						<template #content>
-							<Flex
-								direction="column"
-								gap="6"
-								align="end"
-								:class="$style.tooltip_card"
-							>
+							<Flex direction="column" gap="6" align="end" :class="$style.tooltip_card">
 								<Flex>
 									<span>Balance status:</span>&nbsp;
-									{{
-										capitalizeFirstLetter(
-											balanceToAmountRatio.status,
-										)
-									}}
+									{{ capitalizeFirstLetter(balanceToAmountRatio.status) }}
 								</Flex>
 
 								<Flex>
@@ -458,9 +364,7 @@ const onKeydown = (e) => {
 
 								<Flex>
 									<span>Raw Ratio:</span>&nbsp;
-									{{
-										balanceToAmountRatio.percent.toFixed(2)
-									}}
+									{{ balanceToAmountRatio.percent.toFixed(2) }}
 								</Flex>
 							</Flex>
 						</template>
@@ -470,12 +374,8 @@ const onKeydown = (e) => {
 
 			<Flex direction="column" gap="8">
 				<Flex align="center" justify="between">
-					<Text size="12" weight="600" color="secondary">
-						Deposit Details
-					</Text>
-					<Text size="12" weight="600" color="support">
-						Approximate calculation
-					</Text>
+					<Text size="12" weight="600" color="secondary"> Deposit Details </Text>
+					<Text size="12" weight="600" color="support"> Approximate calculation </Text>
 				</Flex>
 
 				<!-- Deposit to Shares -->
@@ -485,31 +385,14 @@ const onKeydown = (e) => {
 
 						<Flex align="center">
 							<Text size="14" weight="600" color="primary">
-								{{
-									amount.value
-										? numberWithSymbol(amount.value, ",")
-										: 0
-								}} </Text
-							>&nbsp;
-							<Text size="14" weight="600" color="tertiary">
-								XTZ </Text
-							>&nbsp;
-							<Text size="14" weight="600" color="support">
-								-> </Text
-							>&nbsp;
-							<Text size="14" weight="600" color="secondary">
-								~
-							</Text>
+								{{ amount.value ? numberWithSymbol(amount.value, ",") : 0 }} </Text
+							>&nbsp; <Text size="14" weight="600" color="tertiary"> XTZ </Text>&nbsp;
+							<Text size="14" weight="600" color="support"> -> </Text>&nbsp;
+							<Text size="14" weight="600" color="secondary"> ~ </Text>
 							<Text size="14" weight="600" color="primary">
-								{{
-									amount.value
-										? numberWithSymbol(depositInShares, ",")
-										: 0
-								}} </Text
+								{{ amount.value ? numberWithSymbol(depositInShares, ",") : 0 }} </Text
 							>&nbsp;
-							<Text size="14" weight="600" color="tertiary">
-								shares
-							</Text>
+							<Text size="14" weight="600" color="tertiary"> shares </Text>
 						</Flex>
 					</Flex>
 
@@ -528,16 +411,10 @@ const onKeydown = (e) => {
 
 						<Flex align="center">
 							<Text size="14" weight="600" color="primary">
-								{{
-									capitalizeFirstLetter(
-										timing.create.toRelativeCalendar(),
-									)
-								}}
+								{{ capitalizeFirstLetter(timing.create.toRelativeCalendar()) }}
 							</Text>
 							&nbsp;
-							<Text size="14" weight="600" color="tertiary">
-								at
-							</Text>
+							<Text size="14" weight="600" color="tertiary"> at </Text>
 							&nbsp;
 							<Text size="14" weight="600" color="primary">
 								{{ timing.create.toFormat("HH:mm") }}
@@ -546,9 +423,7 @@ const onKeydown = (e) => {
 					</Flex>
 
 					<div v-for="i in 5" :class="$style.dot" />
-					<Text size="14" weight="600" color="tertiary">
-						{{ getEntryLockPeriodText() }}</Text
-					>
+					<Text size="14" weight="600" color="tertiary"> {{ getEntryLockPeriodText() }}</Text>
 					<div v-for="i in 5" :class="$style.dot" />
 
 					<Flex align="center" gap="8">
@@ -556,16 +431,10 @@ const onKeydown = (e) => {
 
 						<Flex align="center">
 							<Text size="14" weight="600" color="primary">
-								{{
-									capitalizeFirstLetter(
-										timing.accept.toRelativeCalendar(),
-									)
-								}}
+								{{ capitalizeFirstLetter(timing.accept.toRelativeCalendar()) }}
 							</Text>
 							&nbsp;
-							<Text size="14" weight="600" color="tertiary"
-								>at</Text
-							>&nbsp;
+							<Text size="14" weight="600" color="tertiary">at</Text>&nbsp;
 							<Text size="14" weight="600" color="primary">
 								{{ timing.accept.toFormat("HH:mm") }}
 							</Text>
@@ -590,16 +459,8 @@ const onKeydown = (e) => {
 					</template>
 				</Button>
 
-				<Text
-					size="12"
-					weight="500"
-					color="support"
-					align="center"
-					height="16"
-					style="max-width: 400px"
-				>
-					Your position will not be accepted instantly, it takes time
-					to confirm. You can track the status in the list of your
+				<Text size="12" weight="500" color="support" align="center" height="16" style="max-width: 400px">
+					Your position will not be accepted instantly, it takes time to confirm. You can track the status in the list of your
 					pools
 				</Text>
 			</Flex>

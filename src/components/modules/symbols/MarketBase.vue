@@ -52,9 +52,7 @@ const market = computed(() => {
 		.map((item) => marketStore.markets[item])
 		.find((item) => item.symbol == route.params.name)
 })
-const price = computed(
-	() => marketStore.markets[market.value?.symbol]?.quotes[0]?.price,
-)
+const price = computed(() => marketStore.markets[market.value?.symbol]?.quotes[0]?.price)
 
 const selectedTab = ref("Available")
 const selectTab = (tab) => {
@@ -72,9 +70,7 @@ const getEvents = async ({ status }) => {
 		status,
 	})
 
-	marketStore.events = cloneDeep(allEvents).sort(
-		(a, b) => new Date(b.createdTime) - new Date(a.createdTime),
-	)
+	marketStore.events = cloneDeep(allEvents).sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime))
 }
 
 if (market.value) {
@@ -121,8 +117,7 @@ watch(market, () => {
 watch(
 	() => marketStore.markets,
 	() => {
-		if (price.value)
-			meta.title = `${market.value.symbol}, ${price.value.toFixed(2)}`
+		if (price.value) meta.title = `${market.value.symbol}, ${price.value.toFixed(2)}`
 	},
 	{ deep: true },
 )
@@ -142,17 +137,14 @@ onBeforeUnmount(() => {
 /** Meta */
 const { meta } = useMeta({
 	title: `Market`,
-	description:
-		"Available markets for events, for providing liquidity and accepting stakes from users",
+	description: "Available markets for events, for providing liquidity and accepting stakes from users",
 })
 </script>
 
 <template>
 	<div v-if="market" :class="$style.wrapper">
 		<metainfo>
-			<template v-slot:title="{ content }"
-				>{{ content }} • Juster</template
-			>
+			<template v-slot:title="{ content }">{{ content }} • Juster</template>
 		</metainfo>
 
 		<Breadcrumbs :crumbs="breadcrumbs" :class="$style.breadcrumbs" />
@@ -172,54 +164,24 @@ const { meta } = useMeta({
 				</div>
 
 				<div :class="$style.filters">
-					<div
-						@click="selectTab('Available')"
-						:class="[
-							$style.filter,
-							selectedTab == 'Available' && $style.active,
-						]"
-					>
+					<div @click="selectTab('Available')" :class="[$style.filter, selectedTab == 'Available' && $style.active]">
 						<Icon name="event_new" size="12" />New
 					</div>
 					<div :class="$style.dot" />
-					<div
-						@click="selectTab('Closed')"
-						:class="[
-							$style.filter,
-							selectedTab == 'Closed' && $style.active,
-						]"
-					>
+					<div @click="selectTab('Closed')" :class="[$style.filter, selectedTab == 'Closed' && $style.active]">
 						<Icon name="event_active" size="12" />Running
 					</div>
 					<div :class="$style.dot" />
-					<div
-						@click="selectTab('Finished')"
-						:class="[
-							$style.filter,
-							selectedTab == 'Finished' && $style.active,
-						]"
-					>
+					<div @click="selectTab('Finished')" :class="[$style.filter, selectedTab == 'Finished' && $style.active]">
 						<Icon name="checkcircle" size="12" />Finished
 					</div>
 				</div>
-			</div>
-
-			<div :class="$style.right">
-				<Button icon="filter" type="tertiary" size="small" />
-				<Button icon="calendar" type="tertiary" size="small" />
 			</div>
 		</div>
 
 		<transition name="fastfade" mode="out-in">
 			<div v-if="events.length" :class="$style.events">
-				<EventCard
-					v-for="event in events.slice(
-						(currentPage - 1) * 8,
-						currentPage * 8,
-					)"
-					:key="event.id"
-					:event="event"
-				/>
+				<EventCard v-for="event in events.slice((currentPage - 1) * 8, currentPage * 8)" :key="event.id" :event="event" />
 			</div>
 
 			<div v-else :class="$style.events">
@@ -229,13 +191,7 @@ const { meta } = useMeta({
 			</div>
 		</transition>
 
-		<Pagination
-			v-if="events && events.length > 8"
-			v-model="currentPage"
-			:total="events.length"
-			:limit="8"
-			:class="$style.pagination"
-		/>
+		<Pagination v-if="events && events.length > 8" v-model="currentPage" :total="events.length" :limit="8" :class="$style.pagination" />
 	</div>
 </template>
 
