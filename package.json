@@ -1,6 +1,6 @@
 {
 	"name": "juster-web",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"private": true,
 	"scripts": {
 		"dev": "vite",
@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"@juster-finance/gql-client": "^0.1.0",
-		"@juster-finance/sdk": "^0.1.4",
+		"@juster-finance/sdk": "^0.1.5",
 		"@rollup/plugin-inject": "^5.0.2",
 		"amplitude-js": "^8.12.0",
 		"axios": "^0.21.4",
