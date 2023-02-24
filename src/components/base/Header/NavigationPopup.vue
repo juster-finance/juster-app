@@ -173,7 +173,7 @@ watch(
 							<div :class="$style.advanced_block">
 								<router-link to="/pools" :class="$style.item">
 									<div :class="$style.icon_wrapper">
-										<Icon name="server" size="20" color="brand" />
+										<Icon name="server" size="20" />
 									</div>
 
 									<div :class="$style.text">

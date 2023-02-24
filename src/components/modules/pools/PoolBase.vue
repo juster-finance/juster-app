@@ -11,6 +11,7 @@ import BN from "bignumber.js"
 /**
  * Local
  */
+import APYPerfomanceCard from "./APYPerfomanceCard.vue"
 import MyFunds from "./MyFunds.vue"
 import BottomInfo from "./BottomInfo.vue"
 import PoolsStats from "./PoolsStats.vue"
@@ -75,13 +76,14 @@ const handleBackFromDeposit = () => {
  */
 
 const pools = computed(() => marketStore.pools)
-const pool = computed(() =>
-	marketStore.pools.find((p) => p.address === route.params.address),
-)
+const pool = computed(() => marketStore.pools.find((p) => p.address === route.params.address))
 const poolDuration = ref(0)
 const selectedPool = ref({})
 const poolState = ref({})
+
 const poolAPY = ref(0)
+const poolsAPY = ref({})
+
 const isPoolStateReady = ref(false)
 
 const summary = ref({})
@@ -114,20 +116,20 @@ const riskIndex = ref(0)
 const utilization = ref(0)
 
 const populatePool = async () => {
-	poolState.value = await juster.pools[
-		route.params.address
-	].getLastPoolState()
+	poolState.value = await juster.pools[route.params.address].getLastPoolState()
 
-	poolAPY.value = (
-		await juster.pools[route.params.address].getAPY()
-	).toNumber()
+	poolAPY.value = (await juster.pools[route.params.address].getAPY()).toNumber()
 
 	setupSubToStates()
+
+	for (const index in pools.value) {
+		if (!Object.hasOwnProperty.call(pools.value, index)) return
+		const pool = pools.value[index]
+		poolsAPY.value[pool.address] = (await juster.pools[pool.address].getAPY()).toNumber()
+	}
 }
 
-const isFullReady = computed(
-	() => isPoolStateReady.value && isPositionReady.value,
-)
+const isFullReady = computed(() => isPoolStateReady.value && isPositionReady.value)
 
 const setupSubToStates = async () => {
 	subStates.value = await juster.gql
@@ -247,15 +249,6 @@ onMounted(() => {
 	if (Object.keys(juster.pools).length && pool.value) {
 		init()
 	}
-
-	juster.pools[pool.value.address].subscribeToRiskIndex((data) => {
-		if (data.isNaN()) return
-		riskIndex.value = data.toNumber() * 100
-	})
-	juster.pools[pool.value.address].subscribeToUtilization((data) => {
-		if (data.isNaN()) return
-		utilization.value = data.toNumber() * 100
-	})
 })
 
 const isInited = ref(false)
@@ -266,6 +259,15 @@ const init = () => {
 	setupSubToPositions()
 	populatePool()
 	setupSubToEvents()
+
+	juster.pools[pool.value.address].subscribeToRiskIndex((data) => {
+		if (data.isNaN()) return
+		riskIndex.value = data.toNumber() * 100
+	})
+	juster.pools[pool.value.address].subscribeToUtilization((data) => {
+		if (data.isNaN()) return
+		utilization.value = data.toNumber() * 100
+	})
 }
 
 /**
@@ -295,24 +297,15 @@ const handleRequestWithdraw = () => {
 }
 
 onUnmounted(() => {
-	if (
-		Object.prototype.hasOwnProperty.call(subEntries.value, "_state") &&
-		!subEntries.value?.closed
-	) {
+	if (Object.prototype.hasOwnProperty.call(subEntries.value, "_state") && !subEntries.value?.closed) {
 		subEntries.value.unsubscribe()
 	}
 
-	if (
-		Object.prototype.hasOwnProperty.call(subPositions.value, "_state") &&
-		!subPositions.value?.closed
-	) {
+	if (Object.prototype.hasOwnProperty.call(subPositions.value, "_state") && !subPositions.value?.closed) {
 		subPositions.value.unsubscribe()
 	}
 
-	if (
-		Object.prototype.hasOwnProperty.call(subStates.value, "_state") &&
-		!subStates.value?.closed
-	) {
+	if (Object.prototype.hasOwnProperty.call(subStates.value, "_state") && !subStates.value?.closed) {
 		subStates.value.unsubscribe()
 	}
 })
@@ -360,17 +353,11 @@ const { meta } = useMeta({
 	<transition name="slide">
 		<div v-if="showAnimation">
 			<metainfo>
-				<template v-slot:title="{ content }"
-					>{{ content }} • Juster</template
-				>
+				<template v-slot:title="{ content }">{{ content }} • Juster</template>
 			</metainfo>
 
 			<!-- Modals -->
-			<SharePoolModal
-				:show="showSharePoolModal"
-				:pool="selectedPool"
-				@onClose="showSharePoolModal = false"
-			/>
+			<SharePoolModal :show="showSharePoolModal" :pool="selectedPool" @onClose="showSharePoolModal = false" />
 			<DepositModal
 				:show="showDepositModal"
 				:selectedPool="pool"
@@ -395,29 +382,20 @@ const { meta } = useMeta({
 
 			<Flex align="center" gap="8" :class="$style.head">
 				<Text size="16" weight="600" color="tertiary">
-					<router-link to="/pools" :class="$style.link">
-						Liquidity Pools
-					</router-link>
+					<router-link to="/pools" :class="$style.link"> Liquidity Pools </router-link>
 				</Text>
 
-				<Icon
-					name="arrow"
-					size="16"
-					color="tertiary"
-					style="rotate: -90deg"
-				/>
+				<Icon name="arrow" size="16" color="tertiary" style="rotate: -90deg" />
 
 				<Text size="16" weight="600" color="primary">
-					{{
-						pool &&
-						parsePoolName(pool.name.replace("Juster Pool: ", ""))
-					}}
+					{{ pool && parsePoolName(pool.name.replace("Juster Pool: ", "")) }}
 				</Text>
 			</Flex>
 
 			<Flex justify="between" :class="$style.content">
 				<Flex direction="column" gap="24" :class="$style.side">
 					<MyFunds
+						v-if="pool"
 						title="My Pool Funds"
 						:pools="[pool]"
 						:poolsStates="{ [pool.address]: poolState }"
@@ -432,57 +410,31 @@ const { meta } = useMeta({
 						@onGetClaims="showWithdrawClaimsModal = true"
 					/>
 
-					<MySummary
-						v-if="summary.totalDeposited"
-						:summary="summary"
-					/>
+					<APYPerfomanceCard :pool="pool" :apy="poolAPY" :apys="poolsAPY" :riskIndex="riskIndex" :utilization="utilization" />
 
-					<BottomInfo
-						v-if="pools.length"
-						:pool="pools[0]"
-						:class="$style.bottom_left_block"
-					/>
+					<MySummary v-if="summary.totalDeposited" :summary="summary" />
+
+					<BottomInfo v-if="pools.length" :pool="pools[0]" :class="$style.bottom_left_block" />
 				</Flex>
 
 				<Flex direction="column" gap="24" wide :class="$style.base">
-					<PoolsStats
-						:pools="[pool]"
-						:poolsStates="[poolState]"
-						:poolMetrics="{ utilization, riskIndex }"
-					/>
+					<PoolsStats :pools="[pool]" :poolsStates="[poolState]" :poolMetrics="{ utilization, riskIndex }" />
 
 					<PoolsChart v-if="pool" :pool="pool" />
 
 					<Flex direction="column" gap="24" :class="$style.events">
 						<Flex direction="column" gap="8">
-							<Text size="16" weight="600" color="primary">
-								Pool line
-							</Text>
-							<Text size="14" weight="500" color="tertiary">
-								Events launched based on this pool
-							</Text>
+							<Text size="16" weight="600" color="primary"> Pool line </Text>
+							<Text size="14" weight="500" color="tertiary"> Events launched based on this pool </Text>
 						</Flex>
 
 						<Flex :class="$style.items">
-							<EventCardLoading
-								v-if="!events.length"
-								v-for="i in 2"
-								:key="i"
-							/>
-							<EventCard
-								v-else
-								v-for="event in events"
-								:key="event.id"
-								:event="event"
-							/>
+							<EventCardLoading v-if="!events.length" v-for="i in 2" :key="i" />
+							<EventCard v-else v-for="event in events" :key="event.id" :event="event" />
 						</Flex>
 					</Flex>
 
-					<BottomInfo
-						v-if="pools.length"
-						:pool="pools[0]"
-						:class="$style.bottom_right_block"
-					/>
+					<BottomInfo v-if="pools.length" :pool="pools[0]" :class="$style.bottom_right_block" />
 				</Flex>
 			</Flex>
 		</div>
