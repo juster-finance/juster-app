@@ -72,7 +72,7 @@ const isActive = (linkName) => {
 	}
 
 	if (linkName === "Resources") {
-		if (["Docs", "DocDiscover", "DocBetting", "DocLiquidity", "DocWithdraw", "DocRoadmap"].includes(route.name)) return true
+		if (["Docs", "Doc"].includes(route.name)) return true
 	}
 
 	if (linkName === "Community") {
@@ -236,7 +236,9 @@ const handleNetworkDblClick = () => {
 					@focus="activeLink = link.name"
 					:class="[$style.link, isActive(link.name) && $style.active]"
 				>
-					<Icon :name="link.icon" size="16" fill />{{ link.name }}
+					<Flex align="center" gap="8" :class="$style.link_content"
+						><Icon :name="link.icon" size="16" fill />{{ link.name }}</Flex
+					>
 				</router-link>
 
 				<!-- Popups -->
@@ -390,7 +392,7 @@ const handleNetworkDblClick = () => {
 	color: var(--text-secondary);
 	fill: var(--text-tertiary);
 
-	padding: 20px;
+	padding: 10px;
 	border-radius: 6px;
 	cursor: pointer;
 
@@ -402,9 +404,23 @@ const handleNetworkDblClick = () => {
 	fill: var(--text-primary);
 }
 
+.link.active .link_content {
+	background: var(--opacity-05);
+}
+
 .link:hover {
 	color: var(--text-primary);
 	fill: var(--text-primary);
+}
+
+.link_content {
+	height: 34px;
+
+	border-radius: 6px;
+
+	padding: 0 10px;
+
+	transition: background 0.2s ease;
 }
 
 .reward_alert {
