@@ -524,7 +524,7 @@ onBeforeUnmount(() => {
 
 <template>
 	<div :class="$style.wrapper">
-		<Flex v-if="!symbol.isQuotesLoaded" align="center" justify="center" gap="12" :class="$.loading_block">
+		<Flex v-if="!symbol.isQuotesLoaded" align="center" justify="center" gap="12" :class="$style.loading_block">
 			<LoadingDots />
 			<Text size="13" weight="500" color="tertiary">Chart loading</Text>
 		</Flex>
