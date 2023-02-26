@@ -117,101 +117,65 @@ const routes = [
 			{
 				name: "AccountSettings",
 				path: "account",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/AccountSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/AccountSettings.vue"),
 			},
 			{
 				name: "ApplicationSettings",
 				path: "application",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/ApplicationSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/ApplicationSettings.vue"),
 			},
 			{
 				name: "WalletSettings",
 				path: "wallet",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/WalletSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/WalletSettings.vue"),
 			},
 			// Appearance Settings
 			{
 				name: "DisplaySettings",
 				path: "display",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/DisplaySettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/DisplaySettings.vue"),
 			},
 			{
 				name: "AmountsSettings",
 				path: "amounts",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/AmountsSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/AmountsSettings.vue"),
 			},
 			{
 				name: "ThemeSettings",
 				path: "theme",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/ThemeSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/ThemeSettings.vue"),
 			},
 			// Accessibility Settings
 			{
 				name: "SearchSettings",
 				path: "search",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/SearchSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/SearchSettings.vue"),
 			},
 			{
 				name: "EffectsSettings",
 				path: "effects",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/EffectsSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/EffectsSettings.vue"),
 			},
 			{
 				name: "ShortcutsSettings",
 				path: "shortcuts",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/ShortcutsSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/ShortcutsSettings.vue"),
 			},
 			// Other Settings
 			{
 				name: "AdvancedSettings",
 				path: "advanced",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/AdvancedSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/AdvancedSettings.vue"),
 			},
 			{
 				name: "DebuggingSettings",
 				path: "debugging",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/DebuggingSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/DebuggingSettings.vue"),
 			},
 			{
 				name: "ResetsSettings",
 				path: "resets",
-				component: () =>
-					import(
-						"@/components/modules/settings/pages/ResetsSettings.vue"
-					),
+				component: () => import("@/components/modules/settings/pages/ResetsSettings.vue"),
 			},
 		],
 	},
@@ -328,6 +292,9 @@ const routes = [
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes,
+	scrollBehavior() {
+		return { top: 0 }
+	},
 })
 
 router.beforeEach((target, prev, next) => {
