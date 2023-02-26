@@ -8,7 +8,6 @@ const watchNetwork = () => {
 	})
 	window.addEventListener("offline", (e) => {
 		appStore.isOnline = false
-		console.log(appStore.isOnline)
 	})
 }
 
