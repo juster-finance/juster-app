@@ -402,6 +402,8 @@ const fillQuotes = async (tsGt) => {
 
 		symbol.quotes = [...symbol.quotes, ...newQuotes]
 
+		if (!newQuotes.length) return
+
 		if (DateTime.fromISO(newQuotes[newQuotes.length - 1].timestamp).ts !== tsGt.ts) {
 			await fillQuotes(tsGt)
 		}
