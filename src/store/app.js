@@ -7,6 +7,8 @@ export const useAppStore = defineStore({
 		return {
 			version: "",
 
+			isOnline: true,
+
 			confirmation: {
 				title: "",
 				description: "",

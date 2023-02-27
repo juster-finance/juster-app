@@ -13,23 +13,13 @@ import BN from "bignumber.js"
 import Button from "@ui/Button.vue"
 import Tooltip from "@ui/Tooltip.vue"
 import LoadingDots from "@ui/LoadingDots.vue"
-import {
-	Dropdown,
-	DropdownItem,
-	DropdownTitle,
-	DropdownDivider,
-} from "@ui/Dropdown"
+import { Dropdown, DropdownItem, DropdownTitle, DropdownDivider } from "@ui/Dropdown"
 
 /**
  * Services
  */
 import { juster } from "@sdk"
-import {
-	toClipboard,
-	getCurrencyIcon,
-	shorten,
-	parsePoolName,
-} from "@utils/misc"
+import { toClipboard, getCurrencyIcon, shorten, parsePoolName } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
 
 /**
@@ -43,7 +33,7 @@ const notificationsStore = useNotificationsStore()
 
 const router = useRouter()
 
-const emit = defineEmits(["onSelectPool", "onRequestWithdraw", "onShare"])
+const emit = defineEmits(["onSelectPool", "onRequestWithdraw", "onShare", "onWatchEvents"])
 const props = defineProps({
 	pool: {
 		type: Object,
@@ -111,8 +101,7 @@ const handleDeposit = () => {
 				notification: {
 					type: "warning",
 					title: "Connect wallet to deposit liquidity",
-					description:
-						"You can connect your wallet through the button in the upper right corner",
+					description: "You can connect your wallet through the button in the upper right corner",
 					autoDestroy: true,
 				},
 			})
@@ -120,10 +109,7 @@ const handleDeposit = () => {
 			notificationsStore.create({
 				notification: {
 					type: "warning",
-					title: `"${props.pool.name.replace(
-						"Juster Pool: ",
-						"",
-					)} pool" is paused`,
+					title: `"${props.pool.name.replace("Juster Pool: ", "")} pool" is paused`,
 					description: "It may be restored soon, try again later. ",
 					autoDestroy: true,
 				},
@@ -178,9 +164,7 @@ const copy = (target) => {
 				autoDestroy: true,
 				badges: [
 					{
-						secondaryText: `ghostnet.tzkt.io/${shorten(
-							props.pool.address,
-						)}`,
+						secondaryText: `ghostnet.tzkt.io/${shorten(props.pool.address)}`,
 						icon: "explorer",
 					},
 				],
@@ -188,11 +172,7 @@ const copy = (target) => {
 				actions: [
 					{
 						name: "Open in new tab",
-						callback: () =>
-							window.open(
-								`https://ghostnet.tzkt.io/${props.pool.address}`,
-								"_blank",
-							),
+						callback: () => window.open(`https://ghostnet.tzkt.io/${props.pool.address}`, "_blank"),
 					},
 				],
 			},
@@ -204,13 +184,7 @@ const copy = (target) => {
 </script>
 
 <template>
-	<Flex
-		@click="router.push(`/pools/${pool.address}`)"
-		direction="column"
-		gap="32"
-		tabindex="0"
-		:class="$style.wrapper"
-	>
+	<Flex @click="router.push(`/pools/${pool.address}`)" direction="column" gap="32" tabindex="0" :class="$style.wrapper">
 		<Flex justify="between">
 			<Flex align="center" gap="16">
 				<div :class="$style.symbols">
@@ -220,26 +194,16 @@ const copy = (target) => {
 
 				<Flex direction="column" gap="8">
 					<Text size="14" color="primary" weight="600">
-						{{
-							parsePoolName(
-								pool?.name.replace("Juster Pool: ", ""),
-							)
-						}}
+						{{ parsePoolName(pool?.name.replace("Juster Pool: ", "")) }}
 					</Text>
 
 					<Flex align="center" gap="4">
 						<Icon
-							:name="
-								!pool.isDepositPaused ? 'zap_circle' : 'pause'
-							"
+							:name="!pool.isDepositPaused ? 'zap_circle' : 'pause'"
 							size="12"
 							:color="!pool.isDepositPaused ? 'green' : 'yellow'"
 						/>
-						<Text
-							size="12"
-							weight="600"
-							:color="!pool.isDepositPaused ? 'green' : 'yellow'"
-						>
+						<Text size="12" weight="600" :color="!pool.isDepositPaused ? 'green' : 'yellow'">
 							{{ !pool.isDepositPaused ? "Active" : "Paused" }}
 						</Text>
 					</Flex>
@@ -259,10 +223,7 @@ const copy = (target) => {
 				>
 					<Button
 						@click.stop="handleDeposit"
-						:disabled="
-							!isDepositAvailable ||
-							!parseFloat(accountStore.balance)
-						"
+						:disabled="!isDepositAvailable || !parseFloat(accountStore.balance)"
 						type="secondary"
 						size="small"
 					>
@@ -272,10 +233,8 @@ const copy = (target) => {
 
 					<template #content>
 						{{
-							(pool.isDepositPaused &&
-								"The pool has been paused") ||
-							(!accountStore.pkh &&
-								"Connect a wallet to make a deposit")
+							(pool.isDepositPaused && "The pool has been paused") ||
+							(!accountStore.pkh && "Connect a wallet to make a deposit")
 						}}
 					</template>
 				</Tooltip>
@@ -286,92 +245,43 @@ const copy = (target) => {
 			<Flex align="center" gap="24" :class="$style.stats">
 				<!-- TVL -->
 				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-					>
+					<Text size="13" weight="600" color="tertiary" :class="$style.stat__title">
 						{{ showUserData ? "My TVL" : "TVL" }}
 					</Text>
 
 					<Flex align="center" gap="6">
 						<Icon name="coins" size="14" color="secondary" />
 
-						<Text
-							v-if="state"
-							size="15"
-							weight="600"
-							color="secondary"
-						>
-							{{
-								showUserData
-									? numberWithSymbol(valueLocked, ",")
-									: numberWithSymbol(
-											state.totalLiquidity,
-											",",
-									  )
-							}}
+						<Text v-if="state" size="15" weight="600" color="secondary">
+							{{ showUserData ? numberWithSymbol(valueLocked, ",") : numberWithSymbol(state.totalLiquidity, ",") }}
 						</Text>
 						<LoadingDots v-else />
 					</Flex>
 				</Flex>
 
-				<Text
-					size="12"
-					weight="500"
-					color="tertiary"
-					:class="$style.star_icon"
-				>
-					✦
-				</Text>
+				<Text size="12" weight="500" color="tertiary" :class="$style.star_icon"> ✦ </Text>
 
 				<!-- Share Price -->
 				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-					>
+					<Text size="13" weight="600" color="tertiary" :class="$style.stat__title">
 						{{ showUserData ? "Entry Price" : "Share Price" }}
 					</Text>
 
 					<Flex align="center" gap="6">
 						<Icon name="banknote" size="14" color="secondary" />
 
-						<Text
-							v-if="state"
-							size="15"
-							weight="600"
-							color="secondary"
-						>
-							{{
-								showUserData
-									? position.entrySharePrice.toFixed(2)
-									: state.sharePrice.toFixed(2)
-							}}
+						<Text v-if="state" size="15" weight="600" color="secondary">
+							{{ showUserData ? position.entrySharePrice.toFixed(2) : state.sharePrice.toFixed(2) }}
 						</Text>
 						<LoadingDots v-else />
 					</Flex>
 				</Flex>
 
-				<Text
-					size="12"
-					weight="500"
-					color="tertiary"
-					:class="$style.star_icon"
-					>✦</Text
-				>
+				<Text size="12" weight="500" color="tertiary" :class="$style.star_icon">✦</Text>
 
 				<!-- APY -->
 				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-					>
+					<Text size="13" weight="600" color="tertiary" :class="$style.stat__title">
 						{{ showUserData ? "My Shares" : "APY" }}
 					</Text>
 
@@ -381,21 +291,17 @@ const copy = (target) => {
 							name="stars"
 							size="14"
 							:color="
-								(apy * 100 < 0 && 'red') ||
-								(apy * 100 < 40 && 'tertiary') ||
-								(apy * 100 < 80 && 'yellow') ||
-								(apy * 100 >= 100 && 'green') ||
+								(apy * 100 < -15 && 'red') ||
+								(apy * 100 < 2 && 'tertiary') ||
+								(apy * 100 < 6 && 'yellow') ||
+								(apy * 100 < 100 && 'green') ||
 								'tertiary'
 							"
 						/>
 						<Icon v-else name="money" size="14" color="secondary" />
 						<Text size="15" weight="600" color="secondary">
 							{{
-								showUserData
-									? numberWithSymbol(position.shares, ",")
-									: apy
-									? `${numberWithSymbol(apy * 100, ",")}%`
-									: `0%`
+								showUserData ? numberWithSymbol(position.shares, ",") : apy ? `${numberWithSymbol(apy * 100, ",")}%` : `0%`
 							}}
 						</Text>
 					</Flex>
@@ -403,108 +309,56 @@ const copy = (target) => {
 
 				<!-- Switch Button -->
 
-				<Flex
-					v-if="accountStore.pkh && position"
-					@click.stop="handleSwitch"
-					align="center"
-					gap="8"
-					:class="$style.switch_btn"
-				>
+				<Flex v-if="accountStore.pkh && position" @click.stop="handleSwitch" align="center" gap="8" :class="$style.switch_btn">
 					<Icon
 						name="arrows"
 						size="16"
 						color="secondary"
 						:class="$style.arrows_icon"
 						:style="{
-							transform: `rotate(${
-								showUserData ? '270' : '90'
-							}deg)`,
+							transform: `rotate(${showUserData ? '270' : '90'}deg)`,
 						}"
 					/>
-					<Text
-						size="12"
-						weight="700"
-						color="secondary"
-						:class="$style.switch_btn__text"
-					>
-						{{
-							showUserData
-								? "Switch to pool statistics"
-								: "Switch to my statistics"
-						}}
+					<Text size="12" weight="700" color="secondary" :class="$style.switch_btn__text">
+						{{ showUserData ? "Switch to pool statistics" : "Switch to my statistics" }}
 					</Text>
 
-					<img
-						v-if="!showUserData"
-						:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-						alt="avatar"
-					/>
+					<img v-if="!showUserData" :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`" alt="avatar" />
 					<Icon v-else name="server" size="16" color="secondary" />
 				</Flex>
 			</Flex>
 
 			<Flex align="center" gap="24" :class="$style.stats">
 				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-					>
-						Utilization
-					</Text>
+					<Text size="13" weight="600" color="tertiary" :class="$style.stat__title"> Utilization </Text>
 
 					<Flex align="center" gap="6">
 						<Icon
-							:name="
-								(utilization < 0.01 && 'warning') ||
-								'checkcircle'
-							"
+							:name="(utilization < 0.01 && 'warning') || 'checkcircle'"
 							size="14"
 							:color="
 								(utilization <= 0.01 && 'red') ||
-								(utilization > 0.01 &&
-									utilization < 0.1 &&
-									'tertiary') ||
+								(utilization > 0.01 && utilization < 0.1 && 'tertiary') ||
 								(utilization >= 0.1 && 'green') ||
 								'tertiary'
 							"
 						/>
-						<Text size="15" weight="600" color="secondary">
-							{{ utilization.toFixed(2) }}%
-						</Text>
+						<Text size="15" weight="600" color="secondary"> {{ utilization.toFixed(2) }}% </Text>
 					</Flex>
 				</Flex>
 
-				<Text
-					size="12"
-					weight="500"
-					color="tertiary"
-					:class="$style.star_icon"
-					>✦</Text
-				>
+				<Text size="12" weight="500" color="tertiary" :class="$style.star_icon">✦</Text>
 
 				<Flex direction="column" gap="8" :class="$style.stat">
-					<Text
-						size="13"
-						weight="600"
-						color="tertiary"
-						:class="$style.stat__title"
-					>
-						Risk Index
-					</Text>
+					<Text size="13" weight="600" color="tertiary" :class="$style.stat__title"> Risk Index </Text>
 
 					<Flex align="center" gap="6">
 						<Icon
-							:name="
-								(riskIndex > 1 && 'warning') || 'checkcircle'
-							"
+							:name="(riskIndex > 1 && 'warning') || 'checkcircle'"
 							size="14"
 							:color="(riskIndex > 1 && 'red') || 'tertiary'"
 						/>
-						<Text size="15" weight="600" color="secondary">
-							{{ riskIndex.toFixed(2) }}%
-						</Text>
+						<Text size="15" weight="600" color="secondary"> {{ riskIndex.toFixed(2) }}% </Text>
 					</Flex>
 				</Flex>
 			</Flex>
@@ -514,14 +368,10 @@ const copy = (target) => {
 			<Flex direction="column" gap="8">
 				<Flex align="center" gap="6">
 					<Icon name="server" size="12" color="tertiary" />
-					<Text size="13" weight="600" color="tertiary">
-						Liquidity Pool
-					</Text>
+					<Text size="13" weight="600" color="tertiary"> Liquidity Pool </Text>
 				</Flex>
 
-				<Text v-if="state" size="12" color="support" weight="600">
-					State updated {{ poolUpdDiff }}
-				</Text>
+				<Text v-if="state" size="12" color="support" weight="600"> State updated {{ poolUpdDiff }} </Text>
 			</Flex>
 
 			<Dropdown disable-autofocus>
@@ -532,34 +382,23 @@ const copy = (target) => {
 				</template>
 
 				<template #dropdown>
-					<DropdownItem
-						@click="emit('onRequestWithdraw', pool)"
-						:disabled="!position"
-					>
+					<DropdownItem @click="emit('onRequestWithdraw', pool)" :disabled="!position">
 						<Icon name="money" size="16" /> Withdraw
 					</DropdownItem>
 
 					<DropdownDivider />
 
-					<DropdownItem disabled>
-						<Icon name="time" size="16" />Pool timeline
-					</DropdownItem>
+					<DropdownItem disabled @click="emit('onWatchEvents', pool)"> <Icon name="time" size="16" />Watch events</DropdownItem>
 
 					<DropdownDivider />
 
 					<DropdownTitle>Copy</DropdownTitle>
-					<DropdownItem @click="copy('address')">
-						<Icon name="copy" size="16" /> Pool address
-					</DropdownItem>
-					<DropdownItem @click="copy('url')">
-						<Icon name="copy" size="16" /> Pool explorer link
-					</DropdownItem>
+					<DropdownItem @click="copy('address')"> <Icon name="copy" size="16" /> Pool address </DropdownItem>
+					<DropdownItem @click="copy('url')"> <Icon name="copy" size="16" /> Pool explorer link </DropdownItem>
 
 					<DropdownDivider />
 
-					<DropdownItem @click="emit('onShare', pool)">
-						<Icon name="share" size="16" />Share
-					</DropdownItem>
+					<DropdownItem @click="emit('onShare', pool)"> <Icon name="share" size="16" />Share </DropdownItem>
 				</template>
 			</Dropdown>
 		</Flex>

@@ -19,6 +19,7 @@ import "@/styles/text.css"
 import Teleports from "@base/Teleports.vue"
 import TheHeader from "@base/Header/TheHeader.vue"
 import Footer from "@base/Footer.vue"
+import NetworkStatus from "@base/NetworkStatus.vue"
 
 /**
  * UI
@@ -31,6 +32,7 @@ import ConfirmationModal from "@local/modals/ConfirmationModal.vue"
  */
 import { juster, initPools, currentNetwork } from "@sdk"
 import { fetchAllPools, fetchPoolsLines } from "@/api/pools"
+import { watchNetwork } from "@/services/network"
 
 /**
  * Store
@@ -68,6 +70,8 @@ onBeforeMount(() => {
 	})
 })
 onMounted(async () => {
+	watchNetwork()
+
 	document.addEventListener("keydown", (e) => {
 		if (e.key === "Enter") {
 			const { activeElement } = document
@@ -102,9 +106,7 @@ setupMarket()
 
 <template>
 	<Teleports />
-
 	<ConfirmationModal :show="appStore.confirmation.show" />
-
 	<Notifications />
 
 	<div class="app_wrapper">
@@ -114,6 +116,8 @@ setupMarket()
 		</div>
 		<Footer class="footer" />
 	</div>
+
+	<NetworkStatus />
 </template>
 
 <style>

@@ -63,25 +63,15 @@ const sortPools = (pools) => {
 			const aState = props.poolsStates[a.address]
 			const bState = props.poolsStates[b.address]
 
-			if (direction === "desc")
-				return (
-					bState.totalLiquidity.toNumber() -
-					aState.totalLiquidity.toNumber()
-				)
-			if (direction === "asc")
-				return (
-					aState.totalLiquidity.toNumber() -
-					bState.totalLiquidity.toNumber()
-				)
+			if (direction === "desc") return bState.totalLiquidity.toNumber() - aState.totalLiquidity.toNumber()
+			if (direction === "asc") return aState.totalLiquidity.toNumber() - bState.totalLiquidity.toNumber()
 		})
 	}
 
 	if (target === "apy") {
 		return pools.sort((a, b) => {
-			if (direction === "desc")
-				return props.poolsAPY[b.address] - props.poolsAPY[a.address]
-			if (direction === "asc")
-				return props.poolsAPY[a.address] - props.poolsAPY[b.address]
+			if (direction === "desc") return props.poolsAPY[b.address] - props.poolsAPY[a.address]
+			if (direction === "asc") return props.poolsAPY[a.address] - props.poolsAPY[b.address]
 		})
 	}
 }
@@ -102,9 +92,7 @@ const handleSort = (prop) => {
 	}
 }
 
-const activePools = computed(() =>
-	props.pools.filter((pool) => !pool.isDepositPaused),
-)
+const activePools = computed(() => props.pools.filter((pool) => !pool.isDepositPaused))
 
 const filteredPools = computed(() => {
 	if (searchText.value) {
@@ -128,8 +116,7 @@ const handleSelectPool = (pool) => {
 			notification: {
 				type: "warning",
 				title: "Connect wallet to deposit liquidity",
-				description:
-					"You can connect your wallet through the button in the upper right corner",
+				description: "You can connect your wallet through the button in the upper right corner",
 				autoDestroy: true,
 			},
 		})
@@ -220,109 +207,43 @@ const handleCloseTestnetWarning = () => {
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
 				<Icon name="server" size="16" color="secondary" />
-				<Text size="14" weight="600" color="primary">
-					Deposit Liquidity
-				</Text>
+				<Text size="14" weight="600" color="primary"> Deposit Liquidity </Text>
 			</Flex>
 
-			<Icon
-				@click="emit('onClose')"
-				name="close"
-				size="16"
-				color="tertiary"
-				:class="$style.close_icon"
-			/>
+			<Icon @click="emit('onClose')" name="close" size="16" color="tertiary" :class="$style.close_icon" />
 		</Flex>
 
-		<Flex
-			@keydown="handlePoolsKeyboardNavigation"
-			direction="column"
-			gap="32"
-			:class="$style.base"
-		>
-			<Block
-				v-if="
-					flags.showTestnetWarningInStakeModal &&
-					currentNetwork === Networks.TESTNET
-				"
-				@onClose="handleCloseTestnetWarning"
-			>
-				<span>This action is for the test network.</span> Use it to test
-				tools or to understand how to interact with product.
+		<Flex @keydown="handlePoolsKeyboardNavigation" direction="column" gap="32" :class="$style.base">
+			<Block v-if="flags.showTestnetWarningInStakeModal && currentNetwork === Networks.TESTNET" @onClose="handleCloseTestnetWarning">
+				<span>This action is for the test network.</span> Use it to test tools or to understand how to interact with product.
 			</Block>
 
-			<Input
-				ref="searchEl"
-				v-model="searchText"
-				type="text"
-				icon="search"
-				placeholder="Search a pool"
-				cleanable
-			/>
+			<Input ref="searchEl" v-model="searchText" type="text" icon="search" placeholder="Search a pool" cleanable />
 
 			<Flex direction="column" gap="8">
 				<Flex align="center" justify="between">
-					<Text size="13" weight="600" color="primary">
-						Select a pool
-					</Text>
+					<Text size="13" weight="600" color="primary"> Select a pool </Text>
 
 					<Flex align="center" gap="16">
-						<Flex
-							@click="handleSort('tvl')"
-							align="center"
-							gap="4"
-							:class="$style.sort_btn"
-						>
+						<Flex @click="handleSort('tvl')" align="center" gap="4" :class="$style.sort_btn">
 							<Icon
-								v-if="
-									sortTarget === 'tvl' &&
-									sortDirection !== 'def'
-								"
-								:name="
-									(sortDirection === 'desc' &&
-										'arrow_down') ||
-									(sortDirection === 'asc' && 'arrow_up')
-								"
+								v-if="sortTarget === 'tvl' && sortDirection !== 'def'"
+								:name="(sortDirection === 'desc' && 'arrow_down') || (sortDirection === 'asc' && 'arrow_up')"
 								size="12"
 								color="blue"
 							/>
-							<Text
-								size="12"
-								weight="600"
-								:color="
-									sortDirection === 'def' ||
-									sortTarget !== 'tvl'
-										? 'tertiary'
-										: 'primary'
-								"
-							>
+							<Text size="12" weight="600" :color="sortDirection === 'def' || sortTarget !== 'tvl' ? 'tertiary' : 'primary'">
 								TVL
 							</Text>
 						</Flex>
 						<Flex @click="handleSort('apy')" align="center" gap="4">
 							<Icon
-								v-if="
-									sortTarget === 'apy' &&
-									sortDirection !== 'def'
-								"
-								:name="
-									(sortDirection === 'desc' &&
-										'arrow_down') ||
-									(sortDirection === 'asc' && 'arrow_up')
-								"
+								v-if="sortTarget === 'apy' && sortDirection !== 'def'"
+								:name="(sortDirection === 'desc' && 'arrow_down') || (sortDirection === 'asc' && 'arrow_up')"
 								size="12"
 								color="blue"
 							/>
-							<Text
-								size="12"
-								weight="600"
-								:color="
-									sortDirection === 'def' ||
-									sortTarget !== 'apy'
-										? 'tertiary'
-										: 'primary'
-								"
-							>
+							<Text size="12" weight="600" :color="sortDirection === 'def' || sortTarget !== 'apy' ? 'tertiary' : 'primary'">
 								APY
 							</Text>
 						</Flex>
@@ -343,45 +264,18 @@ const handleCloseTestnetWarning = () => {
 						<Flex align="center" gap="20">
 							<Flex direction="column" gap="8">
 								<Text size="14" weight="600" color="primary">
-									{{
-										parsePoolName(
-											pool.name.replace(
-												"Juster Pool: ",
-												"",
-											),
-										)
-									}}
+									{{ parsePoolName(pool.name.replace("Juster Pool: ", "")) }}
 								</Text>
 
 								<Flex align="center" gap="8">
 									<Flex align="center" gap="4">
 										<Icon
-											:name="
-												!pool.isDepositPaused
-													? 'zap_circle'
-													: 'pause'
-											"
+											:name="!pool.isDepositPaused ? 'zap_circle' : 'pause'"
 											size="12"
-											:color="
-												!pool.isDepositPaused
-													? 'green'
-													: 'yellow'
-											"
+											:color="!pool.isDepositPaused ? 'green' : 'yellow'"
 										/>
-										<Text
-											size="12"
-											weight="600"
-											:color="
-												!pool.isDepositPaused
-													? 'green'
-													: 'yellow'
-											"
-										>
-											{{
-												!pool.isDepositPaused
-													? "Active"
-													: "Paused"
-											}}
+										<Text size="12" weight="600" :color="!pool.isDepositPaused ? 'green' : 'yellow'">
+											{{ !pool.isDepositPaused ? "Active" : "Paused" }}
 										</Text>
 									</Flex>
 								</Flex>
@@ -391,32 +285,15 @@ const handleCloseTestnetWarning = () => {
 						<Flex align="center" gap="24">
 							<Flex direction="column" gap="8" align="end">
 								<Flex align="center" gap="6">
-									<Icon
-										name="coins"
-										size="12"
-										color="tertiary"
-									/>
+									<Icon name="coins" size="12" color="tertiary" />
 
-									<Text
-										v-if="poolsStates[pool.address]"
-										size="14"
-										weight="600"
-										color="primary"
-									>
-										{{
-											numberWithSymbol(
-												poolsStates[pool.address]
-													.totalLiquidity,
-												",",
-											)
-										}}
+									<Text v-if="poolsStates[pool.address]" size="14" weight="600" color="primary">
+										{{ numberWithSymbol(poolsStates[pool.address].totalLiquidity, ",") }}
 									</Text>
 									<LoadingDots v-else />
 								</Flex>
 
-								<Text size="12" weight="600" color="tertiary">
-									Total Value Locked
-								</Text>
+								<Text size="12" weight="600" color="tertiary"> Total Value Locked </Text>
 							</Flex>
 
 							<Flex direction="column" gap="8" align="end">
@@ -425,71 +302,32 @@ const handleCloseTestnetWarning = () => {
 										name="stars"
 										size="14"
 										:color="
-											(poolsAPY[pool.address] * 100 < 0 &&
-												'red') ||
-											(poolsAPY[pool.address] * 100 <
-												40 &&
-												'tertiary') ||
-											(poolsAPY[pool.address] * 100 <
-												80 &&
-												'yellow') ||
-											(poolsAPY[pool.address] * 100 >=
-												100 &&
-												'green') ||
+											(poolsAPY[pool.address] * 100 < -15 && 'red') ||
+											(poolsAPY[pool.address] * 100 < 2 && 'tertiary') ||
+											(poolsAPY[pool.address] * 100 < 6 && 'yellow') ||
+											(poolsAPY[pool.address] * 100 < 100 && 'green') ||
 											'tertiary'
 										"
 									/>
-									<Text
-										size="14"
-										weight="600"
-										color="primary"
-									>
-										{{
-											numberWithSymbol(
-												poolsAPY[pool.address] * 100,
-												",",
-											)
-										}}%
+									<Text size="14" weight="600" color="primary">
+										{{ numberWithSymbol(poolsAPY[pool.address] * 100, ",") }}%
 									</Text>
 								</Flex>
 
-								<Text size="12" weight="600" color="tertiary">
-									APY
-								</Text>
+								<Text size="12" weight="600" color="tertiary"> APY </Text>
 							</Flex>
 						</Flex>
 					</Flex>
-					<Flex
-						v-else
-						direction="column"
-						gap="8"
-						align="center"
-						:class="$style.nothing_found_warning"
-					>
-						<Text size="13" weight="600" color="secondary">
-							Nothing found
-						</Text>
-						<Text
-							size="12"
-							weight="500"
-							height="16"
-							align="center"
-							color="tertiary"
-						>
-							Tip: You can use the full name e.g.
-							"<b>Bitcoin</b>", "<b>1 day</b>", "<b
-								>Tezos 6 hours</b
-							>" etc
+					<Flex v-else direction="column" gap="8" align="center" :class="$style.nothing_found_warning">
+						<Text size="13" weight="600" color="secondary"> Nothing found </Text>
+						<Text size="12" weight="500" height="16" align="center" color="tertiary">
+							Tip: You can use the full name e.g. "<b>Bitcoin</b>", "<b>1 day</b>", "<b>Tezos 6 hours</b>" etc
 						</Text>
 					</Flex>
 				</Flex>
 
 				<Text size="12" weight="600" color="tertiary">
-					{{
-						searchText.length
-							? filteredPools.length
-							: activePools.length
-					}}
+					{{ searchText.length ? filteredPools.length : activePools.length }}
 					{{ searchText.length ? "found" : "active" }} pools
 				</Text>
 			</Flex>

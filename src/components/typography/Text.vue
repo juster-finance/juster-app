@@ -51,7 +51,7 @@ const classes = computed(() => {
 </script>
 
 <template>
-	<div :class="classes">
+	<span :class="classes">
 		<slot />
-	</div>
+	</span>
 </template>

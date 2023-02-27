@@ -19,7 +19,13 @@ export default defineComponent({
 </script>
 
 <template>
-	<Page>
+	<Page :class="$style.wrapper">
 		<ReleasesBase />
 	</Page>
 </template>
+
+<style module>
+.wrapper {
+	user-select: text;
+}
+</style>

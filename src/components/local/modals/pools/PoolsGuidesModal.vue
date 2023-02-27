@@ -76,7 +76,7 @@ const activeTab = ref(0)
 
 		<Flex direction="column" gap="32" :class="$style.base">
 			<Flex direction="column" gap="16">
-				<Flex align="center" gap="32">
+				<Flex align="center" gap="24" wrap="wrap">
 					<Text size="14" weight="600" color="tertiary"> Learn about </Text>
 
 					<Text

@@ -10,7 +10,7 @@ export const fetchPosts = async () => {
 		const {
 			data: { result: posts },
 		} = await axios.get(
-			`https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'post'] { ..., section->, content[] { ..., asset-> } }`,
+			`https://${sanity.id}.apicdn.sanity.io/v1/data/query/production?query=*[_type == 'post'] { ..., section->, content[] { ..., asset-> } }`,
 		)
 
 		return posts
@@ -25,9 +25,7 @@ export const fetchPostById = async (id) => {
 		const {
 			data: { result: post },
 		} = await axios.get(
-			`https://${
-				sanity.id
-			}.api.sanity.io/v1/data/query/production?query=${encodeURIComponent(
+			`https://${sanity.id}.apicdn.sanity.io/v1/data/query/production?query=${encodeURIComponent(
 				`*[_type == 'post' && _id == '${id}']`,
 			)} { ..., section-> }`,
 		)
@@ -44,7 +42,7 @@ export const fetchArticles = async () => {
 		const {
 			data: { result: articles },
 		} = await axios.get(
-			`https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'article'] {..., content[] { ..., asset-> } }`,
+			`https://${sanity.id}.apicdn.sanity.io/v1/data/query/production?query=*[_type == 'article'] {..., content[] { ..., asset-> } }`,
 		)
 
 		return articles
@@ -59,9 +57,7 @@ export const fetchArticleBySlug = async (slug) => {
 		const {
 			data: { result: article },
 		} = await axios.get(
-			`https://${
-				sanity.id
-			}.api.sanity.io/v1/data/query/production?query=${encodeURIComponent(
+			`https://${sanity.id}.apicdn.sanity.io/v1/data/query/production?query=${encodeURIComponent(
 				`*[_type == 'article' && slug.current == "${slug}"] {..., content[] { ..., asset-> } }`,
 			)}`,
 		)
@@ -77,9 +73,7 @@ export const fetchSections = async () => {
 	try {
 		const {
 			data: { result: sections },
-		} = await axios.get(
-			`https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'section']`,
-		)
+		} = await axios.get(`https://${sanity.id}.apicdn.sanity.io/v1/data/query/production?query=*[_type == 'section']`)
 
 		return sections
 	} catch (error) {
@@ -92,9 +86,7 @@ export const fetchReleases = async () => {
 	try {
 		const {
 			data: { result: releases },
-		} = await axios.get(
-			`https://${sanity.id}.api.sanity.io/v1/data/query/production?query=*[_type == 'release']`,
-		)
+		} = await axios.get(`https://${sanity.id}.apicdn.sanity.io/v1/data/query/production?query=*[_type == 'release']`)
 
 		return releases
 	} catch (error) {

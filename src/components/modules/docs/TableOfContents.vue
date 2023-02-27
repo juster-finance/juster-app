@@ -1,8 +1,15 @@
 <script setup>
+/**
+ * Vendor
+ */
+import { ref } from "vue"
+
 const props = defineProps({
 	title: { type: String, default: "Juster Documentation" },
 	links: Array,
 })
+
+const expand = ref(false)
 
 const generateHref = (text) => {
 	return text
@@ -19,21 +26,28 @@ const generateHref = (text) => {
 <template>
 	<div :class="$style.wrapper">
 		<div :class="$style.base">
-			<div :class="$style.label">Content</div>
+			<div @click="expand = !expand" :class="$style.label">
+				<Flex align="center" gap="6">
+					Content
 
-			<div :class="$style.content">
+					<Icon
+						name="arrow"
+						size="14"
+						color="tertiary"
+						:style="{ transform: `rotate(${expand ? 180 : 0}deg)` }"
+						:class="$style.mobile_arrow"
+					/>
+				</Flex>
+			</div>
+
+			<div :class="[$style.content, $style.mobile, expand && $style.expand]">
 				<Text size="14" weight="600" color="primary">
 					{{ title }}
 				</Text>
 
 				<ul>
-					<li
-						v-for="link in links"
-						:style="{ paddingLeft: `${(link.level - 2) * 10}px` }"
-					>
-						<a :href="`#${generateHref(link.text)}`">{{
-							link.text
-						}}</a>
+					<li v-for="link in links" :style="{ paddingLeft: `${(link.level - 2) * 10}px` }">
+						<a :href="`#${generateHref(link.text)}`">{{ link.text }}</a>
 					</li>
 				</ul>
 			</div>
@@ -110,9 +124,27 @@ const generateHref = (text) => {
 	padding: 8px 0;
 }
 
+.mobile_arrow {
+	display: none;
+}
+
 @media (max-width: 900px) {
 	.wrapper {
 		padding-left: 0;
+	}
+}
+
+@media (max-width: 600px) {
+	.mobile {
+		display: none;
+	}
+
+	.expand {
+		display: initial;
+	}
+
+	.mobile_arrow {
+		display: initial;
 	}
 }
 </style>

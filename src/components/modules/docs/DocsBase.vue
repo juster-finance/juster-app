@@ -3,7 +3,7 @@
  * Vendor
  */
 import { onMounted, ref, watch, reactive } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 
 /**
  * API
@@ -13,12 +13,7 @@ import { fetchPosts, fetchSections } from "@/api/sanity"
 /**
  * UI
  */
-import {
-	Dropdown,
-	DropdownItem,
-	DropdownDivider,
-	DropdownTitle,
-} from "@ui/Dropdown"
+import { Dropdown, DropdownItem, DropdownDivider, DropdownTitle } from "@ui/Dropdown"
 
 /**
  * Store
@@ -26,6 +21,7 @@ import {
 import { useDocsStore } from "@store/docs"
 
 const route = useRoute()
+const router = useRouter()
 
 const docsStore = useDocsStore()
 
@@ -40,36 +36,15 @@ const positions = reactive([
 	},
 	{
 		section: "Events",
-		links: [
-			"Price Events",
-			"How to Stake",
-			"Get a Payout",
-			"Providing Liquidity",
-		],
+		links: ["Price Events", "How to Stake", "Get a Payout", "Providing Liquidity"],
 	},
 	{
 		section: "Pools",
-		links: [
-			"Overview",
-			"Event Line",
-			"Metrics",
-			"Depositing liquidity",
-			"Request withdrawal",
-		],
+		links: ["Overview", "Event Line", "Metrics", "Depositing liquidity", "Request withdrawal"],
 	},
 	{
 		section: "Extra Topics",
-		links: [
-			"FAQ",
-			"Glossary",
-			"Wallets",
-			"Concepts",
-			"Markets",
-			"My submissions",
-			"Statistics",
-			"Fees",
-			"How to get Tezos",
-		],
+		links: ["FAQ", "Glossary", "Wallets", "Concepts", "Markets", "My submissions", "Statistics", "Fees", "How to get Tezos"],
 	},
 ])
 
@@ -82,12 +57,8 @@ onMounted(async () => {
 	/** Sections */
 	sections
 		.sort((a, b) => {
-			const aSectionIdx = positions.findIndex(
-				(p) => p.section.toLowerCase() === a.title.toLowerCase(),
-			)
-			const bSectionIdx = positions.findIndex(
-				(p) => p.section.toLowerCase() === b.title.toLowerCase(),
-			)
+			const aSectionIdx = positions.findIndex((p) => p.section.toLowerCase() === a.title.toLowerCase())
+			const bSectionIdx = positions.findIndex((p) => p.section.toLowerCase() === b.title.toLowerCase())
 			return aSectionIdx - bSectionIdx
 		})
 		.forEach((section) => {
@@ -113,33 +84,15 @@ onMounted(async () => {
 
 	/** Sort posts */
 	Object.keys(docsStore.sections).forEach((section) => {
-		docsStore.sections[section] = docsStore.sections[section].sort(
-			(a, b) => {
-				const aPosition = positions.find(
-					(p) =>
-						p.section.toLowerCase() ===
-						a.section.title.toLowerCase(),
-				)
-				const bPosition = positions.find(
-					(p) =>
-						p.section.toLowerCase() ===
-						b.section.title.toLowerCase(),
-				)
+		docsStore.sections[section] = docsStore.sections[section].sort((a, b) => {
+			const aPosition = positions.find((p) => p.section.toLowerCase() === a.section.title.toLowerCase())
+			const bPosition = positions.find((p) => p.section.toLowerCase() === b.section.title.toLowerCase())
 
-				const aPostIdx = aPosition
-					? aPosition.links.findIndex(
-							(l) => l.toLowerCase() === a.title.toLowerCase(),
-					  )
-					: 0
-				const bPostIdx = bPosition
-					? bPosition.links.findIndex(
-							(l) => l.toLowerCase() === b.title.toLowerCase(),
-					  )
-					: 0
+			const aPostIdx = aPosition ? aPosition.links.findIndex((l) => l.toLowerCase() === a.title.toLowerCase()) : 0
+			const bPostIdx = bPosition ? bPosition.links.findIndex((l) => l.toLowerCase() === b.title.toLowerCase()) : 0
 
-				return aPostIdx - bPostIdx
-			},
-		)
+			return aPostIdx - bPostIdx
+		})
 	})
 
 	/** Select current */
@@ -148,7 +101,12 @@ onMounted(async () => {
 		posts.forEach((post) => {
 			if (post.slug.current == route.params.slug) postBySlug = post
 		})
-		selectPost(postBySlug)
+
+		if (postBySlug) {
+			selectPost(postBySlug)
+		} else {
+			router.push("/docs")
+		}
 	}
 })
 
@@ -157,7 +115,9 @@ watch(
 	() => {
 		const { slug } = route.params
 
-		if (slug !== docsStore.post.slug.current) {
+		if (!docsStore.post.slug) {
+			selectPost(allPosts.value.find((p) => p.slug.current === "discover"))
+		} else if (slug !== docsStore.post.slug.current) {
 			const newPost = allPosts.value.find((p) => slug === p.slug.current)
 			if (newPost) selectPost(newPost)
 		}
@@ -178,13 +138,8 @@ const selectPost = (post) => {
 						<router-link
 							v-for="(generalLink, gIndex) in generalLinks"
 							:key="gIndex"
-							@click="selectPost(generalLink)"
 							:to="`/docs/${generalLink.slug.current}`"
-							:class="[
-								$style.general_link,
-								docsStore.post.slug.current ===
-									generalLink.slug.current && $style.active,
-							]"
+							:class="[$style.general_link, docsStore.post.slug?.current === generalLink.slug.current && $style.active]"
 						>
 							<div :class="$style.icon">
 								<Icon :name="generalLink.icon" size="16" />
@@ -194,35 +149,19 @@ const selectPost = (post) => {
 						</router-link>
 					</div>
 
-					<div
-						v-for="(section, index) in docsStore.sections"
-						:key="section"
-						:class="$style.section"
-					>
+					<div v-for="(section, index) in docsStore.sections" :key="section" :class="$style.section">
 						<div :class="$style.title">{{ index }}</div>
 
 						<router-link
 							v-for="post in section"
 							:key="post._id"
 							:to="post.slug.current"
-							@click="selectPost(post)"
-							:class="[
-								$style.link,
-								docsStore.post == post && $style.active,
-							]"
+							:class="[$style.link, docsStore.post == post && $style.active]"
 						>
 							<Flex align="center" gap="8">
 								{{ post.title }}
 
-								<Text
-									v-if="post.new"
-									size="12"
-									weight="600"
-									color="brand"
-									:class="$style.badge"
-								>
-									New
-								</Text>
+								<Text v-if="post.new" size="12" weight="600" color="brand" :class="$style.badge"> New </Text>
 							</Flex>
 						</router-link>
 					</div>
@@ -240,31 +179,17 @@ const selectPost = (post) => {
 				</template>
 
 				<template #dropdown>
-					<router-link
-						v-for="link in generalLinks"
-						@click="selectPost(link)"
-						:to="`/docs/${link.slug.current}`"
-					>
+					<router-link v-for="link in generalLinks" :to="`/docs/${link.slug.current}`">
 						<DropdownItem>
-							<Icon
-								:name="link.icon"
-								size="16"
-								color="secondary"
-							/>
+							<Icon :name="link.icon" size="16" color="secondary" />
 							{{ link.title }}
 						</DropdownItem>
 					</router-link>
 					<DropdownDivider />
 
-					<template
-						v-for="(section, sectionName) in docsStore.sections"
-					>
+					<template v-for="(section, sectionName) in docsStore.sections">
 						<DropdownTitle>{{ sectionName }}</DropdownTitle>
-						<router-link
-							v-for="link in section"
-							@click="selectPost(link)"
-							:to="`/docs/${link.slug.current}`"
-						>
+						<router-link v-for="link in section" :to="`/docs/${link.slug.current}`">
 							<DropdownItem>
 								{{ link.title }}
 							</DropdownItem>

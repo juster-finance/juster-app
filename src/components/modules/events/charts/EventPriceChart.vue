@@ -402,6 +402,8 @@ const fillQuotes = async (tsGt) => {
 
 		symbol.quotes = [...symbol.quotes, ...newQuotes]
 
+		if (!newQuotes.length) return
+
 		if (DateTime.fromISO(newQuotes[newQuotes.length - 1].timestamp).ts !== tsGt.ts) {
 			await fillQuotes(tsGt)
 		}
@@ -522,7 +524,7 @@ onBeforeUnmount(() => {
 
 <template>
 	<div :class="$style.wrapper">
-		<Flex v-if="!symbol.isQuotesLoaded" align="center" justify="center" gap="12" :class="$.loading_block">
+		<Flex v-if="!symbol.isQuotesLoaded" align="center" justify="center" gap="12" :class="$style.loading_block">
 			<LoadingDots />
 			<Text size="13" weight="500" color="tertiary">Chart loading</Text>
 		</Flex>
