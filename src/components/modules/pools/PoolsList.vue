@@ -31,7 +31,7 @@ const props = defineProps({
 		type: Array,
 	},
 })
-const emit = defineEmits(["onSelectPool", "onRequestWithdraw", "onShare"])
+const emit = defineEmits(["onSelectPool", "onRequestWithdraw", "onShare", "onWatchEvents"])
 
 const searchEl = ref(null)
 const searchText = ref("")
@@ -97,18 +97,12 @@ const sortedPools = computed(() => {
 			if (sort.dir === "desc") {
 				return filteredPools.value.sort(
 					(a, b) =>
-						props.poolsStates[
-							b.address
-						]?.totalLiquidity.toNumber() -
-						props.poolsStates[a.address]?.totalLiquidity.toNumber(),
+						props.poolsStates[b.address]?.totalLiquidity.toNumber() - props.poolsStates[a.address]?.totalLiquidity.toNumber(),
 				)
 			} else {
 				return filteredPools.value.sort(
 					(a, b) =>
-						props.poolsStates[
-							a.address
-						]?.totalLiquidity.toNumber() -
-						props.poolsStates[b.address]?.totalLiquidity.toNumber(),
+						props.poolsStates[a.address]?.totalLiquidity.toNumber() - props.poolsStates[b.address]?.totalLiquidity.toNumber(),
 				)
 			}
 			break
@@ -121,59 +115,39 @@ const sortedPools = computed(() => {
 			if (sort.dir === "desc") {
 				return filteredPools.value.sort(
 					(a, b) =>
-						(positions[b.address]
-							? positions[b.address].depositedAmount
-							: 0) -
-						(positions[a.address]
-							? positions[a.address].depositedAmount
-							: 0),
+						(positions[b.address] ? positions[b.address].depositedAmount : 0) -
+						(positions[a.address] ? positions[a.address].depositedAmount : 0),
 				)
 			} else {
 				return filteredPools.value.sort(
 					(a, b) =>
-						(positions[a.address]
-							? positions[a.address].depositedAmount
-							: 0) -
-						(positions[b.address]
-							? positions[b.address].depositedAmount
-							: 0),
+						(positions[a.address] ? positions[a.address].depositedAmount : 0) -
+						(positions[b.address] ? positions[b.address].depositedAmount : 0),
 				)
 			}
 			break
 		case "share_price":
 			if (sort.dir === "desc") {
 				return filteredPools.value.sort(
-					(a, b) =>
-						props.poolsStates[b.address]?.sharePrice.toNumber() -
-						props.poolsStates[a.address]?.sharePrice.toNumber(),
+					(a, b) => props.poolsStates[b.address]?.sharePrice.toNumber() - props.poolsStates[a.address]?.sharePrice.toNumber(),
 				)
 			} else {
 				return filteredPools.value.sort(
-					(a, b) =>
-						props.poolsStates[a.address]?.sharePrice.toNumber() -
-						props.poolsStates[b.address]?.sharePrice.toNumber(),
+					(a, b) => props.poolsStates[a.address]?.sharePrice.toNumber() - props.poolsStates[b.address]?.sharePrice.toNumber(),
 				)
 			}
 			break
 		case "apy":
 			if (sort.dir === "desc") {
-				return filteredPools.value.sort(
-					(a, b) =>
-						props.poolsAPY[b.address] - props.poolsAPY[a.address],
-				)
+				return filteredPools.value.sort((a, b) => props.poolsAPY[b.address] - props.poolsAPY[a.address])
 			} else {
-				return filteredPools.value.sort(
-					(a, b) =>
-						props.poolsAPY[a.address] - props.poolsAPY[b.address],
-				)
+				return filteredPools.value.sort((a, b) => props.poolsAPY[a.address] - props.poolsAPY[b.address])
 			}
 			break
 	}
 })
 
-const activePools = computed(() =>
-	props.pools.filter((pool) => !pool.isDepositPaused),
-)
+const activePools = computed(() => props.pools.filter((pool) => !pool.isDepositPaused))
 
 const handleSearchKeydown = (e) => {
 	e.stopPropagation()
@@ -225,11 +199,7 @@ onMounted(() => {
 			<Flex direction="column" gap="8">
 				<Text size="16" weight="600" color="primary">Pools</Text>
 				<Text size="14" weight="500" color="tertiary">
-					{{
-						searchText.length
-							? filteredPools.length
-							: activePools.length
-					}}
+					{{ searchText.length ? filteredPools.length : activePools.length }}
 					{{ searchText.length ? "found" : "active" }} pools
 				</Text>
 			</Flex>
@@ -237,35 +207,19 @@ onMounted(() => {
 			<Flex align="center" gap="8">
 				<Flex align="center" gap="4">
 					<transition name="popup">
-						<Flex
-							v-if="isSearchEnabled"
-							align="center"
-							:class="$style.search_field"
-						>
-							<input
-								v-model="searchText"
-								@keydown="handleSearchKeydown"
-								ref="searchEl"
-								placeholder="Search a pool"
-							/>
+						<Flex v-if="isSearchEnabled" align="center" :class="$style.search_field">
+							<input v-model="searchText" @keydown="handleSearchKeydown" ref="searchEl" placeholder="Search a pool" />
 						</Flex>
 					</transition>
 
 					<Button @click="toggleSearch" type="secondary" size="small">
-						<Icon
-							:name="isSearchEnabled ? 'close' : 'search'"
-							size="16"
-						/>
+						<Icon :name="isSearchEnabled ? 'close' : 'search'" size="16" />
 					</Button>
 				</Flex>
 
 				<Flex align="center" gap="2">
 					<Button
-						@click="
-							sort.dir == 'desc'
-								? (sort.dir = 'asc')
-								: (sort.dir = 'desc')
-						"
+						@click="sort.dir == 'desc' ? (sort.dir = 'asc') : (sort.dir = 'desc')"
 						:disabled="sort.by === 'default'"
 						type="secondary"
 						size="small"
@@ -275,37 +229,23 @@ onMounted(() => {
 							name="sort_desc"
 							size="16"
 							:style="{
-								transform: `rotate(${
-									sort.dir == 'asc' ? '180' : '0'
-								}deg)`,
+								transform: `rotate(${sort.dir == 'asc' ? '180' : '0'}deg)`,
 							}"
 						/>
 					</Button>
 
 					<Dropdown>
 						<template #trigger>
-							<Button
-								type="secondary"
-								size="small"
-								style="border-radius: 2px 6px 6px 2px"
-							>
+							<Button type="secondary" size="small" style="border-radius: 2px 6px 6px 2px">
 								<Flex>
-									<Text height="1" color="tertiary">
-										Sort by&nbsp;
-									</Text>
-									{{
-										sorts.find((s) => sort.by === s.key)
-											.title
-									}}
+									<Text height="1" color="tertiary"> Sort by&nbsp; </Text>
+									{{ sorts.find((s) => sort.by === s.key).title }}
 								</Flex>
 							</Button>
 						</template>
 
 						<template #dropdown>
-							<DropdownItem
-								v-for="s in sorts"
-								@click="sort.by = s.key"
-							>
+							<DropdownItem v-for="s in sorts" @click="sort.by = s.key">
 								{{ s.title }}
 							</DropdownItem>
 						</template>
@@ -320,6 +260,7 @@ onMounted(() => {
 				:key="index"
 				@onShare="(pool) => emit('onShare', pool)"
 				@onSelectPool="(pool) => emit('onSelectPool', pool)"
+				@onWatchEvents="(pool) => emit('onWatchEvents', pool)"
 				@onRequestWithdraw="(pool) => emit('onRequestWithdraw', pool)"
 				:pool="pool"
 				:position="getPositionByPool(pool)"

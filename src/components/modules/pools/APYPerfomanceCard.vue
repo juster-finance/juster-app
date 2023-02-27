@@ -101,7 +101,7 @@ const apyPosition = computed(() => {
 	height: 8px;
 
 	border-radius: 50px;
-	background: linear-gradient(90deg, transparent, var(--green), var(--orange));
+	background: linear-gradient(90deg, var(--orange), var(--green));
 }
 
 .dot {

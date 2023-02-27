@@ -29,6 +29,7 @@ import PoolsModal from "@local/modals/pools/PoolsModal.vue"
 import DepositModal from "@local/modals/pools/DepositModal.vue"
 import RequestWithdrawModal from "@local/modals/pools/RequestWithdrawModal.vue"
 import WithdrawClaimsModal from "@local/modals/pools/WithdrawClaimsModal.vue"
+import TimelineModal from "@local/modals/pools/TimelineModal.vue"
 
 /**
  * Services
@@ -54,32 +55,35 @@ const marketStore = useMarketStore()
 
 const showSharePoolModal = ref(false)
 const showPoolsModal = ref(false)
+const showTimelineModal = ref(false)
 const showDepositModal = ref(false)
 const showWithdrawClaimsModal = ref(false)
 const showRequestWithdrawModal = ref(false)
 
 const handleSelectPool = (pool) => {
 	selectedPool.value = pool
-
 	showPoolsModal.value = false
 	showDepositModal.value = true
 }
 
 const handleShare = (pool) => {
 	selectedPool.value = pool
-
 	showSharePoolModal.value = true
 }
 
 const handleRequestWithdraw = (pool) => {
 	selectedPool.value = pool
-
 	showRequestWithdrawModal.value = true
 }
 
 const handleBackFromDeposit = () => {
 	showDepositModal.value = false
 	showPoolsModal.value = true
+}
+
+const handleWatchEvents = (pool) => {
+	selectedPool.value = pool
+	showTimelineModal.value = true
 }
 
 const handleClosePoolsWarning = () => {
@@ -349,6 +353,7 @@ const { meta } = useMeta({
 				@onClose="showRequestWithdrawModal = false"
 			/>
 			<WithdrawClaimsModal :show="showWithdrawClaimsModal" :positions="positions" @onClose="showWithdrawClaimsModal = false" />
+			<TimelineModal :show="showTimelineModal" :pool="selectedPool" @onClose="showTimelineModal = false" />
 
 			<Flex align="center" :class="$style.head">
 				<h1 :class="$style.title">Liquidity Pools</h1>
@@ -397,6 +402,7 @@ const { meta } = useMeta({
 							:positions="positions"
 							@onShare="(pool) => handleShare(pool)"
 							@onSelectPool="handleSelectPool"
+							@onWatchEvents="handleWatchEvents"
 							@onRequestWithdraw="handleRequestWithdraw"
 							:class="$style.list"
 						/>

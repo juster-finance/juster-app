@@ -33,7 +33,7 @@ const notificationsStore = useNotificationsStore()
 
 const router = useRouter()
 
-const emit = defineEmits(["onSelectPool", "onRequestWithdraw", "onShare"])
+const emit = defineEmits(["onSelectPool", "onRequestWithdraw", "onShare", "onWatchEvents"])
 const props = defineProps({
 	pool: {
 		type: Object,
@@ -388,7 +388,7 @@ const copy = (target) => {
 
 					<DropdownDivider />
 
-					<DropdownItem disabled> <Icon name="time" size="16" />Pool timeline </DropdownItem>
+					<DropdownItem disabled @click="emit('onWatchEvents', pool)"> <Icon name="time" size="16" />Watch events</DropdownItem>
 
 					<DropdownDivider />
 

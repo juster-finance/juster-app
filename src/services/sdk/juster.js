@@ -82,4 +82,13 @@ const switchNetwork = (network, router) => {
 	router.push("/")
 }
 
-export { juster, currentNetwork, switchNetwork, initPools }
+/**
+ * Utils
+ */
+const destroySubscription = (sub) => {
+	if (Object.prototype.hasOwnProperty.call(sub, "_state") && !sub?.closed) {
+		sub.unsubscribe()
+	}
+}
+
+export { juster, currentNetwork, switchNetwork, initPools, destroySubscription }
