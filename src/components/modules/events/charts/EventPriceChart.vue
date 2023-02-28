@@ -587,23 +587,17 @@ onBeforeUnmount(() => {
 					v-if="startData"
 					:class="[$style.price_badge, $style.start]"
 					:style="{
-						top: `${scale.y(startData.value) + 20 - 47 / 2}px`,
+						top: `${scale.y(startData.value) + 20 - 30 / 2}px`,
 					}"
 					gap="6"
 				>
 					<Icon name="go" size="10" />
 
-					<Flex direction="column" align="end" gap="6">
-						<Flex align="center">
-							<Text size="12" weight="600" color="secondary">
-								{{ disaggregate(event.startRate * 100)[0] }}
-							</Text>
-							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.startRate * 100)[1] }} </Text>
-						</Flex>
-
-						<Text size="11" weight="500" color="tertiary">
-							{{ DateTime.fromISO(event.betsCloseTime).toFormat("HH:mm") }}
+					<Flex align="center">
+						<Text size="12" weight="600" color="secondary">
+							{{ disaggregate(event.startRate * 100)[0] }}
 						</Text>
+						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.startRate * 100)[1] }} </Text>
 					</Flex>
 				</Flex>
 			</div>
@@ -695,7 +689,7 @@ onBeforeUnmount(() => {
 }
 
 .start line {
-	stroke: var(--blue);
+	stroke: rgba(69, 126, 232, 0.3);
 	stroke-width: 1.5;
 }
 
