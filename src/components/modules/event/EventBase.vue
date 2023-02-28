@@ -766,9 +766,8 @@ onUnmounted(() => {
 
 						<Flex v-if="filteredDeposits.length" direction="column" gap="8">
 							<Flex align="center" :class="$style.columns">
-								<Text size="12" weight="700" color="support" :class="$style.column">TYPE </Text>
-								<Text size="12" weight="700" color="support" :class="$style.column">RISE</Text>
-								<Text size="12" weight="700" color="support" :class="$style.column">FALL</Text>
+								<Text size="12" weight="700" color="support" :class="$style.column">TYPE</Text>
+								<Text size="12" weight="700" color="support" :class="$style.column">AMOUNT</Text>
 
 								<Text size="12" weight="700" color="support" :class="$style.column">RETURN</Text>
 							</Flex>
