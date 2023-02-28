@@ -126,7 +126,7 @@ const getEvent = async () => {
 	event.value = await fetchEventById({ id: eventId })
 
 	/** meta */
-	meta.meta.title = `Price Event - ${supportedMarkets[event.value.currencyPair.symbol].target} (#${numberWithSymbol(
+	meta.meta.title = `${supportedMarkets[event.value.currencyPair.symbol].target} - Price Event (#${numberWithSymbol(
 		event.value.id,
 		",",
 	)})`
