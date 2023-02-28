@@ -12,6 +12,7 @@ export const event = {
 	liquidityPercent: true,
 	measurePeriod: true,
 	closedOracleTime: true,
+	measureOracleStartTime: true,
 	createdTime: true,
 	startRate: true,
 	closedRate: true,

@@ -388,7 +388,7 @@ const copy = (target) => {
 
 					<DropdownDivider />
 
-					<DropdownItem disabled @click="emit('onWatchEvents', pool)"> <Icon name="time" size="16" />Watch events</DropdownItem>
+					<DropdownItem @click="emit('onWatchEvents', pool)"> <Icon name="time" size="16" />Watch events</DropdownItem>
 
 					<DropdownDivider />
 

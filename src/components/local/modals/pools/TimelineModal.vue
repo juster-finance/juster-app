@@ -2,7 +2,8 @@
 /**
  * Vendor
  */
-import { ref, watch } from "vue"
+import { ref, watch, computed } from "vue"
+import { DateTime } from "luxon"
 
 /**
  * UI
@@ -30,6 +31,21 @@ const emit = defineEmits(["onClose"])
 const subscription = ref({})
 const events = ref([])
 
+const labelInterval = ref(null)
+const delayBeforeNextEventLabel = ref("")
+
+watch(
+	() => events.value,
+	() => {
+		if (!events.value.length) return
+
+		delayBeforeNextEventLabel.value = DateTime.now().diff(DateTime.fromISO(events.value[0].timestamp)).toFormat("hh:mm:ss")
+		labelInterval.value = setInterval(() => {
+			delayBeforeNextEventLabel.value = DateTime.now().diff(DateTime.fromISO(events.value[0].timestamp)).toFormat("hh:mm:ss")
+		}, 1000)
+	},
+)
+
 watch(
 	() => props.show,
 	async () => {
@@ -40,10 +56,10 @@ watch(
 						{
 							where: {
 								poolId: {
-									_eq: props.pool.id,
+									_eq: props.pool.address,
 								},
 							},
-							limit: 10,
+							limit: 6,
 							order_by: {
 								counter: "desc",
 							},
@@ -59,9 +75,33 @@ watch(
 				})
 		} else {
 			destroySubscription(subscription.value)
+			clearInterval(labelInterval.value)
 		}
 	},
 )
+
+const getEventIconByActionName = (action) => {
+	if (action === "EVENT_CREATED") {
+		return "plus_circle"
+	}
+	if (action === "EVENT_FINISHED") {
+		return "flag"
+	}
+	if (action === "USER_DEPOSITED") {
+		return "coins_plus"
+	}
+	if (action === "USER_CLAIMED") {
+		return "checkcircle"
+	}
+	if (action === "USER_WITHDRAWN") {
+		return "money"
+	}
+	if (action === "LIQUIDITY_APPROVED") {
+		return "checkcircle"
+	}
+
+	return "help"
+}
 </script>
 
 <template>
@@ -104,9 +144,37 @@ watch(
 				<div :class="$style.divider" />
 			</Flex>
 
-			<div v-for="event in events">
-				{{ event.action }}
-			</div>
+			<Flex direction="column" gap="12">
+				<Flex v-if="events.length" align="center" gap="16">
+					<Text size="14" weight="500" color="tertiary" align="right" :class="$style.when">{{ delayBeforeNextEventLabel }}</Text>
+
+					<Flex align="center" gap="8">
+						<div :class="$style.dot" />
+
+						<Text size="14" weight="500" color="tertiary"> Waiting for next event... </Text>
+					</Flex>
+				</Flex>
+
+				<div :class="$style.test" />
+
+				<Flex v-for="(ev, idx) in events" direction="column" gap="12">
+					<Flex align="center" gap="16">
+						<Text size="14" weight="500" color="tertiary" align="right" :class="$style.when">
+							{{ DateTime.fromISO(ev.timestamp).toFormat("hh:mm") }}
+						</Text>
+
+						<Flex align="center" gap="8">
+							<Icon :name="getEventIconByActionName(ev.action)" size="14" color="secondary" />
+
+							<Text size="14" weight="600" color="primary" :class="$style.action_name">
+								{{ ev.action.toLowerCase().replace("_", " ") }}
+							</Text>
+						</Flex>
+					</Flex>
+
+					<div v-if="idx !== events.length - 1" :class="$style.test" />
+				</Flex>
+			</Flex>
 		</Flex>
 	</Modal>
 </template>
@@ -132,5 +200,52 @@ watch(
 	height: 0px;
 
 	border: 1px dashed var(--opacity-05);
+}
+
+.when {
+	min-width: 80px;
+}
+
+.action_name {
+	text-transform: capitalize;
+}
+
+.dot {
+	width: 4px;
+	height: 4px;
+	border-radius: 50px;
+	background: var(--text-secondary);
+
+	margin: 0 5px;
+
+	box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
+	transform: scale(1);
+	animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
+	}
+
+	70% {
+		transform: scale(1);
+		box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+	}
+
+	100% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+	}
+}
+
+.test {
+	width: 2px;
+	height: 24px;
+
+	background: var(--opacity-05);
+
+	margin-left: 102px;
 }
 </style>

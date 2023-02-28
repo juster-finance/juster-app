@@ -12,7 +12,7 @@ import { fetchQuoteByRange } from "@/api/quotes"
  * Services
  */
 import { prepareQuotesForD3 } from "@utils/quotes"
-import { numberWithSymbol } from "@utils/amounts"
+import { numberWithSymbol, disaggregate } from "@utils/amounts"
 import { juster } from "@sdk"
 
 /**
@@ -36,6 +36,7 @@ const scale = reactive({
 	y: null,
 })
 const startData = ref([])
+const currentQuote = ref({})
 
 const priceDynamics = computed(() => {
 	const startRate = props.event.startRate * 100
@@ -298,13 +299,13 @@ const draw = () => {
 		)
 
 	/** Circle - Current Price */
-	const currentData = data.find((d) => new Date(d.date).getTime() == new Date(quotes[0].timestamp).getTime())
+	currentQuote.value = data.find((d) => new Date(d.date).getTime() == new Date(quotes[0].timestamp).getTime())
 
-	if (currentData) {
+	if (currentQuote.value) {
 		chart
 			.append("circle")
-			.attr("cx", scale.x(currentData.date))
-			.attr("cy", scale.y(currentData.value))
+			.attr("cx", scale.x(currentQuote.value.date))
+			.attr("cy", scale.y(currentQuote.value.value))
 			.attr("r", 2)
 			.attr("fill", "#fff")
 
@@ -313,16 +314,16 @@ const draw = () => {
 			.append("line")
 			.attr("x1", `100%`)
 			.attr("class", classes.current_price_line)
-			.attr("transform", `translate(0, ${scale.y(currentData.value) + 20})`)
+			.attr("transform", `translate(0, ${scale.y(currentQuote.value.value) + 20})`)
 	}
 
 	/** animated circle */
-	if (props.event.status !== "FINISHED" && currentData) {
+	if (props.event.status !== "FINISHED" && currentQuote.value) {
 		chart
 			.append("circle")
 			.attr("id", "animated_circle")
-			.attr("cx", scale.x(currentData.date))
-			.attr("cy", scale.y(currentData.value))
+			.attr("cx", scale.x(currentQuote.value.date))
+			.attr("cy", scale.y(currentQuote.value.value))
 			.attr("fill", "rgba(255,255,255,0.07)")
 			.attr("stroke", "rgba(255,255,255, 0.5)")
 			.attr("stroke-width", "2px")
@@ -541,15 +542,26 @@ onBeforeUnmount(() => {
 			<div v-if="scale.x" :class="$style.price_axis">
 				<!-- Current Price -->
 				<div
-					v-if="symbol.quotes[0]"
+					v-if="currentQuote.value"
 					:class="[$style.price_badge, $style.current, event.status === 'FINISHED' && $style.finished]"
 					:style="{
-						top: `${scale.y(symbol.quotes[0].price) + 20 - 25 / 2}px`,
+						top: `${scale.y(currentQuote.value) + 20 - 25 / 2}px`,
 					}"
 				>
 					<Icon :name="event.status === 'FINISHED' ? 'flag' : 'bolt'" size="10" color="blue" />
-					$
-					{{ numberWithSymbol(symbol.quotes[0].price, ",") }}
+
+					<Flex v-if="event.status === 'FINISHED'" align="center">
+						<Text size="12" weight="600" color="secondary">
+							{{ disaggregate(event.closedRate * 100)[0] }}
+						</Text>
+						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.closedRate * 100)[1] }} </Text>
+					</Flex>
+					<Flex v-else align="center">
+						<Text size="12" weight="600" color="secondary">
+							{{ disaggregate(currentQuote.value)[0] }}
+						</Text>
+						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(currentQuote.value)[1] }} </Text>
+					</Flex>
 				</div>
 
 				<!-- Start Price -->
@@ -561,8 +573,12 @@ onBeforeUnmount(() => {
 					}"
 				>
 					<Icon name="go" size="10" />
-					$
-					{{ numberWithSymbol(event.startRate * 100, ",") }}
+					<Flex align="center">
+						<Text size="12" weight="600" color="secondary">
+							{{ disaggregate(event.startRate * 100)[0] }}
+						</Text>
+						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.startRate * 100)[1] }} </Text>
+					</Flex>
 				</div>
 			</div>
 		</template>
@@ -589,8 +605,10 @@ onBeforeUnmount(() => {
 
 .price_badge {
 	position: absolute;
-	top: 20px;
+	top: 0;
 	right: 0;
+
+	height: 24px;
 
 	display: flex;
 	align-items: center;
@@ -600,10 +618,6 @@ onBeforeUnmount(() => {
 	background: var(--card-bg);
 	padding: 4px 6px;
 	border-radius: 6px;
-
-	font-size: 12px;
-	font-weight: 600;
-	white-space: nowrap;
 }
 
 .price_badge.current {

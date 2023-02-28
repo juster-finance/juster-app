@@ -402,7 +402,7 @@ const { meta } = useMeta({
 							:positions="positions"
 							@onShare="(pool) => handleShare(pool)"
 							@onSelectPool="handleSelectPool"
-							@onWatchEvents="handleWatchEvents"
+							@onWatchEvents="(pool) => handleWatchEvents(pool)"
 							@onRequestWithdraw="handleRequestWithdraw"
 							:class="$style.list"
 						/>
