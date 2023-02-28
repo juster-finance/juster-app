@@ -1,5 +1,5 @@
 <script setup>
-import { defineComponent, ref, reactive, toRefs, onMounted, onBeforeUnmount, useCssModule, computed, nextTick } from "vue"
+import { ref, reactive, onMounted, onBeforeUnmount, useCssModule, computed, nextTick } from "vue"
 import * as d3 from "d3"
 import { DateTime } from "luxon"
 
@@ -102,6 +102,8 @@ const draw = () => {
 			return hours.includes(DateTime.fromISO(q.timestamp).hour)
 		})
 	}
+
+	quotes.unshift(symbol.quotes[0])
 
 	const margin = { top: 20, right: 100, bottom: 30, left: 0 },
 		width = `100%`,
@@ -299,7 +301,9 @@ const draw = () => {
 		)
 
 	/** Circle - Current Price */
-	currentQuote.value = data.find((d) => new Date(d.date).getTime() == new Date(quotes[0].timestamp).getTime())
+	currentQuote.value = prepareQuotesForD3({ quotes: symbol.quotes }).find(
+		(d) => d.date.getTime() == new Date(symbol.quotes[0].timestamp).getTime(),
+	)
 
 	if (currentQuote.value) {
 		chart
@@ -541,45 +545,67 @@ onBeforeUnmount(() => {
 			<!-- Elements -->
 			<div v-if="scale.x" :class="$style.price_axis">
 				<!-- Current Price -->
-				<div
+				<Flex
 					v-if="currentQuote.value"
 					:class="[$style.price_badge, $style.current, event.status === 'FINISHED' && $style.finished]"
 					:style="{
-						top: `${scale.y(currentQuote.value) + 20 - 25 / 2}px`,
+						top: `${scale.y(currentQuote.value) + 20 - 47 / 2}px`,
 					}"
+					gap="6"
 				>
-					<Icon :name="event.status === 'FINISHED' ? 'flag' : 'dot'" size="10" color="blue" />
+					<Icon :name="event.status === 'FINISHED' ? 'flag' : 'bolt'" size="10" color="blue" />
 
-					<Flex v-if="event.status === 'FINISHED'" align="center">
-						<Text size="12" weight="600" color="secondary">
-							{{ disaggregate(event.closedRate * 100)[0] }}
+					<Flex v-if="event.status === 'FINISHED'" direction="column" gap="6" align="end">
+						<Flex align="center">
+							<Text size="12" weight="600" color="secondary">
+								{{ disaggregate(event.closedRate * 100)[0] }}
+							</Text>
+							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.closedRate * 100)[1] }} </Text>
+						</Flex>
+
+						<Text size="11" weight="500" color="tertiary">
+							{{ DateTime.fromISO(event.betsCloseTime).plus({ seconds: event.measurePeriod }).toFormat("HH:mm") }}
 						</Text>
-						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.closedRate * 100)[1] }} </Text>
 					</Flex>
-					<Flex v-else align="center">
-						<Text size="12" weight="600" color="secondary">
-							{{ disaggregate(currentQuote.value)[0] }}
+
+					<Flex v-else direction="column" gap="6" align="end">
+						<Flex align="center">
+							<Text size="12" weight="600" color="secondary">
+								{{ disaggregate(currentQuote.value)[0] }}
+							</Text>
+							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(currentQuote.value)[1] }} </Text>
+						</Flex>
+
+						<Text size="11" weight="500" color="tertiary">
+							{{ DateTime.fromJSDate(currentQuote.date).toFormat("HH:mm") }}
 						</Text>
-						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(currentQuote.value)[1] }} </Text>
 					</Flex>
-				</div>
+				</Flex>
 
 				<!-- Start Price -->
-				<div
+				<Flex
 					v-if="startData"
 					:class="[$style.price_badge, $style.start]"
 					:style="{
-						top: `${scale.y(startData.value) + 20 - 25 / 2}px`,
+						top: `${scale.y(startData.value) + 20 - 47 / 2}px`,
 					}"
+					gap="6"
 				>
 					<Icon name="go" size="10" />
-					<Flex align="center">
-						<Text size="12" weight="600" color="secondary">
-							{{ disaggregate(event.startRate * 100)[0] }}
+
+					<Flex direction="column" align="end" gap="6">
+						<Flex align="center">
+							<Text size="12" weight="600" color="secondary">
+								{{ disaggregate(event.startRate * 100)[0] }}
+							</Text>
+							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.startRate * 100)[1] }} </Text>
+						</Flex>
+
+						<Text size="11" weight="500" color="tertiary">
+							{{ DateTime.fromISO(event.betsCloseTime).toFormat("HH:mm") }}
 						</Text>
-						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.startRate * 100)[1] }} </Text>
 					</Flex>
-				</div>
+				</Flex>
 			</div>
 		</template>
 	</div>
@@ -608,21 +634,22 @@ onBeforeUnmount(() => {
 	top: 0;
 	right: 0;
 
-	height: 24px;
-
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
 	width: fit-content;
-	background: var(--card-bg);
-	padding: 4px 6px;
-	border-radius: 6px;
+
+	background: rgb(30 30 32);
+	border: 1px solid var(--border);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+
+	padding: 8px;
+}
+
+.price_badge:hover {
+	z-index: 2;
 }
 
 .price_badge.current {
 	color: var(--text-primary);
-	border: 1px solid var(--blue);
 	fill: var(--blue);
 
 	z-index: 1;
@@ -630,14 +657,12 @@ onBeforeUnmount(() => {
 
 .price_badge.start {
 	color: var(--text-tertiary);
-	border: 1px solid var(--border);
 	fill: var(--green);
 }
 
 .price_badge.finished {
 	color: var(--text-secondary);
 	fill: var(--text-tertiary);
-	border: 1px solid var(--border);
 }
 .price_badge .dot {
 	width: 4px;
