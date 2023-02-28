@@ -218,6 +218,20 @@ const wonText = computed(() => {
 	}
 })
 
+const priceDynamics = computed(() => {
+	const startRate = event.value.startRate * 100
+	const closedRate = event.value.closedRate * 100
+
+	const percent =
+		event.value.status == "FINISHED"
+			? (100 * Math.abs(closedRate - startRate)) / ((closedRate + startRate) / 2)
+			: (100 * Math.abs(price.value.rate - startRate)) / ((price.value.rate + startRate) / 2)
+
+	const diff = event.value.status == "FINISHED" ? closedRate - startRate : price.value.rate - startRate
+
+	return { diff, percent }
+})
+
 const selectedPageForDeposits = ref(1)
 const paginatedDeposits = computed(() =>
 	cloneDeep(filteredDeposits.value)
@@ -521,6 +535,7 @@ onUnmounted(() => {
 						:start-countdown="startCountdownText"
 						:finish-countdown="finishCountdownText"
 						:price="price"
+						:priceDynamics="priceDynamics"
 						:is-won="hasWonBet"
 						:position-for-withdraw="positionForWithdraw"
 						:is-withdrawing="isWithdrawing"
@@ -625,7 +640,7 @@ onUnmounted(() => {
 				</Flex>
 
 				<Flex direction="column" gap="40" :class="$style.base">
-					<EventChart v-if="event" :event="event" />
+					<EventChart v-if="event" :event="event" :priceDynamics="priceDynamics" />
 
 					<Flex direction="column" gap="24" v-if="accountStore.pkh">
 						<Flex direction="column" gap="8">

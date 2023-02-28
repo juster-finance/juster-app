@@ -12,7 +12,7 @@ import EventTVLChart from "@modules/events/charts/EventTVLChart.vue"
  */
 import Tooltip from "@ui/Tooltip.vue"
 
-defineProps({ event: { type: Object, default: () => {} } })
+defineProps({ event: { type: Object, default: () => {} }, priceDynamics: { type: Object } })
 
 const isOpen = ref(true)
 
@@ -30,7 +30,7 @@ const tabs = ref(["Price"])
 
 		<div v-show="isOpen" :class="$style.base">
 			<!-- Price Chart -->
-			<EventPriceChart v-if="selectedTab == 'Price'" :event="event" />
+			<EventPriceChart v-if="selectedTab == 'Price'" :event="event" :priceDynamics="priceDynamics" />
 
 			<!-- TVL Chart -->
 			<EventTVLChart v-else-if="selectedTab == 'TVL'" :event="event" />
@@ -39,12 +39,7 @@ const tabs = ref(["Price"])
 		<div v-show="isOpen" :class="$style.bottom">
 			<!-- Tabs: Price, TVL, Liquidity -->
 			<div :class="$style.tabs">
-				<div
-					v-for="tab in tabs"
-					:key="tab"
-					@click="selectedTab = tab"
-					:class="[$style.tab, tab == selectedTab && $style.active]"
-				>
+				<div v-for="tab in tabs" :key="tab" @click="selectedTab = tab" :class="[$style.tab, tab == selectedTab && $style.active]">
 					{{ tab }}
 				</div>
 			</div>

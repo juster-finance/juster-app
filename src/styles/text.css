@@ -131,6 +131,10 @@
 	color: var(--green);
 }
 
+.color--red {
+	color: var(--red);
+}
+
 .color--brand {
 	color: var(--brand);
 }

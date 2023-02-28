@@ -12,7 +12,7 @@ import { fetchQuoteByRange } from "@/api/quotes"
  * Services
  */
 import { prepareQuotesForD3 } from "@utils/quotes"
-import { numberWithSymbol, disaggregate } from "@utils/amounts"
+import { disaggregate } from "@utils/amounts"
 import { juster } from "@sdk"
 
 /**
@@ -21,7 +21,7 @@ import { juster } from "@sdk"
 import Banner from "@ui/Banner.vue"
 import LoadingDots from "@ui/LoadingDots.vue"
 
-const props = defineProps({ event: { type: Object, default: () => {} } })
+const props = defineProps({ event: { type: Object, default: () => {} }, priceDynamics: { type: Object } })
 
 const classes = useCssModule()
 
@@ -38,16 +38,16 @@ const scale = reactive({
 const startData = ref([])
 const currentQuote = ref({})
 
-const priceDynamics = computed(() => {
-	const startRate = props.event.startRate * 100
-	const closedRate = props.event.closedRate * 100
+// const priceDynamics = computed(() => {
+// 	const startRate = props.event.startRate * 100
+// 	const closedRate = props.event.closedRate * 100
 
-	if (!symbol.quotes.length) return 0
+// 	if (!symbol.quotes.length) return 0
 
-	const diff = props.event.status == "FINISHED" ? closedRate - startRate : symbol.quotes[0].price - startRate
+// 	const diff = props.event.status == "FINISHED" ? closedRate - startRate : symbol.quotes[0].price - startRate
 
-	return diff
-})
+// 	return diff
+// })
 
 const draw = () => {
 	if (!symbol.quotes.length) return
@@ -289,7 +289,9 @@ const draw = () => {
 		.attr("fill", "none")
 		.attr(
 			"stroke",
-			(priceDynamics.value > 0 && "#1aa168") || (priceDynamics.value < 0 && "#e05c43") || (priceDynamics.value == 0 && "#707070"),
+			(props.priceDynamics.diff > 0 && "#1aa168") ||
+				(props.priceDynamics.diff < 0 && "#e05c43") ||
+				(props.priceDynamics.diff == 0 && "#707070"),
 		)
 		.attr("stroke-width", 1.5)
 		.attr(
@@ -553,30 +555,38 @@ onBeforeUnmount(() => {
 					}"
 					gap="6"
 				>
-					<Icon :name="event.status === 'FINISHED' ? 'flag' : 'bolt'" size="10" color="blue" />
+					<Icon
+						:name="event.status === 'FINISHED' ? 'flag' : 'bolt'"
+						size="10"
+						:color="event.status === 'FINISHED' ? 'tertiary' : 'blue'"
+					/>
 
-					<Flex v-if="event.status === 'FINISHED'" direction="column" gap="6" align="end">
-						<Flex align="center">
+					<Flex direction="column" gap="6" align="end">
+						<Flex v-if="event.status === 'FINISHED'" align="center">
 							<Text size="12" weight="600" color="secondary">
 								{{ disaggregate(event.closedRate * 100)[0] }}
 							</Text>
 							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.closedRate * 100)[1] }} </Text>
 						</Flex>
-
-						<Text size="11" weight="500" color="tertiary">
-							{{ DateTime.fromISO(event.betsCloseTime).plus({ seconds: event.measurePeriod }).toFormat("HH:mm") }}
-						</Text>
-					</Flex>
-
-					<Flex v-else direction="column" gap="6" align="end">
-						<Flex align="center">
+						<Flex v-else align="center">
 							<Text size="12" weight="600" color="secondary">
 								{{ disaggregate(currentQuote.value)[0] }}
 							</Text>
 							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(currentQuote.value)[1] }} </Text>
 						</Flex>
 
-						<Text size="11" weight="500" color="tertiary">
+						<Flex v-if="['STARTED', 'FINISHED'].includes(event.status)" align="center" gap="4">
+							<Icon
+								name="arrow_circle_top"
+								size="10"
+								:color="priceDynamics.diff < 0 ? 'red' : 'green'"
+								:style="{ transform: `rotate(${priceDynamics.diff < 0 && '180deg'})` }"
+							/>
+							<Text size="11" weight="600" :color="priceDynamics.diff < 0 ? 'red' : 'green'">
+								{{ priceDynamics.percent.toFixed(2) }}%
+							</Text>
+						</Flex>
+						<Text v-else size="11" weight="600" color="tertiary">
 							{{ DateTime.fromJSDate(currentQuote.date).toFormat("HH:mm") }}
 						</Text>
 					</Flex>
@@ -591,7 +601,7 @@ onBeforeUnmount(() => {
 					}"
 					gap="6"
 				>
-					<Icon name="go" size="10" />
+					<Icon name="go" size="10" color="secondary" />
 
 					<Flex align="center">
 						<Text size="12" weight="600" color="secondary">
