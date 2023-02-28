@@ -548,7 +548,7 @@ onBeforeUnmount(() => {
 						top: `${scale.y(currentQuote.value) + 20 - 25 / 2}px`,
 					}"
 				>
-					<Icon :name="event.status === 'FINISHED' ? 'flag' : 'bolt'" size="10" color="blue" />
+					<Icon :name="event.status === 'FINISHED' ? 'flag' : 'dot'" size="10" color="blue" />
 
 					<Flex v-if="event.status === 'FINISHED'" align="center">
 						<Text size="12" weight="600" color="secondary">
