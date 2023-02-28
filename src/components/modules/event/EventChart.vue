@@ -23,7 +23,9 @@ const tabs = ref(["Price"])
 <template>
 	<div :class="$style.wrapper">
 		<div @click="isOpen = !isOpen" :class="$style.header">
-			<div :class="$style.title">Chart</div>
+			<Text size="14" weight="600" color="primary">
+				{{ event.currencyPair.symbol.replace("-", "/") }}
+			</Text>
 
 			<Icon name="arrow" size="20" :class="!isOpen && $style.rotate" />
 		</div>
@@ -80,13 +82,6 @@ const tabs = ref(["Price"])
 
 .header:hover {
 	background: var(--opacity-05);
-}
-
-.title {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-primary);
 }
 
 .header svg {
