@@ -18,7 +18,7 @@ import Spin from "@ui/Spin.vue"
 /**
  * Services
  */
-import { parsePoolName } from "@utils/misc"
+import { parsePoolName, shorten } from "@utils/misc"
 import { juster, destroySubscription } from "@sdk"
 
 /**
@@ -65,9 +65,9 @@ watch(
 
 		eventsSearcher.value = new Searcher(events.value, {
 			keySelector: (item) => {
-				return `${item.action.replace("_", " ")} ${item.affectedEventId}`
+				return `${item.action.replace("_", " ")} ${item.affectedEventId} ${item.affectedUserId}`
 			},
-			threshold: 0.62,
+			threshold: 0.8,
 		})
 
 		delayBeforeNextEventLabel.value = DateTime.now().diff(DateTime.fromISO(events.value[0].timestamp)).toFormat("hh:mm:ss")
@@ -139,7 +139,7 @@ const getEventIconByActionName = (action) => {
 	<Modal new :show="show" width="550" closable disableTrap @onClose="emit('onClose')">
 		<Flex align="center" justify="between" :class="$style.head">
 			<Flex align="center" gap="8">
-				<Icon name="time" size="16" color="secondary" />
+				<Icon name="bolt" size="16" color="secondary" />
 				<Text size="14" weight="600" color="primary">Pool timeline</Text>
 			</Flex>
 
@@ -172,7 +172,13 @@ const getEventIconByActionName = (action) => {
 						</Flex>
 					</Flex>
 
-					<Input v-model="searchText" size="small" placeholder="Search event by action name" icon="search" cleanable />
+					<Input
+						v-model="searchText"
+						size="small"
+						placeholder="Search event by action name, user address or event ID"
+						icon="search"
+						cleanable
+					/>
 
 					<div :class="$style.divider" />
 				</Flex>
@@ -218,7 +224,7 @@ const getEventIconByActionName = (action) => {
 
 						<div v-if="idx !== events.length - 1" :class="$style.line">
 							<svg
-								v-if="ev.action === 'EVENT_FINISHED'"
+								v-if="['EVENT_FINISHED', 'USER_DEPOSITED', 'LIQUIDITY_APPROVED'].includes(ev.action)"
 								width="17"
 								height="17"
 								viewBox="0 0 17 17"
@@ -275,6 +281,58 @@ const getEventIconByActionName = (action) => {
 															((ev.affectedEvent.provided + ev.affectedEvent.result) / 2)
 													  ).toFixed(2)
 											}}%
+										</Text>
+									</Flex>
+								</Flex>
+							</Flex>
+
+							<Flex
+								v-if="ev.action === 'USER_DEPOSITED'"
+								@click="router.push(`/profile/${ev.affectedUserId}`)"
+								align="center"
+								gap="14"
+								:class="$style.line_card"
+							>
+								<img
+									:src="`https://services.tzkt.io/v1/avatars/${ev.affectedUserId}`"
+									alt="avatar"
+									:class="$style.avatar"
+								/>
+
+								<Flex direction="column" gap="6">
+									<Flex>
+										<Text size="12" weight="600" color="primary">{{ ev.affectedEntry.amount }}&nbsp;</Text>
+										<Text size="12" weight="600" color="tertiary">XTZ</Text>
+									</Flex>
+
+									<Flex align="center" gap="4" :class="$style.params">
+										<Text size="12" weight="500" color="tertiary">{{ shorten(ev.affectedUserId, 6, 12) }}</Text>
+									</Flex>
+								</Flex>
+							</Flex>
+
+							<Flex
+								v-if="ev.action === 'LIQUIDITY_APPROVED'"
+								@click="router.push(`/profile/${ev.affectedUserId}`)"
+								align="center"
+								gap="14"
+								:class="$style.line_card"
+							>
+								<Icon name="check" size="16" color="secondary" />
+
+								<Flex direction="column" gap="6">
+									<Flex>
+										<Text size="12" weight="600" color="secondary">Plus&nbsp;</Text>
+										<Text size="12" weight="600" color="primary">{{ ev.totalLiquidityDiff }}</Text>
+										<Text size="12" weight="600" color="secondary">&nbsp;XTZ</Text>
+									</Flex>
+
+									<Flex align="center" gap="4" :class="$style.params">
+										<Text size="12" weight="500" color="tertiary">Total: </Text>
+										<Text size="12" weight="500" color="secondary">{{ ev.totalLiquidity.toFixed(2) }}&nbsp;&nbsp;</Text>
+										<Text size="12" weight="500" color="tertiary">From: </Text>
+										<Text size="12" weight="500" color="secondary">
+											{{ shorten(ev.affectedUserId, 4, 6) }}
 										</Text>
 									</Flex>
 								</Flex>
@@ -377,6 +435,7 @@ const getEventIconByActionName = (action) => {
 }
 
 .line_card {
+	width: fit-content;
 	height: 58px;
 
 	cursor: pointer;
@@ -384,8 +443,13 @@ const getEventIconByActionName = (action) => {
 	border-radius: 8px;
 	border: 2px solid var(--opacity-05);
 
-	margin: 14px;
+	margin: 16px 16px 16px 14px;
 	padding: 0 14px;
+}
+
+.avatar {
+	width: 16px;
+	height: 16px;
 }
 
 @media (max-width: 600px) {
