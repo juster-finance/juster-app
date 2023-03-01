@@ -28,41 +28,21 @@ const emit = defineEmits(["onLiquidity"])
 const router = useRouter()
 
 const pool = computed(() =>
-	marketStore.lines.find(
-		(l) =>
-			l.currencyPairId === props.event.currencyPair.id &&
-			l.measurePeriod === props.event.measurePeriod,
-	),
+	marketStore.lines.find((l) => l.currencyPairId === props.event.currencyPair.id && l.measurePeriod === props.event.measurePeriod),
 )
 </script>
 
 <template>
 	<Flex direction="column" gap="24" :class="$style.wrapper">
 		<Flex direction="column" gap="8">
-			<Text color="primary" size="16" height="12" weight="600">
-				Pools Distribution
-			</Text>
-			<Text color="tertiary" size="14" weight="500">
-				Visualization of stakes between directions
-			</Text>
+			<Text color="primary" size="16" height="12" weight="600"> Pools Distribution </Text>
+			<Text color="tertiary" size="14" weight="500"> Visualization of stakes between directions </Text>
 		</Flex>
 
 		<Pool :event="event" />
 
-		<router-link
-			v-if="marketStore.lines.length"
-			:to="`/pools/${pool.poolId}`"
-		>
-			<Button
-				type="secondary"
-				size="medium"
-				block
-				keybind="D+L"
-				@onKeybind="router.push('/pools')"
-				:disabled="
-					event.status !== 'NEW' || event.totalLiquidityProvided == 0
-				"
-			>
+		<router-link v-if="marketStore.lines.length" :to="`/pools/${pool.poolId}`">
+			<Button type="secondary" size="medium" block keybind="D+L" @onKeybind="router.push(`/pools/${pool.poolId}`)">
 				<Icon name="server" size="12" />Deposit Liquidity
 			</Button>
 		</router-link>
