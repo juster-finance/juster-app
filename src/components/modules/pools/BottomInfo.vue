@@ -46,9 +46,7 @@ const showPoolsGuidesModal = ref(false)
 
 				<Dropdown side="top" disable-autofocus>
 					<template #trigger>
-						<Button type="secondary" size="small">
-							<Icon name="dots" size="16" />
-						</Button>
+						<Button type="secondary" size="small"><Icon name="dots" size="12" color="tertiary" /> More</Button>
 					</template>
 
 					<template #dropdown>

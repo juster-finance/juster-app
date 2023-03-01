@@ -583,7 +583,7 @@ onUnmounted(() => {
 
 						<Dropdown side="top">
 							<template #trigger>
-								<Button type="secondary" size="small"><Icon name="dots" size="12" /> More</Button>
+								<Button type="secondary" size="small"><Icon name="dots" size="12" color="tertiary" /> More</Button>
 							</template>
 
 							<template #dropdown>

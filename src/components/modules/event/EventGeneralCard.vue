@@ -9,6 +9,7 @@ import { DateTime } from "luxon"
  * UI
  */
 import Tooltip from "@ui/Tooltip.vue"
+import LoadingDots from "@ui/LoadingDots.vue"
 
 /**
  * Local
@@ -293,7 +294,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 						{{ startCountdown }}
 					</template>
 				</span>
-				<span v-else-if="startStatus == 'Finished'">Soon</span>
+				<span v-else-if="startStatus == 'Finished'"> Soon </span>
 			</div>
 
 			<!-- *Active* -->
@@ -310,7 +311,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 						{{ finishCountdown }}
 					</template>
 				</span>
-				<span v-else-if="finishStatus == 'Finished'">Soon</span>
+				<span v-else-if="finishStatus == 'Finished'"> <LoadingDots />&nbsp;Ending</span>
 			</div>
 
 			<!-- *Finished* -->

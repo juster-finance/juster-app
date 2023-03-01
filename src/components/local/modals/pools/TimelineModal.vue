@@ -160,7 +160,7 @@ const getEventIconByActionName = (action) => {
 				<Flex v-for="(ev, idx) in events" direction="column" gap="12">
 					<Flex align="center" gap="16">
 						<Text size="14" weight="500" color="tertiary" align="right" :class="$style.when">
-							{{ DateTime.fromISO(ev.timestamp).toFormat("hh:mm") }}
+							{{ DateTime.fromISO(ev.timestamp).toFormat("HH:mm") }}
 						</Text>
 
 						<Flex align="center" gap="8">
