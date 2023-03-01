@@ -95,4 +95,9 @@ export const poolState = {
 	totalLiquidity: true,
 	totalShares: true,
 	withdrawableLiquidity: true,
+	affectedEventId: true,
+	affectedEvent: {
+		provided: true,
+		result: true,
+	},
 }

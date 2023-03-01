@@ -2,13 +2,18 @@
 /**
  * Vendor
  */
-import { ref, watch, computed } from "vue"
+import { ref, watch, computed, onMounted } from "vue"
 import { DateTime } from "luxon"
+import { useRouter } from "vue-router"
+import { Searcher } from "fast-fuzzy"
 
 /**
  * UI
  */
 import Modal from "@ui/Modal.vue"
+import Banner from "@ui/Banner.vue"
+import Input from "@ui/Input.vue"
+import Spin from "@ui/Spin.vue"
 
 /**
  * Services
@@ -28,8 +33,27 @@ const props = defineProps({
 
 const emit = defineEmits(["onClose"])
 
+const router = useRouter()
+
 const subscription = ref({})
 const events = ref([])
+
+const searchText = ref("")
+const eventsSearcher = ref({})
+
+const filteredEvents = computed(() => {
+	if (searchText.value) {
+		let findedEvents = eventsSearcher.value
+			.search(searchText.value.toString(), {
+				returnMatchData: true,
+			})
+			.map((el) => el.item)
+
+		return findedEvents
+	} else {
+		return events.value
+	}
+})
 
 const labelInterval = ref(null)
 const delayBeforeNextEventLabel = ref("")
@@ -38,6 +62,13 @@ watch(
 	() => events.value,
 	() => {
 		if (!events.value.length) return
+
+		eventsSearcher.value = new Searcher(events.value, {
+			keySelector: (item) => {
+				return item.action.replace("_", " ")
+			},
+			threshold: 0.62,
+		})
 
 		delayBeforeNextEventLabel.value = DateTime.now().diff(DateTime.fromISO(events.value[0].timestamp)).toFormat("hh:mm:ss")
 		labelInterval.value = setInterval(() => {
@@ -59,7 +90,7 @@ watch(
 									_eq: props.pool.address,
 								},
 							},
-							limit: 6,
+							limit: 12,
 							order_by: {
 								counter: "desc",
 							},
@@ -117,62 +148,144 @@ const getEventIconByActionName = (action) => {
 
 		<Flex direction="column" gap="32" :class="$style.base">
 			<Text size="13" weight="500" color="tertiary" height="16">
-				Your withdrawal request contains available claims. Funds will be available in your wallet as soon as all transactions are
-				accepted.
+				A live list of recent events with the selected pool.<br />Use the search for quick access to the desired action.
 			</Text>
 
-			<Flex direction="column" gap="16">
-				<Flex align="center" gap="12">
-					<Text size="14" weight="600" color="primary">
-						{{ parsePoolName(pool.name.replace("Juster Pool: ", "")) }}
-					</Text>
-
-					<Text size="12" weight="500" color="support"> ✦ </Text>
-
-					<Flex align="center" gap="4">
-						<Icon
-							:name="!pool.isDepositPaused ? 'zap_circle' : 'pause'"
-							size="12"
-							:color="!pool.isDepositPaused ? 'green' : 'yellow'"
-						/>
-						<Text size="12" weight="600" :color="!pool.isDepositPaused ? 'green' : 'yellow'">
-							{{ !pool.isDepositPaused ? "Active" : "Paused" }}
-						</Text>
-					</Flex>
-				</Flex>
-
-				<div :class="$style.divider" />
-			</Flex>
-
-			<Flex direction="column" gap="12">
-				<Flex v-if="events.length" align="center" gap="16">
-					<Text size="14" weight="500" color="tertiary" align="right" :class="$style.when">{{ delayBeforeNextEventLabel }}</Text>
-
-					<Flex align="center" gap="8">
-						<div :class="$style.dot" />
-
-						<Text size="14" weight="500" color="tertiary"> Waiting for next event... </Text>
-					</Flex>
-				</Flex>
-
-				<div :class="$style.test" />
-
-				<Flex v-for="(ev, idx) in events" direction="column" gap="12">
-					<Flex align="center" gap="16">
-						<Text size="14" weight="500" color="tertiary" align="right" :class="$style.when">
-							{{ DateTime.fromISO(ev.timestamp).toFormat("HH:mm") }}
+			<Flex direction="column" gap="20">
+				<Flex direction="column" gap="16">
+					<Flex align="center" gap="12">
+						<Text size="14" weight="600" color="primary">
+							{{ parsePoolName(pool.name.replace("Juster Pool: ", "")) }}
 						</Text>
 
-						<Flex align="center" gap="8">
-							<Icon :name="getEventIconByActionName(ev.action)" size="14" color="secondary" />
+						<Text size="12" weight="500" color="support"> ✦ </Text>
 
-							<Text size="14" weight="600" color="primary" :class="$style.action_name">
-								{{ ev.action.toLowerCase().replace("_", " ") }}
+						<Flex align="center" gap="4">
+							<Icon
+								:name="!pool.isDepositPaused ? 'zap_circle' : 'pause'"
+								size="12"
+								:color="!pool.isDepositPaused ? 'green' : 'yellow'"
+							/>
+							<Text size="12" weight="600" :color="!pool.isDepositPaused ? 'green' : 'yellow'">
+								{{ !pool.isDepositPaused ? "Active" : "Paused" }}
 							</Text>
 						</Flex>
 					</Flex>
 
-					<div v-if="idx !== events.length - 1" :class="$style.test" />
+					<Input v-model="searchText" size="small" placeholder="Search event by action name" icon="search" />
+
+					<div :class="$style.divider" />
+				</Flex>
+
+				<Flex direction="column" gap="12" :class="$style.events">
+					<Flex v-if="events.length" align="center" gap="16">
+						<Text size="13" weight="500" color="tertiary" align="right" :class="$style.when">
+							{{ delayBeforeNextEventLabel }}
+						</Text>
+
+						<Flex align="center" gap="8">
+							<div :class="$style.dot" />
+
+							<Text size="14" weight="500" color="tertiary"> Waiting for next event... </Text>
+						</Flex>
+					</Flex>
+					<Flex v-else align="center" gap="16">
+						<Text size="13" weight="500" color="tertiary" align="right" :class="$style.when">Fetching</Text>
+
+						<Flex align="center" gap="8">
+							<Spin size="14" />
+
+							<Text size="14" weight="500" color="tertiary"></Text>
+						</Flex>
+					</Flex>
+
+					<div v-if="filteredEvents.length" :class="$style.line" />
+
+					<Flex v-for="(ev, idx) in filteredEvents" direction="column" gap="12">
+						<Flex align="center" gap="16">
+							<Text size="13" weight="500" color="tertiary" align="right" :class="$style.when">
+								{{ DateTime.fromISO(ev.timestamp).toFormat("HH:mm") }}
+							</Text>
+
+							<Flex align="center" gap="8">
+								<Icon :name="getEventIconByActionName(ev.action)" size="14" color="secondary" />
+
+								<Text size="14" weight="600" color="primary" :class="$style.action_name">
+									{{ ev.action.toLowerCase().replace("_", " ") }}
+								</Text>
+							</Flex>
+						</Flex>
+
+						<div v-if="idx !== events.length - 1" :class="$style.line">
+							<svg
+								v-if="ev.action === 'EVENT_FINISHED'"
+								width="17"
+								height="17"
+								viewBox="0 0 17 17"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+								:class="$style.line_arrow"
+							>
+								<path d="M1 0V6C1 11.5228 5.47715 16 11 16H17" stroke="#2E2E31" stroke-width="2" />
+							</svg>
+
+							<Flex
+								v-if="ev.action === 'EVENT_FINISHED'"
+								align="center"
+								gap="14"
+								@click="router.push(`/events/${ev.affectedEventId}`)"
+								:class="$style.line_card"
+							>
+								<Icon name="price_event" size="16" color="secondary" />
+
+								<Flex direction="column" gap="6">
+									<Text size="12" weight="600" color="primary">
+										{{ parsePoolName(pool.name.replace("Juster Pool: ", "")) }}
+									</Text>
+
+									<Flex align="center" gap="4">
+										<Text size="12" weight="500" color="tertiary">Provided: </Text>
+										<Text size="12" weight="500" color="secondary"
+											>{{ ev.affectedEvent.provided.toFixed(2) }}&nbsp;&nbsp;</Text
+										>
+										<Text size="12" weight="500" color="tertiary">Result: </Text>
+										<Text size="12" weight="500" color="secondary"
+											>{{ ev.affectedEvent.result.toFixed(2) }}&nbsp;&nbsp;</Text
+										>
+										<Text size="12" weight="500" color="tertiary">Diff: </Text>
+
+										<Text
+											size="12"
+											weight="500"
+											:color="ev.affectedEvent.result - ev.affectedEvent.provided < 0 ? 'orange' : 'green'"
+										>
+											{{
+												(100 * Math.abs(ev.affectedEvent.provided - ev.affectedEvent.result)) /
+													((ev.affectedEvent.provided + ev.affectedEvent.result) / 2) <
+												0.01
+													? "<"
+													: ""
+											}}{{
+												(100 * Math.abs(ev.affectedEvent.provided - ev.affectedEvent.result)) /
+													((ev.affectedEvent.provided + ev.affectedEvent.result) / 2) <
+												0.01
+													? "0.01"
+													: (
+															(100 * Math.abs(ev.affectedEvent.provided - ev.affectedEvent.result)) /
+															((ev.affectedEvent.provided + ev.affectedEvent.result) / 2)
+													  ).toFixed(2)
+											}}%
+										</Text>
+									</Flex>
+								</Flex>
+							</Flex>
+						</div>
+					</Flex>
+				</Flex>
+
+				<Flex direction="column" gap="16">
+					<div :class="$style.divider" />
+					<Banner color="gray">Only 12 recent events are supported at this time</Banner>
 				</Flex>
 			</Flex>
 		</Flex>
@@ -192,7 +305,6 @@ const getEventIconByActionName = (action) => {
 
 .base {
 	padding: 0px 20px 20px 20px;
-	margin-bottom: 16px;
 }
 
 .divider {
@@ -240,12 +352,39 @@ const getEventIconByActionName = (action) => {
 	}
 }
 
-.test {
-	width: 2px;
-	height: 24px;
+.events {
+	max-height: 400px;
+	overflow-y: auto;
+	padding: 8px 0;
+}
 
-	background: var(--opacity-05);
+.line {
+	position: relative;
+
+	border-left: 2px solid var(--opacity-05);
+
+	min-height: 24px;
 
 	margin-left: 102px;
+}
+
+.line_arrow {
+	position: absolute;
+	top: 43%;
+	left: -2px;
+
+	transform: translateY(-50%);
+}
+
+.line_card {
+	height: 58px;
+
+	cursor: pointer;
+	background: rgba(0, 0, 0, 0.1);
+	border-radius: 8px;
+	border: 2px solid var(--opacity-05);
+
+	margin: 14px;
+	padding: 0 14px;
 }
 </style>
