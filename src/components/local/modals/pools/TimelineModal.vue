@@ -44,7 +44,7 @@ const eventsSearcher = ref({})
 const filteredEvents = computed(() => {
 	if (searchText.value) {
 		let findedEvents = eventsSearcher.value
-			.search(searchText.value.toString(), {
+			.search(searchText.value.toString().toLowerCase(), {
 				returnMatchData: true,
 			})
 			.map((el) => el.item)
@@ -65,7 +65,9 @@ watch(
 
 		eventsSearcher.value = new Searcher(events.value, {
 			keySelector: (item) => {
-				return `${item.action.replace("_", " ")} ${item.affectedEventId} ${item.affectedUserId}`
+				return `${item.action.replace("_", " ").toLowerCase()} ${item.affectedEventId} ${
+					item.affectedUserId ? item.affectedUserId : ""
+				}`
 			},
 			threshold: 0.8,
 		})
