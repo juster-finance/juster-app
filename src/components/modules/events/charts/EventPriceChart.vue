@@ -109,10 +109,10 @@ const draw = () => {
 		width = `100%`,
 		height = 240 - margin.top - margin.bottom
 
-	d3.select(`#chart > *`).remove()
+	d3.select(`#price_chart > *`).remove()
 
 	const canvas = d3
-		.select(`#chart`)
+		.select(`#price_chart`)
 		.append("svg")
 		.attr("width", width)
 		.attr("height", height + margin.top + margin.bottom)
@@ -356,10 +356,10 @@ const onMouseMove = ({ layerX, layerY }) => {
 
 	selectedQuote.value = data[snapIndex]
 
-	const circles = d3.selectAll(`#chart > svg > #mouse_line`)
+	const circles = d3.selectAll(`#price_chart > svg > #mouse_line`)
 	circles.remove()
 
-	const svg = d3.select(`#chart > svg`).append("g").attr("id", "mouse_line")
+	const svg = d3.select(`#price_chart > svg`).append("g").attr("id", "mouse_line")
 	svg.append("line")
 		.attr("x1", layerX)
 		.attr("x2", layerX)
@@ -381,7 +381,7 @@ const onMouseMove = ({ layerX, layerY }) => {
 const onMouseLeave = () => {
 	selectedQuote.value = {}
 
-	const circles = d3.selectAll(`#chart > svg > #mouse_line`)
+	const circles = d3.selectAll(`#price_chart > svg > #mouse_line`)
 	circles.remove()
 }
 
@@ -525,7 +525,7 @@ onBeforeUnmount(() => {
 		subscription.value.unsubscribe()
 	}
 
-	d3.select(`#chart > *`).remove()
+	d3.select(`#price_chart > *`).remove()
 })
 </script>
 
@@ -542,7 +542,7 @@ onBeforeUnmount(() => {
 
 		<template v-else>
 			<!-- Chart -->
-			<div @mousemove="onMouseMove" @mouseleave="onMouseLeave" id="chart" :class="$style.chart" />
+			<div @mousemove="onMouseMove" @mouseleave="onMouseLeave" id="price_chart" :class="$style.chart" />
 
 			<!-- Elements -->
 			<div v-if="scale.x" :class="$style.price_axis">

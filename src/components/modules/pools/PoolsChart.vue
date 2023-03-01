@@ -28,27 +28,22 @@ const draw = () => {
 		width = `100%`,
 		height = 260 - margin.top - margin.bottom
 
-	d3.select(`#chart > *`).remove()
+	d3.select(`#pool_chart > *`).remove()
 
 	const canvas = d3
-		.select(`#chart`)
+		.select(`#pool_chart`)
 		.append("svg")
 		.attr("width", width)
 		.attr("height", height + margin.top + margin.bottom)
 
-	const chart = canvas
-		.append("g")
-		.attr("transform", `translate(${margin.left},${margin.top})`)
+	const chart = canvas.append("g").attr("transform", `translate(${margin.left},${margin.top})`)
 
 	scale.x = d3
 		.scaleTime()
 		.domain(d3.extent(data.value, (d) => d.date))
 		.range([0, canvas.node().getBoundingClientRect().width - 100])
 
-	const domain = [
-		d3.min(data.value, (d) => +d.value) - 5,
-		d3.max(data.value, (d) => +d.value) + 5,
-	]
+	const domain = [d3.min(data.value, (d) => +d.value) - 5, d3.max(data.value, (d) => +d.value) + 5]
 	scale.y = d3
 		.scaleLinear()
 		.domain(domain)
@@ -57,9 +52,7 @@ const draw = () => {
 	const format = d3.timeFormat("%b %d")
 
 	scale.x.ticks(data.value.length).forEach((tick, i) => {
-		const tickG = canvas
-			.append("g")
-			.attr("transform", `translate(${scale.x(tick)}, 0)`)
+		const tickG = canvas.append("g").attr("transform", `translate(${scale.x(tick)}, 0)`)
 
 		tickG.append("line").attr("y2", 242).attr("class", classes.time_line)
 
@@ -68,9 +61,7 @@ const draw = () => {
 	})
 
 	scale.y.ticks(5).forEach((tick) => {
-		const tickG = canvas
-			.append("g")
-			.attr("transform", `translate(-10, ${scale.y(tick)})`)
+		const tickG = canvas.append("g").attr("transform", `translate(-10, ${scale.y(tick)})`)
 
 		tickG.append("line").attr("x2", 680).attr("class", classes.value_line)
 		tickG.append("text").attr("x", 700).text(tick)
@@ -80,11 +71,7 @@ const draw = () => {
 	 * Changes to the TVL pool that will not change
 	 * in the future and will remain unchanged
 	 */
-	const recordedData = data.value.filter(
-		(d) =>
-			DateTime.fromJSDate(d.date).startOf("day") <
-			DateTime.now().startOf("day"),
-	)
+	const recordedData = data.value.filter((d) => DateTime.fromJSDate(d.date).startOf("day") < DateTime.now().startOf("day"))
 
 	/** Recorded Chart */
 	chart
@@ -150,11 +137,7 @@ onMounted(async () => {
 
 		if (!states.length) continue
 		data.value.push({
-			value:
-				states.reduce(
-					(prev, curr) => (prev += curr.totalLiquidity),
-					0,
-				) / states.length,
+			value: states.reduce((prev, curr) => (prev += curr.totalLiquidity), 0) / states.length,
 			date: new Date(
 				DateTime.fromObject({
 					year: now.year,
@@ -173,15 +156,11 @@ onMounted(async () => {
 	<Flex direction="column" gap="24" :class="$style.wrapper">
 		<Text size="16" weight="600" color="primary"> Chart </Text>
 
-		<div id="chart" :class="$style.chart" />
+		<div id="pool_chart" :class="$style.chart" />
 
 		<Flex align="end" justify="between">
 			<Flex align="center" gap="6">
-				<Flex
-					align="center"
-					gap="8"
-					:class="[$style.tab, $style.active]"
-				>
+				<Flex align="center" gap="8" :class="[$style.tab, $style.active]">
 					<Icon name="coins" size="14" color="tertiary" />
 					<Text size="14" weight="600">TVL</Text>
 				</Flex>
