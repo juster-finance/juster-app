@@ -45,7 +45,7 @@ const finishTimeText = computed(() => {
 					</div>
 				</div>
 
-				<div :class="[$style.dots, event.status == 'STARTED' && $style.anim]">
+				<div :class="[$style.dots, event.status == 'STARTED' && finishTime.m > 0 && $style.anim]">
 					<div :class="$style.dot" />
 					<div :class="$style.dot" />
 					<div :class="$style.dot" />

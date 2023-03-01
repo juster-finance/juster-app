@@ -705,7 +705,7 @@ onUnmounted(() => {
 									{{
 										(event.status == "CANCELED" && "REFUND") ||
 										(["NEW", "STARTED"].includes(event.status) && "POTENTIAL") ||
-										(event.status == "FINISHED" && "PROFIT")
+										(event.status == "FINISHED" && "PAYOUT")
 									}}
 								</Text>
 							</Flex>
