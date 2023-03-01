@@ -65,7 +65,7 @@ watch(
 
 		eventsSearcher.value = new Searcher(events.value, {
 			keySelector: (item) => {
-				return item.action.replace("_", " ")
+				return `${item.action.replace("_", " ")} ${item.affectedEventId}`
 			},
 			threshold: 0.62,
 		})
@@ -172,7 +172,7 @@ const getEventIconByActionName = (action) => {
 						</Flex>
 					</Flex>
 
-					<Input v-model="searchText" size="small" placeholder="Search event by action name" icon="search" />
+					<Input v-model="searchText" size="small" placeholder="Search event by action name" icon="search" cleanable />
 
 					<div :class="$style.divider" />
 				</Flex>
@@ -243,7 +243,7 @@ const getEventIconByActionName = (action) => {
 										{{ parsePoolName(pool.name.replace("Juster Pool: ", "")) }}
 									</Text>
 
-									<Flex align="center" gap="4">
+									<Flex align="center" gap="4" :class="$style.params">
 										<Text size="12" weight="500" color="tertiary">Provided: </Text>
 										<Text size="12" weight="500" color="secondary"
 											>{{ ev.affectedEvent.provided.toFixed(2) }}&nbsp;&nbsp;</Text
@@ -285,7 +285,7 @@ const getEventIconByActionName = (action) => {
 
 				<Flex direction="column" gap="16">
 					<div :class="$style.divider" />
-					<Banner color="gray">Only 12 recent events are supported at this time</Banner>
+					<Banner color="gray">Only 12 recent events are supported</Banner>
 				</Flex>
 			</Flex>
 		</Flex>
@@ -386,5 +386,30 @@ const getEventIconByActionName = (action) => {
 
 	margin: 14px;
 	padding: 0 14px;
+}
+
+@media (max-width: 600px) {
+	.line_card {
+		flex-direction: column;
+		align-items: flex-start;
+
+		height: initial;
+
+		padding: 16px;
+	}
+
+	.when {
+		min-width: 60px;
+	}
+
+	.params {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	.line {
+		margin-left: 82px;
+	}
 }
 </style>
