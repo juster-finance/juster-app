@@ -41,36 +41,21 @@ const emit = defineEmits(["onClose"])
 const pendingClaims = computed(() => {
 	let claims = []
 	props.positions.forEach((position) => {
-		claims = [
-			...claims,
-			...position.claims.filter((claim) => !claim.event.result),
-		]
+		claims = [...claims, ...position.claims.filter((claim) => !claim.event.result)]
 	})
 	return claims
 })
 const availableClaims = computed(() => {
 	let claims = []
 	props.positions.forEach((position) => {
-		claims = [
-			...claims,
-			...position.claims.filter(
-				(claim) => claim.event.result && !claim.withdrawn,
-			),
-		]
+		claims = [...claims, ...position.claims.filter((claim) => claim.event.result && !claim.withdrawn)]
 	})
 	return claims
 })
-const affectedPools = computed(() => [
-	...new Set(availableClaims.value.map((claim) => claim.poolId)),
-])
+const affectedPools = computed(() => [...new Set(availableClaims.value.map((claim) => claim.poolId))])
 
 const paginationPage = ref(1)
-const paginatedClaims = computed(() =>
-	cloneDeep(availableClaims.value).slice(
-		(paginationPage.value - 1) * 5,
-		paginationPage.value * 5,
-	),
-)
+const paginatedClaims = computed(() => cloneDeep(availableClaims.value).slice((paginationPage.value - 1) * 5, paginationPage.value * 5))
 
 const nextClaim = computed(() => {
 	let closest
@@ -89,9 +74,7 @@ const nextClaim = computed(() => {
 			return
 		}
 
-		const closestDiff = DateTime.fromISO(
-			closest.claim.event.event.betsCloseTime,
-		)
+		const closestDiff = DateTime.fromISO(closest.claim.event.event.betsCloseTime)
 			.plus(closest.claim.event.event.measurePeriod * 1000)
 			.diff(DateTime.now(), ["minutes"])
 			.toObject()
@@ -107,11 +90,7 @@ const nextClaim = computed(() => {
 
 const handleWithdrawClaims = async ({ eventIds, address }) => {
 	try {
-		const contract = await juster.sdk._tezos.contract.at(
-			contracts[
-				juster.sdk._network === "mainnet" ? "mainnet" : "testnet"
-			],
-		)
+		const contract = await juster.sdk._tezos.contract.at(contracts[juster.sdk._network === "mainnet" ? "mainnet" : "testnet"])
 
 		if (!eventIds.length || !address) return
 
@@ -142,9 +121,7 @@ const handleWithdraw = async () => {
 		const transactions = []
 		for (const pos of props.positions.filter((p) => p.claims.length)) {
 			const contract = await juster.sdk._tezos.contract.at(pos.poolId)
-			const claims = pos.claims.filter(
-				(c) => c.event.result && !c.withdrawn,
-			)
+			const claims = pos.claims.filter((c) => c.event.result && !c.withdrawn)
 
 			transactions.push({
 				kind: "transaction",
@@ -173,6 +150,18 @@ const handleWithdraw = async () => {
 			.catch(() => {
 				accountStore.pendingTransaction.awaiting = false
 			})
+
+		notificationsStore.create({
+			notification: {
+				type: "success",
+				title: "Your withdraw has been accepted",
+				description: "We need to process your request, it will take ~30 seconds",
+				autoDestroy: true,
+			},
+		})
+
+		opConfirmationInProgress.value = false
+		emit("onClose")
 	} else {
 		try {
 			const op = await juster.pools[props.pool.address].withdrawClaims(
@@ -197,8 +186,7 @@ const handleWithdraw = async () => {
 				notification: {
 					type: "success",
 					title: "Your withdraw has been accepted",
-					description:
-						"We need to process your request, it will take ~30 seconds",
+					description: "We need to process your request, it will take ~30 seconds",
 					autoDestroy: true,
 				},
 			})
@@ -259,24 +247,10 @@ const buttonState = computed(() => {
 			<Flex align="center" gap="8">
 				<Icon name="money" size="16" color="secondary" />
 
-				<Text
-					@click="emit('onBack')"
-					size="14"
-					weight="600"
-					color="primary"
-					:class="$style.head_btn"
-				>
-					Withdraw claims
-				</Text>
+				<Text @click="emit('onBack')" size="14" weight="600" color="primary" :class="$style.head_btn"> Withdraw claims </Text>
 			</Flex>
 
-			<Icon
-				@click="emit('onClose')"
-				name="close"
-				size="16"
-				color="tertiary"
-				:class="$style.close_icon"
-			/>
+			<Icon @click="emit('onClose')" name="close" size="16" color="tertiary" :class="$style.close_icon" />
 		</Flex>
 
 		<Flex direction="column" gap="32" :class="$style.base">
@@ -284,18 +258,15 @@ const buttonState = computed(() => {
 				<Flex>
 					<Text size="13" weight="500" color="tertiary" height="16">
 						Your withdrawal request contains
-						{{ availableClaims.length }} available claims. Funds
-						will be available in your wallet as soon as all
-						transactions are accepted.
+						{{ availableClaims.length }} available claims. Funds will be available in your wallet as soon as all transactions
+						are accepted.
 					</Text>
 				</Flex>
 			</Flex>
 
 			<Flex direction="column" gap="8">
 				<Flex align="center" justify="between">
-					<Text size="12" weight="600" color="secondary">
-						Withdrawal
-					</Text>
+					<Text size="12" weight="600" color="secondary"> Withdrawal </Text>
 					<Text size="12" weight="600" color="tertiary">
 						{{ affectedPools.length }}
 						affected
@@ -309,33 +280,16 @@ const buttonState = computed(() => {
 
 						<Flex>
 							<Text size="14" weight="600" color="primary">
-								{{
-									numberWithSymbol(
-										availableClaims
-											.reduce(
-												(acc, { amount }) =>
-													(acc += amount),
-												0,
-											)
-											.toFixed(2),
-										",",
-									)
-								}}
+								{{ numberWithSymbol(availableClaims.reduce((acc, { amount }) => (acc += amount), 0).toFixed(2), ",") }}
 							</Text>
-							<Text size="14" weight="600" color="tertiary">
-								&nbsp;ꜩ
-							</Text>
+							<Text size="14" weight="600" color="tertiary"> &nbsp;ꜩ </Text>
 						</Flex>
 					</Flex>
 
 					<Text size="14" weight="600" color="tertiary">-></Text>
 
 					<Flex align="center" gap="6">
-						<img
-							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-							alt="avatar"
-							:class="$style.avatar"
-						/>
+						<img :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`" alt="avatar" :class="$style.avatar" />
 
 						<Flex align="center">
 							<Text size="14" weight="600" color="secondary">
@@ -349,40 +303,20 @@ const buttonState = computed(() => {
 			<Flex direction="column" gap="16">
 				<Flex direction="column" gap="8">
 					<Flex align="center" justify="between">
-						<Text size="12" weight="600" color="tertiary">
-							Claims to withdraw
-						</Text>
-						<Text
-							v-if="pendingClaims.length"
-							size="12"
-							weight="600"
-							color="support"
-						>
+						<Text size="12" weight="600" color="tertiary"> Claims to withdraw </Text>
+						<Text v-if="pendingClaims.length" size="12" weight="600" color="support">
 							Next available claim in
 							{{ nextClaim.diff.minutes.toFixed(0) }} min
 						</Text>
 					</Flex>
 
-					<Flex
-						v-for="claim in paginatedClaims"
-						align="center"
-						justify="between"
-						:class="$style.badge"
-					>
+					<Flex v-for="claim in paginatedClaims" align="center" justify="between" :class="$style.badge">
 						<Flex align="center" gap="8">
-							<Icon
-								name="checkcircle"
-								size="14"
-								color="tertiary"
-							/>
+							<Icon name="checkcircle" size="14" color="tertiary" />
 
 							<Flex>
-								<Text size="14" weight="600" color="primary">
-									Claim
-								</Text>
-								<Text size="14" weight="600" color="tertiary">
-									&nbsp;#{{ claim.id }}
-								</Text>
+								<Text size="14" weight="600" color="primary"> Claim </Text>
+								<Text size="14" weight="600" color="tertiary"> &nbsp;#{{ claim.id }} </Text>
 							</Flex>
 						</Flex>
 
@@ -391,16 +325,9 @@ const buttonState = computed(() => {
 
 							<Flex>
 								<Text size="14" weight="600" color="primary">
-									{{
-										numberWithSymbol(
-											claim.amount.toFixed(2),
-											",",
-										)
-									}}
+									{{ numberWithSymbol(claim.amount.toFixed(2), ",") }}
 								</Text>
-								<Text size="14" weight="600" color="tertiary">
-									&nbsp;ꜩ
-								</Text></Flex
+								<Text size="14" weight="600" color="tertiary"> &nbsp;ꜩ </Text></Flex
 							>
 						</Flex>
 					</Flex>

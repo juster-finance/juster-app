@@ -1,5 +1,5 @@
 <script setup>
-import { defineComponent, ref, reactive, toRefs, onMounted, onBeforeUnmount, useCssModule, computed, nextTick } from "vue"
+import { ref, reactive, onMounted, onBeforeUnmount, useCssModule, computed, nextTick } from "vue"
 import * as d3 from "d3"
 import { DateTime } from "luxon"
 
@@ -12,7 +12,7 @@ import { fetchQuoteByRange } from "@/api/quotes"
  * Services
  */
 import { prepareQuotesForD3 } from "@utils/quotes"
-import { numberWithSymbol } from "@utils/amounts"
+import { disaggregate } from "@utils/amounts"
 import { juster } from "@sdk"
 
 /**
@@ -21,7 +21,7 @@ import { juster } from "@sdk"
 import Banner from "@ui/Banner.vue"
 import LoadingDots from "@ui/LoadingDots.vue"
 
-const props = defineProps({ event: { type: Object, default: () => {} } })
+const props = defineProps({ event: { type: Object, default: () => {} }, priceDynamics: { type: Object } })
 
 const classes = useCssModule()
 
@@ -36,17 +36,18 @@ const scale = reactive({
 	y: null,
 })
 const startData = ref([])
+const currentQuote = ref({})
 
-const priceDynamics = computed(() => {
-	const startRate = props.event.startRate * 100
-	const closedRate = props.event.closedRate * 100
+// const priceDynamics = computed(() => {
+// 	const startRate = props.event.startRate * 100
+// 	const closedRate = props.event.closedRate * 100
 
-	if (!symbol.quotes.length) return 0
+// 	if (!symbol.quotes.length) return 0
 
-	const diff = props.event.status == "FINISHED" ? closedRate - startRate : symbol.quotes[0].price - startRate
+// 	const diff = props.event.status == "FINISHED" ? closedRate - startRate : symbol.quotes[0].price - startRate
 
-	return diff
-})
+// 	return diff
+// })
 
 const draw = () => {
 	if (!symbol.quotes.length) return
@@ -102,14 +103,16 @@ const draw = () => {
 		})
 	}
 
+	quotes.unshift(symbol.quotes[0])
+
 	const margin = { top: 20, right: 100, bottom: 30, left: 0 },
 		width = `100%`,
 		height = 240 - margin.top - margin.bottom
 
-	d3.select(`#chart > *`).remove()
+	d3.select(`#price_chart > *`).remove()
 
 	const canvas = d3
-		.select(`#chart`)
+		.select(`#price_chart`)
 		.append("svg")
 		.attr("width", width)
 		.attr("height", height + margin.top + margin.bottom)
@@ -286,7 +289,9 @@ const draw = () => {
 		.attr("fill", "none")
 		.attr(
 			"stroke",
-			(priceDynamics.value > 0 && "#1aa168") || (priceDynamics.value < 0 && "#e05c43") || (priceDynamics.value == 0 && "#707070"),
+			(props.priceDynamics.diff > 0 && "#1aa168") ||
+				(props.priceDynamics.diff < 0 && "#e05c43") ||
+				(props.priceDynamics.diff == 0 && "#707070"),
 		)
 		.attr("stroke-width", 1.5)
 		.attr(
@@ -298,13 +303,15 @@ const draw = () => {
 		)
 
 	/** Circle - Current Price */
-	const currentData = data.find((d) => new Date(d.date).getTime() == new Date(quotes[0].timestamp).getTime())
+	currentQuote.value = prepareQuotesForD3({ quotes: symbol.quotes }).find(
+		(d) => d.date.getTime() == new Date(symbol.quotes[0].timestamp).getTime(),
+	)
 
-	if (currentData) {
+	if (currentQuote.value) {
 		chart
 			.append("circle")
-			.attr("cx", scale.x(currentData.date))
-			.attr("cy", scale.y(currentData.value))
+			.attr("cx", scale.x(currentQuote.value.date))
+			.attr("cy", scale.y(currentQuote.value.value))
 			.attr("r", 2)
 			.attr("fill", "#fff")
 
@@ -313,16 +320,16 @@ const draw = () => {
 			.append("line")
 			.attr("x1", `100%`)
 			.attr("class", classes.current_price_line)
-			.attr("transform", `translate(0, ${scale.y(currentData.value) + 20})`)
+			.attr("transform", `translate(0, ${scale.y(currentQuote.value.value) + 20})`)
 	}
 
 	/** animated circle */
-	if (props.event.status !== "FINISHED" && currentData) {
+	if (props.event.status !== "FINISHED" && currentQuote.value) {
 		chart
 			.append("circle")
 			.attr("id", "animated_circle")
-			.attr("cx", scale.x(currentData.date))
-			.attr("cy", scale.y(currentData.value))
+			.attr("cx", scale.x(currentQuote.value.date))
+			.attr("cy", scale.y(currentQuote.value.value))
 			.attr("fill", "rgba(255,255,255,0.07)")
 			.attr("stroke", "rgba(255,255,255, 0.5)")
 			.attr("stroke-width", "2px")
@@ -349,10 +356,10 @@ const onMouseMove = ({ layerX, layerY }) => {
 
 	selectedQuote.value = data[snapIndex]
 
-	const circles = d3.selectAll(`#chart > svg > #mouse_line`)
+	const circles = d3.selectAll(`#price_chart > svg > #mouse_line`)
 	circles.remove()
 
-	const svg = d3.select(`#chart > svg`).append("g").attr("id", "mouse_line")
+	const svg = d3.select(`#price_chart > svg`).append("g").attr("id", "mouse_line")
 	svg.append("line")
 		.attr("x1", layerX)
 		.attr("x2", layerX)
@@ -374,7 +381,7 @@ const onMouseMove = ({ layerX, layerY }) => {
 const onMouseLeave = () => {
 	selectedQuote.value = {}
 
-	const circles = d3.selectAll(`#chart > svg > #mouse_line`)
+	const circles = d3.selectAll(`#price_chart > svg > #mouse_line`)
 	circles.remove()
 }
 
@@ -518,7 +525,7 @@ onBeforeUnmount(() => {
 		subscription.value.unsubscribe()
 	}
 
-	d3.select(`#chart > *`).remove()
+	d3.select(`#price_chart > *`).remove()
 })
 </script>
 
@@ -535,35 +542,74 @@ onBeforeUnmount(() => {
 
 		<template v-else>
 			<!-- Chart -->
-			<div @mousemove="onMouseMove" @mouseleave="onMouseLeave" id="chart" :class="$style.chart" />
+			<div @mousemove="onMouseMove" @mouseleave="onMouseLeave" id="price_chart" :class="$style.chart" />
 
 			<!-- Elements -->
 			<div v-if="scale.x" :class="$style.price_axis">
 				<!-- Current Price -->
-				<div
-					v-if="symbol.quotes[0]"
+				<Flex
+					v-if="currentQuote.value"
 					:class="[$style.price_badge, $style.current, event.status === 'FINISHED' && $style.finished]"
 					:style="{
-						top: `${scale.y(symbol.quotes[0].price) + 20 - 25 / 2}px`,
+						top: `${scale.y(currentQuote.value) + 20 - 47 / 2}px`,
 					}"
+					gap="6"
 				>
-					<Icon :name="event.status === 'FINISHED' ? 'flag' : 'bolt'" size="10" color="blue" />
-					$
-					{{ numberWithSymbol(symbol.quotes[0].price, ",") }}
-				</div>
+					<Icon
+						:name="event.status === 'FINISHED' ? 'flag' : 'bolt'"
+						size="10"
+						:color="event.status === 'FINISHED' ? 'tertiary' : 'blue'"
+					/>
+
+					<Flex direction="column" gap="6" align="end">
+						<Flex v-if="event.status === 'FINISHED'" align="center">
+							<Text size="12" weight="600" color="secondary">
+								{{ disaggregate(event.closedRate * 100)[0] }}
+							</Text>
+							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.closedRate * 100)[1] }} </Text>
+						</Flex>
+						<Flex v-else align="center">
+							<Text size="12" weight="600" color="secondary">
+								{{ disaggregate(currentQuote.value)[0] }}
+							</Text>
+							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(currentQuote.value)[1] }} </Text>
+						</Flex>
+
+						<Flex v-if="['STARTED', 'FINISHED'].includes(event.status)" align="center" gap="4">
+							<Icon
+								name="arrow_circle_top"
+								size="10"
+								:color="priceDynamics.diff < 0 ? 'red' : 'green'"
+								:style="{ transform: `rotate(${priceDynamics.diff < 0 && '180deg'})` }"
+							/>
+							<Text size="11" weight="600" :color="priceDynamics.diff < 0 ? 'red' : 'green'">
+								{{ priceDynamics.percent.toFixed(2) }}%
+							</Text>
+						</Flex>
+						<Text v-else size="11" weight="600" color="tertiary">
+							{{ DateTime.fromJSDate(currentQuote.date).toFormat("HH:mm") }}
+						</Text>
+					</Flex>
+				</Flex>
 
 				<!-- Start Price -->
-				<div
+				<Flex
 					v-if="startData"
 					:class="[$style.price_badge, $style.start]"
 					:style="{
-						top: `${scale.y(startData.value) + 20 - 25 / 2}px`,
+						top: `${scale.y(startData.value) + 20 - 30 / 2}px`,
 					}"
+					gap="6"
 				>
-					<Icon name="go" size="10" />
-					$
-					{{ numberWithSymbol(event.startRate * 100, ",") }}
-				</div>
+					<Icon name="go" size="10" color="secondary" />
+
+					<Flex align="center">
+						<Text size="12" weight="600" color="secondary">
+							{{ disaggregate(event.startRate * 100)[0] }}
+						</Text>
+						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.startRate * 100)[1] }} </Text>
+					</Flex>
+				</Flex>
 			</div>
 		</template>
 	</div>
@@ -589,26 +635,25 @@ onBeforeUnmount(() => {
 
 .price_badge {
 	position: absolute;
-	top: 20px;
+	top: 0;
 	right: 0;
 
-	display: flex;
-	align-items: center;
-	gap: 6px;
-
 	width: fit-content;
-	background: var(--card-bg);
-	padding: 4px 6px;
-	border-radius: 6px;
 
-	font-size: 12px;
-	font-weight: 600;
-	white-space: nowrap;
+	background: rgb(30 30 32);
+	border: 1px solid var(--border);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+
+	padding: 8px;
+}
+
+.price_badge:hover {
+	z-index: 2;
 }
 
 .price_badge.current {
 	color: var(--text-primary);
-	border: 1px solid var(--blue);
 	fill: var(--blue);
 
 	z-index: 1;
@@ -616,14 +661,12 @@ onBeforeUnmount(() => {
 
 .price_badge.start {
 	color: var(--text-tertiary);
-	border: 1px solid var(--border);
 	fill: var(--green);
 }
 
 .price_badge.finished {
 	color: var(--text-secondary);
 	fill: var(--text-tertiary);
-	border: 1px solid var(--border);
 }
 .price_badge .dot {
 	width: 4px;
@@ -656,7 +699,7 @@ onBeforeUnmount(() => {
 }
 
 .start line {
-	stroke: var(--blue);
+	stroke: rgba(69, 126, 232, 0.3);
 	stroke-width: 1.5;
 }
 

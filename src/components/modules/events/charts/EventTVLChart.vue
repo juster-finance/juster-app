@@ -1,13 +1,5 @@
 <script>
-import {
-	defineComponent,
-	ref,
-	reactive,
-	toRefs,
-	onMounted,
-	onBeforeUnmount,
-	useCssModule,
-} from "vue"
+import { defineComponent, ref, reactive, toRefs, onMounted, onBeforeUnmount, useCssModule } from "vue"
 import * as d3 from "d3"
 import { DateTime } from "luxon"
 
@@ -47,17 +39,15 @@ export default defineComponent({
 				width = `100%`,
 				height = 194 - margin.top - margin.bottom
 
-			d3.select(`#chart > *`).remove()
+			d3.select(`#tvl_chart > *`).remove()
 
 			const canvas = d3
-				.select(`#chart`)
+				.select(`#tvl_chart`)
 				.append("svg")
 				.attr("width", width)
 				.attr("height", height + margin.top + margin.bottom)
 
-			const chart = canvas
-				.append("g")
-				.attr("transform", `translate(${margin.left},${margin.top})`)
+			const chart = canvas.append("g").attr("transform", `translate(${margin.left},${margin.top})`)
 
 			const data = symbol.tvl.map((el) => {
 				return { value: el.cumSum, date: new Date(el.createdTime) }
@@ -69,24 +59,16 @@ export default defineComponent({
 				.range([0, canvas.node().getBoundingClientRect().width - 130])
 			scale.y = d3
 				.scaleLinear()
-				.domain([
-					d3.min(data, (d) => +d.value),
-					d3.max(data, (d) => +d.value),
-				])
+				.domain([d3.min(data, (d) => +d.value), d3.max(data, (d) => +d.value)])
 				.range([height, 0])
 
 			/** Ticks */
 			scale.x.ticks(10).forEach((tick) => {
 				const format = d3.timeFormat("%H:%M")
 
-				const tickG = canvas
-					.append("g")
-					.attr("transform", `translate(${scale.x(tick)}, 0)`)
+				const tickG = canvas.append("g").attr("transform", `translate(${scale.x(tick)}, 0)`)
 
-				tickG
-					.append("line")
-					.attr("y2", 170)
-					.attr("class", classes.time_line)
+				tickG.append("line").attr("y2", 170).attr("class", classes.time_line)
 
 				tickG.append("text").attr("y", 190).text(format(tick))
 			})
@@ -122,13 +104,10 @@ export default defineComponent({
 
 			selectedQuote.value = data[snapIndex]
 
-			const circles = d3.selectAll(`#chart > svg > #mouse_line`)
+			const circles = d3.selectAll(`#tvl_chart > svg > #mouse_line`)
 			circles.remove()
 
-			const svg = d3
-				.select(`#chart > svg`)
-				.append("g")
-				.attr("id", "mouse_line")
+			const svg = d3.select(`#tvl_chart > svg`).append("g").attr("id", "mouse_line")
 			svg.append("line")
 				.attr("x1", layerX)
 				.attr("x2", layerX)
@@ -150,7 +129,7 @@ export default defineComponent({
 		const onMouseLeave = () => {
 			selectedQuote.value = {}
 
-			const circles = d3.selectAll(`#chart > svg > #mouse_line`)
+			const circles = d3.selectAll(`#tvl_chart > svg > #mouse_line`)
 			circles.remove()
 		}
 
@@ -187,12 +166,7 @@ export default defineComponent({
 						next: (data) => {
 							const newQuote = data.quotesWma[0]
 
-							if (
-								!symbol.quotes.some(
-									(quote) =>
-										quote.timestamp == newQuote.timestamp,
-								)
-							) {
+							if (!symbol.quotes.some((quote) => quote.timestamp == newQuote.timestamp)) {
 								symbol.quotes.unshift(newQuote)
 								draw()
 							}
@@ -202,12 +176,9 @@ export default defineComponent({
 			}
 		})
 		onBeforeUnmount(() => {
-			if (
-				subscription.value.hasOwnProperty("_state") &&
-				!subscription.value?.closed
-			) {
+			if (subscription.value.hasOwnProperty("_state") && !subscription.value?.closed) {
 				subscription.value.unsubscribe()
-				d3.select(`#chart > *`).remove()
+				d3.select(`#tvl_chart > *`).remove()
 			}
 		})
 
@@ -223,12 +194,7 @@ export default defineComponent({
 <template>
 	<div :class="$style.wrapper">
 		<!-- Chart -->
-		<div
-			@mousemove="onMouseMove"
-			@mouseleave="onMouseLeave"
-			id="chart"
-			:class="$style.chart"
-		/>
+		<div @mousemove="onMouseMove" @mouseleave="onMouseLeave" id="tvl_chart" :class="$style.chart" />
 	</div>
 </template>
 

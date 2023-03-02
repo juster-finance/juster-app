@@ -4,22 +4,14 @@ import { computed } from "vue"
 /**
  * Services
  */
-import { numberWithSymbol } from "@utils/amounts"
+import { disaggregate } from "@utils/amounts"
+import { DateTime } from "luxon"
 
 const props = defineProps({
 	event: { type: Object },
 	price: { type: Object },
 	finishTime: { type: Object },
 })
-
-const disaggregate = (num) => {
-	const splittedNum = num.toString().split(".")
-
-	const integer = splittedNum[0]
-	const fraction = splittedNum[1].slice(0, 2)
-
-	return [numberWithSymbol(integer, ","), fraction]
-}
 
 const finishTimeText = computed(() => {
 	let text = ``
@@ -47,22 +39,13 @@ const finishTimeText = computed(() => {
 				<div :class="$style.side">
 					<Icon name="go" size="12" />
 
-					<div v-if="event.status == 'NEW'" :class="$style.price">
-						TBD
-					</div>
+					<div v-if="event.status == 'NEW'" :class="$style.price">TBD</div>
 					<div v-else :class="$style.price">
-						{{ disaggregate(event.startRate * 100)[0] }}.<span>{{
-							disaggregate(event.startRate * 100)[1]
-						}}</span>
+						{{ disaggregate(event.startRate * 100)[0] }}.<span>{{ disaggregate(event.startRate * 100)[1] }}</span>
 					</div>
 				</div>
 
-				<div
-					:class="[
-						$style.dots,
-						event.status == 'STARTED' && $style.anim,
-					]"
-				>
+				<div :class="[$style.dots, event.status == 'STARTED' && finishTime.m > 0 && $style.anim]">
 					<div :class="$style.dot" />
 					<div :class="$style.dot" />
 					<div :class="$style.dot" />
@@ -79,23 +62,12 @@ const finishTimeText = computed(() => {
 						:class="[event.status == 'STARTED' && $style.active]"
 					/>
 
-					<div v-if="event.status == 'NEW'" :class="$style.price">
-						TBD
+					<div v-if="event.status == 'NEW'" :class="$style.price">TBD</div>
+					<div v-else-if="event.status == 'STARTED'" :class="$style.price">
+						{{ price.integer }}<span>.{{ price.fraction?.slice(0, price.integer < 10 ? 4 : 2) }}</span>
 					</div>
-					<div
-						v-else-if="event.status == 'STARTED'"
-						:class="$style.price"
-					>
-						{{ price.integer
-						}}<span>.{{ price.fraction?.slice(0, 2) }}</span>
-					</div>
-					<div
-						v-else-if="event.status == 'FINISHED'"
-						:class="$style.price"
-					>
-						{{ disaggregate(event.closedRate * 100)[0] }}.<span>{{
-							disaggregate(event.closedRate * 100)[1]
-						}}</span>
+					<div v-else-if="event.status == 'FINISHED'" :class="$style.price">
+						{{ disaggregate(event.closedRate * 100)[0] }}.<span>{{ disaggregate(event.closedRate * 100)[1] }}</span>
 					</div>
 				</div>
 			</div>
@@ -103,25 +75,11 @@ const finishTimeText = computed(() => {
 			<div :class="$style.labels">
 				<div :class="$style.label">Start price</div>
 
-				<span v-if="event.status == 'STARTED' && finishTime.m > 0">{{
-					finishTimeText
-				}}</span>
-				<span v-if="event.status == 'STARTED' && finishTime.m <= 0"
-					>Ending</span
-				>
+				<span v-if="event.status == 'STARTED' && finishTime.m > 0">{{ finishTimeText }}</span>
+				<span v-if="event.status == 'STARTED' && finishTime.m <= 0">Ending</span>
 
-				<div
-					v-if="['STARTED', 'NEW'].includes(event.status)"
-					:class="$style.label"
-				>
-					Current price
-				</div>
-				<div
-					v-else-if="event.status == 'FINISHED'"
-					:class="$style.label"
-				>
-					Closed price
-				</div>
+				<div v-if="['STARTED', 'NEW'].includes(event.status)" :class="$style.label">Current price</div>
+				<div v-else-if="event.status == 'FINISHED'" :class="$style.label">Closed price</div>
 			</div>
 		</Flex>
 	</Flex>

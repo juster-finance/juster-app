@@ -6,6 +6,9 @@ import { ref, watch, computed } from "vue"
 
 const emit = defineEmits(["update:modelValue"])
 const props = defineProps({
+	size: {
+		type: String,
+	},
 	type: {
 		type: String,
 	},
@@ -60,10 +63,7 @@ const handleInput = () => {
 	if (props.disabled) return
 
 	if (props.type === "number") {
-		emit(
-			"update:modelValue",
-			isNaN(parseFloat(text.value)) ? text.value : parseFloat(text.value),
-		)
+		emit("update:modelValue", isNaN(parseFloat(text.value)) ? text.value : parseFloat(text.value))
 	} else {
 		emit("update:modelValue", text.value)
 	}
@@ -106,15 +106,7 @@ const handleBlur = () => {
 			<slot name="rightText" />
 		</Flex>
 
-		<div
-			ref="base"
-			@click="handleClick"
-			:class="[
-				$style.base,
-				isFocused && $style.focused,
-				disabled && $style.disabled,
-			]"
-		>
+		<div ref="base" @click="handleClick" :class="[$style.base, isFocused && $style.focused, disabled && $style.disabled, $style[size]]">
 			<Flex align="center" gap="4" wide>
 				<Icon v-if="icon" :name="icon" size="16" color="tertiary" />
 				<input
@@ -130,13 +122,7 @@ const handleBlur = () => {
 			</Flex>
 
 			<transition name="fade">
-				<Icon
-					v-if="cleanable && modelValue"
-					@click="handleClear"
-					name="close_circle"
-					size="16"
-					:class="$style.clean_btn"
-				/>
+				<Icon v-if="cleanable && modelValue" @click="handleClear" name="close_circle" size="16" :class="$style.clean_btn" />
 			</transition>
 
 			<div v-if="subtext" :class="$style.subtext">{{ subtext }}</div>
@@ -162,6 +148,16 @@ const handleBlur = () => {
 	cursor: text;
 
 	transition: all 0.2s ease;
+}
+
+.base.small {
+	height: 36px;
+
+	padding: 0 8px;
+}
+
+.base.small input {
+	font-size: 13px;
 }
 
 .base:hover {
@@ -193,6 +189,7 @@ const handleBlur = () => {
 
 .base input::placeholder {
 	font-weight: 500;
+	color: var(--text-support);
 }
 
 .base input::-webkit-outer-spin-button,

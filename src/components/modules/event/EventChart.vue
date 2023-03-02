@@ -12,7 +12,7 @@ import EventTVLChart from "@modules/events/charts/EventTVLChart.vue"
  */
 import Tooltip from "@ui/Tooltip.vue"
 
-defineProps({ event: { type: Object, default: () => {} } })
+defineProps({ event: { type: Object, default: () => {} }, priceDynamics: { type: Object } })
 
 const isOpen = ref(true)
 
@@ -23,14 +23,16 @@ const tabs = ref(["Price"])
 <template>
 	<div :class="$style.wrapper">
 		<div @click="isOpen = !isOpen" :class="$style.header">
-			<div :class="$style.title">Chart</div>
+			<Text size="14" weight="600" color="primary">
+				{{ event.currencyPair.symbol.replace("-", "/") }}
+			</Text>
 
 			<Icon name="arrow" size="20" :class="!isOpen && $style.rotate" />
 		</div>
 
 		<div v-show="isOpen" :class="$style.base">
 			<!-- Price Chart -->
-			<EventPriceChart v-if="selectedTab == 'Price'" :event="event" />
+			<EventPriceChart v-if="selectedTab == 'Price'" :event="event" :priceDynamics="priceDynamics" />
 
 			<!-- TVL Chart -->
 			<EventTVLChart v-else-if="selectedTab == 'TVL'" :event="event" />
@@ -39,12 +41,7 @@ const tabs = ref(["Price"])
 		<div v-show="isOpen" :class="$style.bottom">
 			<!-- Tabs: Price, TVL, Liquidity -->
 			<div :class="$style.tabs">
-				<div
-					v-for="tab in tabs"
-					:key="tab"
-					@click="selectedTab = tab"
-					:class="[$style.tab, tab == selectedTab && $style.active]"
-				>
+				<div v-for="tab in tabs" :key="tab" @click="selectedTab = tab" :class="[$style.tab, tab == selectedTab && $style.active]">
 					{{ tab }}
 				</div>
 			</div>
@@ -85,13 +82,6 @@ const tabs = ref(["Price"])
 
 .header:hover {
 	background: var(--opacity-05);
-}
-
-.title {
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 600;
-	color: var(--text-primary);
 }
 
 .header svg {

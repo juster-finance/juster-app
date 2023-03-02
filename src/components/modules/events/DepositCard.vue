@@ -29,10 +29,7 @@ const props = defineProps({
 const showOperationModal = ref(false)
 
 const aboveEqProfit = computed(() => {
-	let profit =
-		(props.event.poolBelow * props.deposit.shares) /
-			props.event.totalLiquidityShares -
-		props.deposit.amountAboveEq
+	let profit = (props.event.poolBelow * props.deposit.shares) / props.event.totalLiquidityShares - props.deposit.amountAboveEq
 
 	if (profit > 0) {
 		profit = profit * (1 - 0.01)
@@ -41,10 +38,7 @@ const aboveEqProfit = computed(() => {
 	return profit
 })
 const belowProfit = computed(() => {
-	let profit =
-		(props.event.poolAboveEq * props.deposit.shares) /
-			props.event.totalLiquidityShares -
-		props.deposit.amountBelow
+	let profit = (props.event.poolAboveEq * props.deposit.shares) / props.event.totalLiquidityShares - props.deposit.amountBelow
 
 	if (profit > 0) {
 		profit = profit * (1 - 0.01)
@@ -54,10 +48,8 @@ const belowProfit = computed(() => {
 })
 
 const returnForLiquidity = computed(() => {
-	if (props.event.winnerBets == "ABOVE_EQ")
-		return aboveEqProfit.value + props.deposit.amountAboveEq
-	if (props.event.winnerBets == "BELOW")
-		return belowProfit.value + props.deposit.amountBelow
+	if (props.event.winnerBets == "ABOVE_EQ") return aboveEqProfit.value + props.deposit.amountAboveEq
+	if (props.event.winnerBets == "BELOW") return belowProfit.value + props.deposit.amountBelow
 
 	return 0
 })
@@ -65,38 +57,16 @@ const returnForLiquidity = computed(() => {
 
 <template>
 	<div @click="showOperationModal = true" :class="$style.wrapper">
-		<OperationModal
-			:show="showOperationModal"
-			:data="deposit"
-			@onClose="showOperationModal = false"
-		/>
+		<OperationModal :show="showOperationModal" :data="deposit" @onClose="showOperationModal = false" />
 
 		<div :class="$style.base">
 			<div :class="$style.icon">
-				<Icon
-					v-if="
-						!verifiedMakers[currentNetwork].includes(deposit.userId)
-					"
-					name="liquidity"
-					size="16"
-				/>
-				<Icon
-					v-else
-					name="server"
-					size="16"
-					:class="$style.logo_icon"
-				/>
+				<Icon v-if="!verifiedMakers[currentNetwork].includes(deposit.userId)" name="liquidity" size="16" />
+				<Icon v-else name="server" size="16" :class="$style.logo_icon" />
 
-				<router-link
-					:to="`/profile/${deposit.userId}`"
-					:class="$style.user_avatar"
-				>
+				<router-link :to="`/profile/${deposit.userId}`" :class="$style.user_avatar">
 					<img
-						v-if="
-							!verifiedMakers[currentNetwork].includes(
-								deposit.userId,
-							)
-						"
+						v-if="!verifiedMakers[currentNetwork].includes(deposit.userId)"
 						:src="`https://services.tzkt.io/v1/avatars/${deposit.userId}`"
 						alt="avatar"
 					/>
@@ -104,12 +74,7 @@ const returnForLiquidity = computed(() => {
 			</div>
 
 			<div :class="$style.info">
-				<div
-					v-if="
-						!verifiedMakers[currentNetwork].includes(deposit.userId)
-					"
-					:class="$style.title"
-				>
+				<div v-if="!verifiedMakers[currentNetwork].includes(deposit.userId)" :class="$style.title">
 					{{ accountStore.pkh == deposit.userId ? "My" : "" }}
 					Liquidity
 				</div>
@@ -128,28 +93,13 @@ const returnForLiquidity = computed(() => {
 		<!-- Desktop Template -->
 		<div :class="$style.desktop">
 			<div :class="[$style.param, $style.up]">
-				<Icon name="arrow_circle_top_right" size="12" />{{
-					numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
-				}}&nbsp;<span>XTZ</span>
+				{{ numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",") }}&nbsp;<span>XTZ</span>
 			</div>
 
-			<div :class="[$style.param, $style.down]">
-				<Icon name="arrow_circle_top_right" size="12" />{{
-					numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
-				}}&nbsp;<span>XTZ</span>
+			<div v-if="event.status == 'FINISHED' && returnForLiquidity" :class="[$style.param]">
+				{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>XTZ</span>
 			</div>
-
-			<div
-				v-if="event.status == 'FINISHED' && returnForLiquidity"
-				:class="[$style.param]"
-			>
-				{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
-					>XTZ</span
-				>
-			</div>
-			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
-				Refund
-			</div>
+			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">Refund</div>
 			<div v-else :class="$style.param">
 				<span>TBD</span>
 			</div>
@@ -161,9 +111,9 @@ const returnForLiquidity = computed(() => {
 				<div :class="$style.key">Rise</div>
 
 				<div :class="$style.value">
-					<Icon name="arrow_circle_top_right" size="12" />{{
-						numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",")
-					}}&nbsp;<span>XTZ</span>
+					<Icon name="arrow_circle_top_right" size="12" />{{ numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",") }}&nbsp;<span
+						>XTZ</span
+					>
 				</div>
 			</div>
 
@@ -171,23 +121,16 @@ const returnForLiquidity = computed(() => {
 				<div :class="$style.key">Rise</div>
 
 				<div :class="$style.value">
-					<Icon name="arrow_circle_top_right" size="12" />{{
-						numberWithSymbol(deposit.amountBelow.toFixed(0), ",")
-					}}&nbsp;<span>XTZ</span>
-				</div>
-			</div>
-
-			<div
-				v-if="event.status == 'FINISHED' && returnForLiquidity"
-				:class="[$style.param]"
-			>
-				<div :class="$style.key">Return</div>
-
-				<div :class="$style.value">
-					{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span
+					<Icon name="arrow_circle_top_right" size="12" />{{ numberWithSymbol(deposit.amountBelow.toFixed(0), ",") }}&nbsp;<span
 						>XTZ</span
 					>
 				</div>
+			</div>
+
+			<div v-if="event.status == 'FINISHED' && returnForLiquidity" :class="[$style.param]">
+				<div :class="$style.key">Return</div>
+
+				<div :class="$style.value">{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>XTZ</span></div>
 			</div>
 			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
 				<div :class="$style.key">Return</div>
@@ -313,7 +256,7 @@ const returnForLiquidity = computed(() => {
 .desktop {
 	display: flex;
 	align-items: center;
-	flex: 3;
+	flex: 2;
 }
 
 .mobile {

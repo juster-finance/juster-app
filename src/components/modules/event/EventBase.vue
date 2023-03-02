@@ -126,7 +126,7 @@ const getEvent = async () => {
 	event.value = await fetchEventById({ id: eventId })
 
 	/** meta */
-	meta.meta.title = `Price Event - ${supportedMarkets[event.value.currencyPair.symbol].target} (#${numberWithSymbol(
+	meta.meta.title = `${supportedMarkets[event.value.currencyPair.symbol].target} - Price Event (#${numberWithSymbol(
 		event.value.id,
 		",",
 	)})`
@@ -216,6 +216,20 @@ const wonText = computed(() => {
 	} else {
 		return ""
 	}
+})
+
+const priceDynamics = computed(() => {
+	const startRate = event.value.startRate * 100
+	const closedRate = event.value.closedRate * 100
+
+	const percent =
+		event.value.status == "FINISHED"
+			? (100 * Math.abs(closedRate - startRate)) / ((closedRate + startRate) / 2)
+			: (100 * Math.abs(price.value.rate - startRate)) / ((price.value.rate + startRate) / 2)
+
+	const diff = event.value.status == "FINISHED" ? closedRate - startRate : price.value.rate - startRate
+
+	return { diff, percent }
 })
 
 const selectedPageForDeposits = ref(1)
@@ -521,6 +535,7 @@ onUnmounted(() => {
 						:start-countdown="startCountdownText"
 						:finish-countdown="finishCountdownText"
 						:price="price"
+						:priceDynamics="priceDynamics"
 						:is-won="hasWonBet"
 						:position-for-withdraw="positionForWithdraw"
 						:is-withdrawing="isWithdrawing"
@@ -568,7 +583,7 @@ onUnmounted(() => {
 
 						<Dropdown side="top">
 							<template #trigger>
-								<Button type="secondary" size="small"><Icon name="dots" size="12" /> More</Button>
+								<Button type="secondary" size="small"><Icon name="dots" size="12" color="tertiary" /> More</Button>
 							</template>
 
 							<template #dropdown>
@@ -625,7 +640,7 @@ onUnmounted(() => {
 				</Flex>
 
 				<Flex direction="column" gap="40" :class="$style.base">
-					<EventChart v-if="event" :event="event" />
+					<EventChart v-if="event" :event="event" :priceDynamics="priceDynamics" />
 
 					<Flex direction="column" gap="24" v-if="accountStore.pkh">
 						<Flex direction="column" gap="8">
@@ -690,7 +705,7 @@ onUnmounted(() => {
 									{{
 										(event.status == "CANCELED" && "REFUND") ||
 										(["NEW", "STARTED"].includes(event.status) && "POTENTIAL") ||
-										(event.status == "FINISHED" && "PROFIT")
+										(event.status == "FINISHED" && "PAYOUT")
 									}}
 								</Text>
 							</Flex>
@@ -751,9 +766,8 @@ onUnmounted(() => {
 
 						<Flex v-if="filteredDeposits.length" direction="column" gap="8">
 							<Flex align="center" :class="$style.columns">
-								<Text size="12" weight="700" color="support" :class="$style.column">TYPE </Text>
-								<Text size="12" weight="700" color="support" :class="$style.column">RISE</Text>
-								<Text size="12" weight="700" color="support" :class="$style.column">FALL</Text>
+								<Text size="12" weight="700" color="support" :class="$style.column">TYPE</Text>
+								<Text size="12" weight="700" color="support" :class="$style.column">AMOUNT</Text>
 
 								<Text size="12" weight="700" color="support" :class="$style.column">RETURN</Text>
 							</Flex>

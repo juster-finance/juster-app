@@ -42,9 +42,7 @@ export const abbreviateNumber = (num, digits = 1) => {
 		.find(function (item) {
 			return num >= item.value
 		})
-	return item
-		? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol
-		: "0"
+	return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0"
 }
 
 export const f = (num) => {
@@ -108,4 +106,13 @@ export const truncate = (num) => {
 	}
 
 	return `${left}.${result}`
+}
+
+export const disaggregate = (num) => {
+	const splittedNum = num.toString().split(".")
+
+	const integer = splittedNum[0]
+	const fraction = splittedNum[1].slice(0, integer < 10 ? 4 : 2)
+
+	return [numberWithSymbol(integer, ","), fraction]
 }

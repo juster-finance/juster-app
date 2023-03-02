@@ -636,7 +636,7 @@ onUnmounted(() => {
 						<span>Stakes:</span>
 						{{ event.bets.length }} <br />
 						<span>Liquidity:</span>
-						{{ event.totalLiquidityProvided.toFixed(2) }} XTZ
+						{{ event.totalLiquidityProvided.toFixed(0) }} XTZ
 					</template>
 				</Tooltip>
 

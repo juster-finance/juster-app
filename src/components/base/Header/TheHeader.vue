@@ -393,7 +393,6 @@ const handleNetworkDblClick = () => {
 	fill: var(--text-tertiary);
 
 	padding: 10px;
-	border-radius: 6px;
 	cursor: pointer;
 
 	transition: all 0.2s ease;
@@ -416,9 +415,9 @@ const handleNetworkDblClick = () => {
 .link_content {
 	height: 34px;
 
-	border-radius: 6px;
+	border-radius: 8px;
 
-	padding: 0 10px;
+	padding: 0 12px 0 10px;
 
 	transition: background 0.2s ease;
 }

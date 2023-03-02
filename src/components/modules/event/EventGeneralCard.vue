@@ -9,6 +9,7 @@ import { DateTime } from "luxon"
  * UI
  */
 import Tooltip from "@ui/Tooltip.vue"
+import LoadingDots from "@ui/LoadingDots.vue"
 
 /**
  * Local
@@ -49,6 +50,9 @@ const props = defineProps({
 	finishStatus: {
 		type: String,
 		required: true,
+	},
+	priceDynamics: {
+		type: Object,
 	},
 	price: {
 		type: Object,
@@ -115,20 +119,6 @@ const timing = computed(() => {
 		},
 		showDay: eventDt.ordinal < endDt.ordinal,
 	}
-})
-
-const priceDynamics = computed(() => {
-	const startRate = props.event.startRate * 100
-	const closedRate = props.event.closedRate * 100
-
-	const percent =
-		props.event.status == "FINISHED"
-			? (100 * Math.abs(closedRate - startRate)) / ((closedRate + startRate) / 2)
-			: (100 * Math.abs(props.price.rate - startRate)) / ((props.price.rate + startRate) / 2)
-
-	const diff = props.event.status == "FINISHED" ? closedRate - startRate : props.price.rate - startRate
-
-	return { diff, percent }
 })
 
 const endDiff = computed(() =>
@@ -304,7 +294,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 						{{ startCountdown }}
 					</template>
 				</span>
-				<span v-else-if="startStatus == 'Finished'">Soon</span>
+				<span v-else-if="startStatus == 'Finished'"> Soon </span>
 			</div>
 
 			<!-- *Active* -->
@@ -321,7 +311,7 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 						{{ finishCountdown }}
 					</template>
 				</span>
-				<span v-else-if="finishStatus == 'Finished'">Soon</span>
+				<span v-else-if="finishStatus == 'Finished'"> <LoadingDots />&nbsp;Ending</span>
 			</div>
 
 			<!-- *Finished* -->
@@ -393,11 +383,9 @@ const isHighdemand = computed(() => props.event.bets.length >= 4)
 					Price Dynamics
 				</span>
 
-				<span v-if="priceDynamics.diff" :class="priceDynamics.diff > 0 ? $style.green_full : $style.red_full"
-					><Icon name="carret" size="12" />{{ Math.abs(priceDynamics.diff).toFixed(2) }} ({{
-						priceDynamics.percent.toFixed(2)
-					}}%)</span
-				>
+				<span v-if="priceDynamics.diff" :class="priceDynamics.diff > 0 ? $style.green_full : $style.red_full">
+					<Icon name="carret" size="12" />{{ Math.abs(priceDynamics.diff).toFixed(2) }} ({{ priceDynamics.percent.toFixed(2) }}%)
+				</span>
 				<span v-else> 0.00 (0.00%) </span>
 			</div>
 

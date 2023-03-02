@@ -39,39 +39,21 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 <template>
 	<div @click="showOperationModal = true" :class="$style.wrapper">
-		<OperationModal
-			:show="showOperationModal"
-			:data="bet"
-			@onClose="showOperationModal = false"
-		/>
+		<OperationModal :show="showOperationModal" :data="bet" @onClose="showOperationModal = false" />
 
 		<div :class="$style.base">
 			<div :class="[$style.icon, isWon && $style.won]">
-				<Icon
-					v-if="!pending"
-					:name="isWon ? 'checkcircle' : 'money'"
-					size="16"
-				/>
+				<Icon v-if="!pending" :name="isWon ? 'checkcircle' : 'money'" size="16" />
 
 				<Spin v-else size="16" />
 
-				<router-link
-					:to="`/profile/${pending ? accountStore.pkh : bet.userId}`"
-					:class="$style.user_avatar"
-				>
-					<img
-						:src="`https://services.tzkt.io/v1/avatars/${
-							pending ? accountStore.pkh : bet.userId
-						}`"
-						alt="avatar"
-					/>
+				<router-link :to="`/profile/${pending ? accountStore.pkh : bet.userId}`" :class="$style.user_avatar">
+					<img :src="`https://services.tzkt.io/v1/avatars/${pending ? accountStore.pkh : bet.userId}`" alt="avatar" />
 				</router-link>
 			</div>
 
 			<div :class="$style.info">
-				<div v-if="!pending" :class="$style.title">
-					{{ accountStore.pkh == bet.userId ? "My" : "" }} Stake
-				</div>
+				<div v-if="!pending" :class="$style.title">{{ accountStore.pkh == bet.userId ? "My" : "" }} Stake</div>
 
 				<div v-else :class="$style.title">Pending Stake</div>
 
@@ -89,17 +71,8 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 		<!-- Desktop Template -->
 		<div :class="$style.desktop">
-			<div
-				:class="[$style.param, side == 'Up' ? $style.up : $style.down]"
-			>
-				<Icon
-					:name="
-						side === 'Up'
-							? 'arrow_circle_top_right'
-							: 'arrow_circle_bottom_right'
-					"
-					size="12"
-				/>
+			<div :class="[$style.param, side == 'Up' ? $style.up : $style.down]">
+				<Icon :name="side === 'Up' ? 'arrow_circle_top_right' : 'arrow_circle_bottom_right'" size="12" />
 				{{ side }}
 			</div>
 
@@ -114,44 +87,25 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 			</div>
 
 			<div v-else-if="event.status == 'FINISHED'" :class="$style.param">
-				{{
-					isWon
-						? `+${numberWithSymbol(
-								(bet.reward - bet.amount).toFixed(2),
-								",",
-						  )}`
-						: 0
+				<Icon v-if="isWon" name="plus" size="14" color="green" />{{
+					isWon ? `${numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",")}` : 0
 				}}&nbsp;
 				<span>XTZ</span>
 			</div>
 
-			<div
-				v-else-if="['NEW', 'STARTED'].includes(event.status)"
-				:class="$style.param"
-			>
-				{{
-					numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",")
-				}}&nbsp;
+			<div v-else-if="['NEW', 'STARTED'].includes(event.status)" :class="$style.param">
+				{{ numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",") }}&nbsp;
 				<span>XTZ</span>
 			</div>
 		</div>
 
 		<!-- Mobile Template -->
 		<div :class="$style.mobile">
-			<div
-				:class="[$style.param, side == 'Up' ? $style.up : $style.down]"
-			>
+			<div :class="[$style.param, side == 'Up' ? $style.up : $style.down]">
 				<div :class="$style.key">Side</div>
 
 				<div :class="$style.value">
-					<Icon
-						:name="
-							side === 'Up'
-								? 'arrow_circle_top_right'
-								: 'arrow_circle_bottom_right'
-						"
-						size="12"
-					/>
+					<Icon :name="side === 'Up' ? 'arrow_circle_top_right' : 'arrow_circle_bottom_right'" size="12" />
 					{{ side }}
 				</div>
 			</div>
@@ -178,31 +132,16 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 				<div :class="$style.key">Amount</div>
 
 				<div :class="$style.value">
-					{{
-						isWon
-							? `+${numberWithSymbol(
-									(bet.reward - bet.amount).toFixed(2),
-									",",
-							  )}`
-							: 0
-					}}&nbsp;
+					{{ isWon ? `+${numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",")}` : 0 }}&nbsp;
 					<span>XTZ</span>
 				</div>
 			</div>
 
-			<div
-				v-else-if="['NEW', 'STARTED'].includes(event.status)"
-				:class="$style.param"
-			>
+			<div v-else-if="['NEW', 'STARTED'].includes(event.status)" :class="$style.param">
 				<div :class="$style.key">Amount</div>
 
 				<div :class="$style.value">
-					{{
-						numberWithSymbol(
-							(bet.reward - bet.amount).toFixed(2),
-							",",
-						)
-					}}&nbsp;
+					{{ numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",") }}&nbsp;
 					<span>XTZ</span>
 				</div>
 			</div>
