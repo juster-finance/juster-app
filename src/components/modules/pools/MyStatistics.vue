@@ -385,7 +385,7 @@ const parseProfitAmount = (amount) => {
 					</Flex>
 				</template>
 
-				<Flex align="center" gap="16">
+				<Flex align="center" gap="16" wrap="wrap">
 					<Flex align="center" gap="6">
 						<div :class="$style.orange_dot" />
 						<Text size="12" weight="600" color="secondary"> Realized Loss </Text>
