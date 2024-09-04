@@ -30,7 +30,7 @@ import Page from "@base/Page.vue"
 
 			<ul>
 				<li>
-					<a href="/markets/XTZ-USD">Tezos</a>
+					<a href="/markets/TON-USD">TON</a>
 				</li>
 				<li>
 					<a href="/markets/ETH-USD">Ethereum</a>

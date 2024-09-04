@@ -91,7 +91,7 @@ const checkNetwork = async () => {
 }
 
 const checkQuotes = () => {
-	const quotesDiff = initCurrentDt.diff(DateTime.fromISO(marketStore.markets["XTZ-USD"].quotes[0].timestamp), ["minutes"]).toObject()
+	const quotesDiff = initCurrentDt.diff(DateTime.fromISO(marketStore.markets["TON-USD"].quotes[0].timestamp), ["minutes"]).toObject()
 
 	if (quotesDiff.minutes >= 10) {
 		status.quotes = STATUSES.DELAYED
@@ -107,20 +107,20 @@ const handleSwitch = (network) => {
 }
 
 marketStore.$subscribe((mutation, state) => {
-	if (state.markets["XTZ-USD"].quotes.length) {
+	if (state.markets["TON-USD"].quotes.length) {
 		checkQuotes()
 	}
 })
 
 onMounted(async () => {
-	checkDipdup()
-	checkNetwork()
+	// checkDipdup()
+	// checkNetwork()
 
-	checkInterval = setInterval(async () => {
-		checkDipdup()
-		checkNetwork()
-		checkQuotes()
-	}, 30000)
+	// checkInterval = setInterval(async () => {
+	// 	checkDipdup()
+	// 	checkNetwork()
+	// 	checkQuotes()
+	// }, 30000)
 })
 
 onBeforeUnmount(() => {

@@ -167,10 +167,10 @@ const getTypeOfOperation = () => {
 								numberWithSymbol(
 									(data.amount
 										? data.amount *
-										  marketStore.markets["XTZ-USD"]
+										  marketStore.markets["TON-USD"]
 												.quotes[0].price
 										: data.amountBelow *
-										  marketStore.markets["XTZ-USD"]
+										  marketStore.markets["TON-USD"]
 												.quotes[0].price
 									).toFixed(2),
 									",",
@@ -178,9 +178,9 @@ const getTypeOfOperation = () => {
 							}}
 						</template>
 						<template v-else>
-							1 XTZ = ${{
+							1 TON = ${{
 								marketStore.markets[
-									"XTZ-USD"
+									"TON-USD"
 								].quotes[0].price.toFixed(2)
 							}}
 						</template>

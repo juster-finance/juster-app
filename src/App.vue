@@ -80,23 +80,23 @@ onMounted(async () => {
 		}
 	})
 
-	setupPools()
+	// setupPools()
 })
 
 /** Network Watcher */
 watch(
 	() => currentNetwork.value,
 	() => {
-		setupPools()
+		// setupPools()
 	},
 )
 
-const setupPools = async () => {
-	marketStore.pools = await fetchAllPools()
-	initPools(marketStore.pools)
+// const setupPools = async () => {
+// 	marketStore.pools = await fetchAllPools()
+// 	initPools(marketStore.pools)
 
-	marketStore.lines = await fetchPoolsLines()
-}
+// 	marketStore.lines = await fetchPoolsLines()
+// }
 
 /**
  * Setup Market (Markets & Quotes & Subscriptinos)

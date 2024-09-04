@@ -50,7 +50,7 @@ import { useMarketStore } from "@store/market"
 const defaultFilters = {
 	symbols: [
 		{
-			name: "XTZ-USD",
+			name: "TON-USD",
 			active: true,
 		},
 		{

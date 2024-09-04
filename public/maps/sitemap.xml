@@ -25,7 +25,7 @@
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://app.juster.fi/markets/XTZ-USD</loc>
+        <loc>https://app.juster.fi/markets/TON-USD</loc>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
     </url>

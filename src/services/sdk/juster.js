@@ -26,20 +26,21 @@ const juster = reactive({
 	pools: {},
 })
 
+const defaultNetwork = Networks.TESTNET;
 const currentNetwork = computed(() => (juster.sdk._network === "mainnet" ? "mainnet" : "testnet"))
 
 /**
  * Storage "activeNetwork"
  */
 if (!localStorage.activeNetwork) {
-	localStorage.activeNetwork = Networks.MAINNET
+	localStorage.activeNetwork = defaultNetwork
 }
 
 /**
  * Validate "activeNetwork" (Integrity Repair)
  */
 if (![Networks.MAINNET, Networks.TESTNET].includes(localStorage.activeNetwork)) {
-	localStorage.activeNetwork = Networks.MAINNET
+	localStorage.activeNetwork = defaultNetwork
 }
 
 juster.provider = new BeaconWallet({

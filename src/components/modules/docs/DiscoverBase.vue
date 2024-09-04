@@ -103,7 +103,7 @@ const getImageUrl = (image) => {
 					Our main goal is to provide the most transparent betting
 					system for everyone. At the initial stage, we will give you
 					the opportunity to bet on price changes of different
-					currency pairs (ETH-USD, BTC-USD & XTZ-USD).
+					currency pairs (BTC-USD, ETH-USD & TON-USD).
 				</p>
 			</div>
 
