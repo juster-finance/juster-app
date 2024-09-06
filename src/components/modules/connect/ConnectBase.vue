@@ -57,8 +57,9 @@ useMeta({
 
 const handleBeacon = async () => {
 	try {
-		await juster.sdk.sync()
-		login()
+		// TODO: #1
+		// await juster.sdk.sync()
+		// login()
 	} catch (error) {
 		if (error.title === "Aborted") {
 			notificationsStore.create({
@@ -133,14 +134,15 @@ const handleCustomLogin = () => {
 	showCustomLoginModal.value = true
 }
 const handleSelectCustomNode = async (node) => {
-	await juster.sdk._provider.requestPermissions({
-		network: {
-			type: NetworkType.CUSTOM,
-			name: node.value.name,
-			rpcUrl: node.value.url,
-		},
-	})
-	login()
+	// TODO: #1
+	// await juster.sdk._provider.requestPermissions({
+	// 	network: {
+	// 		type: NetworkType.CUSTOM,
+	// 		name: node.value.name,
+	// 		rpcUrl: node.value.url,
+	// 	},
+	// })
+	// login()
 }
 
 const handleLogout = () => {

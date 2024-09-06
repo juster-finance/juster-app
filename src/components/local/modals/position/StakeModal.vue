@@ -3,7 +3,7 @@
  * Vendor
  */
 import { ref, reactive, computed, watch } from "vue"
-import { estimateFeeMultiplier } from "@juster-finance/sdk"
+import { estimator } from "@juster-finance/sdk"
 import { DateTime } from "luxon"
 import BN from "bignumber.js"
 
@@ -142,7 +142,7 @@ const ratioBeforeBet = computed(() => {
 })
 
 const fee = computed(() =>
-	estimateFeeMultiplier(
+	estimator.estimateFee(
 		{
 			betsCloseTime: new Date(props.event.betsCloseTime),
 			createdTime: new Date(props.event.createdTime),
@@ -300,6 +300,7 @@ const handleUserTransactionConfirmation = () => {
 
 	sendingBet.value = true
 
+	// TODO: #2
 	juster.sdk
 		.bet(props.event.id, betType, BN(amount.value), BN(minReward.value))
 		.then((op) => {

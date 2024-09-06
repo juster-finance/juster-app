@@ -83,9 +83,10 @@ const isActive = (linkName) => {
 const pkh = computed(() => accountStore.pkh)
 
 const handleNetworkDblClick = () => {
-	juster.sdk._provider.client.clearActiveAccount().then(async () => {
-		switchNetwork("mainnet", router)
-	})
+	// TODO: #1
+	// juster.sdk._provider.client.clearActiveAccount().then(async () => {
+	// 	switchNetwork("mainnet", router)
+	// })
 }
 </script>
 

@@ -60,14 +60,15 @@ const appStore = useAppStore()
 const marketStore = useMarketStore()
 
 onBeforeMount(() => {
-	juster.sdk._provider.client.getActiveAccount().then(async (account) => {
-		if (!account) return
+	// TODO: #1
+	// juster.sdk._provider.client.getActiveAccount().then(async (account) => {
+	// 	if (!account) return
 
-		accountStore.setPkh(account.address)
-		accountStore.updateBalance()
+	// 	accountStore.setPkh(account.address)
+	// 	accountStore.updateBalance()
 
-		setupUser()
-	})
+	// 	setupUser()
+	// })
 })
 onMounted(async () => {
 	watchNetwork()

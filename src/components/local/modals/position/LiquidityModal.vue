@@ -175,6 +175,7 @@ export default defineComponent({
 				showHint.confirmationDelay = true
 			}, 5000)
 
+			// TODO: #2
 			juster.sdk
 				.provideLiquidity(
 					event.value.id,
@@ -237,10 +238,11 @@ export default defineComponent({
 
 		/** Login */
 		const handleLogin = async () => {
-			await juster.sdk.sync()
-			juster.sdk.getPkh().then((pkh) => {
-				accountStore.setPkh(pkh)
-			})
+			// TODO: #1
+			// await juster.sdk.sync()
+			// juster.sdk.getPkh().then((pkh) => {
+			// 	accountStore.setPkh(pkh)
+			// })
 
 			context.emit("onClose")
 		}

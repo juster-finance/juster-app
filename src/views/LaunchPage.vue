@@ -21,9 +21,10 @@ import { juster, switchNetwork } from "@sdk"
 const router = useRouter()
 
 const handleSwitch = () => {
-	juster.sdk._provider.client.clearActiveAccount().then(async () => {
-		switchNetwork("mainnet", router)
-	})
+	// TODO: #1
+	// juster.sdk._provider.client.clearActiveAccount().then(async () => {
+	// 	switchNetwork("mainnet", router)
+	// })
 }
 </script>
 
@@ -53,7 +54,8 @@ const handleSwitch = () => {
 				application is <b>1.0</b>.
 			</p>
 
-			<div
+			<!-- TODO: #1 -->
+			<!-- <div
 				v-if="juster.sdk._network == 'ghostnet'"
 				:class="$style.interactive_block"
 			>
@@ -95,7 +97,7 @@ const handleSwitch = () => {
 				<div :class="$style.hint">
 					You can always change the current network in the Footer
 				</div>
-			</div>
+			</div> -->
 
 			<p>
 				<b

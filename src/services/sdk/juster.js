@@ -2,7 +2,7 @@
  * Vendor
  */
 import { computed, reactive } from "vue"
-import { JusterCore, JusterPool } from "@juster-finance/sdk"
+import { JusterDemo } from "@juster-finance/sdk"
 import { createClient } from "@juster-finance/gql-client"
 import { BeaconWallet } from "@taquito/beacon-wallet"
 import { TezosToolkit } from "@taquito/taquito"
@@ -26,9 +26,10 @@ const juster = reactive({
 	pools: {},
 })
 
-const defaultNetwork = Networks.TESTNET;
-const currentNetwork = computed(() => (juster.sdk._network === "mainnet" ? "mainnet" : "testnet"))
-
+const defaultNetwork = Networks.MAINNET;
+// TODO: #1
+// const currentNetwork = computed(() => (juster.sdk._network === "mainnet" ? "mainnet" : "testnet"))
+const currentNetwork = computed(() => defaultNetwork)
 /**
  * Storage "activeNetwork"
  */
@@ -51,7 +52,9 @@ juster.provider = new BeaconWallet({
 juster.tezos = new TezosToolkit(rpcNodes[localStorage.activeNetwork][0].url)
 
 const init = async () => {
-	juster.sdk = JusterCore.create(juster.tezos, juster.provider, localStorage.activeNetwork)
+	juster.sdk = new JusterDemo(
+		'http://localhost:5502'
+	)
 
 	/** GQL */
 	juster.gql = createClient({

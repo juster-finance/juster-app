@@ -178,6 +178,7 @@ const handleWithdraw = () => {
 
 	analytics.log("clickWithdraw", { where: "event_card" })
 
+	// TODO: #2
 	juster.sdk
 		.withdraw(props.event.id, accountStore.pkh)
 		.then((op) => {

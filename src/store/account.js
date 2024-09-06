@@ -29,15 +29,16 @@ export const useAccountStore = defineStore({
 	},
 	actions: {
 		logout() {
-			juster.sdk._provider.client.clearActiveAccount().then(async () => {
-				await juster.sdk._provider.client.getActiveAccount()
+			// TODO: #1
+			// juster.sdk._provider.client.clearActiveAccount().then(async () => {
+			// 	await juster.sdk._provider.client.getActiveAccount()
 
-				analytics.log("logout", { address: this.pkh })
+			// 	analytics.log("logout", { address: this.pkh })
 
-				this.setPkh("")
+			// 	this.setPkh("")
 
-				this.positionsForWithdrawal = []
-			})
+			// 	this.positionsForWithdrawal = []
+			// })
 		},
 
 		setPkh(pkh) {

@@ -101,9 +101,10 @@ const checkQuotes = () => {
 }
 
 const handleSwitch = (network) => {
-	juster.sdk._provider.client.clearActiveAccount().then(async () => {
-		switchNetwork(network, router)
-	})
+	// TODO: #1
+	// juster.sdk._provider.client.clearActiveAccount().then(async () => {
+	// 	switchNetwork(network, router)
+	// })
 }
 
 marketStore.$subscribe((mutation, state) => {
