@@ -9,6 +9,10 @@ export const dipdup = {
 	}
 }
 
+export const demoMode = {
+	baseUrl: "http://localhost:5502"
+}
+
 export const supportedMarkets = {
 	"ETH-USD": { target: "Ethereum", description: "Ethereum / U.S. Dollar" },
 	"BTC-USD": { target: "Bitcoin", description: "Bitcoin / U.S. Dollar" },
