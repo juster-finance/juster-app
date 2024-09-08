@@ -4,8 +4,7 @@
  */
 import { ref, onMounted } from "vue"
 import { useMeta } from "vue-meta"
-import { NetworkType } from "@airgap/beacon-dapp"
-import { TonConnectButton } from '@townsquarelabs/ui-vue';
+import { useTonConnectModal, useTonConnectUI } from '@townsquarelabs/ui-vue';
 import { useRouter } from "vue-router"
 
 /**
@@ -44,6 +43,8 @@ import { useNotificationsStore } from "@store/notifications"
 const appStore = useAppStore()
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
+const { open: openTonConnectModal } = useTonConnectModal()
+const [tonConnectUI] = useTonConnectUI()
 
 const { setupUser } = useMarket()
 
@@ -58,20 +59,17 @@ useMeta({
 
 const handleTonConnect = async () => {
 	try {
-		// TODO: #1
-		// await juster.sdk.sync()
+		openTonConnectModal()
 		// login()
 	} catch (error) {
-		if (error.title === "Aborted") {
-			notificationsStore.create({
-				notification: {
-					type: "Warning",
-					title: "Wallet connection rejected",
-					description: "Try again.",
-					autoDestroy: true,
-				},
-			})
-		}
+		notificationsStore.create({
+			notification: {
+				type: "Warning",
+				title: "Wallet connection rejected",
+				description: "Try again.",
+				autoDestroy: true,
+			},
+		})
 	}
 }
 
@@ -146,7 +144,8 @@ const handleSelectCustomNode = async (node) => {
 	// login()
 }
 
-const handleLogout = () => {
+const handleLogout = async () => {
+	await tonConnectUI.disconnect()
 	accountStore.logout()
 	notificationsStore.create({
 		notification: {
@@ -212,7 +211,7 @@ onMounted(async () => {
 			</div>
 
 			<div v-if="!accountStore.isLoggined" :class="$style.buttons">
-				<!-- <Button
+				<Button
 					@click="handleTonConnect"
 					@onKeybind="handleTonConnect"
 					type="primary"
@@ -222,9 +221,8 @@ onMounted(async () => {
 				>
 					<Icon name="login" size="16" />
 					Ton Connect
-				</Button> -->
-				<TonConnectButton />
-				<Button
+				</Button>
+				<!--<Button
 					@click="handleCustomLogin"
 					@onKeybind="handleCustomLogin"
 					type="secondary"
@@ -233,7 +231,7 @@ onMounted(async () => {
 					keybind="C"
 				>
 					<Icon name="settings" size="16" />Custom Connection</Button
-				>
+				>-->
 			</div>
 			<div v-else :class="$style.buttons">
 				<router-link :to="`/profile/${accountStore.pkh}`">

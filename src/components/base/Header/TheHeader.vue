@@ -264,9 +264,7 @@ const handleNetworkDblClick = () => {
 					</router-link>
 
 					<ProfileMenu v-if="pkh">
-						<div :class="$style.avatar">
-							<img :src="`https://services.tzkt.io/v1/avatars/${pkh}`" alt="avatar" />
-						</div>
+						<Icon name="user" size="20" :class="$style.avatar" />
 					</ProfileMenu>
 				</Flex>
 			</div>
@@ -428,14 +426,13 @@ const handleNetworkDblClick = () => {
 }
 
 .avatar {
-	position: relative;
-}
-
-.avatar img {
 	display: flex;
 	width: 24px;
 	padding: 4px;
 	box-sizing: content-box;
+
+	color: var(--text-secondary);
+	fill: var(--text-tertiary);
 
 	background: var(--btn-secondary-bg);
 	border-radius: 6px;
@@ -443,11 +440,13 @@ const handleNetworkDblClick = () => {
 	transition: all 0.2s ease;
 }
 
-.avatar:hover img {
+.avatar:hover {
+	color: var(--text-primary);
+	fill: var(--text-primary);
 	background: var(--btn-secondary-bg-hover);
 }
 
-.avatar:active img {
+.avatar:active {
 	transform: translateY(1px);
 }
 

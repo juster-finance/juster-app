@@ -3,7 +3,7 @@
  * Vendor
  */
 import { onBeforeMount, onMounted, watch } from "vue"
-import { TonConnectUIProvider } from '@townsquarelabs/ui-vue';
+import { useTonAddress } from '@townsquarelabs/ui-vue';
 
 /**
  * Styles
@@ -59,18 +59,18 @@ else favicon.href = "/favicon_light.svg"
 const accountStore = useAccountStore()
 const appStore = useAppStore()
 const marketStore = useMarketStore()
+const address = useTonAddress(false)
 
-onBeforeMount(() => {
-	// TODO: #1
-	// juster.sdk._provider.client.getActiveAccount().then(async (account) => {
-	// 	if (!account) return
-
-	// 	accountStore.setPkh(account.address)
-	// 	accountStore.updateBalance()
-
-	// 	setupUser()
-	// })
+watch(address, (address) => {
+	if (!address) 
+		return
+	
+	accountStore.setPkh(address)
+	accountStore.updateBalance()
+	setupUser()
 })
+
+
 onMounted(async () => {
 	watchNetwork()
 
@@ -110,21 +110,19 @@ const tonConnectOptions = {
 </script>
 
 <template>
-	<TonConnectUIProvider :options="tonConnectOptions">
-		<Teleports />
-		<ConfirmationModal :show="appStore.confirmation.show" />
-		<Notifications />
-
-		<div class="app_wrapper">
-			<TheHeader />
-			<div class="app_base">
-				<router-view />
-			</div>
-			<Footer class="footer" />
+	<Teleports />
+	<ConfirmationModal :show="appStore.confirmation.show" />
+	<Notifications />
+	
+	<div class="app_wrapper">
+		<TheHeader />
+		<div class="app_base">
+			<router-view />
 		</div>
+		<Footer class="footer" />
+	</div>
 
-		<NetworkStatus />
-	</TonConnectUIProvider>
+	<NetworkStatus />
 </template>
 
 <style>

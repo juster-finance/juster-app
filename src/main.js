@@ -13,7 +13,7 @@ import "@sdk"
 import { initFlags } from "@/services/flags"
 initFlags()
 
-import App from "./App.vue"
+import App from "./TonApp.vue"
 import router from "./router"
 
 const app = createApp({

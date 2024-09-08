@@ -1,6 +1,7 @@
 <script setup>
 /** Vendor */
 import { useRouter } from "vue-router"
+import { useTonConnectUI, useTonAddress } from "@townsquarelabs/ui-vue"
 
 /**
  * Components: UI
@@ -22,6 +23,8 @@ import { useNotificationsStore } from "@store/notifications"
 
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
+const [tonConnectUI] = useTonConnectUI()
+const tonAddress = useTonAddress()
 
 const router = useRouter()
 
@@ -37,8 +40,9 @@ const handleOpenWithdrawals = () => {
 	analytics.log("openWithdrawals")
 }
 
-const handleLogout = () => {
+const handleLogout = async () => {
 	/** confirmation.request -> onConfirm -> callback */
+	await tonConnectUI.disconnect()
 	accountStore.logout()
 	location.reload()
 	notificationsStore.create({
@@ -68,56 +72,32 @@ const handleLogout = () => {
 		<template #dropdown>
 			<Flex direction="column">
 				<Flex direction="column" gap="2" :class="$style.general_links">
-					<Flex
-						@click="handleOpenProfile"
-						align="center"
-						gap="12"
-						:class="$style.general_link"
-						tabindex="1"
-					>
-						<img
-							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
-							alt="avatar"
-						/>
+					<Flex @click="handleOpenProfile" align="center" gap="12" :class="$style.general_link" tabindex="1">
+						<Icon name="user" size="20" :class="$style.icon" />
 
 						<Flex direction="column" gap="8">
-							<Text size="13" weight="600" color="primary">
-								My Profile
-							</Text>
+							<Text size="13" weight="600" color="primary"> My Profile </Text>
 							<Text size="11" weight="600" color="tertiary">
-								{{ shorten(accountStore.pkh, 8, 5) }}
+								{{ shorten(tonAddress, 4, 4) }}
 							</Text>
 						</Flex>
 					</Flex>
 
-					<Flex
-						@click="handleOpenWithdrawals"
-						align="center"
-						gap="12"
-						:class="$style.general_link"
-						tabindex="1"
-					>
+					<Flex @click="handleOpenWithdrawals" align="center" gap="12" :class="$style.general_link" tabindex="1">
 						<Icon name="money" size="20" :class="$style.icon" />
 
 						<Flex direction="column" gap="6">
 							<Text size="13" weight="600" color="primary">
 								<Flex>
-									{{
-										numberWithSymbol(
-											accountStore.balance,
-											",",
-										)
-									}}&nbsp;
+									{{ numberWithSymbol(accountStore.balance, ",") }}&nbsp;
 									<Text color="tertiary">XTZ</Text>
 								</Flex>
 							</Text>
-							<Text size="11" weight="600" color="tertiary">
-								Manage your assets
-							</Text>
+							<Text size="11" weight="600" color="tertiary"> Manage your assets </Text>
 						</Flex>
 					</Flex>
 
-					<Flex
+					<!-- <Flex
 						align="center"
 						gap="12"
 						:class="[$style.general_link, $style.disabled]"
@@ -133,11 +113,11 @@ const handleLogout = () => {
 								Unavailable Now
 							</Text>
 						</Flex>
-					</Flex>
+					</Flex> -->
 				</Flex>
 
 				<Flex direction="column" :class="$style.links">
-					<Flex
+					<!-- <Flex
 						align="center"
 						gap="8"
 						:class="[$style.link, $style.disabled]"
@@ -147,18 +127,10 @@ const handleLogout = () => {
 						<Text size="13" color="primary" weight="500">
 							Settings
 						</Text>
-					</Flex>
-					<Flex
-						@click="handleLogout"
-						align="center"
-						gap="8"
-						:class="$style.link"
-						tabindex="1"
-					>
+					</Flex> -->
+					<Flex @click="handleLogout" align="center" gap="8" :class="$style.link" tabindex="1">
 						<Icon name="logout" size="16" />
-						<Text size="13" color="primary" weight="500">
-							Logout
-						</Text>
+						<Text size="13" color="primary" weight="500"> Logout </Text>
 					</Flex>
 				</Flex>
 			</Flex>
