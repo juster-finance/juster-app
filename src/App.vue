@@ -3,6 +3,7 @@
  * Vendor
  */
 import { onBeforeMount, onMounted, watch } from "vue"
+import { TonConnectUIProvider } from '@townsquarelabs/ui-vue';
 
 /**
  * Styles
@@ -103,22 +104,27 @@ watch(
  * Setup Market (Markets & Quotes & Subscriptinos)
  */
 setupMarket()
+const tonConnectOptions = {
+	manifestUrl:"http://localhost:5173/tonconnect-manifest.json",
+};
 </script>
 
 <template>
-	<Teleports />
-	<ConfirmationModal :show="appStore.confirmation.show" />
-	<Notifications />
+	<TonConnectUIProvider :options="tonConnectOptions">
+		<Teleports />
+		<ConfirmationModal :show="appStore.confirmation.show" />
+		<Notifications />
 
-	<div class="app_wrapper">
-		<TheHeader />
-		<div class="app_base">
-			<router-view />
+		<div class="app_wrapper">
+			<TheHeader />
+			<div class="app_base">
+				<router-view />
+			</div>
+			<Footer class="footer" />
 		</div>
-		<Footer class="footer" />
-	</div>
 
-	<NetworkStatus />
+		<NetworkStatus />
+	</TonConnectUIProvider>
 </template>
 
 <style>

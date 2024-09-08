@@ -5,6 +5,7 @@
 import { ref, onMounted } from "vue"
 import { useMeta } from "vue-meta"
 import { NetworkType } from "@airgap/beacon-dapp"
+import { TonConnectButton } from '@townsquarelabs/ui-vue';
 import { useRouter } from "vue-router"
 
 /**
@@ -55,7 +56,7 @@ useMeta({
 		"Liquidity provider leaderboard based on perfomance & earnings",
 })
 
-const handleBeacon = async () => {
+const handleTonConnect = async () => {
 	try {
 		// TODO: #1
 		// await juster.sdk.sync()
@@ -211,17 +212,18 @@ onMounted(async () => {
 			</div>
 
 			<div v-if="!accountStore.isLoggined" :class="$style.buttons">
-				<Button
-					@click="handleBeacon"
-					@onKeybind="handleBeacon"
+				<!-- <Button
+					@click="handleTonConnect"
+					@onKeybind="handleTonConnect"
 					type="primary"
 					size="large"
 					block
-					keybind="B"
+					keybind="T"
 				>
 					<Icon name="login" size="16" />
-					Beacon Wallet
-				</Button>
+					Ton Connect
+				</Button> -->
+				<TonConnectButton />
 				<Button
 					@click="handleCustomLogin"
 					@onKeybind="handleCustomLogin"
