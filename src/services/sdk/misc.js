@@ -1,10 +1,9 @@
 import { juster } from "./juster"
 
 const fetchBalance = async (address) => {
-	// TODO: #1
-	// const balance = await juster.sdk._tezos.tz.getBalance(address)
-	// return (balance.toNumber() / 1000000).toFixed(2)
-	return '0'
+	console.log('fetchBalance', address)
+	const user = await juster.sdk.getUser(address)
+	return user.balance.toFixed(2)
 }
 
 export { fetchBalance }
