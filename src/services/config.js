@@ -10,7 +10,12 @@ export const dipdup = {
 }
 
 export const demoMode = {
-	baseUrl: "http://localhost:5502"
+	baseUrl: "http://localhost:5502",
+	walletPayloadTokenExpiresInSeconds: 900
+}
+
+export const localStorageKeys = {
+	AUTH_TOKEN: 'auth_token'
 }
 
 export const supportedMarkets = {

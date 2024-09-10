@@ -7,7 +7,7 @@ import { createClient } from "@juster-finance/gql-client"
 import { BeaconWallet } from "@taquito/beacon-wallet"
 import { TezosToolkit } from "@taquito/taquito"
 
-import { dipdup, rpcNodes, demoMode } from "@config"
+import { dipdup, rpcNodes, demoMode, localStorageKeys } from "@config"
 
 /**
  * Services.Constants
@@ -54,7 +54,7 @@ juster.tezos = new TezosToolkit(rpcNodes[localStorage.activeNetwork][0].url)
 const init = async () => {
 	juster.sdk = new JusterDemo(
 		demoMode.baseUrl,
-		() => localStorage.getItem('auth_token')
+		() => localStorage.getItem(localStorageKeys.AUTH_TOKEN)
 	)
 
 	/** GQL */
