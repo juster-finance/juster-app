@@ -4,8 +4,7 @@ import replace from "rollup-plugin-re"
 import vue from "@vitejs/plugin-vue"
 import path from "path"
 
-// import nodePolyfills from "vite-plugin-node-stdlib-browser"
-// if we need this, we can try @emreerdogan/vite-plugin-node-stdlib-browser
+import nodePolyfills from '@emreerdogan/vite-plugin-node-stdlib-browser'
 
 const aliases = {
 	"@": path.resolve(__dirname, "./src"),
@@ -31,7 +30,7 @@ export default (ctx) => {
 	return defineConfig({
 		plugins: [
 			vue(),
-			// nodePolyfills(),
+			nodePolyfills(),
 			...(process.env.STATS
 				? [
 						{
