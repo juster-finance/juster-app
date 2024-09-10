@@ -108,11 +108,12 @@ export const truncate = (num) => {
 	return `${left}.${result}`
 }
 
+// TODO: #2
 export const disaggregate = (num) => {
 	const splittedNum = num.toString().split(".")
 
 	const integer = splittedNum[0]
-	const fraction = splittedNum[1].slice(0, integer < 10 ? 4 : 2)
+	const fraction = (splittedNum[1] || "00").slice(0, integer < 10 ? 4 : 2)
 
 	return [numberWithSymbol(integer, ","), fraction]
 }

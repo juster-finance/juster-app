@@ -65,11 +65,12 @@ const handleCopy = (target, name) => {
 	toClipboard(target)
 }
 
+// TODO: #2
 const disaggregate = (num) => {
 	const splittedNum = num.toString().split(".")
 
 	const integer = splittedNum[0]
-	const fraction = splittedNum[1]?.slice(0, 2)
+	const fraction = (splittedNum[1] || "00").slice(0, 2)
 
 	return [numberWithSymbol(integer, ","), fraction]
 }
