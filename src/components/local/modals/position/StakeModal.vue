@@ -299,26 +299,11 @@ const handleUserTransactionConfirmation = () => {
 	if (side.value == "Fall") betType = "below"
 
 	sendingBet.value = true
+	accountStore.pendingTransaction.awaiting = true
 
-	// TODO: #2
 	juster.sdk
 		.bet(props.event.id, betType, BN(amount.value), BN(minReward.value))
-		.then((op) => {
-			/** Pending transaction label */
-			accountStore.pendingTransaction.awaiting = true
-			op.confirmation()
-				.then((result) => {
-					accountStore.pendingTransaction.awaiting = false
-					if (!result.completed) {
-						// todo: handle it?
-					}
-				})
-				.catch(() => {
-					accountStore.pendingTransaction.awaiting = false
-				})
-
-			sendingBet.value = false
-
+		.then(() => {
 			/** slow notification to get attention */
 			setTimeout(() => {
 				notificationsStore.create({
@@ -357,7 +342,10 @@ const handleUserTransactionConfirmation = () => {
 					},
 				})
 			}, 700)
+		})
+		.finally(() => {
 			sendingBet.value = false
+			accountStore.pendingTransaction.awaiting = false
 		})
 }
 </script>
