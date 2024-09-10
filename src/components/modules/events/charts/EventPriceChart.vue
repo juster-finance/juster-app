@@ -39,8 +39,8 @@ const startData = ref([])
 const currentQuote = ref({})
 
 // const priceDynamics = computed(() => {
-// 	const startRate = props.event.startRate * 100
-// 	const closedRate = props.event.closedRate * 100
+// 	const startRate = props.event.startRate
+// 	const closedRate = props.event.closedRate
 
 // 	if (!symbol.quotes.length) return 0
 
@@ -564,9 +564,9 @@ onBeforeUnmount(() => {
 					<Flex direction="column" gap="6" align="end">
 						<Flex v-if="event.status === 'FINISHED'" align="center">
 							<Text size="12" weight="600" color="secondary">
-								{{ disaggregate(event.closedRate * 100)[0] }}
+								{{ disaggregate(event.closedRate)[0] }}
 							</Text>
-							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.closedRate * 100)[1] }} </Text>
+							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.closedRate)[1] }} </Text>
 						</Flex>
 						<Flex v-else align="center">
 							<Text size="12" weight="600" color="secondary">
@@ -605,9 +605,9 @@ onBeforeUnmount(() => {
 
 					<Flex align="center">
 						<Text size="12" weight="600" color="secondary">
-							{{ disaggregate(event.startRate * 100)[0] }}
+							{{ disaggregate(event.startRate)[0] }}
 						</Text>
-						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.startRate * 100)[1] }} </Text>
+						<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.startRate)[1] }} </Text>
 					</Flex>
 				</Flex>
 			</div>

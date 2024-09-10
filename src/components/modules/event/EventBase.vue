@@ -219,8 +219,8 @@ const wonText = computed(() => {
 })
 
 const priceDynamics = computed(() => {
-	const startRate = event.value.startRate * 100
-	const closedRate = event.value.closedRate * 100
+	const startRate = event.value.startRate
+	const closedRate = event.value.closedRate
 
 	const percent =
 		event.value.status == "FINISHED"

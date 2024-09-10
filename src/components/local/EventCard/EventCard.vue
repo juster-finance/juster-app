@@ -649,7 +649,7 @@ onUnmounted(() => {
 
 					<template #content
 						><span>Difference =</span> <br />
-						{{ (event.closedRate * 100 - event.startRate * 100).toFixed(2) }}</template
+						{{ (event.closedRate - event.startRate).toFixed(2) }}</template
 					>
 				</Tooltip>
 
@@ -661,7 +661,7 @@ onUnmounted(() => {
 
 					<template #content
 						><span>Difference =</span> <br />
-						{{ (event.closedRate * 100 - event.startRate * 100).toFixed(2) }}</template
+						{{ (event.closedRate - event.startRate).toFixed(2) }}</template
 					>
 				</Tooltip>
 			</div>
