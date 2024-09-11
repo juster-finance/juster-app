@@ -91,12 +91,12 @@ const handleNetworkDblClick = () => {
 </script>
 
 <template>
-	<header :class="[$style.wrapper, currentNetwork !== Networks.MAINNET && $style.testnet]">
-		<div v-if="currentNetwork !== Networks.MAINNET" :class="$style.testnetwork_warning">
+	<header :class="[$style.wrapper, $style.testnet]">
+		<div :class="$style.testnetwork_warning">
 			<Tooltip placement="bottom">
-				<div @dblclick="handleNetworkDblClick" :class="$style.testnetwork_warning__label">Test network</div>
+				<div @dblclick="handleNetworkDblClick" :class="$style.testnetwork_warning__label">Demo</div>
 
-				<template #content>Ghostnet in use. <span>Double-click to switch to Mainnet.</span></template>
+				<template #content>This is demo mode. <span>All transactions are simulated</span></template>
 			</Tooltip>
 		</div>
 

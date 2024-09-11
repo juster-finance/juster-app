@@ -166,7 +166,7 @@ onBeforeUnmount(() => {
 			<div :class="$style.bottom">
 				<div :class="$style.block">
 					<div :class="$style.left">
-						<Tooltip placement="top">
+						<!-- <Tooltip placement="top">
 							<Button
 								type="secondary"
 								size="small"
@@ -183,9 +183,9 @@ onBeforeUnmount(() => {
 								>
 								{{ status.quotes }}
 							</template>
-						</Tooltip>
+						</Tooltip> -->
 
-						<Dropdown side="top">
+						<!-- <Dropdown side="top">
 							<template #trigger>
 								<Button type="secondary" size="small" :class="[$style.footer_btn]" data-cy="network-dropdown">
 									<Icon :name="currentNetwork === 'testnet' ? 'hammer' : 'explorer'" size="12" />
@@ -205,7 +205,7 @@ onBeforeUnmount(() => {
 									Test Network
 								</DropdownItem>
 							</template>
-						</Dropdown>
+						</Dropdown> -->
 					</div>
 
 					<div :class="$style.right">
