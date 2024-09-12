@@ -44,7 +44,7 @@ export default defineComponent({
 					quotes.value[0].price.toString().split(".")[0],
 					",",
 				),
-				fraction: quotes.value[0].price.toString().split(".")[1],
+				fraction: quotes.value[0].price.toString().split(".")[1] || '00',
 			}
 		})
 
@@ -159,7 +159,7 @@ export default defineComponent({
 					selectedQuote.value.value.toString().split(".")[0],
 					",",
 				),
-				fraction: selectedQuote.value.value.toString().split(".")[1],
+				fraction: selectedQuote.value.value.toString().split(".")[1] || '00',
 			}
 		})
 

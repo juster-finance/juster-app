@@ -92,6 +92,7 @@ const handleNetworkDblClick = () => {
 
 <template>
 	<header :class="[$style.wrapper, $style.testnet]">
+		<!-- TODO: #3 -->
 		<div :class="$style.testnetwork_warning">
 			<Tooltip placement="bottom">
 				<div @dblclick="handleNetworkDblClick" :class="$style.testnetwork_warning__label">Demo</div>

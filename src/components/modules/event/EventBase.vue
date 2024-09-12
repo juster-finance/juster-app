@@ -176,7 +176,7 @@ const price = computed(() => {
 	return {
 		rate: marketStore.markets[event.value?.currencyPair.symbol]?.quotes[0]?.price,
 		integer: numberWithSymbol(marketStore.markets[event.value?.currencyPair.symbol]?.quotes[0]?.price.toString().split(".")[0], ","),
-		fraction: marketStore.markets[event.value?.currencyPair.symbol]?.quotes[0]?.price.toString().split(".")[1],
+		fraction: marketStore.markets[event.value?.currencyPair.symbol]?.quotes[0]?.price.toString().split(".")[1] || '00',
 	}
 })
 

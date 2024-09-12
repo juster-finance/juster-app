@@ -166,6 +166,7 @@ onBeforeUnmount(() => {
 			<div :class="$style.bottom">
 				<div :class="$style.block">
 					<div :class="$style.left">
+						<!-- TODO: #3 -->
 						<!-- <Tooltip placement="top">
 							<Button
 								type="secondary"
