@@ -2,6 +2,7 @@
 /** Vendor */
 import { ref, reactive, computed, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import { useIsConnectionRestored } from "@townsquarelabs/ui-vue"
 
 /**
  * Services
@@ -36,6 +37,8 @@ import RewardAlert from "@local/RewardAlert.vue"
  */
 import { useAppStore } from "@store/app"
 import { useAccountStore } from "@store/account"
+
+const isConnectionRestored = useIsConnectionRestored();
 
 const appStore = useAppStore()
 const accountStore = useAccountStore()
@@ -251,22 +254,24 @@ const handleNetworkDblClick = () => {
 				<RewardAlert :class="$style.reward_alert" />
 
 				<Flex gap="8">
-					<router-link v-if="!pkh && route.path !== '/connect'" to="/connect">
-						<Button type="primary" size="small">
-							<Icon name="login" size="16" />
-							Connect Wallet
-						</Button>
-					</router-link>
-					<router-link v-else-if="!pkh && route.path === '/connect' && appStore.prevRoute" :to="appStore.prevRoute.path">
-						<Button type="secondary" size="small">
-							<Icon name="back" size="16" />
-							Back to {{ appStore.prevRoute.name }}
-						</Button>
-					</router-link>
+					<template v-if="isConnectionRestored">
+						<router-link v-if="!pkh && route.path !== '/connect'" to="/connect">
+							<Button type="primary" size="small">
+								<Icon name="login" size="16" />
+								Connect Wallet
+							</Button>
+						</router-link>
+						<router-link v-else-if="!pkh && route.path === '/connect' && appStore.prevRoute" :to="appStore.prevRoute.path">
+							<Button type="secondary" size="small">
+								<Icon name="back" size="16" />
+								Back to {{ appStore.prevRoute.name }}
+							</Button>
+						</router-link>
 
-					<ProfileMenu v-if="pkh">
-						<Icon name="user" size="20" :class="$style.avatar" />
-					</ProfileMenu>
+						<ProfileMenu v-if="pkh">
+							<Icon name="user" size="20" :class="$style.avatar" />
+						</ProfileMenu>
+					</template>
 				</Flex>
 			</div>
 		</div>
