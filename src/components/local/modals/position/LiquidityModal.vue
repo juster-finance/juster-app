@@ -175,6 +175,7 @@ export default defineComponent({
 				showHint.confirmationDelay = true
 			}, 5000)
 
+			accountStore.pendingTransaction.awaiting = true
 			// TODO: #2
 			juster.sdk
 				.provideLiquidity(
@@ -184,22 +185,9 @@ export default defineComponent({
 					new BigNumber(slippage.value / 100),
 					new BigNumber(amount.value),
 				)
-				.then((op) => {
+				.then(() => {
 					/** Pending transaction label */
-					accountStore.pendingTransaction.awaiting = true
-
-					op.confirmation()
-						.then((result) => {
-							accountStore.pendingTransaction.awaiting = false
-
-							if (!result.completed) {
-								// todo: handle it?
-							}
-						})
-						.catch((err) => {
-							accountStore.pendingTransaction.awaiting = false
-						})
-
+					accountStore.pendingTransaction.awaiting = false
 					sendingLiquidity.value = false
 					showHint.confirmationDelay = false
 					showHint.aborted = false
@@ -229,6 +217,7 @@ export default defineComponent({
 					context.emit("onClose")
 				})
 				.catch((err) => {
+					accountStore.pendingTransaction.awaiting = false
 					sendingLiquidity.value = false
 					showHint.confirmationDelay = false
 
