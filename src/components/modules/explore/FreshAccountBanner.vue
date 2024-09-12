@@ -27,6 +27,7 @@ const router = useRouter()
 			>
 				Your account is ready for your first stake or liquidity deposit
 			</Text>
+			<br />
 			<Text
 				size="14"
 				weight="500"
@@ -54,12 +55,14 @@ const router = useRouter()
 					</Text>
 				</Flex>
 
-				<Flex gap="8" align="center" :class="$style.task">
+
+				<!-- TODO: #3 -->
+				<!-- <Flex gap="8" align="center" :class="$style.task">
 					<Icon name="money" size="16" />
 					<Text size="14" weight="600" color="primary">
 						Withdraw available funds
 					</Text>
-				</Flex>
+				</Flex> -->
 			</Flex>
 
 			<Flex align="center" gap="16" :class="$style.actions">
@@ -151,6 +154,7 @@ const router = useRouter()
 }
 
 .tasks {
+	margin-top: 10px;
 	margin-bottom: 32px;
 }
 

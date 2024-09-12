@@ -184,8 +184,8 @@ useMeta({
 					v-if="accountStore.pkh && !user"
 					:class="$style.block"
 				/>
-
-				<Flex
+				<!-- TODO: #3 -->
+				<!-- <Flex
 					justify="between"
 					gap="40"
 					:class="[$style.block, $style.billboard]"
@@ -220,7 +220,7 @@ useMeta({
 					>
 						<Icon name="login" size="16" />Go to Pools
 					</Button>
-				</Flex>
+				</Flex> -->
 
 				<!-- My Positions -->
 				<div v-if="myPositions.length" :class="$style.block">

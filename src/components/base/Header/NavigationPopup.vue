@@ -171,7 +171,8 @@ watch(
 
 						<Flex direction="column" gap="16" :class="$style.column">
 							<div :class="$style.advanced_block">
-								<router-link to="/pools" :class="$style.item">
+								<!-- TODO: #3 -->
+								<router-link to="/pools" :class="[$style.item, $style.disabled]">
 									<div :class="$style.icon_wrapper">
 										<Icon name="server" size="20" />
 									</div>
