@@ -266,7 +266,8 @@ useMeta({
 			</div>
 		</div>
 
-		<div :class="$style.block">
+		<!-- TODO: #3 -->
+		<!-- <div :class="$style.block">
 			<div :class="$style.header">
 				<div :class="$style.left">
 					<h2>Outstanding balances</h2>
@@ -318,7 +319,7 @@ useMeta({
 				:limit="6"
 				:class="$style.pagination"
 			/>
-		</div>
+		</div>-->
 
 		<div :class="$style.block">
 			<h2>Withdrawal history</h2>

@@ -80,7 +80,8 @@ export default defineComponent({
 		}
 
 		onMounted(() => {
-			if (address.value.length !== 36 || (!isMyProfile.value && accountStore.pkh == address.value)) {
+			// TODO: #3
+			if (/* address.value.length !== 36 || */ (!isMyProfile.value && accountStore.pkh == address.value)) {
 				router.push("/profile")
 				return
 			}
