@@ -12,6 +12,7 @@ import { currentNetwork } from "@sdk"
 import { flags, updateFlag } from "@/services/flags"
 import { parsePoolName } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
+import { token } from "@config"
 
 /**
  * Constants
@@ -132,8 +133,8 @@ onMounted(() => {
 		keySelector: (item) => {
 			let { name } = item
 
-			if (name.includes("XTZ")) {
-				name += " Tezos"
+			if (name.includes(token.symbol)) {
+				name += ` ${token.name}`
 			}
 			if (name.includes("BTC")) {
 				name += " Bitcoin"
@@ -321,7 +322,7 @@ const handleCloseTestnetWarning = () => {
 					<Flex v-else direction="column" gap="8" align="center" :class="$style.nothing_found_warning">
 						<Text size="13" weight="600" color="secondary"> Nothing found </Text>
 						<Text size="12" weight="500" height="16" align="center" color="tertiary">
-							Tip: You can use the full name e.g. "<b>Bitcoin</b>", "<b>1 day</b>", "<b>Tezos 6 hours</b>" etc
+							Tip: You can use the full name e.g. "<b>Bitcoin</b>", "<b>1 day</b>", "<b>{{token.name}} 6 hours</b>" etc
 						</Text>
 					</Flex>
 				</Flex>

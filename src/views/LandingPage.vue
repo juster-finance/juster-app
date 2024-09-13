@@ -8,6 +8,7 @@ import Page from "@base/Page.vue"
  * UI
  */
 import Button from "@ui/Button.vue"
+import { token } from "@config"
 
 export default {
 	name: "LandingPage",
@@ -78,7 +79,7 @@ export default {
 
 			<div :class="$style.hint">
 				<Icon name="help" size="14" />Juster is built on
-				<span>Tezos</span> blockchain and uses
+				<span>{{token.name}}</span> blockchain and uses
 				<span>Harbinger</span> oracle price feed
 			</div>
 		</div>

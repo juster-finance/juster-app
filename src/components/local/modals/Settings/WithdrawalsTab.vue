@@ -11,6 +11,7 @@ import { fetchUserWithdrawals } from "@/api/users"
  * Store
  */
 import { useAccountStore } from "@store/account"
+import { token } from "@config"
 
 export default defineComponent({
 	name: "WithdrawalsTab",
@@ -53,12 +54,12 @@ export default defineComponent({
 				<div :class="$style.stat">
 					<div :class="$style.key">In Total</div>
 					<div :class="$style.value">
-						{{ inTotal.toFixed(2) }} <span>XTZ</span>
+						{{ inTotal.toFixed(2) }} <span>{{token.symbol}}</span>
 					</div>
 				</div>
 				<div :class="$style.stat">
 					<div :class="$style.key">Lucky Symbol</div>
-					<div :class="$style.value">XTZ/USD</div>
+					<div :class="$style.value">{{token.symbol}}/USD</div>
 				</div>
 				<div :class="$style.stat">
 					<div :class="$style.key">Withdrawals</div>
@@ -80,7 +81,7 @@ export default defineComponent({
 						<Icon name="money" size="16" />
 
 						<div :class="$style.amount">
-							+{{ withdraw.amount.toFixed(2) }} <span>XTZ</span>
+							+{{ withdraw.amount.toFixed(2) }} <span>{{token.symbol}}</span>
 						</div>
 					</div>
 

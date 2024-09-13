@@ -21,6 +21,7 @@ import { useAccountStore } from "@store/account"
  * Services
  */
 import { numberWithSymbol } from "@utils/amounts"
+import { token } from "@config"
 
 const accountStore = useAccountStore()
 
@@ -78,24 +79,24 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 			<div :class="$style.param">
 				{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
-				<span>XTZ</span>
+				<span>{{token.symbol}}</span>
 			</div>
 
 			<div v-if="event.status == 'CANCELED'" :class="$style.param">
 				{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
-				<span>XTZ</span>
+				<span>{{token.symbol}}</span>
 			</div>
 
 			<div v-else-if="event.status == 'FINISHED'" :class="$style.param">
 				<Icon v-if="isWon" name="plus" size="14" color="green" />{{
 					isWon ? `${numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",")}` : 0
 				}}&nbsp;
-				<span>XTZ</span>
+				<span>{{token.symbol}}</span>
 			</div>
 
 			<div v-else-if="['NEW', 'STARTED'].includes(event.status)" :class="$style.param">
 				{{ numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",") }}&nbsp;
-				<span>XTZ</span>
+				<span>{{token.symbol}}</span>
 			</div>
 		</div>
 
@@ -115,7 +116,7 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 				<div :class="$style.value">
 					{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
-					<span>XTZ</span>
+					<span>{{token.symbol}}</span>
 				</div>
 			</div>
 
@@ -124,7 +125,7 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 				<div :class="$style.value">
 					{{ numberWithSymbol(bet.amount.toFixed(2), ",") }}&nbsp;
-					<span>XTZ</span>
+					<span>{{token.symbol}}</span>
 				</div>
 			</div>
 
@@ -133,7 +134,7 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 				<div :class="$style.value">
 					{{ isWon ? `+${numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",")}` : 0 }}&nbsp;
-					<span>XTZ</span>
+					<span>{{token.symbol}}</span>
 				</div>
 			</div>
 
@@ -142,7 +143,7 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 				<div :class="$style.value">
 					{{ numberWithSymbol((bet.reward - bet.amount).toFixed(2), ",") }}&nbsp;
-					<span>XTZ</span>
+					<span>{{token.symbol}}</span>
 				</div>
 			</div>
 		</div>

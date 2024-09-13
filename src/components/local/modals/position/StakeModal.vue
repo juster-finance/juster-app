@@ -11,7 +11,7 @@ import BN from "bignumber.js"
  * Services
  */
 import { juster, currentNetwork, analytics } from "@sdk"
-import { verifiedMakers, supportedMarkets } from "@config"
+import { verifiedMakers, supportedMarkets, token } from "@config"
 import { sanitizeInput, getCurrencyIcon } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
 import { toReadableDuration } from "@utils/date"
@@ -500,7 +500,7 @@ const handleUserTransactionConfirmation = () => {
 								autofocus
 								:class="$style.active_input"
 							/>
-							<input :value="`${amount.value} XTZ`" disabled :class="$style.behind_input" />
+							<input :value="`${amount.value} ${token.symbol}`" disabled :class="$style.behind_input" />
 						</Flex>
 
 						<Flex align="center" gap="8" :class="$style.percent_btns">
@@ -539,7 +539,7 @@ const handleUserTransactionConfirmation = () => {
 						<Text size="26" weight="600" color="secondary">
 							{{ payoutText }}
 						</Text>
-						<Text size="26" weight="600" color="tertiary"> &nbsp;XTZ </Text>
+						<Text size="26" weight="600" color="tertiary"> &nbsp;{{token.symbol}} </Text>
 					</Flex>
 				</Flex>
 			</Flex>

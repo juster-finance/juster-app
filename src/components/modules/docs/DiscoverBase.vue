@@ -1,5 +1,6 @@
 <script setup>
 import { reactive } from "vue"
+import { token } from "@config"
 
 /**
  * Modules: Docs
@@ -83,8 +84,8 @@ const getImageUrl = (image) => {
 					</div>
 					<div :class="$style.benefit">
 						<Icon name="verified" size="20" /> Juster is powered by
-						Tezos, which enables payouts to run as an automated
-						process that no person or organisation, including
+						{{token.name}}, which enables payouts to run as an automated
+						process that no person or organization, including
 						Juster, can interfere with
 					</div>
 					<div :class="$style.benefit">

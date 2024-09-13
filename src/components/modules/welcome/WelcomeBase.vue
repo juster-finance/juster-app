@@ -30,6 +30,7 @@ import { useAccountStore } from "@store/account"
  * Services
  */
 import { currentNetwork } from "@sdk"
+import { token } from "@config"
 
 const accountStore = useAccountStore()
 
@@ -80,7 +81,7 @@ const selectedTheme = ref("Dark")
 
 const currencyItems = reactive([
 	{
-		name: "Tezos",
+		name: token.name,
 		hint: "Default",
 	},
 	{

@@ -9,6 +9,7 @@ import { ref } from "vue"
  */
 import Modal from "@ui/Modal.vue"
 import Button from "@ui/Button.vue"
+import { token } from "@config"
 
 const props = defineProps({
 	show: Boolean,
@@ -33,7 +34,7 @@ const tabs = ref([
 		icon: "checkcircle",
 		items: [
 			"Entry acceptance depends on the pool period",
-			"Entries smaller than 1 XTZ need to be approved manually",
+			`Entries smaller than 1 ${token.symbol} need to be approved manually`,
 			"You cannot revoke the approval of the entry",
 		],
 	},

@@ -1,4 +1,5 @@
-import { supportedMarkets } from "@/services/config"
+import { supportedMarkets, token } from "@/services/config"
+
 
 export const toClipboard = (value) => {
 	navigator.clipboard.writeText(value)
@@ -6,8 +7,8 @@ export const toClipboard = (value) => {
 
 export const getCurrencyIcon = (name) => {
 	switch (name) {
-		case "XTZ":
-			return new URL(`../../assets/symbols/tz.png`, import.meta.url).href
+		case token.symbol:
+			return new URL(`../../assets/symbols/${token.currencyIconFileName}`, import.meta.url).href
 		case "ETH":
 			return new URL(`../../assets/symbols/eth.png`, import.meta.url).href
 		case "BTC":

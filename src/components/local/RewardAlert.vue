@@ -37,7 +37,7 @@ const reward = computed(() => {
 					<Text size="12" weight="700" color="primary">
 						{{ numberWithSymbol(reward, ",") }}&nbsp;
 					</Text>
-					<Text size="12" weight="700" color="tertiary"> XTZ </Text>
+					<Text size="12" weight="700" color="tertiary"> {{token.symbol}} </Text>
 				</Flex>
 			</Flex>
 

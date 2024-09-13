@@ -26,7 +26,7 @@ import EventActions from "@local/EventActions.vue"
 import { toClipboard, getCurrencyIcon } from "@utils/misc"
 import { juster, analytics, currentNetwork } from "@sdk"
 import { abbreviateNumber } from "@utils/amounts"
-import { supportedMarkets, verifiedMakers } from "@config"
+import { supportedMarkets, verifiedMakers, token } from "@config"
 import { toReadableDuration } from "@utils/date"
 
 /**
@@ -637,7 +637,7 @@ onUnmounted(() => {
 						<span>Stakes:</span>
 						{{ event.bets.length }} <br />
 						<span>Liquidity:</span>
-						{{ event.totalLiquidityProvided.toFixed(0) }} XTZ
+						{{ event.totalLiquidityProvided.toFixed(0) }} {{token.symbol}}
 					</template>
 				</Tooltip>
 

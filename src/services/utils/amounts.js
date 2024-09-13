@@ -109,7 +109,7 @@ export const truncate = (num) => {
 }
 
 // TODO: #2
-export const disaggregate = (num) => {
+export const disaggregate = (num = 0) => {
 	const splittedNum = num.toString().split(".")
 
 	const integer = splittedNum[0]

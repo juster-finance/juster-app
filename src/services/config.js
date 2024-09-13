@@ -14,6 +14,12 @@ export const demoMode = {
 	walletPayloadTokenExpiresInSeconds: 900
 }
 
+export const token = {
+	name: 'TON',
+	symbol: 'TON',
+	currencyIconFileName: 'ton.png'
+}
+
 export const localStorageKeys = {
 	AUTH_TOKEN: 'auth_token'
 }

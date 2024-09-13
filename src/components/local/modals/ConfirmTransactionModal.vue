@@ -15,6 +15,7 @@ import Button from "@ui/Button.vue"
 import { shorten, capitalizeFirstLetter } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
 import { toReadableDuration } from "@utils/date"
+import { token } from "@config"
 
 /**
  * Store
@@ -169,7 +170,7 @@ watch(
 								}}
 							</Text>
 							<Text size="14" weight="600" color="tertiary">
-								&nbsp;XTZ
+								&nbsp;{{token.symbol}}
 							</Text>
 						</Flex>
 					</Flex>
@@ -318,7 +319,7 @@ watch(
 							}}
 						</Text>
 						<Text size="14" weight="600" color="tertiary">
-							&nbsp;XTZ
+							&nbsp;{{token.symbol}}
 						</Text>
 					</Flex>
 				</Flex>

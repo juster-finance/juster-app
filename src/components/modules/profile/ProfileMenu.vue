@@ -20,6 +20,7 @@ import { analytics } from "@sdk"
  */
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
+import { token } from "@config"
 
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
@@ -90,7 +91,7 @@ const handleLogout = async () => {
 							<Text size="13" weight="600" color="primary">
 								<Flex>
 									{{ numberWithSymbol(accountStore.balance, ",") }}&nbsp;
-									<Text color="tertiary">XTZ</Text>
+									<Text color="tertiary">{{token.symbol}}</Text>
 								</Flex>
 							</Text>
 							<Text size="11" weight="600" color="tertiary"> Manage your assets </Text>

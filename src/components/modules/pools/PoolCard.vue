@@ -21,6 +21,7 @@ import { Dropdown, DropdownItem, DropdownTitle, DropdownDivider } from "@ui/Drop
 import { juster } from "@sdk"
 import { toClipboard, getCurrencyIcon, shorten, parsePoolName } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
+import { token } from "@config"
 
 /**
  * Store
@@ -188,7 +189,7 @@ const copy = (target) => {
 		<Flex justify="between">
 			<Flex align="center" gap="16">
 				<div :class="$style.symbols">
-					<img :src="getCurrencyIcon('XTZ')" alt="symbol" />
+					<img :src="getCurrencyIcon(token.symbol)" alt="symbol" />
 					<img :src="getCurrencyIcon('USD')" alt="symbol" />
 				</div>
 

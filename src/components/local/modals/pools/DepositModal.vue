@@ -22,6 +22,7 @@ import LoadingDots from "@ui/LoadingDots.vue"
 import { juster, analytics } from "@sdk"
 import { sanitizeInput, capitalizeFirstLetter, parsePoolName } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
+import { token } from "@config"
 
 /**
  * Store
@@ -102,7 +103,7 @@ const handleDeposit = async () => {
 				notification: {
 					icon: "warning",
 					title: "The operation was rejected",
-					description: `The deposit to ${props.selectedPool.name} of ${amount.value} XTZ was not accepted`,
+					description: `The deposit to ${props.selectedPool.name} of ${amount.value} ${token.symbol} was not accepted`,
 					autoDestroy: true,
 				},
 			})
@@ -139,7 +140,7 @@ const buttonState = computed(() => {
 			disabled: true,
 			type: "secondary",
 		}
-	if (amount.value > 0 && amount.value < 0.01) return { text: "Minimum 0.01 XTZ", disabled: true, type: "secondary" }
+	if (amount.value > 0 && amount.value < 0.01) return { text: `Minimum 0.01 ${token.symbol}`, disabled: true, type: "secondary" }
 	if (amount.value > accountStore.balance)
 		return {
 			text: "Insufficient funds",
@@ -386,7 +387,7 @@ const onKeydown = (e) => {
 						<Flex align="center">
 							<Text size="14" weight="600" color="primary">
 								{{ amount.value ? numberWithSymbol(amount.value, ",") : 0 }} </Text
-							>&nbsp; <Text size="14" weight="600" color="tertiary"> XTZ </Text>&nbsp;
+							>&nbsp; <Text size="14" weight="600" color="tertiary"> {{token.symbol}} </Text>&nbsp;
 							<Text size="14" weight="600" color="support"> -> </Text>&nbsp;
 							<Text size="14" weight="600" color="secondary"> ~ </Text>
 							<Text size="14" weight="600" color="primary">

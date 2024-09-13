@@ -4,6 +4,7 @@
  */
 import Toggle from "@ui/Toggle.vue"
 import Selector from "@ui/Selector.vue"
+import { token } from "@config"
 </script>
 
 <template>
@@ -12,7 +13,7 @@ import Selector from "@ui/Selector.vue"
 			<Text size="13" weight="600" color="primary"> Currency </Text>
 
 			<Flex justify="between" gap="8">
-				<Selector name="Tezos" :selected="true">
+				<Selector :name="token.symbol" :selected="true">
 					<template #hint>
 						<Text size="11" weight="600" color="tertiary">
 							Default

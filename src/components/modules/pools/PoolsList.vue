@@ -10,6 +10,7 @@ import { Searcher } from "fast-fuzzy"
  */
 import Button from "@ui/Button.vue"
 import { Dropdown, DropdownItem } from "@ui/Dropdown"
+import { token } from "@config"
 
 /**
  * Local
@@ -166,8 +167,8 @@ onMounted(() => {
 		keySelector: (item) => {
 			let { name } = item
 
-			if (name.includes("XTZ")) {
-				name += " Tezos"
+			if (name.includes(token.symbol)) {
+				name += ` ${token.name}`
 			}
 			if (name.includes("BTC")) {
 				name += " Bitcoin"

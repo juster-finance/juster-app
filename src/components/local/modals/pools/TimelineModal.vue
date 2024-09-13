@@ -20,6 +20,7 @@ import Spin from "@ui/Spin.vue"
  */
 import { parsePoolName, shorten } from "@utils/misc"
 import { juster, destroySubscription } from "@sdk"
+import { token } from "@config"
 
 /**
  * Models
@@ -304,7 +305,7 @@ const getEventIconByActionName = (action) => {
 								<Flex direction="column" gap="6">
 									<Flex>
 										<Text size="12" weight="600" color="primary">{{ ev.affectedEntry.amount }}&nbsp;</Text>
-										<Text size="12" weight="600" color="tertiary">XTZ</Text>
+										<Text size="12" weight="600" color="tertiary">{{token.symbol}}</Text>
 									</Flex>
 
 									<Flex align="center" gap="4" :class="$style.params">
@@ -326,7 +327,7 @@ const getEventIconByActionName = (action) => {
 									<Flex>
 										<Text size="12" weight="600" color="secondary">Plus&nbsp;</Text>
 										<Text size="12" weight="600" color="primary">{{ ev.totalLiquidityDiff }}</Text>
-										<Text size="12" weight="600" color="secondary">&nbsp;XTZ</Text>
+										<Text size="12" weight="600" color="secondary">&nbsp;{{token.symbol}}</Text>
 									</Flex>
 
 									<Flex align="center" gap="4" :class="$style.params">

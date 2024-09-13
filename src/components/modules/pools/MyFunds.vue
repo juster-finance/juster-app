@@ -20,7 +20,7 @@ import LargeBanner from "@ui/LargeBanner.vue"
 import { juster } from "@sdk"
 import { getCurrencyIcon, parsePoolName } from "@utils/misc"
 import { numberWithSymbol, truncate } from "@utils/amounts"
-import { supportedMarkets } from "@config"
+import { supportedMarkets, token } from "@config"
 
 /**
  * Store
@@ -318,7 +318,7 @@ watch(
 									One (or more) entries need manual confirmation
 									<span>
 										This is due to the fact that the amount<br />
-										of the deposit was less than one tezos
+										of the deposit was less than one {{token.symbol}}
 									</span>
 								</Flex>
 							</template>

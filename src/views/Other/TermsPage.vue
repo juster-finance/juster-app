@@ -3,6 +3,8 @@
  * Base
  */
 import Page from "@base/Page.vue"
+import { token } from "@config"
+
 </script>
 
 <template>
@@ -55,7 +57,7 @@ import Page from "@base/Page.vue"
 			</p>
 			<p>
 				“Protocol” means the Juster’s set of smart contracts that are
-				deployed on the Tezos Blockchain.
+				deployed on the {{token.name}} Blockchain.
 			</p>
 			<p>
 				“Website” means the Juster’s application website and all its
@@ -64,8 +66,8 @@ import Page from "@base/Page.vue"
 				>)
 			</p>
 			<p>
-				“Tez” means the Tezos Blockchain utility token that may be used
-				to perform actions on the Tezos Blockchain.
+				“{{token.symbol}}” means the {{token.name}} Blockchain utility token that may be used
+				to perform actions on the {{token.name}} Blockchain.
 			</p>
 			<p>
 				“Event” means Juster’s contract data structure, consisting of a
@@ -106,10 +108,10 @@ import Page from "@base/Page.vue"
 			<p>
 				Juster Protocol and Website is made up of free, public,
 				open-source or source-available software including a set of
-				smart contracts that are deployed on the Tezos Blockchain.
+				smart contracts that are deployed on the {{token.name}} Blockchain.
 				However, Baking Bad OÜ does not provide, own, or control the
 				Juster Protocol, which is run by smart contracts deployed on the
-				Tezos blockchain. No developer or entity involved in creating
+				{{token.name}} blockchain. No developer or entity involved in creating
 				the Juster Protocol and Website will be liable for any claims or
 				damages whatsoever associated with your use, inability to use,
 				or your interaction with other users of, the Juster Protocol and
@@ -228,15 +230,15 @@ import Page from "@base/Page.vue"
 				risks. The Juster Website provides functionality that allows You
 				to generate Cryptographic Currency transactions and transmit
 				them to Your wallet. But Juster Website has no control over the
-				Tezos blockchain that You can interact with, and has no ability
+				{{token.name}} blockchain that You can interact with, and has no ability
 				to cancel, modify or affect any transaction that You have caused
-				to be transmitted to the Tezos blockchain network. The Juster
+				to be transmitted to the {{token.name}} blockchain network. The Juster
 				Website does not guarantee that transactions You perform shall
-				be stored in the Tezos blockchain or the conditions of the
+				be stored in the {{token.name}} blockchain or the conditions of the
 				operation will be the same as expected. Providing correct
 				transaction data including slippage, fees, gas limit, storage
 				limit and e.g. is Your sole responsibility. You should take care
-				to understand the details of the Tezos blockchain. Juster
+				to understand the details of the {{token.name}} blockchain. Juster
 				Website shall not be responsible for any losses You incur due to
 				transaction fees, front-running attacks, lack of liquidity or
 				any losses that occur due to incorrectly set transaction data.
@@ -253,7 +255,7 @@ import Page from "@base/Page.vue"
 				liquidity providing which is presented to You in the Juster
 				Website prior to submitting the operation are not final. It can
 				differ from the final values due to other users’ bets, changes
-				of liquidity, front-running attacks, Tezos network conditions
+				of liquidity, front-running attacks, {{token.name}} network conditions
 				and e.g.
 			</p>
 			<p>

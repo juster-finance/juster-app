@@ -13,7 +13,7 @@ import Badge from "@ui/Badge.vue"
 /**
  * Services
  */
-import { supportedMarkets } from "@config"
+import { supportedMarkets, token } from "@config"
 import { toReadableDuration } from "@utils/date"
 import { abbreviateNumber } from "@utils/amounts"
 
@@ -133,7 +133,7 @@ const value = computed(() => {
 
 			<Badge size="medium" color="gray">
 				<Icon name="coins" size="14" color="tertiary" />
-				{{ value }}<span>XTZ</span>
+				{{ value }}<span>{{token.symbol}}</span>
 			</Badge>
 		</Flex>
 	</router-link>

@@ -271,7 +271,7 @@ const init = () => {
 }
 
 /**
- * Deposits with an amount <1 xtz need manual confirmation
+ * Deposits with an amount <1 TON need manual confirmation
  */
 const handleManualEntryApprove = async (entry) => {
 	await juster.provider.client.requestOperation({

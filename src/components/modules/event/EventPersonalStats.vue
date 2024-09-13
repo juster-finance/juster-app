@@ -13,6 +13,7 @@ import { useAccountStore } from "@store/account"
  * Services
  */
 import { abbreviateNumber, numberWithSymbol } from "@utils/amounts"
+import { token } from "@config"
 
 /**
  * UI
@@ -102,7 +103,7 @@ const hasHedge = computed(() => {
 
 				<div :class="$style.amount">
 					{{ abbreviateNumber(dvl + bvl) }}
-					<span>XTZ</span>
+					<span>{{token.symbol}}</span>
 				</div>
 			</div>
 
@@ -133,7 +134,7 @@ const hasHedge = computed(() => {
 					v-else-if="!position || !position.value"
 					:class="$style.amount"
 				>
-					0 <span>XTZ</span>
+					0 <span>{{token.symbol}}</span>
 				</div>
 				<div v-else :class="$style.amount">
 					{{
@@ -141,7 +142,7 @@ const hasHedge = computed(() => {
 							? numberWithSymbol(position.value.toFixed(2), ",")
 							: 0
 					}}
-					<span>XTZ</span>
+					<span>{{token.symbol}}</span>
 				</div>
 			</div>
 
@@ -174,17 +175,17 @@ const hasHedge = computed(() => {
 					v-else-if="['NEW', 'STARTED'].includes(event.status)"
 					:class="$style.amount"
 				>
-					{{ potentialProfit.toFixed(2) }} <span>XTZ</span>
+					{{ potentialProfit.toFixed(2) }} <span>{{token.symbol}}</span>
 				</div>
 
 				<div
 					v-else-if="event.status == 'FINISHED'"
 					:class="$style.amount"
 				>
-					{{ profitOnFinish.toFixed(2) }} <span>XTZ</span>
+					{{ profitOnFinish.toFixed(2) }} <span>{{token.symbol}}</span>
 				</div>
 
-				<div v-else :class="$style.amount">0 <span>XTZ</span></div>
+				<div v-else :class="$style.amount">0 <span>{{token.symbol}}</span></div>
 			</div>
 
 			<Tooltip

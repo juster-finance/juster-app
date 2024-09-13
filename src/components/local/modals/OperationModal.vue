@@ -66,7 +66,7 @@ const handleCopy = (target, name) => {
 }
 
 // TODO: #2
-const disaggregate = (num) => {
+const disaggregate = (num = 0) => {
 	const splittedNum = num.toString().split(".")
 
 	const integer = splittedNum[0]

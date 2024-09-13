@@ -11,7 +11,7 @@ import OperationModal from "@local/modals/OperationModal.vue"
  * Services
  */
 import { currentNetwork } from "@sdk"
-import { verifiedMakers } from "@config"
+import { verifiedMakers, token } from "@config"
 import { numberWithSymbol } from "@utils/amounts"
 
 /**
@@ -93,11 +93,11 @@ const returnForLiquidity = computed(() => {
 		<!-- Desktop Template -->
 		<div :class="$style.desktop">
 			<div :class="[$style.param, $style.up]">
-				{{ numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",") }}&nbsp;<span>XTZ</span>
+				{{ numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",") }}&nbsp;<span>{{token.symbol}}</span>
 			</div>
 
 			<div v-if="event.status == 'FINISHED' && returnForLiquidity" :class="[$style.param]">
-				{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>XTZ</span>
+				{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>{{token.symbol}}</span>
 			</div>
 			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">Refund</div>
 			<div v-else :class="$style.param">
@@ -112,7 +112,7 @@ const returnForLiquidity = computed(() => {
 
 				<div :class="$style.value">
 					<Icon name="arrow_circle_top_right" size="12" />{{ numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",") }}&nbsp;<span
-						>XTZ</span
+						>{{token.symbol}}</span
 					>
 				</div>
 			</div>
@@ -122,7 +122,7 @@ const returnForLiquidity = computed(() => {
 
 				<div :class="$style.value">
 					<Icon name="arrow_circle_top_right" size="12" />{{ numberWithSymbol(deposit.amountBelow.toFixed(0), ",") }}&nbsp;<span
-						>XTZ</span
+						>{{token.symbol}}</span
 					>
 				</div>
 			</div>
@@ -130,7 +130,7 @@ const returnForLiquidity = computed(() => {
 			<div v-if="event.status == 'FINISHED' && returnForLiquidity" :class="[$style.param]">
 				<div :class="$style.key">Return</div>
 
-				<div :class="$style.value">{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>XTZ</span></div>
+				<div :class="$style.value">{{ numberWithSymbol(returnForLiquidity, ",") }}&nbsp;<span>{{token.symbol}}</span></div>
 			</div>
 			<div v-else-if="event.status == 'CANCELED'" :class="$style.param">
 				<div :class="$style.key">Return</div>
