@@ -26,7 +26,7 @@ import { withdrawAll } from "@sdk"
 /**
  * Services
  */
-import { supportedMarkets } from "@config"
+import { supportedMarkets, token } from "@config"
 import { numberWithSymbol } from "@utils/amounts"
 
 export default defineComponent({
@@ -76,7 +76,7 @@ export default defineComponent({
 						0,
 					),
 					",",
-				)} ꜩ`,
+				)} ${token.symbol}`,
 				disabled: false,
 			}
 		})
@@ -270,8 +270,9 @@ export default defineComponent({
 								Event: #{{ position.event.id }},
 								amount:&nbsp;<span>{{
 									position.value.toFixed(2)
-								}}</span
-								>&nbsp;ꜩ
+								}}</span>
+								&nbsp;
+								<TokenSymbol size="12" />
 							</div>
 						</Flex>
 					</div>

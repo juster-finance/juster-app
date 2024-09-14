@@ -3,6 +3,7 @@
  * Vendor
  */
 import { ref, watch, computed } from "vue"
+import TokenSymbol from "../icons/TokenSymbol.vue";
 
 const emit = defineEmits(["update:modelValue"])
 const props = defineProps({
@@ -26,6 +27,9 @@ const props = defineProps({
 	},
 	subtext: {
 		type: String,
+	},
+	showTokenIcon: {
+		type: Boolean,
 	},
 	placeholder: {
 		type: String,
@@ -126,6 +130,7 @@ const handleBlur = () => {
 			</transition>
 
 			<div v-if="subtext" :class="$style.subtext">{{ subtext }}</div>
+			<TokenSymbol v-if="showTokenIcon" size="15" :class="$style.token_icon" />
 		</div>
 
 		<Text v-if="hint" size="12" weight="600" color="support" height="14">
@@ -201,6 +206,10 @@ const handleBlur = () => {
 .subtext {
 	font-size: 12px;
 	font-weight: 700;
+	color: var(--text-tertiary);
+}
+
+.token_icon {
 	color: var(--text-tertiary);
 }
 

@@ -161,7 +161,10 @@ export default defineComponent({
 					<Icon name="copy" size="14" />
 				</div>
 
-				<div :class="$style.status">{{ isMyProfile ? accountStore.balance : balance }} ꜩ</div>
+				<Flex align="end" gap="4" justify="center" :class="$style.status">
+					{{ isMyProfile ? accountStore.balance : balance }} 
+					<TokenSymbol size="15"/>
+				</Flex>
 
 				<div :class="$style.progress">
 					<div :class="$style.head">
@@ -191,29 +194,29 @@ export default defineComponent({
 					<div :class="$style.stat">
 						<div :class="$style.key">Liquidity provided</div>
 
-						<div :class="$style.value">
+						<Flex align="end" gap="2" :class="$style.value">
 							{{ abbreviateNumber(user.totalLiquidityProvided) }}
 
-							<span>ꜩ</span>
-						</div>
+							<TokenSymbol size="16"/>
+						</Flex>
 					</div>
 
 					<div :class="$style.stat">
 						<div :class="$style.key">Net return</div>
 
-						<div :class="$style.value">
+						<Flex align="end" gap="2" :class="$style.value">
 							{{ abbreviateNumber(user.totalProviderReward) }}
-							<span>ꜩ</span>
-						</div>
+							<TokenSymbol size="16"/>
+						</Flex>
 					</div>
 
 					<div :class="$style.stat">
 						<div :class="$style.key">Fees collected</div>
 
-						<div :class="$style.value">
+						<Flex align="end" gap="2" :class="$style.value">
 							{{ user.totalFeesCollected.toFixed(0) }}
-							<span>ꜩ</span>
-						</div>
+							<TokenSymbol size="16"/>
+						</Flex>
 					</div>
 				</div>
 
@@ -223,19 +226,19 @@ export default defineComponent({
 					<div :class="$style.stat">
 						<div :class="$style.key">Bets value</div>
 
-						<div :class="$style.value">
+						<Flex align="end" gap="2" :class="$style.value">
 							{{ user.totalBetsAmount }}
-							<span>ꜩ</span>
-						</div>
+							<TokenSymbol size="16"/>
+						</Flex>
 					</div>
 
 					<div v-if="user.totalWithdrawn" :class="$style.stat">
 						<div :class="$style.key">Withdrawn</div>
 
-						<div :class="$style.value">
+						<Flex align="end" gap="2" :class="$style.value">
 							{{ abbreviateNumber(user.totalWithdrawn) }}
-							<span>ꜩ</span>
-						</div>
+							<TokenSymbol size="16"/>
+						</Flex>
 					</div>
 
 					<div :class="$style.stat">
@@ -486,7 +489,8 @@ export default defineComponent({
 	margin-bottom: 12px;
 }
 
-.value span {
+.value span,
+.value svg {
 	color: var(--text-tertiary);
 }
 

@@ -375,7 +375,7 @@ const handleCloseRequestFundsWarning = () => {
 									: 0
 							}} </Text
 						>&nbsp;
-						<Text size="14" weight="600" color="tertiary"> ꜩ </Text>
+						<TokenSymbol size="14" color="var(--text-tertiary)" />
 					</Flex>
 				</Flex>
 

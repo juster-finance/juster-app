@@ -22,6 +22,10 @@ const props = defineProps({
 		type: Boolean,
 		default: false,
 	},
+	inline: {
+		type: Boolean,
+		default: false,
+	},
 })
 
 const classes = computed(() => {
@@ -44,6 +48,9 @@ const classes = computed(() => {
 	}
 	if (props.wide) {
 		flexClasses.push("f--wide")
+	}
+	if (props.inline) {
+		flexClasses.push("f--inline")
 	}
 
 	return flexClasses

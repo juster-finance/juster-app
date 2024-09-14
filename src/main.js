@@ -37,9 +37,11 @@ app.provide("amplitude", amplitude.getInstance())
  * Global components
  */
 import Icon from "@/components/icons/Icon.vue"
+import TokenSymbol from "@/components/icons/TokenSymbol.vue"
 import Flex from "@layout/Flex.vue"
 import Text from "@typography/Text.vue"
 app.component("Icon", Icon)
+app.component("TokenSymbol", TokenSymbol)
 app.component("Flex", Flex)
 app.component("Text", Text)
 

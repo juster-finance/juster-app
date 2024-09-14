@@ -388,21 +388,28 @@ watch(
 							</Flex>
 						</Flex>
 
-						<Text v-if="!isEntryReadyToManualApprove(entry)" size="14" weight="600" color="secondary">
-							{{ numberWithSymbol(entry.amount, ",") }} ꜩ
-						</Text>
+						<Flex v-if="!isEntryReadyToManualApprove(entry)" align="end" gap="2">
+							<Text  size="14" weight="600" color="secondary">
+								{{ numberWithSymbol(entry.amount, ",") }}
+							</Text>
+							<TokenSymbol size="14" color="var(--text-tertiary)"/>
+						</Flex>
 
-						<Text
-							v-else
-							@click="emit('onManualEntryApprove', entry)"
-							size="14"
-							weight="600"
-							color="blue"
+						<Flex 
+							v-else 
+							align="end"
+							gap="2"
 							style="cursor: pointer"
-						>
-							Approve
-							{{ numberWithSymbol(entry.amount, ",") }} ꜩ
-						</Text>
+							@click="emit('onManualEntryApprove', entry)">
+							<Text
+								size="14"
+								color="blue"
+								weight="600">
+								Approve
+								{{ numberWithSymbol(entry.amount, ",") }}
+							</Text>
+							<TokenSymbol size="14" color="var(--text-blue)"/>
+						</Flex>
 					</Flex>
 				</Flex>
 			</Flex>
@@ -486,11 +493,11 @@ watch(
 							</Text>
 						</Flex>
 
-						<Flex align="center" gap="4">
+						<Flex align="end" gap="2">
 							<Text size="14" weight="600" color="secondary">
 								{{ numberWithSymbol(claim.amount, ",") }}
 							</Text>
-							<Text size="14" weight="600" color="tertiary">ꜩ</Text>
+							<TokenSymbol size="14" color="var(--text-tertiary)"/>
 						</Flex>
 					</Flex>
 				</Flex>

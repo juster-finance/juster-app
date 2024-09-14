@@ -126,12 +126,10 @@ const handleCopy = (target) => {
 					<div :class="$style.dot" />
 					<div :class="$style.param">
 						Liquidity:
-						<span
-							>{{
-								user.liquidityProvidedBelow.toFixed(2)
-							}}
-							ꜩ</span
-						>
+						<Flex align="end" gap="2" inline>
+							<span> {{ user.liquidityProvidedBelow.toFixed(2) }} </span>
+							<TokenSymbol size="12"/>
+						</Flex>
 					</div>
 				</div>
 				<div v-else-if="user.creator" :class="$style.params">

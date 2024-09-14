@@ -263,7 +263,7 @@ const handleKeydown = (e) => {
 							@click="minInputEl.focus()"
 							:class="$style.range_input"
 						>
-							<Icon name="download" size="12" />
+							<Icon name="download" size="12" :class="$style.direct" />
 							<input
 								ref="minInputEl"
 								v-model="inputs.min"
@@ -273,14 +273,14 @@ const handleKeydown = (e) => {
 								@blur="handleBlur('min')"
 								placeholder="0"
 							/>
-							<span>ꜩ</span>
+							<TokenSymbol size="12"/>
 						</div>
 
 						<div
 							@click="maxInputEl.focus()"
 							:class="$style.range_input"
 						>
-							<span>ꜩ</span>
+							<TokenSymbol size="12"/>
 							<input
 								ref="maxInputEl"
 								v-model="inputs.max"
@@ -736,7 +736,7 @@ const handleKeydown = (e) => {
 	transition: border 0.2s ease;
 }
 
-.range_input svg {
+.range_input svg.direct {
 	fill: var(--text-tertiary);
 
 	margin: 0 8px 0 0;

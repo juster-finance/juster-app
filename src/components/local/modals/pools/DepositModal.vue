@@ -324,7 +324,7 @@ const onKeydown = (e) => {
 				:limit="1000000"
 				label="Amount"
 				placeholder="Deposit amount"
-				subtext="ꜩ"
+				showTokenIcon
 				v-model="amount.value"
 				@keydown="handleKeydown"
 				:class="$style.amount_input"

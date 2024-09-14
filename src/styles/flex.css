@@ -2,6 +2,10 @@
 	display: flex;
 }
 
+.f--inline {
+	display: inline-flex;
+}
+
 .f--wide {
 	width: 100%;
 }

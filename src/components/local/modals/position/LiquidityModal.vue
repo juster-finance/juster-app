@@ -318,7 +318,7 @@ export default defineComponent({
 				:limit="10000"
 				label="Amount"
 				placeholder="Liquidity amount"
-				subtext="ꜩ"
+				showTokenIcon
 				v-model="amount.value"
 			/>
 

@@ -266,7 +266,7 @@ useMeta({
 				<RatingCard
 					v-if="!isTopProvidersLoading"
 					:users="topProviders"
-					suffix="ꜩ"
+					isTokenSuffix
 					data-cy="rating-card-liquidity"
 					:class="$style.rating_card"
 				/>

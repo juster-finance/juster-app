@@ -135,32 +135,33 @@ const getTypeOfOperation = () => {
 						{{ getTypeOfOperation() }} <span>by</span>
 						{{ shorten(data.userId, 4, 4) }}
 					</router-link>
-
-					<div :class="$style.amount">
-						{{
-							disaggregate(
-								data.amount ? data.amount : data.amountBelow,
-							)[0]
-						}}<span>
-							<template
-								v-if="
+					<Flex align="end" gap="2" :class="$style.amount">
+						<div >
+							{{
+								disaggregate(
+									data.amount ? data.amount : data.amountBelow,
+								)[0]
+							}}<span>
+								<template
+									v-if="
+										disaggregate(
+											data.amount
+												? data.amount
+												: data.amountBelow,
+										)[1]
+									"
+									>.</template
+								>{{
 									disaggregate(
 										data.amount
 											? data.amount
 											: data.amountBelow,
 									)[1]
-								"
-								>.</template
-							>{{
-								disaggregate(
-									data.amount
-										? data.amount
-										: data.amountBelow,
-								)[1]
-							}}
-							ꜩ
-						</span>
-					</div>
+								}}
+							</span>
+						</div>
+						<TokenSymbol size="26"/>
+					</Flex>
 
 					<div :class="$style.usd">
 						<template v-if="!isPriceHovered">
@@ -350,7 +351,8 @@ const getTypeOfOperation = () => {
 	margin-bottom: 12px;
 }
 
-.amount span {
+.amount span,
+.amount svg {
 	color: var(--text-tertiary);
 }
 

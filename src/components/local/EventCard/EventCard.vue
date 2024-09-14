@@ -551,7 +551,10 @@ onUnmounted(() => {
 							:class="$style.my_avatar"
 							alt="avatar"
 						/>
-						{{ abbreviateNumber(userTVL) }} ꜩ
+						<Flex align="end" gap="2">
+							{{ abbreviateNumber(userTVL) }}
+							<TokenSymbol size="12"/>
+						</Flex>
 					</Badge>
 
 					<template #content>My TVL: Bets + Liquidity</template>

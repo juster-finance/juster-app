@@ -72,14 +72,14 @@ const timing = computed(() => {
 						)}`
 					}}
 				</div>
-				<div :class="$style.subname">
+				<Flex align="end" gap="2" :class="$style.subname">
 					<span
 						@click="amount.value = Math.floor(accountStore.balance)"
 						@dblclick="amount.value = accountStore.balance / 2"
 						>{{ accountStore.balance }}</span
 					>
-					ꜩ
-				</div>
+					<TokenSymbol size="12" />
+				</Flex>
 			</div>
 		</div>
 

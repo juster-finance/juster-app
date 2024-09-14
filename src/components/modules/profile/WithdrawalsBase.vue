@@ -225,35 +225,47 @@ useMeta({
 			<div :class="$style.stats">
 				<div :class="$style.stat">
 					<div :class="$style.stat_name">Last week</div>
-					<div :class="$style.stat_value">
-						{{ statistics.week.value.toFixed(0) }} ꜩ
-					</div>
+					<Flex align="end" gap="4" :class="$style.stat_value">
+						{{ statistics.week.value.toFixed(0) }} 
+						<TokenSymbol size="24"/>
+					</Flex>
 					<div :class="$style.stat_avg">
 						Avg
-						<span>{{ statistics.week.avg.toFixed(0) }} ꜩ</span>
+						<Flex align="end" gap="2" inline :class="$style.stat_avg_amount">
+							<span>{{ statistics.week.avg.toFixed(0) }}</span>
+							<TokenSymbol size="12"/>
+						</Flex>
 						per event
 					</div>
 				</div>
 				<div :class="$style.stat">
 					<div :class="$style.stat_name">Last month</div>
-					<div :class="$style.stat_value">
-						{{ statistics.month.value.toFixed(0) }} ꜩ
-					</div>
+					<Flex align="end" gap="4" :class="$style.stat_value">
+						{{ statistics.month.value.toFixed(0) }}
+						<TokenSymbol size="24"/>
+					</Flex>
 					<div :class="$style.stat_avg">
 						Avg
-						<span>{{ statistics.month.avg.toFixed(0) }} ꜩ</span>
+						<Flex align="end" gap="2" inline :class="$style.stat_avg_amount">
+							<span>{{ statistics.month.avg.toFixed(0) }}</span>
+							<TokenSymbol size="12"/>
+						</Flex>
 						per event
 					</div>
 				</div>
 				<div :class="$style.stat">
 					<div :class="$style.stat_name">All time</div>
-					<div :class="$style.stat_value">
-						{{ statistics.all.value.toFixed(0) }} ꜩ
-					</div>
+					<Flex align="end" gap="4" :class="$style.stat_value">
+						{{ statistics.all.value.toFixed(0) }}
+						<TokenSymbol size="24"/>
+					</Flex>
 					<div :class="$style.stat_avg">
 						Avg
-						<span>{{ statistics.all.avg.toFixed(0) }} ꜩ</span> per
-						event
+						<Flex align="end" gap="2" inline :class="$style.stat_avg_amount">
+							<span>{{ statistics.all.avg.toFixed(0) }}</span>
+							<TokenSymbol size="12"/>
+						</Flex>
+						per event
 					</div>
 				</div>
 			</div>
@@ -391,13 +403,15 @@ useMeta({
 							</div>
 						</td>
 						<td>
-							+{{
-								numberWithSymbol(
-									withdraw.amount.toFixed(2),
-									",",
-								)
-							}}
-							<span>ꜩ</span>
+							<Flex align="end" gap="2">
+								+{{
+									numberWithSymbol(
+										withdraw.amount.toFixed(2),
+										",",
+									)
+								}}
+								<TokenSymbol size="14"/>
+							</Flex>
 						</td>
 						<td>
 							<router-link :to="`/events/${withdraw.event.id}`">
@@ -438,12 +452,13 @@ useMeta({
 					</div>
 				</div>
 			</div>
-
-			<div :class="$style.hint">
+			
+			<!-- TODO: #3 -->
+			<!-- <div :class="$style.hint">
 				<Icon name="help" size="14" />You can withdraw your funds
 				manually, however if not done within 24 hours, Juster will do
 				that for you and charge a small fee.
-			</div>
+			</div> -->
 		</div>
 	</div>
 </template>
@@ -513,7 +528,7 @@ useMeta({
 	text-transform: uppercase;
 }
 
-.stat_avg span {
+.stat_avg_amount {
 	color: var(--text-secondary);
 }
 
@@ -574,7 +589,8 @@ useMeta({
 	padding: 0;
 }
 
-.withdrawboard td span {
+.withdrawboard td span,
+.withdrawboard td svg {
 	color: var(--text-tertiary);
 }
 

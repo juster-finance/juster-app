@@ -281,8 +281,9 @@ const buttonState = computed(() => {
 						<Flex>
 							<Text size="14" weight="600" color="primary">
 								{{ numberWithSymbol(availableClaims.reduce((acc, { amount }) => (acc += amount), 0).toFixed(2), ",") }}
+								&nbsp;
 							</Text>
-							<Text size="14" weight="600" color="tertiary"> &nbsp;ꜩ </Text>
+							<TokenSymbol size="14" color="var(--text-tertiary)"/>
 						</Flex>
 					</Flex>
 
@@ -326,9 +327,10 @@ const buttonState = computed(() => {
 							<Flex>
 								<Text size="14" weight="600" color="primary">
 									{{ numberWithSymbol(claim.amount.toFixed(2), ",") }}
+									&nbsp;
 								</Text>
-								<Text size="14" weight="600" color="tertiary"> &nbsp;ꜩ </Text></Flex
-							>
+								<TokenSymbol size="14" color="var(--text-tertiary)" />
+							</Flex>
 						</Flex>
 					</Flex>
 				</Flex>

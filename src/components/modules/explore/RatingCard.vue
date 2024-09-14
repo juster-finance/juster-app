@@ -6,7 +6,8 @@ import { abbreviateNumber } from "@utils/amounts"
 
 const props = defineProps({
 	users: { type: Array, default: [] },
-	suffix: { type: String },
+	suffix: { type: String, default: "" },
+	isTokenSuffix: { type: Boolean },
 })
 
 const shorten = (address) => {
@@ -41,10 +42,13 @@ const shorten = (address) => {
 				>{{ shorten(user.address)[1] }}
 			</div>
 
-			<div :class="$style.amount">
+			<Flex align="end" gap="2" :class="$style.amount">
 				<span>{{ abbreviateNumber(user.value) }}</span>
-				{{ suffix }}
-			</div>
+				<TokenSymbol v-if="isTokenSuffix" size="14"/>
+				<template v-else>
+					{{ suffix }}
+				</template>
+			</Flex>
 
 			<div v-if="index !== users.length - 1" :class="$style.separator">
 				/

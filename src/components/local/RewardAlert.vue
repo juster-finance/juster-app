@@ -5,6 +5,7 @@ import { computed } from "vue"
  * Utils
  */
 import { numberWithSymbol } from "@utils/amounts"
+import { token } from "@config"
 
 /**
  * Store

@@ -82,22 +82,32 @@ const handleJoin = () => {
 
 				<div :class="$style.info">
 					<div :class="$style.param">
-						<span>Events:</span>
-						<span>{{ market.totalEvents }}</span>
+						<span :class="$style.param_name">Events:</span>
+						<span :class="$style.param_value">{{ market.totalEvents }}</span>
 					</div>
 
 					<div :class="$style.dot" />
 
 					<div :class="$style.param">
-						<span>TVL:</span>
-						<span>{{ abbreviateNumber(market.totalValueLocked.toFixed(0)) }} ꜩ</span>
+						<span :class="$style.param_name">TVL:</span>
+						<Flex :class="$style.param_value" align="end" gap="2">
+							<span>
+								{{ abbreviateNumber(market.totalValueLocked.toFixed(0)) }} 
+							</span>
+							<TokenSymbol size="13"/>
+						</Flex>
 					</div>
 
 					<div :class="$style.dot" />
 
 					<div :class="$style.param">
-						<span>Volume (24h):</span>
-						<span>{{ abbreviateNumber(market.totalVolume.toFixed(0)) }} ꜩ</span>
+						<span :class="$style.param_name">Volume (24h):</span>
+						<Flex :class="$style.param_value" align="end" gap="2">
+							<span>
+								{{ abbreviateNumber(market.totalVolume.toFixed(0)) }} 
+							</span>
+							<TokenSymbol size="13"/>
+						</Flex>
 					</div>
 				</div>
 			</div>
@@ -201,11 +211,11 @@ const handleJoin = () => {
 	font-weight: 500;
 }
 
-.param span:first-child {
+.param_name {
 	color: var(--text-tertiary);
 }
 
-.param span:last-child {
+.param_value {
 	color: var(--text-primary);
 }
 
