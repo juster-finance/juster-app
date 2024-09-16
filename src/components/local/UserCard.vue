@@ -102,9 +102,9 @@ const handleCopy = (target) => {
 					<!-- User -->
 					<template v-else-if="user.userId !== accountStore.pkh">
 						{{
-							`${user.userId.slice(0, 8)}..${user.userId.slice(
-								user.userId.length - 3,
-								user.userId.length,
+							`${user.userFriendlyAddress.slice(0, 8)}..${user.userFriendlyAddress.slice(
+								user.userFriendlyAddress.length - 3,
+								user.userFriendlyAddress.length,
 							)}`
 						}}
 					</template>

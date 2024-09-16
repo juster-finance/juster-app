@@ -6,6 +6,7 @@ import { DateTime } from "luxon"
  * Store
  */
 import { useAccountStore } from "@store/account"
+import { toUserFriendlyAddress } from "@utils/address"
 
 /**
  * Services
@@ -15,6 +16,7 @@ import { supportedMarkets } from "@config"
 const props = defineProps(["event", "amount", "countdown"])
 
 const accountStore = useAccountStore()
+const userFriendlyAddress = computed(() => toUserFriendlyAddress(accountStore.pkh))
 
 const symbol = computed(() => props.event.currencyPair.symbol)
 
@@ -63,12 +65,12 @@ const timing = computed(() => {
 			<div :class="$style.meta">
 				<div :class="$style.name">
 					{{
-						`${accountStore.pkh.slice(
+						`${userFriendlyAddress.slice(
 							0,
 							6,
-						)}..${accountStore.pkh.slice(
-							accountStore.pkh.length - 4,
-							accountStore.pkh.length,
+						)}..${userFriendlyAddress.slice(
+							userFriendlyAddress.length - 4,
+							userFriendlyAddress.length,
 						)}`
 					}}
 				</div>

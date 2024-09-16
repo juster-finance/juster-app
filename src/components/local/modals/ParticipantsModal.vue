@@ -15,6 +15,7 @@ import Modal from "@ui/Modal.vue"
  * API
  */
 import { fetchEventParticipants } from "@/api/events"
+import { toUserFriendlyAddress } from "@townsquarelabs/ui-vue";
 
 const emit = defineEmits(["onClose"])
 const props = defineProps({
@@ -53,7 +54,7 @@ onMounted(async () => {
 				<div :class="$style.subtitle">Creator</div>
 				<div :class="$style.users">
 					<UserCard
-						:user="{ userId: event.creatorId, creator: true }"
+						:user="{ userId: event.creatorId, userFriendlyAddress: toUserFriendlyAddress(event.creatorId), creator: true }"
 						:class="$style.user"
 					/>
 				</div>

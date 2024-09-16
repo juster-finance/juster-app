@@ -2,7 +2,7 @@
 /**
  * Vendor
  */
-import { ref, reactive, onMounted } from "vue"
+import { ref, reactive, onMounted, computed } from "vue"
 import { useRouter } from "vue-router"
 
 /**
@@ -31,8 +31,11 @@ import { useAccountStore } from "@store/account"
  */
 import { currentNetwork } from "@sdk"
 import { token } from "@config"
+import { toUserFriendlyAddress } from "@utils/address"
 
 const accountStore = useAccountStore()
+const userFriendlyAddress = computed(() => toUserFriendlyAddress(accountStore.pkh))
+
 
 const router = useRouter()
 
@@ -300,10 +303,10 @@ const handleEnd = () => {
 										weight="600"
 										color="primary"
 									>
-										{{ accountStore.pkh.slice(0, 8) }}...{{
-											accountStore.pkh.slice(
-												accountStore.pkh.length - 8,
-												accountStore.pkh.length,
+										{{ userFriendlyAddress.slice(0, 8) }}...{{
+											userFriendlyAddress.slice(
+												userFriendlyAddress.length - 8,
+												userFriendlyAddress.length,
 											)
 										}}
 									</Text>

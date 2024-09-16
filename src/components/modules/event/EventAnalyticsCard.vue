@@ -425,15 +425,15 @@ const distributionOfBets = computed(() => {
 	fill: var(--text-tertiary);
 }
 
-.item.green svg {
+.item.green > svg {
 	fill: var(--green);
 }
 
-.item.red svg {
+.item.red > svg {
 	fill: var(--red);
 }
 
-.item.blue svg {
+.item.blue > svg {
 	fill: var(--blue);
 }
 

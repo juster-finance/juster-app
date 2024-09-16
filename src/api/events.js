@@ -8,6 +8,8 @@ import { juster } from "@sdk"
  */
 import { event as eventModel } from "@/graphql/models"
 
+import { toUserFriendlyAddress } from "@utils/address"
+
 export const fetchAllEvents = async () => {
 	try {
 		const { event } = await juster.gql.query({
@@ -114,7 +116,10 @@ export const fetchEventParticipants = async ({ id }) => {
 			],
 		})
 
-		return event[0].positions
+		return event[0].positions.map((position) => ({
+			...position,
+			userFriendlyAddress: toUserFriendlyAddress(position.userId),
+		}))
 	} catch (error) {
 		console.error(
 			`Error during fetching event participant \n\n ${error.name}: ${error.message}`,
