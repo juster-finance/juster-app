@@ -53,10 +53,10 @@ export const rpcNodes = {
 
 export const verifiedMakers = {
 	mainnet: [
-		"0QCtT-Fkel-ySt46KrZX5APrfxHFCHSkYlq59cl5Fc3JCfQc"
+		"0:fcb91a3a3816d0f7b8c2c76108b8a9bc5a6b7a55bd79f8ab101c52db29232260"
 	],
 	testnet: [
-		"0QCtT-Fkel-ySt46KrZX5APrfxHFCHSkYlq59cl5Fc3JCfQc"
+		"0:fcb91a3a3816d0f7b8c2c76108b8a9bc5a6b7a55bd79f8ab101c52db29232260"
 	],
 }
 
