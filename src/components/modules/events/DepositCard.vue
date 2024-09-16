@@ -18,6 +18,7 @@ import { numberWithSymbol } from "@utils/amounts"
  * Store
  */
 import { useAccountStore } from "@store/account"
+import { toUserFriendlyAddress } from "@utils/address"
 
 const accountStore = useAccountStore()
 
@@ -64,7 +65,7 @@ const returnForLiquidity = computed(() => {
 				<Icon v-if="!verifiedMakers[currentNetwork].includes(deposit.userId)" name="liquidity" size="16" />
 				<Icon v-else name="server" size="16" :class="$style.logo_icon" />
 
-				<router-link :to="`/profile/${deposit.userId}`" :class="$style.user_avatar">
+				<router-link :to="`/profile/${toUserFriendlyAddress(deposit.userId)}`" :class="$style.user_avatar">
 					<img
 						v-if="!verifiedMakers[currentNetwork].includes(deposit.userId)"
 						:src="`https://services.tzkt.io/v1/avatars/${deposit.userId}`"

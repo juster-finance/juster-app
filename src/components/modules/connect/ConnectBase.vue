@@ -22,6 +22,7 @@ import CustomLoginModal from "@local/modals/CustomLoginModal.vue"
  * Services
  */
 import { juster, analytics, currentNetwork } from "@sdk"
+import { toUserFriendlyAddress } from "@utils/address"
 
 /**
  * Composable
@@ -234,9 +235,9 @@ onMounted(async () => {
 				>-->
 			</div>
 			<div v-else :class="$style.buttons">
-				<router-link :to="`/profile/${accountStore.pkh}`">
+				<router-link :to="`/profile/${toUserFriendlyAddress(accountStore.pkh)}`">
 					<Button
-						@onKeybind="router.push(`/profile/${accountStore.pkh}`)"
+						@onKeybind="router.push(`/profile/${toUserFriendlyAddress(accountStore.pkh)}`)"
 						type="secondary"
 						size="large"
 						block

@@ -19,6 +19,7 @@ import Spin from "@ui/Spin.vue"
  * Services
  */
 import { parsePoolName, shorten } from "@utils/misc"
+import { toUserFriendlyAddress } from "@utils/address"
 import { juster, destroySubscription } from "@sdk"
 import { token } from "@config"
 
@@ -291,7 +292,7 @@ const getEventIconByActionName = (action) => {
 
 							<Flex
 								v-if="ev.action === 'USER_DEPOSITED'"
-								@click="router.push(`/profile/${ev.affectedUserId}`)"
+								@click="router.push(`/profile/${toUserFriendlyAddress(ev.affectedUserId)}`)"
 								align="center"
 								gap="14"
 								:class="$style.line_card"
@@ -309,14 +310,14 @@ const getEventIconByActionName = (action) => {
 									</Flex>
 
 									<Flex align="center" gap="4" :class="$style.params">
-										<Text size="12" weight="500" color="tertiary">{{ shorten(ev.affectedUserId, 6, 12) }}</Text>
+										<Text size="12" weight="500" color="tertiary">{{ shorten(toUserFriendlyAddress(ev.affectedUserId), 6, 12) }}</Text>
 									</Flex>
 								</Flex>
 							</Flex>
 
 							<Flex
 								v-if="ev.action === 'LIQUIDITY_APPROVED'"
-								@click="router.push(`/profile/${ev.affectedUserId}`)"
+								@click="router.push(`/profile/${toUserFriendlyAddress(ev.affectedUserId)}`)"
 								align="center"
 								gap="14"
 								:class="$style.line_card"
@@ -335,7 +336,7 @@ const getEventIconByActionName = (action) => {
 										<Text size="12" weight="500" color="secondary">{{ ev.totalLiquidity.toFixed(2) }}&nbsp;&nbsp;</Text>
 										<Text size="12" weight="500" color="tertiary">From: </Text>
 										<Text size="12" weight="500" color="secondary">
-											{{ shorten(ev.affectedUserId, 4, 6) }}
+											{{ shorten(toUserFriendlyAddress(ev.affectedUserId), 4, 6) }}
 										</Text>
 									</Flex>
 								</Flex>

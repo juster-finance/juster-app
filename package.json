@@ -14,6 +14,7 @@
 		"@rollup/plugin-inject": "^5.0.2",
 		"@taquito/beacon-wallet": "^15.1.0",
 		"@taquito/taquito": "^15.1.0",
+		"@ton/core": "^0.58.1",
 		"@townsquarelabs/ui-vue": "^2.0.10-beta.0",
 		"amplitude-js": "^8.12.0",
 		"axios": "^0.21.4",

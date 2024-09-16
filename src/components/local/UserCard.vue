@@ -15,6 +15,7 @@ import { Dropdown, DropdownItem, DropdownDivider } from "@ui/Dropdown"
  */
 import { currentNetwork } from "@sdk"
 import { toClipboard, shorten } from "@utils/misc"
+import { toUserFriendlyAddress } from "@utils/address"
 import { verifiedMakers } from "@config"
 
 /**
@@ -41,7 +42,7 @@ const handleCopy = (target) => {
 				badges: [
 					{
 						icon: "user",
-						secondaryText: shorten(props.user.userId, 10, 6),
+						secondaryText: shorten(toUserFriendlyAddress(props.user.userId), 10, 6),
 					},
 				],
 			},
@@ -60,14 +61,14 @@ const handleCopy = (target) => {
 						name: "Open in new tab",
 						callback: () =>
 							window.open(
-								`https://app.juster.fi/profile/${props.user.userId}`,
+								`/profile/${toUserFriendlyAddress(props.user.userId)}`,
 								"_blank",
 							),
 					},
 				],
 			},
 		})
-		toClipboard(`https://app.juster.fi/profile/${props.user.userId}`)
+		toClipboard(`${location.origin}/profile/${toUserFriendlyAddress(props.user.userId)}`)
 	}
 }
 </script>
@@ -146,7 +147,7 @@ const handleCopy = (target) => {
 			</template>
 
 			<template #dropdown>
-				<DropdownItem @click="router.push(`/profile/${user.userId}`)">
+				<DropdownItem @click="router.push(`/profile/${toUserFriendlyAddress(user.userId)}`)">
 					<Icon name="user" size="16" />User profile
 				</DropdownItem>
 				<!-- TODO: #3 -->

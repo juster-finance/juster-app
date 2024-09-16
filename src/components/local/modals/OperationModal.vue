@@ -12,6 +12,7 @@ import Button from "@ui/Button.vue"
  * Services
  */
 import { shorten, toClipboard } from "@utils/misc"
+import { toUserFriendlyAddress } from "@utils/address"
 import { numberWithSymbol } from "@utils/amounts"
 import { currentNetwork } from "@sdk"
 
@@ -118,7 +119,7 @@ const getTypeOfOperation = () => {
 					</div>
 
 					<router-link
-						:to="`/profile/${data.userId}`"
+						:to="`/profile/${toUserFriendlyAddress(data.userId)}`"
 						target="_blank"
 						:class="$style.type"
 					>
@@ -133,7 +134,7 @@ const getTypeOfOperation = () => {
 							size="14"
 						/>
 						{{ getTypeOfOperation() }} <span>by</span>
-						{{ shorten(data.userId, 4, 4) }}
+						{{ shorten(toUserFriendlyAddress(data.userId), 4, 4) }}
 					</router-link>
 					<Flex align="end" gap="2" :class="$style.amount">
 						<div >

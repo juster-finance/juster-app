@@ -25,7 +25,7 @@ import { token } from "@config"
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 const [tonConnectUI] = useTonConnectUI()
-const tonAddress = useTonAddress()
+const userFriendlyAddress = useTonAddress()
 
 const router = useRouter()
 
@@ -79,7 +79,7 @@ const handleLogout = async () => {
 						<Flex direction="column" gap="8">
 							<Text size="13" weight="600" color="primary"> My Profile </Text>
 							<Text size="11" weight="600" color="tertiary">
-								{{ shorten(tonAddress, 4, 4) }}
+								{{ shorten(userFriendlyAddress, 4, 4) }}
 							</Text>
 						</Flex>
 					</Flex>

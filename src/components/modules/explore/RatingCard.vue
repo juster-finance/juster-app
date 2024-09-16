@@ -3,6 +3,7 @@
  * Utils
  */
 import { abbreviateNumber } from "@utils/amounts"
+import { toUserFriendlyAddress } from "@utils/address";
 
 const props = defineProps({
 	users: { type: Array, default: [] },
@@ -23,7 +24,7 @@ const shorten = (address) => {
 		<router-link
 			v-for="(user, index) in users"
 			:key="user.address"
-			:to="`/profile/${user.address}`"
+			:to="`/profile/${toUserFriendlyAddress(user.address)}`"
 			:class="$style.user"
 		>
 			<div :class="$style.position">

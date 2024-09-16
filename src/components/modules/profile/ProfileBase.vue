@@ -33,7 +33,7 @@ import { fetchAllUserPositions } from "@/api/positions"
  */
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
-import { toUserFriendlyAddress } from "@utils/address"
+import { toUserFriendlyAddress, toRawAddress, isValidAddress, isRawAddress } from "@utils/address"
 
 export default defineComponent({
 	name: "ProfileBase",
@@ -48,7 +48,7 @@ export default defineComponent({
 
 		const user = ref(null)
 		const balance = ref(0)
-		const address = computed(() => (isMyProfile.value ? accountStore.pkh : router.currentRoute.value.params.address))
+		const address = computed(() => (toRawAddress(isMyProfile.value ? accountStore.pkh : router.currentRoute.value.params.address)))
 		const userFriendlyAddress = computed(() => toUserFriendlyAddress(address.value))
 
 		const events = ref([])
@@ -83,8 +83,14 @@ export default defineComponent({
 
 		onMounted(() => {
 			// TODO: #3
-			if (/* address.value.length !== 36 || */ (!isMyProfile.value && accountStore.pkh == address.value)) {
+			if ( !isValidAddress(address.value) || (!isMyProfile.value && accountStore.pkh == address.value)) {
 				router.push("/profile")
+				return
+			}
+
+			const routeAddress = router.currentRoute.value.params.address
+			if(routeAddress && isRawAddress(routeAddress) ) {
+				router.push(`/profile/${toUserFriendlyAddress(routeAddress)}`)
 				return
 			}
 

@@ -15,6 +15,7 @@ import Button from "@ui/Button.vue"
 import { shorten, capitalizeFirstLetter } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
 import { toReadableDuration } from "@utils/date"
+import { toUserFriendlyAddress } from "@utils/address"
 import { token } from "@config"
 
 /**
@@ -334,7 +335,7 @@ watch(
 					</Flex>
 
 					<Text size="14" weight="600" color="primary">
-						{{ shorten(accountStore.pkh, 4, 4) }}
+						{{ shorten(toUserFriendlyAddress(accountStore.pkh), 4, 4) }}
 					</Text>
 				</Flex>
 			</Flex>

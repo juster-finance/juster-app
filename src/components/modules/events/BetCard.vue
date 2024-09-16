@@ -21,6 +21,7 @@ import { useAccountStore } from "@store/account"
  * Services
  */
 import { numberWithSymbol } from "@utils/amounts"
+import { toUserFriendlyAddress } from "@utils/address"
 import { token } from "@config"
 
 const accountStore = useAccountStore()
@@ -48,7 +49,7 @@ const isWon = computed(() => props.bet.side == props.event?.winnerBets)
 
 				<Spin v-else size="16" />
 
-				<router-link :to="`/profile/${pending ? accountStore.pkh : bet.userId}`" :class="$style.user_avatar">
+				<router-link :to="`/profile/${toUserFriendlyAddress(pending ? accountStore.pkh : bet.userId)}`" :class="$style.user_avatar">
 					<img :src="`https://services.tzkt.io/v1/avatars/${pending ? accountStore.pkh : bet.userId}`" alt="avatar" />
 				</router-link>
 			</div>

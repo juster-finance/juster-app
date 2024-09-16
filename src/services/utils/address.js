@@ -1,7 +1,24 @@
-import { toUserFriendlyAddress as toUserFriendlyAddressCore } from '@tonconnect/ui'
+import { Address } from '@ton/core'
 import { currentNetwork } from "@sdk"
 import { Networks } from "../constants/networks"
 
-export const toUserFriendlyAddress = (rawAddress) => {
-    return toUserFriendlyAddressCore(rawAddress, currentNetwork === Networks.TESTNET)
+export const toUserFriendlyAddress = (address) => {
+    return Address.parse(address).toString({urlSafe: true, bounceable: false, testOnly: currentNetwork === Networks.TESTNET})
+}
+
+export const toRawAddress = (address) => {
+    return Address.parse(address).toRawString()
+}
+
+export const isValidAddress = (address) => {
+    try {
+        Address.parse(address)
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+export const isRawAddress = (address) => {
+    return Address.isRaw(address);
 }

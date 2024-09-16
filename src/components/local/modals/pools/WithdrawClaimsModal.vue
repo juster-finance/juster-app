@@ -26,6 +26,7 @@ import { numberWithSymbol } from "@utils/amounts"
  */
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
+import { toUserFriendlyAddress } from "@utils/address"
 
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
@@ -294,7 +295,7 @@ const buttonState = computed(() => {
 
 						<Flex align="center">
 							<Text size="14" weight="600" color="secondary">
-								{{ shorten(accountStore.pkh) }}
+								{{ shorten(toUserFriendlyAddress(accountStore.pkh)) }}
 							</Text>
 						</Flex>
 					</Flex>
