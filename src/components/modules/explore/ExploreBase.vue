@@ -109,12 +109,12 @@ const init = async () => {
 	const rawTopBettors = await fetchTopBettors()
 
 	topProviders.value = rawTopProviders.map((el) => {
-		return { address: el.address, value: el.totalProviderReward }
+		return { address: el.address, userFriendlyAddress: el.userFriendlyAddress, value: el.totalProviderReward }
 	})
 	isTopProvidersLoading.value = false
 
 	topBettors.value = rawTopBettors.map((el) => {
-		return { address: el.address, value: el.totalBetsCount }
+		return { address: el.address, userFriendlyAddress: el.userFriendlyAddress, value: el.totalBetsCount }
 	})
 	isTopBettorsLoading.value = false
 }

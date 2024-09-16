@@ -2,6 +2,7 @@
  * Services
  */
 import { juster } from "@sdk"
+import { toUserFriendlyAddress } from "@utils/address"
 
 /**
  * Models
@@ -76,7 +77,12 @@ export const fetchTopLiquidityProviders = async () => {
 				userWithRewardModel,
 			],
 		})
-		return user
+		return user.map((user) => 
+			({
+				...user,
+				userFriendlyAddress: toUserFriendlyAddress(user.address),
+			})
+		)
 	} catch (error) {
 		console.error(
 			`Error during fetching top liquidity providers \n\n ${error.name}: ${error.message}`,
@@ -96,7 +102,12 @@ export const fetchTopBettors = async () => {
 				userWithBetsModel,
 			],
 		})
-		return user
+		return user.map((user) => 
+			({
+				...user,
+				userFriendlyAddress: toUserFriendlyAddress(user.address),
+			})
+		)
 	} catch (error) {
 		console.error(
 			`Error during fetching top bettors \n\n ${error.name}: ${error.message}`,

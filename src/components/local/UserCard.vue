@@ -149,8 +149,8 @@ const handleCopy = (target) => {
 				<DropdownItem @click="router.push(`/profile/${user.userId}`)">
 					<Icon name="user" size="16" />User profile
 				</DropdownItem>
-
-				<DropdownDivider />
+				<!-- TODO: #3 -->
+				<!-- <DropdownDivider />
 
 				<a
 					:href="`https://${
@@ -161,7 +161,7 @@ const handleCopy = (target) => {
 					<DropdownItem>
 						<Icon name="database" size="16" />View on TzKT
 					</DropdownItem>
-				</a>
+				</a> -->
 
 				<DropdownDivider />
 

@@ -33,6 +33,7 @@ import { fetchAllUserPositions } from "@/api/positions"
  */
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
+import { toUserFriendlyAddress } from "@utils/address"
 
 export default defineComponent({
 	name: "ProfileBase",
@@ -48,6 +49,7 @@ export default defineComponent({
 		const user = ref(null)
 		const balance = ref(0)
 		const address = computed(() => (isMyProfile.value ? accountStore.pkh : router.currentRoute.value.params.address))
+		const userFriendlyAddress = computed(() => toUserFriendlyAddress(address.value))
 
 		const events = ref([])
 
@@ -94,7 +96,7 @@ export default defineComponent({
 		})
 
 		const handleCopyAddress = () => {
-			toClipboard(address.value)
+			toClipboard(userFriendlyAddress.value)
 
 			notificationsStore.create({
 				notification: {
@@ -124,6 +126,7 @@ export default defineComponent({
 			balance,
 			isMyProfile,
 			address,
+			userFriendlyAddress,
 			events,
 			selectedPageForEvents,
 			paginatedEvents,
@@ -157,7 +160,7 @@ export default defineComponent({
 				</div>
 
 				<div @click="handleCopyAddress" :class="$style.username">
-					{{ `${address.slice(0, 8)}..${address.slice(address.length - 3, address.length)}` }}
+					{{ `${userFriendlyAddress.slice(0, 4)}..${userFriendlyAddress.slice(userFriendlyAddress?.length - 4, userFriendlyAddress.length)}` }}
 					<Icon name="copy" size="14" />
 				</div>
 
@@ -260,12 +263,13 @@ export default defineComponent({
 
 				<div :class="$style.additional">
 					<div :class="$style.left">
-						<a :href="`https://${currentNetwork == 'mainnet' ? '' : 'ghostnet.'}tzkt.io/${address}`" target="_blank">
+						<!-- TODO: #3 -->
+						<!-- <a :href="`https://${currentNetwork == 'mainnet' ? '' : 'ghostnet.'}tzkt.io/${address}`" target="_blank">
 							<Button type="secondary" size="small">
 								<Icon name="database" size="14" />
 								View on TzKT
 							</Button>
-						</a>
+						</a> -->
 					</div>
 
 					<div :class="$style.right"></div>

@@ -38,8 +38,8 @@ const shorten = (address) => {
 			/>
 
 			<div :class="$style.username">
-				{{ shorten(user.address)[0] }}<span>...</span
-				>{{ shorten(user.address)[1] }}
+				{{ shorten(user.userFriendlyAddress)[0] }}<span>...</span
+				>{{ shorten(user.userFriendlyAddress)[1] }}
 			</div>
 
 			<Flex align="end" gap="2" :class="$style.amount">

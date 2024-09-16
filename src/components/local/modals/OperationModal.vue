@@ -222,8 +222,9 @@ const getTypeOfOperation = () => {
 						</div>
 					</div>
 				</div>
-
-				<a
+				
+				<!-- TODO: #3 -->
+				<!-- <a
 					:href="`https://${
 						currentNetwork === 'mainnet' ? '' : 'ghostnet.'
 					}tzkt.io/${data.opgHash}`"
@@ -233,7 +234,7 @@ const getTypeOfOperation = () => {
 						<Icon name="arrowrighttop" size="12" color="tertiary" />
 						View operation on TzKT
 					</Button>
-				</a>
+				</a> -->
 
 				<div :class="[$style.bg, showRadialBg && $style.visible]" />
 			</Flex>
