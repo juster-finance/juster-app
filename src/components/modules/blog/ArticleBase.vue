@@ -52,7 +52,7 @@ onMounted(async () => {
 	})
 	meta.meta.push({
 		property: "og:url",
-		content: `https://app.juster.fi${route.fullPath}`,
+		content: `${location.origin}${route.fullPath}`,
 	})
 	meta.meta.push({
 		property: "og:image",

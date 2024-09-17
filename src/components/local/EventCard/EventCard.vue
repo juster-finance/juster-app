@@ -258,7 +258,7 @@ const copy = (target) => {
 				autoDestroy: true,
 				badges: [
 					{
-						secondaryText: `app.juster.fi/events/${props.event.id}`,
+						secondaryText: `${location.origin}/events/${props.event.id}`,
 						icon: "copy",
 					},
 				],
@@ -266,13 +266,13 @@ const copy = (target) => {
 				actions: [
 					{
 						name: "Open in new tab",
-						callback: () => window.open(`https://app.juster.fi/events/${props.event.id}`, "_blank"),
+						callback: () => window.open(`${location.origin}/events/${props.event.id}`, "_blank"),
 					},
 				],
 			},
 		})
 
-		toClipboard(`https://app.juster.fi/events/${props.event.id}`)
+		toClipboard(`${location.origin}/events/${props.event.id}`)
 	}
 }
 

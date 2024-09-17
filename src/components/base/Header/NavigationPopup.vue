@@ -205,9 +205,10 @@ watch(
 						</router-link>
 
 						<Flex gap="8">
-							<Button size="small" type="tertiary" link="https://status.juster.fi">
+							<!-- TODO: #3 -->
+							<!-- <Button size="small" type="tertiary" link="https://status.juster.fi">
 								<Icon name="bolt" size="16" color="tertiary" />System Status
-							</Button>
+							</Button> -->
 
 							<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
 								<Icon name="help" size="16" color="tertiary" />Support
@@ -284,9 +285,10 @@ watch(
 						</router-link>
 
 						<Flex gap="8">
-							<Button size="small" type="tertiary" link="https://status.juster.fi">
+							<!-- TODO: #3 -->
+							<!-- <Button size="small" type="tertiary" link="https://status.juster.fi">
 								<Icon name="bolt" size="16" color="tertiary" />System Status
-							</Button>
+							</Button> -->
 
 							<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
 								<Icon name="help" size="16" color="tertiary" />Support
@@ -367,9 +369,10 @@ watch(
 						</router-link>
 
 						<Flex gap="8">
-							<Button size="small" type="tertiary" link="https://status.juster.fi">
+							<!-- TODO: #3 -->
+							<!-- <Button size="small" type="tertiary" link="https://status.juster.fi">
 								<Icon name="bolt" size="16" color="tertiary" />System Status
-							</Button>
+							</Button> -->
 
 							<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
 								<Icon name="help" size="16" color="tertiary" />Support

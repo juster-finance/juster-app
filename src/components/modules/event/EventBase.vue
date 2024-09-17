@@ -375,7 +375,7 @@ const copy = (target) => {
 				autoDestroy: true,
 				badges: [
 					{
-						secondaryText: `app.juster.fi${location.pathname}`,
+						secondaryText: `${location.origin}${location.pathname}`,
 						icon: "copy",
 					},
 				],
