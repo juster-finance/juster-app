@@ -31,6 +31,10 @@ const props = defineProps({ user: { type: Object, default: () => {} } })
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
 
+const handleOpenUerProfile = () => {
+	window.open(`/profile/${toUserFriendlyAddress(props.user.userId)}`, '_self')
+}
+
 const handleCopy = (target) => {
 	if (target == "address") {
 		notificationsStore.create({
@@ -147,7 +151,7 @@ const handleCopy = (target) => {
 			</template>
 
 			<template #dropdown>
-				<DropdownItem @click="router.push(`/profile/${toUserFriendlyAddress(user.userId)}`)">
+				<DropdownItem @click="handleOpenUerProfile">
 					<Icon name="user" size="16" />User profile
 				</DropdownItem>
 				<!-- TODO: #3 -->

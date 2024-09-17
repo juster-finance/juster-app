@@ -82,9 +82,9 @@ watch(
 				}
 
 				if (!props.closeOutside) return
-				removeOutside = useOnOutsidePress(modal, () => {
+				removeOutside = useOnOutsidePress(modal, (e) => {
 					if (props.blockClosing) return
-					handleClose()
+					handleClose(e)
 				})
 			})
 		}
@@ -111,7 +111,8 @@ const calcModalStyles = computed(() => {
 
 const showShakeAnimation = ref(false)
 const handleClose = (e) => {
-	if (e && e.path.find((el) => el.id === "dropdown")) {
+	const path = e && (e.path ?? e.composedPath());
+	if (path && path.find((el) => el.id === "dropdown")) {
 		return
 	} else {
 		/** prevent closing */

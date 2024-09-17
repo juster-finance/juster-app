@@ -44,6 +44,9 @@ const toggleDropdown = (event) => {
 	event.stopPropagation()
 
 	isOpen.value = !isOpen.value
+	if(!isOpen.value) {
+		emit("onClose")
+	}
 }
 const close = (event) => {
 	if (event) event.stopPropagation()
