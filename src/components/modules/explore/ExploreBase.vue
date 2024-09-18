@@ -6,6 +6,7 @@ import { ref, onMounted, onBeforeUnmount, onUnmounted, watch } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { useMeta } from "vue-meta"
 import cloneDeep from "lodash.clonedeep"
+import { useIsConnectionRestored } from '@townsquarelabs/ui-vue';
 
 /**
  * Local
@@ -53,10 +54,13 @@ const route = useRoute()
 
 const marketStore = useMarketStore()
 const accountStore = useAccountStore()
+const isConnectionRestored = useIsConnectionRestored();
 
 const user = ref({})
 const subToMyPositions = ref({})
 const myPositions = ref([])
+const subToHasPositions = ref({})
+const hasPositions = ref(true)
 
 const topEvents = ref([])
 
@@ -100,6 +104,30 @@ const init = async () => {
 		})
 
 	/**
+	 * Block: FreshAccountBanner
+	 */
+	subToHasPositions.value = await juster.gql
+		.subscription({
+			position: [
+				{
+					where: {
+						userId: { _eq: accountStore.pkh },
+					},
+					limit: 1
+				},
+				{
+					id: true,
+				},
+			],
+		})
+		.subscribe({
+			next: ({ position: positions }) => {
+				hasPositions.value = !!positions.length
+			},
+			error: console.error,
+		})
+
+	/**
 	 * Block: Top Events & Providers
 	 */
 	const rawTopEvents = await fetchTopEvents({ limit: 3 })
@@ -120,9 +148,10 @@ const init = async () => {
 }
 
 watch(
-	() => juster.sdk._network,
+	() => [juster.sdk._network, accountStore.pkh],
 	() => {
 		subToMyPositions.value.unsubscribe()
+		subToHasPositions.value.unsubscribe()
 		myPositions.value = []
 		marketStore.events = []
 		topEvents.value = []
@@ -153,15 +182,12 @@ onBeforeUnmount(() => {
 })
 
 onUnmounted(() => {
-	if (
-		Object.prototype.hasOwnProperty.call(
-			subToMyPositions.value,
-			"_state",
-		) &&
-		!subToMyPositions.value?.closed
-	) {
-		subToMyPositions.value.unsubscribe()
-	}
+	const subscriptions = [subToMyPositions, subToHasPositions]
+	subscriptions.forEach((sub) => {
+		if (Object.prototype.hasOwnProperty.call(sub.value, "_state") && !sub.value?.closed) {
+			sub.value.unsubscribe()
+		}
+	})
 })
 
 /** Meta */
@@ -181,7 +207,7 @@ useMeta({
 
 			<transition-group name="fade" mode="out-in">
 				<FreshAccountBanner
-					v-if="accountStore.pkh && !user"
+					v-if="isConnectionRestored && accountStore.pkh && !hasPositions"
 					:class="$style.block"
 				/>
 				<!-- TODO: #3 -->
