@@ -31,6 +31,7 @@ import ProfileMenu from "@modules/profile/ProfileMenu.vue"
 import ThePendingTransaction from "./ThePendingTransaction.vue"
 import NavigationPopup from "./NavigationPopup.vue"
 import RewardAlert from "@local/RewardAlert.vue"
+import TopUpAlert from "@local/TopUpAlert.vue"
 
 /**
  * Store
@@ -251,7 +252,9 @@ const handleNetworkDblClick = () => {
 			</div>
 
 			<div :class="$style.right">
-				<RewardAlert :class="$style.reward_alert" />
+				<!-- TODO: #3 -->
+				<!-- <RewardAlert :class="$style.reward_alert" /> -->
+				<TopUpAlert :class="$style.reward_alert" />
 
 				<Flex gap="8">
 					<template v-if="isConnectionRestored">

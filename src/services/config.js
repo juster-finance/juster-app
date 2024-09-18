@@ -11,7 +11,10 @@ export const dipdup = {
 
 export const demoMode = {
 	baseUrl: "http://localhost:5502",
-	walletPayloadTokenExpiresInSeconds: 900
+	walletPayloadTokenExpiresInSeconds: 900,
+	newUserBalance: 10000,
+	topUpAmount: 10000,
+	minBalanceToTopUp: 10,
 }
 
 export const token = {

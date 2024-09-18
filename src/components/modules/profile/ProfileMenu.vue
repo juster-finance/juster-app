@@ -1,5 +1,6 @@
 <script setup>
 /** Vendor */
+import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { useTonConnectUI, useTonAddress } from "@townsquarelabs/ui-vue"
 
@@ -13,14 +14,14 @@ import { Dropdown } from "@ui/Dropdown"
  */
 import { shorten } from "@utils/misc"
 import { numberWithSymbol } from "@utils/amounts"
-import { analytics } from "@sdk"
+import { analytics, juster} from "@sdk"
 
 /**
  * Store
  */
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
-import { token } from "@config"
+import { demoMode, token } from "@config"
 
 const accountStore = useAccountStore()
 const notificationsStore = useNotificationsStore()
@@ -28,6 +29,8 @@ const [tonConnectUI] = useTonConnectUI()
 const userFriendlyAddress = useTonAddress()
 
 const router = useRouter()
+
+const isTopUpAllowed = computed(() => accountStore.pkh && accountStore.balance <= demoMode.minBalanceToTopUp)
 
 const handleOpenProfile = () => {
 	router.push("/profile")
@@ -39,6 +42,14 @@ const handleOpenWithdrawals = () => {
 	router.push("/withdrawals")
 
 	analytics.log("openWithdrawals")
+}
+
+const handleTopUp = async () => {
+	if (!isTopUpAllowed)
+		return
+
+	await juster.sdk.topUp()
+	accountStore.updateBalance()
 }
 
 const handleLogout = async () => {
@@ -97,6 +108,32 @@ const handleLogout = async () => {
 							<Text size="11" weight="600" color="tertiary"> Manage your assets </Text>
 						</Flex>
 					</Flex>
+
+					<!-- TODO: #3 -->
+					<Flex 
+						@click="handleTopUp" 
+						align="center" 
+						gap="12" 
+						:class="[$style.general_link, !isTopUpAllowed ? $style.disabled : '']" 
+						tabindex="1">
+						<Icon name="coins" size="20" :class="$style.icon" />
+
+						<Flex direction="column" gap="6">
+							<Text size="13" weight="600" color="primary">
+								<Flex>
+									<Text size="13" weight="700" color="tertiary">
+										Top Up&nbsp;
+									</Text>
+									<Text size="13" weight="700" color="primary">
+										{{ numberWithSymbol(demoMode.topUpAmount, ",") }}&nbsp;
+									</Text>
+									<Text size="13" weight="700" color="tertiary"> {{token.symbol}} </Text>
+								</Flex>
+							</Text>
+							<Text size="11" weight="600" color="tertiary"> {{isTopUpAllowed ? 'Get free demo tokens' : `Balance must be ${demoMode.minBalanceToTopUp} ${token.symbol} or less`}} </Text>
+						</Flex>
+					</Flex>
+
 
 					<!-- <Flex
 						align="center"

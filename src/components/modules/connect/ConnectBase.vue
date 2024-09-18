@@ -40,6 +40,9 @@ import { fetchAllUsers } from "@/api/users"
 import { useAppStore } from "@store/app"
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
+import { demoMode, token } from "@config";
+
+import { numberWithSymbol } from "@utils/amounts"
 
 const appStore = useAppStore()
 const accountStore = useAccountStore()
@@ -192,6 +195,7 @@ onMounted(async () => {
 				}}
 			</div>
 
+
 			<Tooltip v-if="!accountStore.isLoggined" placement="top">
 				<div :class="$style.description">
 					By continuing, you agree to
@@ -210,6 +214,14 @@ onMounted(async () => {
 				Do you want to use a different wallet? Logout and connect with
 				the desired wallet
 			</div>
+			<template v-if="!accountStore.isLoggined">
+				<div :class="$style.subtitle">
+					Demo mode
+				</div>
+				<div :class="$style.description">
+					New users start with {{ numberWithSymbol(demoMode.newUserBalance, ',') }} {{ token.symbol }} and can repeatedly refill another {{ numberWithSymbol(demoMode.topUpAmount, ',') }} {{ token.symbol }} whenever the balance is less then {{ numberWithSymbol(demoMode.minBalanceToTopUp, ',') }} {{ token.symbol }}.
+				</div>
+			</template>
 
 			<div v-if="!accountStore.isLoggined" :class="$style.buttons">
 				<Button
@@ -312,6 +324,16 @@ onMounted(async () => {
 	font-weight: 600;
 	color: var(--text-primary);
 
+	margin-bottom: 16px;
+}
+
+.subtitle {
+	font-size: 18px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
+
+	margin-top: 32px;
 	margin-bottom: 16px;
 }
 
