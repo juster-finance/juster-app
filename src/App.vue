@@ -2,7 +2,7 @@
 /**
  * Vendor
  */
-import { onBeforeUnmount, onMounted, watch } from "vue"
+import { onBeforeUnmount, onMounted, watch, ref } from "vue"
 import { useTonAddress, useIsConnectionRestored, useTonConnectUI, useTonWallet } from '@townsquarelabs/ui-vue';
 
 /**
@@ -73,9 +73,10 @@ const address = useTonAddress(false)
 const wallet = useTonWallet()
 const [tonConnectUI] = useTonConnectUI()
 const isConnectionRestored = useIsConnectionRestored()
+const isAuthTokenValid = ref(false)
 
-watch(address, (address) => {
-	if (!address) 
+watch([address, isAuthTokenValid], ([address, isAuthTokenValid]) => {
+	if (!address || !isAuthTokenValid) 
 		return
 	
 	accountStore.setPkh(address)
@@ -90,6 +91,7 @@ watch([wallet, isConnectionRestored], async () => {
 		return;
 
 	const logout = async (message) => {
+		isAuthTokenValid.value = false;
 		localStorage.removeItem(localStorageKeys.AUTH_TOKEN);
 		tonConnectUI.disconnect();
 		accountStore.logout();
@@ -110,6 +112,7 @@ watch([wallet, isConnectionRestored], async () => {
 		if (isExpired || wallet?.value?.account?.address !== parsedJwt.subject) {
 			logout('Auth token expired');
 		} else {
+			isAuthTokenValid.value = true;
 			expirationTimeoutId = setTimeout(() => {
 				logout('Auth token expired');
 			}, parsedJwt.expiredAt - Date.now());
