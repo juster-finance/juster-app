@@ -46,7 +46,6 @@ const handleTopUp = async () => {
 		return
 
 	await juster.sdk.topUp()
-	await accountStore.updateBalance()
 	notificationsStore.create({
 		notification: {
 			type: "Success",

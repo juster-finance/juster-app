@@ -1,11 +1,11 @@
-import { reactive } from "vue"
+import { reactive, ref, onBeforeUnmount } from "vue"
 import { DateTime } from "luxon"
 
 /**
  * Services
  */
 import { supportedMarkets } from "@config"
-import { juster } from "@sdk"
+import { juster, destroySubscription } from "@sdk"
 
 /**
  * API
@@ -32,6 +32,11 @@ export const useMarket = () => {
 
 	const markets = reactive([])
 
+	const newPositionsSubscription = ref({})
+	const updateBalanceSubscription = ref({})
+	const newWithdrawnPositionsSubscription = ref({})
+	const quotesSubscription = ref({})
+
 	const setupUser = async () => {
 		/** All positions for withdraw */
 		const userPositions = await fetchUserPositionsForWithdraw({
@@ -52,7 +57,7 @@ export const useMarket = () => {
 		 */
 
 		/** New Positions */
-		juster.gql
+		newPositionsSubscription.value = await juster.gql
 			.subscription({
 				position: [
 					{
@@ -88,8 +93,29 @@ export const useMarket = () => {
 				error: console.error,
 			})
 
+		/** Update user balance */
+		updateBalanceSubscription.value = await juster.gql
+			.subscription({
+				user: [
+					{
+						where: {
+							address: { _eq: accountStore.pkh },
+						},
+					},
+					{
+						balance: true,
+					},
+				],
+			})
+			.subscribe({
+				next: (data) => {
+					accountStore.balance = data.user[0].balance
+				},
+				error: console.error,
+			})
+
 		/** Newly withdrawn positions */
-		juster.gql
+		newWithdrawnPositionsSubscription.value = await juster.gql
 			.subscription({
 				position: [
 					{
@@ -171,7 +197,7 @@ export const useMarket = () => {
 			 */
 
 			/** Quotes */
-			juster.gql
+			quotesSubscription.value = await juster.gql
 				.subscription({
 					quotesWma: [
 						{
@@ -200,6 +226,13 @@ export const useMarket = () => {
 				})
 		})
 	}
+
+	onBeforeUnmount(() => {
+		destroySubscription(updateBalanceSubscription.value)
+		destroySubscription(newPositionsSubscription.value)
+		destroySubscription(newWithdrawnPositionsSubscription.value)
+		destroySubscription(quotesSubscription.value)
+	})
 
 	return { setupMarket, setupUser, updateWithdrawals, markets }
 }
