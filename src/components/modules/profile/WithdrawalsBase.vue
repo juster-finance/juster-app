@@ -1,8 +1,10 @@
 <script setup>
-import { computed, onMounted, onUnmounted, reactive, ref } from "vue"
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue"
 import { useMeta } from "vue-meta"
 import { DateTime } from "luxon"
 import cloneDeep from "lodash.clonedeep"
+import { useIsConnectionRestored } from '@townsquarelabs/ui-vue';
+import { useRouter } from "vue-router"
 
 /**
  * UI
@@ -38,6 +40,8 @@ import { numberWithSymbol } from "@utils/amounts"
 import { useAccountStore } from "@store/account"
 
 const accountStore = useAccountStore()
+const isConnectionRestored = useIsConnectionRestored()
+const router = useRouter()
 
 const showWithdrawAllModal = ref(false)
 const showOperationModal = ref(false)
@@ -185,6 +189,12 @@ onMounted(async () => {
 		: 0
 })
 
+watch(isConnectionRestored, (isConnectionRestored) => {
+	if (isConnectionRestored && !accountStore.pkh) {
+		router.push("/Explore")
+	}
+})
+
 onUnmounted(() => {
 	if (
 		subToNewPositions.value.hasOwnProperty("_state") &&
@@ -201,7 +211,7 @@ useMeta({
 </script>
 
 <template>
-	<div :class="$style.wrapper">
+	<div v-if="!!accountStore.pkh" :class="$style.wrapper">
 		<WithdrawAllModal
 			:show="showWithdrawAllModal"
 			@onClose="showWithdrawAllModal = false"

@@ -7,7 +7,6 @@ import { createRouter, createWebHistory } from "vue-router"
  * Store
  */
 import { useAppStore } from "@store/app"
-import { useAccountStore } from "@store/account"
 
 const routes = [
 	{
@@ -34,12 +33,12 @@ const routes = [
 		name: "Landing",
 		component: () => import("@views/LandingPage.vue"),
 	},
+	// TODO: #3
 	{
 		path: "/launch",
 		name: "Launch",
 		component: () => import("@views/LaunchPage.vue"),
 	},
-
 	{
 		path: "/",
 		name: "Explore",
@@ -101,15 +100,7 @@ const routes = [
 		name: "Settings",
 		component: () => import("@views/SettingsPage.vue"),
 		beforeEnter: (to, from, next) => {
-			const accountStore = useAccountStore()
-
 			next({ name: "Explore" })
-
-			// if (accountStore.isLoggined) {
-			// 	next()
-			// } else {
-			// 	next({ name: "Explore" })
-			// }
 		},
 		redirect: "/settings/account/",
 		children: [
@@ -190,33 +181,10 @@ const routes = [
 		path: "/welcome",
 		name: "Welcome",
 		component: () => import("@views/WelcomePage.vue"),
-		beforeEnter: (to, from, next) => {
-			const accountStore = useAccountStore()
-
-			if (!accountStore.pkh.length) {
-				next({ name: "Explore" })
-			} else {
-				next()
-			}
-		},
 	},
 	{
 		path: "/profile",
 		name: "MyProfile",
-		beforeEnter: (to, from, next) => {
-			const accountStore = useAccountStore()
-
-			if (to.params.address) {
-				next()
-				return
-			}
-
-			if (accountStore.isLoggined) {
-				next()
-			} else {
-				next({ name: "Explore" })
-			}
-		},
 		component: () => import("@views/ProfilePage.vue"),
 		children: [
 			{
@@ -229,14 +197,6 @@ const routes = [
 	{
 		path: "/withdrawals",
 		name: "Withdrawals",
-		beforeEnter: (to, from, next) => {
-			const accountStore = useAccountStore()
-			if (accountStore.isLoggined) {
-				next()
-			} else {
-				next({ name: "Explore" })
-			}
-		},
 		component: () => import("@views/WithdrawalsPage.vue"),
 	},
 

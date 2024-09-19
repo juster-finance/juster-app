@@ -2,6 +2,7 @@
 import { defineComponent, ref, onMounted, computed, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
+import { useIsConnectionRestored } from '@townsquarelabs/ui-vue';
 
 /**
  * UI
@@ -43,13 +44,14 @@ export default defineComponent({
 
 		const accountStore = useAccountStore()
 		const notificationsStore = useNotificationsStore()
+		const isConnectionRestored = useIsConnectionRestored()
 
 		const isMyProfile = computed(() => !router.currentRoute.value.params.address)
 
 		const user = ref(null)
 		const balance = ref(0)
-		const address = computed(() => (toRawAddress(isMyProfile.value ? accountStore.pkh : router.currentRoute.value.params.address)))
-		const userFriendlyAddress = computed(() => toUserFriendlyAddress(address.value))
+		const rawAddress = ref('')
+		const userFriendlyAddress = ref('')
 
 		const events = ref([])
 
@@ -59,47 +61,62 @@ export default defineComponent({
 
 		/** Balance */
 		const getUserBalance = async () => {
-			balance.value = await fetchBalance(address.value)
+			balance.value = await fetchBalance(rawAddress.value)
 		}
 
-		if (!isMyProfile.value) {
-			getUserBalance()
-		} else {
-			accountStore.updateBalance()
-		}
 
 		const isProfileLoaded = ref(false)
 
 		const getUserData = async () => {
-			user.value = await fetchUser({ address: address.value })
+			user.value = await fetchUser({ address: rawAddress.value })
 
 			isProfileLoaded.value = true
 
 			const positions = await fetchAllUserPositions({
-				address: address.value,
+				address: rawAddress.value,
 			})
 			events.value = positions.map((position) => position.event)
 		}
 
-		onMounted(() => {
-			// TODO: #3
-			if ( !isValidAddress(address.value) || (!isMyProfile.value && accountStore.pkh == address.value)) {
+		const init = () => {
+			const routeAddress = router.currentRoute.value.params.address
+			const address = isMyProfile.value ? accountStore.pkh : routeAddress
+
+			if (!address) {
+				router.push("/Explore")
+			}
+
+			rawAddress.value = toRawAddress(isMyProfile.value ? accountStore.pkh : routeAddress)
+			if (!isValidAddress(rawAddress.value) || (!isMyProfile.value && accountStore.pkh == rawAddress.value)) {
 				router.push("/profile")
 				return
 			}
 
-			const routeAddress = router.currentRoute.value.params.address
 			if(routeAddress && isRawAddress(routeAddress) ) {
 				router.push(`/profile/${toUserFriendlyAddress(routeAddress)}`)
 				return
 			}
 
+			userFriendlyAddress.value = toUserFriendlyAddress(rawAddress.value)
+
+			if (!isMyProfile.value) {
+				getUserBalance()
+			} else {
+				accountStore.updateBalance()
+			}
+
 			getUserData()
-		})
+		}
 
 		watch(router.currentRoute, () => {
 			getUserData()
 		})
+
+		watch(isConnectionRestored, (isConnectionRestored) => {
+			if (isConnectionRestored) {
+				init()
+			}
+		}, {immediate: true})
 
 		const handleCopyAddress = () => {
 			toClipboard(userFriendlyAddress.value)
@@ -131,7 +148,7 @@ export default defineComponent({
 			user,
 			balance,
 			isMyProfile,
-			address,
+			rawAddress,
 			userFriendlyAddress,
 			events,
 			selectedPageForEvents,
@@ -159,7 +176,7 @@ export default defineComponent({
 			<div :class="$style.profile">
 				<div :class="$style.avatar">
 					<Tooltip placement="bottom">
-						<img :src="`https://services.tzkt.io/v1/avatars/${address}`" :class="$style.image" alt="avatar" />
+						<img :src="`https://services.tzkt.io/v1/avatars/${rawAddress}`" :class="$style.image" alt="avatar" />
 
 						<template v-slot:content> This avatar is supported by TzKT.io </template>
 					</Tooltip>

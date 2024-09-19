@@ -2,8 +2,9 @@
 /**
  * Vendor
  */
-import { ref, reactive, onMounted, computed } from "vue"
+import { ref, reactive, onMounted, computed, watch } from "vue"
 import { useRouter } from "vue-router"
+import { useIsConnectionRestored } from '@townsquarelabs/ui-vue';
 
 /**
  * UI
@@ -34,8 +35,8 @@ import { token } from "@config"
 import { toUserFriendlyAddress } from "@utils/address"
 
 const accountStore = useAccountStore()
+const isConnectionRestored = useIsConnectionRestored()
 const userFriendlyAddress = computed(() => toUserFriendlyAddress(accountStore.pkh))
-
 
 const router = useRouter()
 
@@ -98,6 +99,12 @@ const selectedCurrencyItem = ref(currencyItems[0].name)
 
 const isViewed = localStorage.isOnbShown
 
+watch(isConnectionRestored, (isConnectionRestored) => {
+	if (isConnectionRestored && !accountStore.pkh) {
+		router.push("/Explore")
+	}
+})
+
 onMounted(async () => {
 	event.value = (await fetchEventsByStatus({ status: "NEW" }))[0]
 })
@@ -130,7 +137,7 @@ const handleEnd = () => {
 </script>
 
 <template>
-	<Flex direction="column" align="center" justfy="between">
+	<Flex v-if="!!accountStore.pkh" direction="column" align="center" justfy="between">
 		<Flex direction="column" align="center" wide :class="$style.wrapper">
 			<Flex align="center" gap="8" :class="$style.slider">
 				<!-- Start -->
