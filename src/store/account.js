@@ -5,6 +5,7 @@ import { defineStore } from "pinia"
  */
 import { juster, analytics } from "@sdk"
 import { fetchBalance } from "@sdk"
+import { demoMode } from "@config"
 
 export const useAccountStore = defineStore({
 	id: "account",
@@ -13,6 +14,7 @@ export const useAccountStore = defineStore({
 		return {
 			pkh: "",
 			balance: 0,
+			isBalanceLoaded: false,
 
 			pendingTransaction: {
 				awaiting: false,
@@ -40,6 +42,7 @@ export const useAccountStore = defineStore({
 
 		async updateBalance() {
 			this.balance = await fetchBalance(this.pkh)
+			this.isBalanceLoaded = true
 		},
 
 		/** positions */
@@ -62,5 +65,9 @@ export const useAccountStore = defineStore({
 				(position) => position.value,
 			)
 		},
+
+		isTopUpAllowed() {
+			return this.isBalanceLoaded && this.pkh && this.balance <= demoMode.minBalanceToTopUp
+		}
 	},
 })

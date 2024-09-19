@@ -52,8 +52,8 @@ import { useMarketStore } from "@store/market"
  * Composable
  */
 import { useMarket } from "@/composable/market"
-import { parseJwt } from "./services/utils/auth";
-import { useNotificationsStore } from "./store/notifications";
+import { parseJwt } from "@/services/utils/auth";
+import { useNotificationsStore } from "@store/notifications";
 
 const { setupMarket, setupUser } = useMarket()
 
@@ -75,12 +75,12 @@ const [tonConnectUI] = useTonConnectUI()
 const isConnectionRestored = useIsConnectionRestored()
 const isAuthTokenValid = ref(false)
 
-watch([address, isAuthTokenValid], ([address, isAuthTokenValid]) => {
+watch([address, isAuthTokenValid], async ([address, isAuthTokenValid]) => {
 	if (!address || !isAuthTokenValid) 
 		return
 	
 	accountStore.setPkh(address)
-	accountStore.updateBalance()
+	await accountStore.updateBalance()
 	setupUser()
 })
 

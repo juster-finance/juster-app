@@ -1,11 +1,9 @@
 <script setup>
-import { computed } from "vue"
 
 /**
  * Utils
  */
 import { numberWithSymbol } from "@utils/amounts"
-import { token, demoMode } from "@config"
 
 /**
  * Store
@@ -17,22 +15,32 @@ import { useAccountStore } from "@store/account"
  */
 import Tooltip from "@ui/Tooltip.vue"
 import { juster } from "@sdk"
+import { useNotificationsStore } from "@store/notifications";
+import { token, demoMode } from "@config";
 
 
 const accountStore = useAccountStore()
-const isTopUpAllowed = computed(() => accountStore.pkh && accountStore.balance <= demoMode.minBalanceToTopUp)
+const notificationsStore = useNotificationsStore()
 
 const handleTopUp = async () => {
-	if (!isTopUpAllowed)
+	if (!accountStore.isTopUpAllowed)
 		return
 
 	await juster.sdk.topUp()
-	accountStore.updateBalance()
+	await accountStore.updateBalance()
+	notificationsStore.create({
+		notification: {
+			type: "Success",
+			title: `You have received ${numberWithSymbol(demoMode.topUpAmount, ",")} ${token.symbol}`,
+			description: "Check out your balance",
+			autoDestroy: true,
+		},
+	});
 }
 </script>
 
 <template>
-	<Tooltip v-if="isTopUpAllowed" placement="left">
+	<Tooltip v-if="accountStore.isTopUpAllowed" placement="left">
 		<Flex align="center" gap="8" :class="$style.wrapper" @click="handleTopUp">
 			<Icon name="coins" size="14" color="green" />
 

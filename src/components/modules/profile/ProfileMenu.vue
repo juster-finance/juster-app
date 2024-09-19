@@ -1,6 +1,5 @@
 <script setup>
 /** Vendor */
-import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { useTonConnectUI, useTonAddress } from "@townsquarelabs/ui-vue"
 
@@ -30,8 +29,6 @@ const userFriendlyAddress = useTonAddress()
 
 const router = useRouter()
 
-const isTopUpAllowed = computed(() => accountStore.pkh && accountStore.balance <= demoMode.minBalanceToTopUp)
-
 const handleOpenProfile = () => {
 	router.push("/profile")
 
@@ -45,11 +42,19 @@ const handleOpenWithdrawals = () => {
 }
 
 const handleTopUp = async () => {
-	if (!isTopUpAllowed)
+	if (!accountStore.isTopUpAllowed)
 		return
 
 	await juster.sdk.topUp()
-	accountStore.updateBalance()
+	await accountStore.updateBalance()
+	notificationsStore.create({
+		notification: {
+			type: "Success",
+			title: `You have received ${numberWithSymbol(demoMode.topUpAmount, ",")} ${token.symbol}`,
+			description: "Check out your balance",
+			autoDestroy: true,
+		},
+	});
 }
 
 const handleLogout = async () => {
@@ -114,7 +119,7 @@ const handleLogout = async () => {
 						@click="handleTopUp" 
 						align="center" 
 						gap="12" 
-						:class="[$style.general_link, !isTopUpAllowed ? $style.disabled : '']" 
+						:class="[$style.general_link, !accountStore.isTopUpAllowed ? $style.disabled : '']" 
 						tabindex="1">
 						<Icon name="coins" size="20" :class="$style.icon" />
 
@@ -130,7 +135,7 @@ const handleLogout = async () => {
 									<Text size="13" weight="700" color="tertiary"> {{token.symbol}} </Text>
 								</Flex>
 							</Text>
-							<Text size="11" weight="600" color="tertiary"> {{isTopUpAllowed ? 'Get free demo tokens' : `Balance must be ${demoMode.minBalanceToTopUp} ${token.symbol} or less`}} </Text>
+							<Text size="11" weight="600" color="tertiary"> {{accountStore.isTopUpAllowed ? 'Get free demo tokens' : `Balance must be ${demoMode.minBalanceToTopUp} ${token.symbol} or less`}} </Text>
 						</Flex>
 					</Flex>
 
