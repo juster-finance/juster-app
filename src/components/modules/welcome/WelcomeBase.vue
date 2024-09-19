@@ -31,7 +31,7 @@ import { useAccountStore } from "@store/account"
  * Services
  */
 import { currentNetwork } from "@sdk"
-import { token } from "@config"
+import { token, localStorageKeys } from "@config"
 import { toUserFriendlyAddress } from "@utils/address"
 
 const accountStore = useAccountStore()
@@ -97,7 +97,7 @@ const currencyItems = reactive([
 ])
 const selectedCurrencyItem = ref(currencyItems[0].name)
 
-const isViewed = localStorage.isOnbShown
+const isViewed = localStorage.getItem(localStorageKeys.IS_ONBOARDING_SHOWN)
 
 watch(isConnectionRestored, (isConnectionRestored) => {
 	if (isConnectionRestored && !accountStore.pkh) {
@@ -124,13 +124,13 @@ const getCirclePos = (index) => {
 }
 
 const handleStart = () => {
-	localStorage.isOnbShown = true
+	// localStorage.setItem(localStorageKeys.IS_ONBOARDING_SHOWN, true)
 
 	activeStepIndex.value = 1
 }
 
 const handleEnd = () => {
-	localStorage.isOnbShown = true
+	localStorage.setItem(localStorageKeys.IS_ONBOARDING_SHOWN, true)
 
 	router.push("/?welcome=1")
 }
@@ -143,6 +143,7 @@ const handleEnd = () => {
 				<!-- Start -->
 				<div
 					v-for="(step, index) in steps"
+					:key="step.name"
 					@click="activeStepIndex = index"
 					:style="{
 						left: `${getCirclePos(index).left}%`,

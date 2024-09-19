@@ -40,7 +40,7 @@ import { fetchAllUsers } from "@/api/users"
 import { useAppStore } from "@store/app"
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
-import { demoMode, token } from "@config";
+import { demoMode, localStorageKeys, token } from "@config";
 
 import { numberWithSymbol } from "@utils/amounts"
 
@@ -87,7 +87,7 @@ const login = () => {
 		setupUser()
 
 		/** Onboarding redirect */
-		if (!localStorage.isOnbShown) {
+		if (!localStorage.getItem(localStorageKeys.IS_ONBOARDING_SHOWN)) {
 			router.push("/welcome")
 
 			notificationsStore.create({
@@ -112,7 +112,7 @@ const login = () => {
 			notificationsStore.create({
 				notification: {
 					type: "success",
-					title: "Successfuly connected",
+					title: "Successfully connected",
 					description:
 						"Wallet is connected and we recovered the previous page before login",
 					autoDestroy: true,

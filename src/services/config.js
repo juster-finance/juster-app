@@ -24,7 +24,8 @@ export const token = {
 }
 
 export const localStorageKeys = {
-	AUTH_TOKEN: 'auth_token'
+	AUTH_TOKEN: 'auth_token',
+	IS_ONBOARDING_SHOWN: 'is_onboarding_shown'
 }
 
 export const supportedMarkets = {

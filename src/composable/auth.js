@@ -1,7 +1,9 @@
 import { onBeforeUnmount, watch, ref } from "vue"
+import { useRouter } from "vue-router"
 import { useTonAddress, useIsConnectionRestored, useTonConnectUI, useTonWallet } from '@townsquarelabs/ui-vue';
 import { demoMode, localStorageKeys } from "@config"
 import { useAccountStore } from "@store/account"
+import { useAppStore } from "@store/app"
 import { useNotificationsStore } from "@store/notifications";
 import { parseJwt } from "@/services/utils/auth";
 import { generateTonProof, checkTonProof } from "@/api/auth"
@@ -10,7 +12,9 @@ import { useMarket } from "@/composable/market"
 export const useAuth = () => {
     const notificationsStore = useNotificationsStore()
     const accountStore = useAccountStore()
+    const appStore = useAppStore()
     const { setupUser } = useMarket()
+    const router = useRouter()
     
     const address = useTonAddress(false)
     const wallet = useTonWallet()
@@ -25,6 +29,47 @@ export const useAuth = () => {
         accountStore.setPkh(address)
         await accountStore.updateBalance()
         setupUser()
+
+        /** Onboarding redirect */
+		if (!localStorage.getItem(localStorageKeys.IS_ONBOARDING_SHOWN)) {
+			router.push("/welcome")
+
+			notificationsStore.create({
+				notification: {
+					type: "success",
+					title: "Successfuly connected",
+					description:
+						"Go through a little onboarding to quickly explore the features of the project",
+					autoDestroy: true,
+
+					actions: [
+						{
+							name: "Skip Onboarding",
+							callback: () => router.push("/explore"),
+						},
+					],
+				},
+			})
+		} else if (appStore.prevRoute?.path) {
+			router.push(appStore.prevRoute.path)
+
+			notificationsStore.create({
+				notification: {
+					type: "success",
+					title: "Successfully connected",
+					description:
+						"Wallet is connected and we recovered the previous page before login",
+					autoDestroy: true,
+
+					actions: [
+						{
+							name: "Go to Explore",
+							callback: () => router.push("/"),
+						},
+					],
+				},
+			})
+		}
     })
     
     let refreshPayloadIntervalId;
