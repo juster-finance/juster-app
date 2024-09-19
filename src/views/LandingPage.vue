@@ -12,8 +12,12 @@ import { token } from "@config"
 
 export default {
 	name: "LandingPage",
-
 	components: { Page, Button },
+    data() {
+        return {
+            token,
+        }
+    },
 }
 </script>
 
@@ -57,7 +61,8 @@ export default {
 			</div>
 
 			<div :class="$style.promo">
-				<div :class="$style.promo_video">
+                <!-- TODO: #3 -->
+				<!-- <div :class="$style.promo_video">
 					<iframe
 						width="560"
 						height="315"
@@ -67,7 +72,7 @@ export default {
 						allow
 						allowfullscreen
 					></iframe>
-				</div>
+				</div> -->
 			</div>
 
 			<!-- <img
