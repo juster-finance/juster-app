@@ -109,7 +109,7 @@ export const useMarket = () => {
 			})
 			.subscribe({
 				next: (data) => {
-					accountStore.balance = data.user[0].balance
+					accountStore.balance = data.user[0].balance.toFixed(2)
 				},
 				error: console.error,
 			})

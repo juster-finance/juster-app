@@ -34,7 +34,7 @@ import { fetchAllUserPositions } from "@/api/positions"
  */
 import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
-import { toUserFriendlyAddress, toRawAddress, isValidAddress, isRawAddress } from "@utils/address"
+import { toUserFriendlyAddress, toRawAddress, checkIfValidAddress, isRawAddress } from "@utils/address"
 
 export default defineComponent({
 	name: "ProfileBase",
@@ -59,12 +59,6 @@ export default defineComponent({
 		const selectedPageForEvents = ref(1)
 		const paginatedEvents = computed(() => events.value.slice((selectedPageForEvents.value - 1) * 6, selectedPageForEvents.value * 6))
 
-		/** Balance */
-		const getUserBalance = async () => {
-			balance.value = await fetchBalance(rawAddress.value)
-		}
-
-
 		const isProfileLoaded = ref(false)
 
 		const getUserData = async () => {
@@ -78,29 +72,33 @@ export default defineComponent({
 			events.value = positions.map((position) => position.event)
 		}
 
-		const init = () => {
+		const init = async () => {
 			const routeAddress = router.currentRoute.value.params.address
 			const address = isMyProfile.value ? accountStore.pkh : routeAddress
 
-			if (!address) {
+
+
+			const isValidAddress = checkIfValidAddress(address)
+			rawAddress.value = isValidAddress ? toRawAddress(address) : ''
+			userFriendlyAddress.value = isValidAddress ? toUserFriendlyAddress(rawAddress.value) : ''
+
+			if (!address || !isValidAddress) {
 				router.push("/Explore")
+				return
 			}
 
-			rawAddress.value = toRawAddress(isMyProfile.value ? accountStore.pkh : routeAddress)
-			if (!isValidAddress(rawAddress.value) || (!isMyProfile.value && accountStore.pkh == rawAddress.value)) {
-				router.push("/profile")
+			if (!isMyProfile.value && accountStore.pkh == rawAddress.value) {
+				router.replace("/profile")
 				return
 			}
 
 			if(routeAddress && isRawAddress(routeAddress) ) {
-				router.push(`/profile/${toUserFriendlyAddress(routeAddress)}`)
+				router.replace(`/profile/${toUserFriendlyAddress(routeAddress)}`)
 				return
 			}
 
-			userFriendlyAddress.value = toUserFriendlyAddress(rawAddress.value)
-
 			if (!isMyProfile.value) {
-				getUserBalance()
+				balance.value = await fetchBalance(rawAddress.value)
 			} else {
 				accountStore.updateBalance()
 			}
@@ -326,9 +324,9 @@ export default defineComponent({
 	<div v-if="!user && isProfileLoaded" :class="$style.empty_profile">
 		<img :src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`" :class="$style.error_avatar" alt="error_avatar" />
 
-		<div :class="$style.error_title">Your profile is not ready yet</div>
+		<div :class="$style.error_title">The profile is not ready yet</div>
 
-		<div :class="$style.error_description">Once you participate in any event, your profile will become available!</div>
+		<div :class="$style.error_description">Once the account has participated in any event, the profile will be made available!</div>
 
 		<div :class="$style.error_buttons">
 			<router-link to="/">

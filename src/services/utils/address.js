@@ -10,7 +10,7 @@ export const toRawAddress = (address) => {
     return Address.parse(address).toRawString()
 }
 
-export const isValidAddress = (address) => {
+export const checkIfValidAddress = (address) => {
     try {
         Address.parse(address)
         return true
