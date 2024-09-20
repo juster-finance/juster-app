@@ -198,11 +198,12 @@ watch(
 					</Flex>
 
 					<Flex align="center" justify="between" :class="$style.bottom">
-						<router-link to="/releases">
+						<!-- TODO: #3 -->
+						<!-- <router-link to="/releases">
 							<Button size="small" type="secondary" block>
 								<Icon name="asterisk" size="16" style="fill: var(--green)" />What's New in 1.1
 							</Button>
-						</router-link>
+						</router-link> -->
 
 						<Flex gap="8">
 							<!-- TODO: #3 -->
@@ -274,15 +275,16 @@ watch(
 						<Button size="small" type="secondary"> <Icon name="shield_tick" size="14" color="green" />Security Audits </Button>
 
 						<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
-							<Icon name="document" size="14" color="primary" />White-Papper
+							<Icon name="document" size="14" color="primary" />White-Paper
 						</Button>
 					</Flex> -->
 					<Flex align="center" justify="between" :class="$style.bottom">
-						<router-link to="/releases">
+						<!-- TODO: #3 -->
+						<!-- <router-link to="/releases">
 							<Button size="small" type="secondary" block>
 								<Icon name="asterisk" size="16" style="fill: var(--green)" />What's New in 1.1
 							</Button>
-						</router-link>
+						</router-link> -->
 
 						<Flex gap="8">
 							<!-- TODO: #3 -->
@@ -362,11 +364,12 @@ watch(
 						<Button size="small" type="tertiary"> <Icon name="help" size="14" color="tertiary" />About </Button>
 					</Flex> -->
 					<Flex align="center" justify="between" :class="$style.bottom">
-						<router-link to="/releases">
+						<!-- TODO: #3 -->
+						<!-- <router-link to="/releases">
 							<Button size="small" type="secondary" block>
 								<Icon name="asterisk" size="16" style="fill: var(--green)" />What's New in 1.1
 							</Button>
-						</router-link>
+						</router-link> -->
 
 						<Flex gap="8">
 							<!-- TODO: #3 -->

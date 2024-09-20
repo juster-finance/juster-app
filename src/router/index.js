@@ -34,11 +34,11 @@ const routes = [
 		component: () => import("@views/LandingPage.vue"),
 	},
 	// TODO: #3
-	{
-		path: "/launch",
-		name: "Launch",
-		component: () => import("@views/LaunchPage.vue"),
-	},
+	// {
+	// 	path: "/launch",
+	// 	name: "Launch",
+	// 	component: () => import("@views/LaunchPage.vue"),
+	// },
 	{
 		path: "/",
 		name: "Explore",
@@ -71,111 +71,112 @@ const routes = [
 		name: "Market",
 		component: () => import("@views/MarketPage.vue"),
 	},
-
+	// TODO: #3
 	// Pools
-	{
-		path: "/pools",
-		name: "Liquidity Pools",
-		component: () => import("@views/PoolsPage.vue"),
-	},
-	{
-		path: "/pools/:address",
-		name: "Liquidity Pool",
-		component: () => import("@views/PoolPage.vue"),
-	},
-	{
-		path: "/pools/list",
-		name: "Raw Pools",
-		component: () => import("@views/RawPoolsPage.vue"),
-	},
-	{
-		path: "/pools/positions",
-		name: "Raw Positions",
-		component: () => import("@views/RawPositionsPage.vue"),
-	},
+	// {
+	// 	path: "/pools",
+	// 	name: "Liquidity Pools",
+	// 	component: () => import("@views/PoolsPage.vue"),
+	// },
+	// {
+	// 	path: "/pools/:address",
+	// 	name: "Liquidity Pool",
+	// 	component: () => import("@views/PoolPage.vue"),
+	// },
+	// {
+	// 	path: "/pools/list",
+	// 	name: "Raw Pools",
+	// 	component: () => import("@views/RawPoolsPage.vue"),
+	// },
+	// {
+	// 	path: "/pools/positions",
+	// 	name: "Raw Positions",
+	// 	component: () => import("@views/RawPositionsPage.vue"),
+	// },
 
+	// TODO: #3
 	// Settings
-	{
-		path: "/settings",
-		name: "Settings",
-		component: () => import("@views/SettingsPage.vue"),
-		beforeEnter: (to, from, next) => {
-			next({ name: "Explore" })
-		},
-		redirect: "/settings/account/",
-		children: [
-			// General Settings
-			{
-				name: "AccountSettings",
-				path: "account",
-				component: () => import("@/components/modules/settings/pages/AccountSettings.vue"),
-			},
-			{
-				name: "ApplicationSettings",
-				path: "application",
-				component: () => import("@/components/modules/settings/pages/ApplicationSettings.vue"),
-			},
-			{
-				name: "WalletSettings",
-				path: "wallet",
-				component: () => import("@/components/modules/settings/pages/WalletSettings.vue"),
-			},
-			// Appearance Settings
-			{
-				name: "DisplaySettings",
-				path: "display",
-				component: () => import("@/components/modules/settings/pages/DisplaySettings.vue"),
-			},
-			{
-				name: "AmountsSettings",
-				path: "amounts",
-				component: () => import("@/components/modules/settings/pages/AmountsSettings.vue"),
-			},
-			{
-				name: "ThemeSettings",
-				path: "theme",
-				component: () => import("@/components/modules/settings/pages/ThemeSettings.vue"),
-			},
-			// Accessibility Settings
-			{
-				name: "SearchSettings",
-				path: "search",
-				component: () => import("@/components/modules/settings/pages/SearchSettings.vue"),
-			},
-			{
-				name: "EffectsSettings",
-				path: "effects",
-				component: () => import("@/components/modules/settings/pages/EffectsSettings.vue"),
-			},
-			{
-				name: "ShortcutsSettings",
-				path: "shortcuts",
-				component: () => import("@/components/modules/settings/pages/ShortcutsSettings.vue"),
-			},
-			// Other Settings
-			{
-				name: "AdvancedSettings",
-				path: "advanced",
-				component: () => import("@/components/modules/settings/pages/AdvancedSettings.vue"),
-			},
-			{
-				name: "DebuggingSettings",
-				path: "debugging",
-				component: () => import("@/components/modules/settings/pages/DebuggingSettings.vue"),
-			},
-			{
-				name: "ResetsSettings",
-				path: "resets",
-				component: () => import("@/components/modules/settings/pages/ResetsSettings.vue"),
-			},
-		],
-	},
-
-	{
-		path: "/rating",
-		name: "Rating",
-		component: () => import("@views/LeaderboardPage.vue"),
-	},
+	// {
+	// 	path: "/settings",
+	// 	name: "Settings",
+	// 	component: () => import("@views/SettingsPage.vue"),
+	// 	beforeEnter: (to, from, next) => {
+	// 		next({ name: "Explore" })
+	// 	},
+	// 	redirect: "/settings/account/",
+	// 	children: [
+	// 		// General Settings
+	// 		{
+	// 			name: "AccountSettings",
+	// 			path: "account",
+	// 			component: () => import("@/components/modules/settings/pages/AccountSettings.vue"),
+	// 		},
+	// 		{
+	// 			name: "ApplicationSettings",
+	// 			path: "application",
+	// 			component: () => import("@/components/modules/settings/pages/ApplicationSettings.vue"),
+	// 		},
+	// 		{
+	// 			name: "WalletSettings",
+	// 			path: "wallet",
+	// 			component: () => import("@/components/modules/settings/pages/WalletSettings.vue"),
+	// 		},
+	// 		// Appearance Settings
+	// 		{
+	// 			name: "DisplaySettings",
+	// 			path: "display",
+	// 			component: () => import("@/components/modules/settings/pages/DisplaySettings.vue"),
+	// 		},
+	// 		{
+	// 			name: "AmountsSettings",
+	// 			path: "amounts",
+	// 			component: () => import("@/components/modules/settings/pages/AmountsSettings.vue"),
+	// 		},
+	// 		{
+	// 			name: "ThemeSettings",
+	// 			path: "theme",
+	// 			component: () => import("@/components/modules/settings/pages/ThemeSettings.vue"),
+	// 		},
+	// 		// Accessibility Settings
+	// 		{
+	// 			name: "SearchSettings",
+	// 			path: "search",
+	// 			component: () => import("@/components/modules/settings/pages/SearchSettings.vue"),
+	// 		},
+	// 		{
+	// 			name: "EffectsSettings",
+	// 			path: "effects",
+	// 			component: () => import("@/components/modules/settings/pages/EffectsSettings.vue"),
+	// 		},
+	// 		{
+	// 			name: "ShortcutsSettings",
+	// 			path: "shortcuts",
+	// 			component: () => import("@/components/modules/settings/pages/ShortcutsSettings.vue"),
+	// 		},
+	// 		// Other Settings
+	// 		{
+	// 			name: "AdvancedSettings",
+	// 			path: "advanced",
+	// 			component: () => import("@/components/modules/settings/pages/AdvancedSettings.vue"),
+	// 		},
+	// 		{
+	// 			name: "DebuggingSettings",
+	// 			path: "debugging",
+	// 			component: () => import("@/components/modules/settings/pages/DebuggingSettings.vue"),
+	// 		},
+	// 		{
+	// 			name: "ResetsSettings",
+	// 			path: "resets",
+	// 			component: () => import("@/components/modules/settings/pages/ResetsSettings.vue"),
+	// 		},
+	// 	],
+	// },
+	// TODO: #3
+	// {
+	// 	path: "/rating",
+	// 	name: "Rating",
+	// 	component: () => import("@views/LeaderboardPage.vue"),
+	// },
 
 	{
 		path: "/welcome",

@@ -10,7 +10,7 @@ import { token } from "@config"
 <template>
 	<Page>
 		<h1 id="terms-of-use">Terms of Use</h1>
-		<div :class="$style.description">Last Updated: February 1th 2022</div>
+		<div :class="$style.description">Last Updated: September 25th 2024</div>
 
 		<div :class="$style.block">
 			<p>

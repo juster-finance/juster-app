@@ -230,10 +230,10 @@ onBeforeUnmount(() => {
 					<Flex align="center" wrap="wrap" :class="$style.line">
 						<Text size="14" weight="500" color="tertiary"> © {{ DateTime.now().year }}&nbsp;&nbsp; </Text>
 						<Text size="11" color="support">✦</Text>
-						<Text size="14" weight="500" color="secondary"> &nbsp;&nbsp;Juster 1.1&nbsp; </Text>
+						<Text size="14" weight="500" color="secondary"> &nbsp;&nbsp;Juster&nbsp; </Text>
 						<Text size="14" weight="500" color="tertiary"> Market data provided by&nbsp; </Text>
-						<a href="https://tzkt.io/KT1AdbYiPYb5hDuEuVrfxmFehtnBCXv4Np7r/operations/" target="_blank">
-							<Text size="14" weight="500" color="secondary"> Harbinger Oracle </Text>
+						<a href="https://redstone.finance/" target="_blank">
+							<Text size="14" weight="500" color="secondary"> RedStone Oracle </Text>
 						</a>
 					</Flex>
 

@@ -16,7 +16,7 @@ export default defineComponent({
 <template>
 	<Page>
 		<h1>Privacy Policy</h1>
-		<div :class="$style.description">Updated 25 Sep 2021</div>
+		<div :class="$style.description">Updated 25 Sep 2024</div>
 
 		<div :class="$style.block">
 			<h2>Scope</h2>

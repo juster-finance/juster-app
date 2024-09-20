@@ -45,9 +45,9 @@ import Page from "@base/Page.vue"
 			<h3>Learn</h3>
 
 			<ul>
-				<li>
-					<a href="/">White Papper</a>
-				</li>
+				<!-- <li>
+					<a href="/">White Paper</a>
+				</li> -->
 				<li>
 					<a href="/docs">Documentation</a>
 				</li>
