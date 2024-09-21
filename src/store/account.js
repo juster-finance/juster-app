@@ -4,7 +4,6 @@ import { defineStore } from "pinia"
  * Services
  */
 import { juster, analytics } from "@sdk"
-import { fetchBalance } from "@sdk"
 import { demoMode } from "@config"
 
 export const useAccountStore = defineStore({
@@ -14,6 +13,7 @@ export const useAccountStore = defineStore({
 		return {
 			pkh: "",
 			balance: 0,
+			lockedAmount: 0,
 			isBalanceLoaded: false,
 
 			pendingTransaction: {
@@ -41,7 +41,9 @@ export const useAccountStore = defineStore({
 		},
 
 		async updateBalance() {
-			this.balance = await fetchBalance(this.pkh)
+			const user = await juster.sdk.getUser(this.pkh)
+			this.balance = user.balance.toFixed(2)
+			this.lockedAmount = user.lockedAmount.toFixed(2)
 			this.isBalanceLoaded = true
 		},
 
@@ -67,7 +69,7 @@ export const useAccountStore = defineStore({
 		},
 
 		isTopUpAllowed() {
-			return this.isBalanceLoaded && this.pkh && this.balance <= demoMode.minBalanceToTopUp
+			return this.isBalanceLoaded && this.pkh && (this.balance + this.lockedAmount) <= demoMode.minBalanceToTopUp
 		}
 	},
 })
