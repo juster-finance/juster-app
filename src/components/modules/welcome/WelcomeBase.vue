@@ -482,8 +482,11 @@ const handleEnd = () => {
 										color="tertiary"
 										height="16"
 									>
-										The duration of the event varies, from 6
-										hours to 7 days
+										<!--TODO: #3 -->
+										<!-- The duration of the event varies, from 6
+										hours to 7 days -->
+										The duration of the event varies, from 5
+										minutes to 7 days
 									</Text>
 								</Flex>
 								<Flex align="center" gap="6">
@@ -515,7 +518,7 @@ const handleEnd = () => {
 						</Button>
 					</Flex>
 
-					<EventCard
+					<EventCard v-if="!!event"
 						:event="event"
 						disableSub
 						:class="$style.event_card"
@@ -584,8 +587,8 @@ const handleEnd = () => {
 								Last step and you're ready
 								<Icon name="login" size="16" color="black" />
 							</Button>
-
-							<Flex>
+							<!-- TODO: #3 -->
+							<!--<Flex>
 								<Text size="12" weight="500" color="tertiary"
 									>I want to</Text
 								>
@@ -599,7 +602,7 @@ const handleEnd = () => {
 								<Text size="12" weight="500" color="tertiary">
 									and use liquidity pools</Text
 								>
-							</Flex>
+							</Flex>-->
 						</Flex>
 					</Flex>
 
