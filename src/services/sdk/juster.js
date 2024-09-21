@@ -52,10 +52,10 @@ juster.provider = new BeaconWallet({
 juster.tezos = new TezosToolkit(rpcNodes[localStorage.activeNetwork][0].url)
 
 const init = async () => {
-	juster.sdk = new JusterDemo(
-		demoMode.baseUrl,
-		() => localStorage.getItem(localStorageKeys.AUTH_TOKEN)
-	)
+	juster.sdk = new JusterDemo({
+		baseUrl: demoMode.baseUrl,
+		accessTokenFactory: () => localStorage.getItem(localStorageKeys.AUTH_TOKEN)
+	})
 
 	/** GQL */
 	juster.gql = createClient({
