@@ -232,7 +232,7 @@ onBeforeUnmount(() => {
 						<Text size="11" color="support">✦</Text>
 						<Text size="14" weight="500" color="secondary"> &nbsp;&nbsp;Juster&nbsp; </Text>
 						<Text size="14" weight="500" color="tertiary"> Market data provided by&nbsp; </Text>
-						<a href="https://redstone.finance/" target="_blank">
+						<a href="https://app.redstone.finance/#/app/data-services/redstone-primary-prod" target="_blank">
 							<Text size="14" weight="500" color="secondary"> RedStone Oracle </Text>
 						</a>
 					</Flex>
