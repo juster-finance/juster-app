@@ -29,11 +29,13 @@ const props = defineProps({
 
 const showOperationModal = ref(false)
 
+const fee = 0
 const aboveEqProfit = computed(() => {
 	let profit = (props.event.poolBelow * props.deposit.shares) / props.event.totalLiquidityShares - props.deposit.amountAboveEq
 
 	if (profit > 0) {
-		profit = profit * (1 - 0.01)
+		// TODO: #1 Include fee from config
+		profit = profit * (1 - fee)
 	}
 
 	return profit
@@ -42,7 +44,7 @@ const belowProfit = computed(() => {
 	let profit = (props.event.poolAboveEq * props.deposit.shares) / props.event.totalLiquidityShares - props.deposit.amountBelow
 
 	if (profit > 0) {
-		profit = profit * (1 - 0.01)
+		profit = profit * (1 - fee)
 	}
 
 	return profit
