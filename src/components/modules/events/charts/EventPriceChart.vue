@@ -58,6 +58,14 @@ const draw = () => {
 	}
 
 	let quotes = []
+	
+	/** <1h */
+	if (props.event.measurePeriod < 3600) {
+		chartEars.hour = 0
+		chartEars.minute = 30
+
+		quotes = symbol.quotes
+	}
 
 	/** 1h */
 	if (props.event.measurePeriod == 3600) {
@@ -196,13 +204,15 @@ const draw = () => {
 		} else if (
 			DateTime.fromJSDate(tick).ordinal ==
 				DateTime.fromISO(props.event.betsCloseTime).plus({
-					hour: props.event.measurePeriod / 3600,
+					seconds: props.event.measurePeriod,
 				}).ordinal &&
 			DateTime.fromJSDate(tick).hour ==
 				DateTime.fromISO(props.event.betsCloseTime).plus({
-					hour: props.event.measurePeriod / 3600,
+					seconds: props.event.measurePeriod,
 				}).hour &&
-			DateTime.fromJSDate(tick).minute == DateTime.fromISO(props.event.betsCloseTime).minute
+			DateTime.fromJSDate(tick).minute == DateTime.fromISO(props.event.betsCloseTime).plus({
+					seconds: props.event.measurePeriod,
+				}).minute
 		) {
 			const eventFinishDt = DateTime.fromISO(props.event.betsCloseTime).plus({
 				seconds: props.event.measurePeriod,
@@ -423,6 +433,12 @@ onMounted(async () => {
 		minute: 0,
 	}
 
+	/** <1h */
+	if (props.event.measurePeriod < 3600) {
+		chartEars.hour = 0
+		chartEars.minute = 30
+	}
+
 	/** 1h */
 	if (props.event.measurePeriod == 3600) {
 		chartEars.hour = 1
@@ -453,7 +469,7 @@ onMounted(async () => {
 			minute: chartEars.minute,
 		}),
 		DateTime.fromISO(props.event.betsCloseTime).plus({
-			hour: parseInt(props.event.measurePeriod) / 3600,
+			seconds: parseInt(props.event.measurePeriod)
 		}),
 		chartEars,
 	)
