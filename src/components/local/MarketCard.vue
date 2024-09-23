@@ -69,11 +69,11 @@ export default defineComponent({
 			}
 		})
 
-		const draw = () => {
-			const margin = { top: 20, right: 20, bottom: 20, left: 0 },
-				width = 500 - margin.left - margin.right,
-				height = 140 - margin.top - margin.bottom
+		const margin = { top: 20, right: 20, bottom: 20, left: 0 }
+		const width = 500 - margin.left - margin.right
+		const height = 140 - margin.top - margin.bottom
 
+		const draw = () => {
 			d3.select(`#chart_${market.value.id} > *`).remove()
 
 			const svg = d3
@@ -148,6 +148,12 @@ export default defineComponent({
 			draw()
 		})
 
+		watch(quotes.value, () => {
+			if (quotes.value.length) {
+				draw()
+			}
+		})
+
 		/**
 		 * Select quote on hover
 		 */
@@ -169,19 +175,27 @@ export default defineComponent({
 			const xScale = d3
 				.scaleTime()
 				.domain(d3.extent(data, (d) => d.date))
-				.range([0, 500])
+				.range([0, width])
 
-			const exactDate = xScale.invert(layerX)
-			const diffs = data.map((d) => Math.abs(d.date - exactDate))
-			const snapIndex = diffs.indexOf(Math.min(...diffs))
+			const inBounds = layerX >= 0 && layerX <= width
 
-			selectedQuote.value = data[snapIndex]
+			if (inBounds) {
+				const exactDate = xScale.invert(layerX)
+				const diffs = data.map((d) => Math.abs(d.date - exactDate))
+				const snapIndex = diffs.indexOf(Math.min(...diffs))
+				selectedQuote.value = data[snapIndex]
+			} else {
+				selectedQuote.value = {}
+			}
 
 			/** draw dots */
-			const circles = d3.selectAll(
+			const dots = d3.selectAll(
 				`#chart_${market.value.id} > svg > line`,
 			)
-			circles.remove()
+			dots.remove()
+
+			if (!inBounds)
+				return;
 
 			const svg = d3.select(`#chart_${market.value.id} > svg`)
 			svg.append("line")
