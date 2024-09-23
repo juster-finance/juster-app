@@ -60,17 +60,15 @@ const selectTab = (tab) => {
 	selectedTab.value = tab
 }
 
-const events = computed(() => marketStore.events)
+const events = ref([])
 
 const getEvents = async ({ status }) => {
-	marketStore.events = []
-
 	let allEvents = await fetchEventsByMarket({
 		id: market.value.id,
 		status,
 	})
 
-	marketStore.events = cloneDeep(allEvents).sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime))
+	events.value = cloneDeep(allEvents).sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime))
 }
 
 if (market.value) {
@@ -130,9 +128,6 @@ onMounted(() => {
 	}
 })
 
-onBeforeUnmount(() => {
-	marketStore.events = []
-})
 
 /** Meta */
 const { meta } = useMeta({

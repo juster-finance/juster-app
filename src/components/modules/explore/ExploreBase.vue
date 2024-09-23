@@ -48,6 +48,7 @@ import { useAccountStore } from "@store/account"
  * Services
  */
 import { juster, analytics } from "@sdk"
+import { destroySubscription } from "@/services/sdk";
 
 const router = useRouter()
 const route = useRoute()
@@ -62,6 +63,7 @@ const myPositions = ref([])
 const subToHasPositions = ref({})
 const hasPositions = ref(true)
 
+const subToTopEvents = ref({})
 const topEvents = ref([])
 
 /** Ranking */
@@ -130,8 +132,23 @@ const init = async () => {
 	/**
 	 * Block: Top Events & Providers
 	 */
-	const rawTopEvents = await fetchTopEvents({ limit: 3 })
-	topEvents.value = rawTopEvents.sort((a, b) => b.bets.length - a.bets.length)
+	subToTopEvents.value = await juster.gql
+		.subscription({
+			event: [
+				{
+					where: { status: { _eq: "NEW" } },
+					order_by: [{ bets_aggregate: {count: "desc"}}, {id: "desc"}],
+					limit: 3,
+				},
+				eventModel,
+			],
+		})
+		.subscribe({
+			next: ({ event: rawTopEvents }) => {
+				topEvents.value = rawTopEvents
+			},
+			error: console.error,
+		})
 
 	const rawTopProviders = await fetchTopLiquidityProviders()
 	const rawTopBettors = await fetchTopBettors()
@@ -150,10 +167,10 @@ const init = async () => {
 watch(
 	() => [juster.sdk._network, accountStore.pkh],
 	() => {
-		subToMyPositions.value.unsubscribe()
-		subToHasPositions.value.unsubscribe()
+		destroySubscription(subToMyPositions)
+		destroySubscription(subToHasPositions)
+		destroySubscription(subToTopEvents)
 		myPositions.value = []
-		marketStore.events = []
 		topEvents.value = []
 		topProviders.value = []
 		isTopProvidersLoading.value = true
