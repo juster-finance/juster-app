@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onBeforeUnmount, onUnmounted, ref, reactive, computed, nextTick } from "vue"
+import { onMounted, onBeforeUnmount, onUnmounted, ref, reactive, computed, nextTick, watch } from "vue"
 import { DateTime } from "luxon"
 
 /**
@@ -136,13 +136,27 @@ const positionForWithdraw = computed(() => {
 	return accountStore.wonPositions.find((position) => position.event.id == props.event.id)
 })
 
-const progressPercentage = computed(() => {
+const progressPercentage = ref(0)
+const updateProgressPercentage = () => {
 	const nowDt = DateTime.now()
 	const startDt = DateTime.fromISO(props.event.betsCloseTime)
 	const endDt = startDt.plus(props.event.measurePeriod * 1000)
 
-	return ((endDt.ts - nowDt.ts) * 100) / (endDt.ts - startDt.ts)
-})
+	progressPercentage.value = ((endDt.ts - nowDt.ts) * 100) / (endDt.ts - startDt.ts)
+}
+
+const relativeStartEndTime = ref('')
+const updateRelativeStartEndTime = () => {
+	let date = DateTime.fromISO(props.event.betsCloseTime)
+	if (startStatus.value !== 'In progress')
+		date = date.plus({ second: props.event.measurePeriod })
+	relativeStartEndTime.value = date.setLocale("en").toRelative()
+}
+
+const updateRelativeStartEndTimeTimer = setInterval(() => {
+	updateRelativeStartEndTime()
+	updateProgressPercentage()
+}, 1000);
 
 /** Join to the event & Liquidity */
 const handleJoin = (target) => {
@@ -296,6 +310,8 @@ const contextMenuHandler = (e) => {
 
 onMounted(async () => {
 	start()
+	updateRelativeStartEndTime()
+	updateProgressPercentage()
 
 	if (card.value) card.value.addEventListener("contextmenu", contextMenuHandler)
 
@@ -357,6 +373,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
 	card.value.removeEventListener("contextmenu", contextMenuHandler)
+	clearInterval(updateRelativeStartEndTimeTimer)
 })
 
 onUnmounted(() => {
@@ -567,7 +584,7 @@ onUnmounted(() => {
 					<div>
 						Starting
 						<span>
-							{{ DateTime.fromISO(event.betsCloseTime).setLocale("en").toRelative() }}
+							{{ relativeStartEndTime }}
 						</span>
 					</div>
 				</div>
@@ -582,7 +599,7 @@ onUnmounted(() => {
 					<div>
 						Ending
 						<span>
-							{{ DateTime.fromISO(event.betsCloseTime).plus({ second: event.measurePeriod }).setLocale("en").toRelative() }}
+							{{ relativeStartEndTime }}
 						</span>
 					</div>
 				</div>
@@ -592,13 +609,7 @@ onUnmounted(() => {
 					<div>
 						Ended
 						<span>
-							{{
-								DateTime.fromISO(event.betsCloseTime, {
-									locale: "en",
-								})
-									.plus({ second: event.measurePeriod })
-									.toRelative()
-							}}
+							{{ relativeStartEndTime }}
 						</span>
 					</div>
 				</div>

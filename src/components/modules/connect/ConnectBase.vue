@@ -93,7 +93,7 @@ const login = () => {
 			notificationsStore.create({
 				notification: {
 					type: "success",
-					title: "Successfuly connected",
+					title: "Successfully connected",
 					description:
 						"Go through a little onboarding to quickly explore the features of the project",
 					autoDestroy: true,
