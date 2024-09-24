@@ -47,8 +47,7 @@ import { useAccountStore } from "@store/account"
 /**
  * Services
  */
-import { juster, analytics } from "@sdk"
-import { destroySubscription } from "@/services/sdk";
+import { juster, analytics, destroySubscription } from "@sdk"
 
 const router = useRouter()
 const route = useRoute()
@@ -199,12 +198,9 @@ onBeforeUnmount(() => {
 })
 
 onUnmounted(() => {
-	const subscriptions = [subToMyPositions, subToHasPositions]
-	subscriptions.forEach((sub) => {
-		if (Object.prototype.hasOwnProperty.call(sub.value, "_state") && !sub.value?.closed) {
-			sub.value.unsubscribe()
-		}
-	})
+	destroySubscription(subToMyPositions)
+	destroySubscription(subToHasPositions)
+	destroySubscription(subToTopEvents)
 })
 
 /** Meta */

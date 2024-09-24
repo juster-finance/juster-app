@@ -388,9 +388,6 @@ onMounted(async () => {
 		.subscription({
 			event: [
 				{
-					where: {
-						status: { _eq: "NEW" },
-					},
 				},
 				{
 					...eventModel,
@@ -402,15 +399,11 @@ onMounted(async () => {
 				const { event: newEvents } = data
 
 				newEvents.forEach((newEvent) => {
-					if (
-						marketStore.events.some(
-							(event) => newEvent.id == event.id,
-						)
-					) {
-						return
+					if (marketStore.events.some((event) => newEvent.id == event.id)) {
+						marketStore.updEvent(newEvent)
+					} else {
+						marketStore.events.push(newEvent)
 					}
-
-					marketStore.events.push(newEvent)
 				})
 			},
 			error: console.error,

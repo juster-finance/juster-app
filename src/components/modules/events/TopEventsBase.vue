@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, reactive, ref, onMounted } from "vue"
+import { defineComponent, reactive, ref, onMounted, onUnmounted } from "vue"
 import { useMeta } from "vue-meta"
 import cloneDeep from "lodash.clonedeep"
 
@@ -19,6 +19,10 @@ import Banner from "@ui/Banner.vue"
  */
 import { EventCard } from "@local/EventCard"
 
+import { event as eventModel } from "@/graphql/models/events"
+import { juster, destroySubscription } from "@sdk"
+
+
 export default defineComponent({
 	name: "TopEventsBase",
 
@@ -35,14 +39,31 @@ export default defineComponent({
 		])
 
 		/** Events */
+		const subToTopEvents = ref({})
 		const topEvents = ref([])
 
 		onMounted(async () => {
-			const events = await fetchTopEvents({ limit: 9 })
+			subToTopEvents.value = await juster.gql
+				.subscription({
+					event: [
+						{
+							where: { status: { _eq: "NEW" } },
+							order_by: [{ bets_aggregate: {count: "desc"}}, {id: "desc"}],
+							limit: 9,
+						},
+						eventModel,
+					],
+				})
+				.subscribe({
+					next: ({ event: rawTopEvents }) => {
+						topEvents.value = rawTopEvents
+					},
+					error: console.error,
+				})
+		})
 
-			topEvents.value = cloneDeep(events).sort(
-				(a, b) => a.bets.length - a.bets.length,
-			)
+		onUnmounted(() => {
+			destroySubscription(subToTopEvents)
 		})
 
 		/** Meta */

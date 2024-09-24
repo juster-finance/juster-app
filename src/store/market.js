@@ -55,11 +55,7 @@ export const useMarketStore = defineStore({
 
 			if (!event) console.warn("market:updEvent -> event not found")
 
-			if (event?.status !== newEvent.status) {
-				this.events.splice(indexOfEvent, 1)
-			} else {
-				this.events[indexOfEvent] = { ...event, ...newEvent }
-			}
+			this.events[indexOfEvent] = { ...event, ...newEvent }
 		},
 
 		updateQuotes({ target, quote }) {
