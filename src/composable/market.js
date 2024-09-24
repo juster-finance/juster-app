@@ -106,12 +106,15 @@ export const useMarket = () => {
 					},
 					{
 						balance: true,
+						lockedAmount: true,
 					},
 				],
 			})
 			.subscribe({
 				next: (data) => {
-					accountStore.balance = data.user[0].balance.toFixed(2)
+					const user = data.user[0]
+					accountStore.balance = user.balance.toFixed(2)
+					accountStore.lockedAmount = user.lockedAmount.toFixed(2)
 				},
 				error: console.error,
 			})

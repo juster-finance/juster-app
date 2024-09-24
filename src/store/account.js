@@ -69,7 +69,7 @@ export const useAccountStore = defineStore({
 		},
 
 		isTopUpAllowed() {
-			return this.isBalanceLoaded && this.pkh && (this.balance + this.lockedAmount) <= demoMode.minBalanceToTopUp
+			return this.isBalanceLoaded && this.pkh && (+this.balance + +this.lockedAmount) <= demoMode.minBalanceToTopUp
 		}
 	},
 })
