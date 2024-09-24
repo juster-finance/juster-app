@@ -24,7 +24,8 @@ import { useAccountStore } from "@store/account"
 /**
  * gql
  */
-import { position } from "@/graphql/models"
+	
+import { position, userWithdrawal as userWithdrawalModel } from "@/graphql/models"
 
 export const useMarket = () => {
 	const marketStore = useMarketStore()
@@ -34,6 +35,7 @@ export const useMarket = () => {
 
 	const newPositionsSubscription = ref({})
 	const updateBalanceSubscription = ref({})
+	const updateWithdrawalsSubscription = ref({})
 	const newWithdrawnPositionsSubscription = ref({})
 	const quotesSubscription = ref({})
 
@@ -110,6 +112,31 @@ export const useMarket = () => {
 			.subscribe({
 				next: (data) => {
 					accountStore.balance = data.user[0].balance.toFixed(2)
+				},
+				error: console.error,
+			})
+
+		/** Update user withdrawals */
+		updateWithdrawalsSubscription.value = await juster.gql
+			.subscription({
+				withdrawal: [
+					{
+						where: { userId: { _eq: accountStore.pkh } },
+						order_by: { id: "desc" },
+					},
+					userWithdrawalModel,
+				],
+			})
+			.subscribe({
+				next: (data) => {
+					const newWithdrawals = data.withdrawal
+
+					newWithdrawals.forEach((newWithdrawal) => {
+						if (accountStore.withdrawals.some((withdrawal) => withdrawal.id == newWithdrawal.id))
+							return
+
+						accountStore.withdrawals.push(newWithdrawal)
+					})
 				},
 				error: console.error,
 			})
@@ -232,6 +259,7 @@ export const useMarket = () => {
 		destroySubscription(newPositionsSubscription.value)
 		destroySubscription(newWithdrawnPositionsSubscription.value)
 		destroySubscription(quotesSubscription.value)
+		destroySubscription(updateWithdrawalsSubscription.value)
 	})
 
 	return { setupMarket, setupUser, updateWithdrawals, markets }

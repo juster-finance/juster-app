@@ -102,7 +102,7 @@ const hasHedge = computed(() => {
 				<div :class="$style.name">TVL</div>
 
 				<div :class="$style.amount">
-					{{ abbreviateNumber(dvl + bvl) }}
+					{{ numberWithSymbol((dvl + bvl).toFixed(2), ",") }}
 					<span>{{token.symbol}}</span>
 				</div>
 			</div>
@@ -175,14 +175,14 @@ const hasHedge = computed(() => {
 					v-else-if="['NEW', 'STARTED'].includes(event.status)"
 					:class="$style.amount"
 				>
-					{{ potentialProfit.toFixed(2) }} <span>{{token.symbol}}</span>
+					{{ numberWithSymbol(potentialProfit.toFixed(2), ",") }} <span>{{token.symbol}}</span>
 				</div>
 
 				<div
 					v-else-if="event.status == 'FINISHED'"
 					:class="$style.amount"
 				>
-					{{ profitOnFinish.toFixed(2) }} <span>{{token.symbol}}</span>
+					{{ numberWithSymbol(profitOnFinish.toFixed(2), ",") }} <span>{{token.symbol}}</span>
 				</div>
 
 				<div v-else :class="$style.amount">0 <span>{{token.symbol}}</span></div>
