@@ -178,59 +178,56 @@ const draw = () => {
 	/** Ticks */
 	const format = d3.timeFormat("%H:%M")
 
+	const startTime = DateTime.fromISO(props.event.betsCloseTime)
+	const finishTime = startTime.plus({ seconds: props.event.measurePeriod })
+
 	scale.x.ticks(15).forEach((tick) => {
+		const tickTime = DateTime.fromJSDate(tick)
+
 		const tickG = canvas
 			.append("g")
 			.attr("transform", `translate(${scale.x(tick)}, 12)`)
 			.attr("id", "xTick")
 			.attr("data-value", DateTime.fromISO(tick).ts)
 
-		const startTime = DateTime.fromISO(props.event.betsCloseTime)
-		const finishTime = startTime.plus({ seconds: props.event.measurePeriod })
 		if (
-			startTime.ordinal == DateTime.fromJSDate(tick).ordinal &&
-			startTime.hour == DateTime.fromJSDate(tick).hour &&
-			startTime.minute == DateTime.fromJSDate(tick).minute &&
-			startTime.second == DateTime.fromJSDate(tick).second &&
-			startTime.millisecond == DateTime.fromJSDate(tick).millisecond
+			startTime.ordinal == tickTime.ordinal &&
+			startTime.hour == tickTime.hour &&
+			startTime.minute == tickTime.minute &&
+			startTime.second == tickTime.second &&
+			startTime.millisecond == tickTime.millisecond
 		) {
 			tickG.attr("id", "sector_start")
-			const eventStartDt = startTime
-
 			tickG.attr("class", classes.start)
 
 			const startLine = tickG.append("line").attr("y2", 200).attr("class", classes.time_line)
 			startLine.attr("y1", 24)
 
 			tickG.append("text").attr("y", 0).text(`Start`)
-			tickG.append("text").attr("y", 12).text(eventStartDt.toFormat("H:mm"))
+			tickG.append("text").attr("y", 12).text(startTime.toFormat("H:mm"))
 			tickG.append("text").attr("y", 220).text(format(tick))
 		} else if (
-			finishTime.ordinal == DateTime.fromJSDate(tick).ordinal &&
-			finishTime.hour == DateTime.fromJSDate(tick).hour &&
-			finishTime.minute == DateTime.fromJSDate(tick).minute &&
-			finishTime.second == DateTime.fromJSDate(tick).second &&
-			finishTime.millisecond == DateTime.fromJSDate(tick).millisecond
+			finishTime.ordinal == tickTime.ordinal &&
+			finishTime.hour == tickTime.hour &&
+			finishTime.minute == tickTime.minute &&
+			finishTime.second == tickTime.second &&
+			finishTime.millisecond == tickTime.millisecond
 		) {
-			const eventFinishDt = DateTime.fromISO(props.event.betsCloseTime).plus({
-				seconds: props.event.measurePeriod,
-			})
-
 			tickG.attr("class", classes.start)
 
 			const finishLine = tickG.append("line").attr("y2", 200).attr("class", classes.time_line)
 			finishLine.attr("y1", 24)
 
 			tickG.append("text").attr("y", 0).text(`Finish`)
-			tickG.append("text").attr("y", 12).text(eventFinishDt.toFormat("H:mm"))
+			tickG.append("text").attr("y", 12).text(finishTime.toFormat("H:mm"))
 			tickG.append("text").attr("y", 220).text(format(tick))
 		} else {
 			tickG.append("line").attr("y2", 200).attr("class", classes.time_line)
 
-			if (![0, 15, 30, 45].includes(DateTime.fromJSDate(tick).minute)) return
+			if (![0, 15, 30, 45].includes(tickTime.minute)) return
 
 			if (format(tick) == "00:00") {
-				tickG.append("text").attr("y", 220).text(DateTime.fromJSDate(tick).toFormat("LLL dd"))
+				tickG.append("text").attr("y", 220).text(tickTime.toFormat("LLL dd"))
 			} else {
 				tickG.append("text").attr("y", 220).text(format(tick))
 			}
@@ -242,8 +239,7 @@ const draw = () => {
 		/**
 		 * Start
 		 */
-		const eventStartDt = DateTime.fromISO(props.event.betsCloseTime)
-		const startTickValue = scale.x(eventStartDt.ts)
+		const startTickValue = scale.x(startTime.ts)
 
 		const startTickG = canvas.append("g").attr("transform", `translate(${startTickValue}, 12)`)
 		startTickG.attr("class", classes.start)
@@ -252,15 +248,12 @@ const draw = () => {
 		startLine.attr("y1", 24)
 
 		startTickG.append("text").attr("y", 0).text(`Start`)
-		startTickG.append("text").attr("y", 12).text(eventStartDt.toFormat("H:mm"))
+		startTickG.append("text").attr("y", 12).text(startTime.toFormat("H:mm"))
 
 		/**
 		 * Finish
 		 */
-		const eventFinishDt = DateTime.fromISO(props.event.betsCloseTime).plus({
-			seconds: props.event.measurePeriod,
-		})
-		const finishTickValue = scale.x(eventFinishDt)
+		const finishTickValue = scale.x(finishTime)
 
 		const finishTickG = canvas.append("g").attr("transform", `translate(${finishTickValue}, 12)`)
 		finishTickG.attr("class", classes.start)
@@ -269,11 +262,11 @@ const draw = () => {
 		finishLine.attr("y1", 24)
 
 		finishTickG.append("text").attr("y", 0).text(`Finish`)
-		finishTickG.append("text").attr("y", 12).text(eventFinishDt.toFormat("H:mm"))
+		finishTickG.append("text").attr("y", 12).text(finishTime.toFormat("H:mm"))
 	}
 
 	/** Draw chart Before start */
-	const dataBeforeStart = data.filter((quote) => DateTime.fromJSDate(quote.date).ts <= DateTime.fromISO(props.event.betsCloseTime).ts)
+	const dataBeforeStart = data.filter((quote) => DateTime.fromJSDate(quote.date).ts <= startTime.ts)
 
 	chart
 		.append("path")
@@ -290,7 +283,7 @@ const draw = () => {
 		)
 
 	/** Draw chart After start */
-	const dataAfterStart = data.filter((quote) => DateTime.fromJSDate(quote.date).ts >= DateTime.fromISO(props.event.betsCloseTime).ts)
+	const dataAfterStart = data.filter((quote) => DateTime.fromJSDate(quote.date).ts >= startTime.ts)
 	chart
 		.append("path")
 		.datum(dataAfterStart)
