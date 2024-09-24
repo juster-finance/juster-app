@@ -610,7 +610,7 @@ onBeforeUnmount(() => {
 
 				<!-- Start Price -->
 				<Flex
-					v-if="startData"
+					v-if="startData && event.startRate"
 					:class="[$style.price_badge, $style.start]"
 					:style="{
 						top: `${scale.y(startData.value) + 20 - 30 / 2}px`,
