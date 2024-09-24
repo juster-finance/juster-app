@@ -338,7 +338,7 @@ const handleKeydown = (e) => {
 							:class="$style.avatar"
 							alt="avatar"
 						/>
-						{{ participant.slice(0, 5) }}..{{
+						{{ participant.slice(0, 4) }}..{{
 							participant.slice(
 								participant.length - 4,
 								participant.length,

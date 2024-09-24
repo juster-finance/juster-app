@@ -13,7 +13,7 @@ const props = defineProps({
 
 const shorten = (address) => {
 	return [
-		address.slice(0, 5),
+		address.slice(0, 4),
 		address.slice(address.length - 4, address.length),
 	]
 }
@@ -122,7 +122,7 @@ const shorten = (address) => {
 	line-height: 14px;
 	font-weight: 600;
 	color: var(--text-primary);
-
+	text-wrap: nowrap;
 	margin-right: 8px;
 }
 
