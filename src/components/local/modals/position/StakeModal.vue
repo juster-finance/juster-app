@@ -310,7 +310,8 @@ const handleUserTransactionConfirmation = () => {
 					notification: {
 						type: "success",
 						title: "Your bet has been accepted",
-						description: "We need to process your bet, it will take 15-30 seconds",
+						// TODO: #3
+						// description: "We need to process your bet, it will take 15-30 seconds",
 						autoDestroy: true,
 					},
 				})

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 
 /**
  * Local
@@ -25,9 +25,12 @@ const props = defineProps({
 
 const users = ref([])
 
-onMounted(async () => {
-	users.value = await fetchEventParticipants({ id: props.event.id })
+watch(() => props.show, async () => {
+	if (props.show) {
+		users.value = await fetchEventParticipants({ id: props.event.id })
+	}
 })
+
 </script>
 
 <template>
