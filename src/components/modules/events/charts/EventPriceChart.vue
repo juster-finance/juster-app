@@ -62,7 +62,7 @@ const draw = () => {
 	/** <1h */
 	if (props.event.measurePeriod < 3600) {
 		chartEars.hour = 0
-		chartEars.minute = 30
+		chartEars.minute = props.event.measurePeriod / 10 
 
 		quotes = symbol.quotes
 	}
@@ -185,13 +185,17 @@ const draw = () => {
 			.attr("id", "xTick")
 			.attr("data-value", DateTime.fromISO(tick).ts)
 
+		const startTime = DateTime.fromISO(props.event.betsCloseTime)
+		const finishTime = startTime.plus({ seconds: props.event.measurePeriod })
 		if (
-			DateTime.fromISO(props.event.betsCloseTime).ordinal == DateTime.fromJSDate(tick).ordinal &&
-			DateTime.fromISO(props.event.betsCloseTime).hour == DateTime.fromJSDate(tick).hour &&
-			DateTime.fromISO(props.event.betsCloseTime).minute == DateTime.fromJSDate(tick).minute
+			startTime.ordinal == DateTime.fromJSDate(tick).ordinal &&
+			startTime.hour == DateTime.fromJSDate(tick).hour &&
+			startTime.minute == DateTime.fromJSDate(tick).minute &&
+			startTime.second == DateTime.fromJSDate(tick).second &&
+			startTime.millisecond == DateTime.fromJSDate(tick).millisecond
 		) {
 			tickG.attr("id", "sector_start")
-			const eventStartDt = DateTime.fromISO(props.event.betsCloseTime)
+			const eventStartDt = startTime
 
 			tickG.attr("class", classes.start)
 
@@ -202,17 +206,11 @@ const draw = () => {
 			tickG.append("text").attr("y", 12).text(eventStartDt.toFormat("H:mm"))
 			tickG.append("text").attr("y", 220).text(format(tick))
 		} else if (
-			DateTime.fromJSDate(tick).ordinal ==
-				DateTime.fromISO(props.event.betsCloseTime).plus({
-					seconds: props.event.measurePeriod,
-				}).ordinal &&
-			DateTime.fromJSDate(tick).hour ==
-				DateTime.fromISO(props.event.betsCloseTime).plus({
-					seconds: props.event.measurePeriod,
-				}).hour &&
-			DateTime.fromJSDate(tick).minute == DateTime.fromISO(props.event.betsCloseTime).plus({
-					seconds: props.event.measurePeriod,
-				}).minute
+			finishTime.ordinal == DateTime.fromJSDate(tick).ordinal &&
+			finishTime.hour == DateTime.fromJSDate(tick).hour &&
+			finishTime.minute == DateTime.fromJSDate(tick).minute &&
+			finishTime.second == DateTime.fromJSDate(tick).second &&
+			finishTime.millisecond == DateTime.fromJSDate(tick).millisecond
 		) {
 			const eventFinishDt = DateTime.fromISO(props.event.betsCloseTime).plus({
 				seconds: props.event.measurePeriod,
@@ -436,7 +434,7 @@ onMounted(async () => {
 	/** <1h */
 	if (props.event.measurePeriod < 3600) {
 		chartEars.hour = 0
-		chartEars.minute = 30
+		chartEars.minute = props.event.measurePeriod / 10 
 	}
 
 	/** 1h */
