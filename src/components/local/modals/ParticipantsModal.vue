@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, onUnmounted } from "vue"
 
 /**
  * Local
@@ -16,6 +16,7 @@ import Modal from "@ui/Modal.vue"
  */
 import { fetchEventParticipants } from "@/api/events"
 import { toUserFriendlyAddress } from "@townsquarelabs/ui-vue";
+import { juster, destroySubscription } from "@sdk"
 
 const emit = defineEmits(["onClose"])
 const props = defineProps({
@@ -24,11 +25,41 @@ const props = defineProps({
 })
 
 const users = ref([])
+const usersSubscription = ref([])
 
-watch(() => props.show, async () => {
-	if (props.show) {
-		users.value = await fetchEventParticipants({ id: props.event.id })
-	}
+onMounted(async () => {
+	usersSubscription.value = await juster.gql
+		.subscription({
+			event: [
+				{
+					where: { id: { _eq: props.event.id } },
+				},
+				{
+					positions: {
+						userId: true,
+						liquidityProvidedAboveEq: true,
+						liquidityProvidedBelow: true,
+						rewardAboveEq: true,
+						rewardBelow: true,
+						eventId: true,
+						shares: true,
+					},
+				},
+			],
+		})
+		.subscribe({
+			next: ({ event: events }) => {
+				users.value = events[0].positions.map((position) => ({
+					...position,
+					userFriendlyAddress: toUserFriendlyAddress(position.userId),
+				}))
+			},
+			error: console.error,
+		})
+})
+
+onUnmounted(() => {
+	destroySubscription(usersSubscription)
 })
 
 </script>
