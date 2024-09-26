@@ -1,15 +1,14 @@
 <script>
-import { defineComponent, reactive, ref, onMounted, onUnmounted } from "vue"
+import { defineComponent, reactive, onMounted, onUnmounted } from "vue"
 import { useMeta } from "vue-meta"
-import cloneDeep from "lodash.clonedeep"
 
 /**
- * API
+ * Store
  */
-import { fetchTopEvents } from "@/api/events"
+import { useTopNEvents } from "@/composable/events"
 
 /**
- * UI
+ * UIc
  */
 import Breadcrumbs from "@ui/Breadcrumbs.vue"
 import Banner from "@ui/Banner.vue"
@@ -18,10 +17,6 @@ import Banner from "@ui/Banner.vue"
  * Local
  */
 import { EventCard } from "@local/EventCard"
-
-import { event as eventModel } from "@/graphql/models/events"
-import { juster, destroySubscription } from "@sdk"
-
 
 export default defineComponent({
 	name: "TopEventsBase",
@@ -39,31 +34,14 @@ export default defineComponent({
 		])
 
 		/** Events */
-		const subToTopEvents = ref({})
-		const topEvents = ref([])
+		const {topEvents, start, stop} = useTopNEvents(9)
 
 		onMounted(async () => {
-			subToTopEvents.value = await juster.gql
-				.subscription({
-					event: [
-						{
-							where: { status: { _eq: "NEW" } },
-							order_by: [{ bets_aggregate: {count: "desc"}}, {id: "desc"}],
-							limit: 9,
-						},
-						eventModel,
-					],
-				})
-				.subscribe({
-					next: ({ event: rawTopEvents }) => {
-						topEvents.value = rawTopEvents
-					},
-					error: console.error,
-				})
+			start()
 		})
 
 		onUnmounted(() => {
-			destroySubscription(subToTopEvents)
+			stop()
 		})
 
 		/** Meta */

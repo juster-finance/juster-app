@@ -59,7 +59,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-	destroySubscription(usersSubscription)
+	destroySubscription(usersSubscription.value)
 })
 
 </script>

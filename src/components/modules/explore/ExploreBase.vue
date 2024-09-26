@@ -32,11 +32,12 @@ import {
 	fetchTopBettors,
 	fetchTopLiquidityProviders,
 } from "@/api/users"
+import { event as eventModel } from "@/graphql/models/events"
 
 /**
  * Subscriptions
  */
-import { event as eventModel } from "@/graphql/models/events"
+import { useTopNEvents } from "@/composable/events"
 
 /**
  * Store
@@ -62,8 +63,7 @@ const myPositions = ref([])
 const subToHasPositions = ref({})
 const hasPositions = ref(true)
 
-const subToTopEvents = ref({})
-const topEvents = ref([])
+const {topEvents, start: startTopEventsSubscription, stop: stopTopEventsSubscription} = useTopNEvents(3)
 
 /** Ranking */
 const isTopProvidersLoading = ref(true)
@@ -131,23 +131,7 @@ const init = async () => {
 	/**
 	 * Block: Top Events & Providers
 	 */
-	subToTopEvents.value = await juster.gql
-		.subscription({
-			event: [
-				{
-					where: { status: { _eq: "NEW" } },
-					order_by: [{ bets_aggregate: {count: "desc"}}, {id: "desc"}],
-					limit: 3,
-				},
-				eventModel,
-			],
-		})
-		.subscribe({
-			next: ({ event: rawTopEvents }) => {
-				topEvents.value = rawTopEvents
-			},
-			error: console.error,
-		})
+	startTopEventsSubscription()
 
 	const rawTopProviders = await fetchTopLiquidityProviders()
 	const rawTopBettors = await fetchTopBettors()
@@ -166,9 +150,9 @@ const init = async () => {
 watch(
 	() => [juster.sdk._network, accountStore.pkh],
 	() => {
-		destroySubscription(subToMyPositions)
-		destroySubscription(subToHasPositions)
-		destroySubscription(subToTopEvents)
+		destroySubscription(subToMyPositions.value)
+		destroySubscription(subToHasPositions.value)
+		stopTopEventsSubscription()
 		myPositions.value = []
 		topEvents.value = []
 		topProviders.value = []
@@ -198,9 +182,9 @@ onBeforeUnmount(() => {
 })
 
 onUnmounted(() => {
-	destroySubscription(subToMyPositions)
-	destroySubscription(subToHasPositions)
-	destroySubscription(subToTopEvents)
+	destroySubscription(subToMyPositions.value)
+	destroySubscription(subToHasPositions.value)
+	stopTopEventsSubscription()
 })
 
 /** Meta */
