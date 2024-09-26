@@ -21,7 +21,8 @@ import { useAccountStore } from "@store/account"
  * Services
  */
 import { analytics } from "@sdk"
-import { getCurrencyIcon } from "@utils/misc"
+import { getCurrencyIcon, shorten } from "@utils/misc"
+import { toUserFriendlyAddress } from "@utils/address"
 
 const props = defineProps({
 	filters: { type: Object },
@@ -339,11 +340,8 @@ const handleKeydown = (e) => {
 							:class="$style.avatar"
 							alt="avatar"
 						/>
-						{{ participant.slice(0, 4) }}..{{
-							participant.slice(
-								participant.length - 4,
-								participant.length,
-							)
+						{{ 
+							shorten(toUserFriendlyAddress(participant))
 						}}
 					</div>
 				</div>

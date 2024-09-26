@@ -30,7 +30,7 @@ export const pluralize = (val, word, plural = word + "s") => {
 	return _pluralize(val, word, plural)
 }
 
-export const shorten = (str, left = 6, right = 4) => {
+export const shorten = (str, left = 4, right = 4) => {
 	return `${str.slice(0, left)}...${str.slice(
 		str.length - right,
 		str.length,

@@ -47,6 +47,8 @@ import { event as eventModel } from "@/graphql/models"
  */
 import { useMarketStore } from "@store/market"
 
+import { toRawAddress, checkIfValidAddress } from "@utils/address"
+
 const defaultFilters = {
 	symbols: [
 		{
@@ -207,10 +209,12 @@ const handleResetFilters = () => {
 }
 
 const handleManageParticipant = ({ address, action }) => {
-	if (action == "add") {
-		if (filters.value.advanced.participants.includes(address)) return
+	if (action == "add" && checkIfValidAddress(address)) {
+		const rawAddress = toRawAddress(address)
+		if (filters.value.advanced.participants.includes(rawAddress)) 
+			return
 
-		filters.value.advanced.participants.push(address)
+		filters.value.advanced.participants.push(rawAddress)
 	}
 
 	if (action == "remove") {

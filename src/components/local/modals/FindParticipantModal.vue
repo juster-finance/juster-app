@@ -8,6 +8,7 @@ import { computed, ref, watch } from "vue"
 import Modal from "@ui/Modal.vue"
 import Input from "@ui/Input.vue"
 import Button from "@ui/Button.vue"
+import { checkIfValidAddress } from "@utils/address"
 
 const emit = defineEmits(["onAdd", "onClose"])
 const props = defineProps({
@@ -20,12 +21,8 @@ const props = defineProps({
 const address = ref("")
 
 const buttonState = computed(() => {
-	if (address.value.length < 36)
-		return { text: "Type account address", isDisabled: true }
-	if (address.value.length !== 36)
-		return { text: "Invalid length", isDisabled: true }
-	if (!address.value.startsWith("tz"))
-		return { text: "Invalid address format", isDisabled: true }
+	if (!checkIfValidAddress(address.value))
+		return { text: "Invalid address", isDisabled: true }
 
 	return { text: "Add user", isDisabled: false }
 })
