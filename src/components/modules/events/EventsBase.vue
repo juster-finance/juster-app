@@ -21,7 +21,7 @@ import { verifiedMakers } from "@config"
 /**
  * API
  */
-import { fetchEventsByStatus } from "@/api/events"
+import { useFilteredEvents } from "@/composable/events"
 
 /**
  * UI
@@ -41,11 +41,6 @@ import { EventCard, EventCardLoading } from "@local/EventCard"
  * gql
  */
 import { event as eventModel } from "@/graphql/models"
-
-/**
- * Store
- */
-import { useMarketStore } from "@store/market"
 
 import { toRawAddress, checkIfValidAddress } from "@utils/address"
 
@@ -156,12 +151,13 @@ const breadcrumbs = reactive([
 	},
 ])
 
-const marketStore = useMarketStore()
+// TODO: Implement remote filtering and paging
+const {events: rawEvents, start: startEventsSubscription, stop: stopEventsSubscription} = useFilteredEvents()
 
 const subscription = ref(null)
 
-const isNewEventsLoaded = ref(false)
-const isFinishedEventsLoaded = ref(false)
+const isNewEventsLoaded = ref(true)
+const isFinishedEventsLoaded = ref(true)
 
 const currentPage = ref(1)
 
@@ -229,9 +225,8 @@ const handleManageParticipant = ({ address, action }) => {
 
 /** Events */
 const filteredEvents = computed(() => {
-	let events = cloneDeep(marketStore.events)
-
 	/** Filter by Symbol */
+	let events = rawEvents.value
 	if (filters.value.symbols.some((symbol) => symbol.active)) {
 		const selectedSymbols = filters.value.symbols
 			.filter((symbol) => symbol.active)
@@ -368,64 +363,11 @@ const filteredEvents = computed(() => {
 
 onMounted(async () => {
 	analytics.log("onPage", { name: "AllEvents" })
-
-	let newEvents = await fetchEventsByStatus({ status: "NEW" })
-	isNewEventsLoaded.value = true
-	marketStore.events = cloneDeep(newEvents)
-
-	let runningEvents = await fetchEventsByStatus({ status: "STARTED" })
-	marketStore.events = [...marketStore.events, ...cloneDeep(runningEvents)]
-
-	let finishedEvents = await fetchEventsByStatus({ status: "FINISHED" })
-	isFinishedEventsLoaded.value = true
-	marketStore.events = [
-		...marketStore.events,
-		...cloneDeep(finishedEvents).sort(
-			(a, b) =>
-				DateTime.fromISO(b.createdTime).ts -
-				DateTime.fromISO(a.createdTime).ts,
-		),
-	]
-
-	// Sub to New Events
-	subscription.value = await juster.gql
-		.subscription({
-			event: [
-				{
-				},
-				{
-					...eventModel,
-				},
-			],
-		})
-		.subscribe({
-			next: (data) => {
-				const { event: newEvents } = data
-
-				newEvents.forEach((newEvent) => {
-					if (marketStore.events.some((event) => newEvent.id == event.id)) {
-						marketStore.updEvent(newEvent)
-					} else {
-						marketStore.events.push(newEvent)
-					}
-				})
-			},
-			error: console.error,
-		})
+	startEventsSubscription()
 })
 
 onBeforeUnmount(() => {
-	marketStore.events = []
-})
-
-onUnmounted(() => {
-	if (
-		subscription.value &&
-		Object.prototype.hasOwnProperty.call(subscription.value, "_state") &&
-		!subscription.value?.closed
-	) {
-		subscription.value.unsubscribe()
-	}
+	stopEventsSubscription()
 })
 
 /** Meta */
@@ -466,7 +408,7 @@ useMeta({
 				<EventsFilters
 					:filters="filters"
 					:liquidity-filters="liquidityFilters"
-					:events="marketStore.events"
+					:events="rawEvents"
 					:filtered-events-count="filteredEvents.length"
 					@onNewMin="handleNewMin"
 					@onNewMax="handleNewMax"

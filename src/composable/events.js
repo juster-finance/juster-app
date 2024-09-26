@@ -78,14 +78,14 @@ export const useFilteredEvents = () => {
     const subToEvents = ref({})
     const events = ref([])
 
-    const start = async (currencyPairId, status) => {
+    const start = async ({currencyPairId, status} = {}) => {
         subToEvents.value = await juster.gql
 	    	.subscription({
                 event: [
                     {
                         where: {
                             currencyPairId: currencyPairId ? { _eq: currencyPairId } : undefined,
-                            status: { _eq: status },
+                            status: status ? { _eq: status } : undefined,
                         },
                         order_by: { createdTime: "desc" },
                     },

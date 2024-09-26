@@ -61,11 +61,12 @@ const selectTab = (tab) => {
 	selectedTab.value = tab
 }
 
+// TODO: Implement remote filtering and paging
 const {events, start: startEventsSubscription, stop: stopEventsSubscription} = useFilteredEvents()
 
 const getEvents = async ({ status }) => {
 	stopEventsSubscription()
-	startEventsSubscription(market.value.id, status)
+	startEventsSubscription({currencyPairId: market.value.id, status})
 }
 
 if (market.value) {
