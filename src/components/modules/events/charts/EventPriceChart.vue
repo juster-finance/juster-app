@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, useCssModule, computed, nextTick } from "vue"
+import { ref, reactive, onMounted, onBeforeUnmount, useCssModule, computed, nextTick, watch } from "vue"
 import * as d3 from "d3"
 import { DateTime } from "luxon"
 
@@ -480,6 +480,10 @@ onMounted(async () => {
 		draw()
 	})
 
+	watch([() => props.priceDynamics, () => symbol.quotes], () => {
+		draw()
+	})
+
 	if (props.event.status !== "FINISHED") {
 		subscription.value = await juster.gql
 			.subscription({
@@ -518,8 +522,6 @@ onMounted(async () => {
 
 					if (!symbol.quotes.some((quote) => quote.timestamp == newQuote.timestamp) && symbol.quotes.length) {
 						symbol.quotes.unshift(newQuote)
-
-						draw()
 					}
 				},
 				error: console.error,
