@@ -32,6 +32,7 @@ import Breadcrumbs from "@ui/Breadcrumbs.vue"
  * Services
  */
 import { analytics } from "@sdk"
+import { useFilteredEvents } from "@/composable/events"
 
 const header = ref(null)
 const breadcrumbs = reactive([
@@ -60,15 +61,11 @@ const selectTab = (tab) => {
 	selectedTab.value = tab
 }
 
-const events = ref([])
+const {events, start: startEventsSubscription, stop: stopEventsSubscription} = useFilteredEvents()
 
 const getEvents = async ({ status }) => {
-	let allEvents = await fetchEventsByMarket({
-		id: market.value.id,
-		status,
-	})
-
-	events.value = cloneDeep(allEvents).sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime))
+	stopEventsSubscription()
+	startEventsSubscription(market.value.id, status)
 }
 
 if (market.value) {
@@ -126,6 +123,10 @@ onMounted(() => {
 	if (price.value) {
 		meta.title = `${market.value.symbol} • ${price.value.toFixed(2)}`
 	}
+})
+
+onBeforeUnmount(() => {
+	stopEventsSubscription()
 })
 
 

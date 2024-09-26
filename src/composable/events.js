@@ -27,7 +27,7 @@ export const useTopNEvents = (count) => {
 	    		},
 	    		error: console.error,
 	    	})
-        }
+    }
 
     const stop = () => {
         destroySubscription(subToTopEvents.value)
@@ -64,10 +64,44 @@ export const useParticipatedEvents = () => {
 	    		},
 	    		error: console.error,
 	    	})
-        }
+    }
 
     const stop = () => {
         destroySubscription(subToPositions.value)
+    }
+
+    return { events, start, stop }
+}
+
+
+export const useFilteredEvents = () => {
+    const subToEvents = ref({})
+    const events = ref([])
+
+    const start = async (currencyPairId, status) => {
+        subToEvents.value = await juster.gql
+	    	.subscription({
+                event: [
+                    {
+                        where: {
+                            currencyPairId: currencyPairId ? { _eq: currencyPairId } : undefined,
+                            status: { _eq: status },
+                        },
+                        order_by: { createdTime: "desc" },
+                    },
+                    eventModel,
+                ],
+	    	})
+	    	.subscribe({
+	    		next: ({ event: rawEvents }) => {
+	    			events.value = rawEvents
+	    		},
+	    		error: console.error,
+	    	})
+    }
+
+    const stop = () => {
+        destroySubscription(subToEvents.value)
     }
 
     return { events, start, stop }
