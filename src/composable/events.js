@@ -1,6 +1,9 @@
 import { ref } from "vue"
 import { juster, destroySubscription } from "@sdk"
-import { event as eventModel } from "@/graphql/models/events"
+import { 
+    event as eventModel, 
+    position as positionModel
+} from "@/graphql/models"
 
 export const useTopNEvents = (count) => {
     const subToTopEvents = ref({})
@@ -31,4 +34,41 @@ export const useTopNEvents = (count) => {
     }
 
     return { topEvents, start, stop }
+}
+
+
+export const useParticipatedEvents = () => {
+    const subToPositions = ref({})
+    const events = ref([])
+
+    const start = async (userId) => {
+        subToPositions.value = await juster.gql
+	    	.subscription({
+                position: [
+                    {
+                        where: {
+                            userId: {
+                                _eq: userId,
+                            },
+                        },
+                        order_by: {
+                            id: "desc",
+                        },
+                    },
+                    positionModel,
+                ],
+	    	})
+	    	.subscribe({
+	    		next: ({ position: positions }) => {
+	    			events.value = positions.map((position) => position.event)
+	    		},
+	    		error: console.error,
+	    	})
+        }
+
+    const stop = () => {
+        destroySubscription(subToPositions.value)
+    }
+
+    return { events, start, stop }
 }

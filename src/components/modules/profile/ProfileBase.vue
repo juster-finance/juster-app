@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref, onMounted, computed, watch } from "vue"
+import { defineComponent, ref, onMounted, computed, watch, onBeforeUnmount } from "vue"
 import { useRouter } from "vue-router"
 import { useMeta } from "vue-meta"
 import { useIsConnectionRestored } from '@townsquarelabs/ui-vue';
@@ -36,6 +36,8 @@ import { useAccountStore } from "@store/account"
 import { useNotificationsStore } from "@store/notifications"
 import { toUserFriendlyAddress, toRawAddress, checkIfValidAddress, isRawAddress } from "@utils/address"
 
+import { useParticipatedEvents } from "@/composable/events"
+
 export default defineComponent({
 	name: "ProfileBase",
 
@@ -53,7 +55,7 @@ export default defineComponent({
 		const rawAddress = ref('')
 		const userFriendlyAddress = ref('')
 
-		const events = ref([])
+		const { events, start: startEventsSubscription, stop: stopEventsSubscription } = useParticipatedEvents()
 
 		/** pagination */
 		const selectedPageForEvents = ref(1)
@@ -66,17 +68,15 @@ export default defineComponent({
 
 			isProfileLoaded.value = true
 
-			const positions = await fetchAllUserPositions({
-				address: rawAddress.value,
-			})
-			events.value = positions.map((position) => position.event)
+			stopEventsSubscription()
+			events.value = []
+			if (isMyProfile)
+				startEventsSubscription(rawAddress.value)
 		}
 
 		const init = async () => {
 			const routeAddress = router.currentRoute.value.params.address
 			const address = isMyProfile.value ? accountStore.pkh : routeAddress
-
-
 
 			const isValidAddress = checkIfValidAddress(address)
 			rawAddress.value = isValidAddress ? toRawAddress(address) : ''
@@ -115,6 +115,10 @@ export default defineComponent({
 				init()
 			}
 		}, {immediate: true})
+
+		onBeforeUnmount(() => {
+			stopEventsSubscription()
+		})
 
 		const handleCopyAddress = () => {
 			toClipboard(userFriendlyAddress.value)
