@@ -227,7 +227,8 @@ const handleKeydown = (e) => {
 				</div>
 			</div>
 
-			<div :class="$style.block">
+			<!-- TODO: #3 -->
+			<!-- <div :class="$style.block">
 				<div :class="$style.subtitle">Period</div>
 
 				<div :class="$style.badges">
@@ -241,7 +242,7 @@ const handleKeydown = (e) => {
 						{{ period.name }}
 					</div>
 				</div>
-			</div>
+			</div> -->
 		</template>
 		<template v-else>
 			<div :class="$style.block">
