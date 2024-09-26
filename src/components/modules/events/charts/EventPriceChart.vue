@@ -480,7 +480,7 @@ onMounted(async () => {
 		draw()
 	})
 
-	watch([() => props.priceDynamics, () => symbol.quotes], () => {
+	watch(() => props.priceDynamics, () => {
 		draw()
 	})
 
@@ -522,6 +522,7 @@ onMounted(async () => {
 
 					if (!symbol.quotes.some((quote) => quote.timestamp == newQuote.timestamp) && symbol.quotes.length) {
 						symbol.quotes.unshift(newQuote)
+						draw()
 					}
 				},
 				error: console.error,
