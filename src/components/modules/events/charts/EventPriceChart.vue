@@ -514,7 +514,6 @@ onMounted(async () => {
 							}).ts
 					) {
 						subscription.value.unsubscribe()
-						return
 					}
 
 					if (!symbol.quotes.some((quote) => quote.timestamp == newQuote.timestamp) && symbol.quotes.length) {
