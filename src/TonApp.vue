@@ -9,9 +9,8 @@ import { TonConnectUIProvider  } from '@townsquarelabs/ui-vue';
  */
 import App from "@/App.vue"
 
-// TODO: #1 Fix Url and manifest content
 const tonConnectOptions = {
-	manifestUrl:"http://localhost:5173/tonconnect-manifest.json",
+	manifestUrl:"https://juster.io/tonconnect-manifest.json",
 };
 </script>
 
