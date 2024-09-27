@@ -37,8 +37,7 @@ defineProps({
 					directly in your browser
 				</div>
 				<div :class="$style.description">
-					Right now you can use our <span>Telegram Bot</span> or our
-					<span>Discord Server</span>. Use them as a temporary
+					Right now you can use our <span>Telegram Bot</span>. Use them as a temporary
 					substitute for notifications
 				</div>
 			</Flex>
@@ -48,9 +47,6 @@ defineProps({
 				<div :class="$style.buttons">
 					<Button type="secondary" size="small" block disabled>
 						<Icon name="telegram" size="12" />Telegram Bot
-					</Button>
-					<Button type="secondary" size="small" block disabled>
-						<Icon name="discord" size="12" />Discord Server
 					</Button>
 				</div>
 			</Flex>

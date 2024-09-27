@@ -120,8 +120,8 @@ const handleSwitch = () => {
 				epic features include a liquidity pool contract, reward
 				programs, and many other interesting things. Check out our
 				roadmap and join
-				<a href="https://discord.gg/FeGDCkHhnB" target="_blank"
-					>Juster Discord server</a
+				<a href="https://t.me/juster_io" target="_blank"
+					>Juster Telegram channel</a
 				>
 				to get the latest updates!
 			</p>
@@ -137,9 +137,9 @@ const handleSwitch = () => {
 		</div>
 
 		<div :class="$style.buttons">
-			<a href="https://discord.gg/FeGDCkHhnB" target="_blank">
+			<a href="https://t.me/juster_io" target="_blank">
 				<Button type="secondary" size="small"
-					><Icon name="discord" size="16" />Join our Discord
+					><Icon name="telegram" size="16" />Join our Telegram
 				</Button></a
 			>
 			<a href="https://twitter.com/Juster_fi" target="_blank">

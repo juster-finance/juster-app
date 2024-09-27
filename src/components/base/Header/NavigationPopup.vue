@@ -85,10 +85,10 @@ const communityLinks = ref([
 		url: "/releases",
 	},
 	{
-		icon: "discord",
-		title: "Discord",
+		icon: "telegram",
+		title: "Telegram",
 		description: "Communication and discussion",
-		url: "https://discord.gg/FeGDCkHhnB",
+		url: "https://t.me/juster_io",
 	},
 	{
 		icon: "twitter",
@@ -211,7 +211,7 @@ watch(
 								<Icon name="bolt" size="16" color="tertiary" />System Status
 							</Button> -->
 
-							<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
+							<Button size="small" type="tertiary" link="https://t.me/juster_io">
 								<Icon name="help" size="16" color="tertiary" />Support
 							</Button>
 						</Flex>
@@ -274,7 +274,7 @@ watch(
 					<!-- <Flex align="center" justify="between" :class="$style.bottom">
 						<Button size="small" type="secondary"> <Icon name="shield_tick" size="14" color="green" />Security Audits </Button>
 
-						<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
+						<Button size="small" type="tertiary" link="https://t.me/juster_io">
 							<Icon name="document" size="14" color="primary" />White-Paper
 						</Button>
 					</Flex> -->
@@ -292,7 +292,7 @@ watch(
 								<Icon name="bolt" size="16" color="tertiary" />System Status
 							</Button> -->
 
-							<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
+							<Button size="small" type="tertiary" link="https://t.me/juster_io">
 								<Icon name="help" size="16" color="tertiary" />Support
 							</Button>
 						</Flex>
@@ -377,7 +377,7 @@ watch(
 								<Icon name="bolt" size="16" color="tertiary" />System Status
 							</Button> -->
 
-							<Button size="small" type="tertiary" link="https://discord.gg/FeGDCkHhnB">
+							<Button size="small" type="tertiary" link="https://t.me/juster_io">
 								<Icon name="help" size="16" color="tertiary" />Support
 							</Button>
 						</Flex>

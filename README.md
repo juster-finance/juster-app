@@ -8,7 +8,7 @@
     <br />
     <a href="https://app.juster.fi/">Application</a>
     ·
-    <a href="https://discord.gg/FeGDCkHhnB">Discord</a>
+    <a href="https://t.me/juster_io">Telegram</a>
     ·
     <a href="https://app.juster.fi/docs">Documentation (WIP)</a>
   </p>

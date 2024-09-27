@@ -688,7 +688,7 @@ const handleEnd = () => {
 							:class="$style.description"
 						>
 							You can learn more about the application in the<br />
-							docs or ask a question on our discord server
+							docs or ask a question on our telegram chanel
 						</Text>
 					</Flex>
 					<!-- 

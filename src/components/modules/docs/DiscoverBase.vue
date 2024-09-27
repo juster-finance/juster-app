@@ -42,7 +42,7 @@ const getImageUrl = (image) => {
 			<p>
 				This documentation will help you understand how our platform is
 				set up, how to place bets, and how to provide liquidity. If you
-				have questions or suggestions, join our discord server.
+				have questions or suggestions, join our telegram channel.
 			</p>
 
 			<div :class="$style.cards">
@@ -139,7 +139,7 @@ const getImageUrl = (image) => {
 				<HeaderAnchor h="2">Community</HeaderAnchor>
 
 				<p>
-					Join our community (Discord, Twitter, GitHub). Communicate
+					Join our community (Telegram, Twitter, GitHub). Communicate
 					with other users, analyze the market, make joint bets.
 					Working together can improve your results. Also, we
 					regularly publish release notes.

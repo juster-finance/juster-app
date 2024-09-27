@@ -199,10 +199,10 @@ const handleNetworkDblClick = () => {
 
 								<div :class="$style.mobile_menu__description">Detailed list of all changes</div>
 							</router-link>
-							<a href="https://discord.gg/FeGDCkHhnB" target="_blank" :class="$style.mobile_menu__link">
+							<a href="https://t.me/juster_io" target="_blank" :class="$style.mobile_menu__link">
 								<div :class="$style.left">
-									<Icon name="discord" size="14" />
-									<span>Discord</span>
+									<Icon name="telegram" size="14" />
+									<span>Telegram</span>
 								</div>
 
 								<div :class="$style.mobile_menu__description">Communication and discussion</div>

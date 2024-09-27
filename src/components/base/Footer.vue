@@ -211,8 +211,8 @@ onBeforeUnmount(() => {
 					</div>
 
 					<div :class="$style.right">
-						<Button type="secondary" size="small" link="https://discord.gg/FeGDCkHhnB" :class="$style.footer_btn">
-							Discord
+						<Button type="secondary" size="small" link="https://t.me/juster_io" :class="$style.footer_btn">
+							Telegram
 							<Icon name="arrowrighttop" size="16" color="tertiary" />
 						</Button>
 						<Button type="secondary" size="small" link="https://twitter.com/Juster_fi" :class="$style.footer_btn">
