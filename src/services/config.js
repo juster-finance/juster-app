@@ -1,16 +1,16 @@
 export const dipdup = {
 	mainnet: {
-		graphq: "http://localhost:5501/v1/graphql",
-		ws: "ws://localhost:5501/v1/graphql",
+		graphq: import.meta.env.VITE_DIPDUP_GRAPHQ_MAINNET,
+		ws: import.meta.env.VITE_DIPDUP_WS_MAINNET,
 	},
 	testnet: {
-		graphq: "http://localhost:5501/v1/graphql",
-		ws: "ws://localhost:5501/v1/graphql",
+		graphq: import.meta.env.VITE_DIPDUP_GRAPHQ_TESTNET,
+		ws: import.meta.env.VITE_DIPDUP_WS_TESTNET,
 	}
 }
 
 export const demoMode = {
-	baseUrl: "http://localhost:5502",
+	baseUrl: import.meta.env.VITE_DEMO_MODE_BASE_URL,
 	walletPayloadTokenExpiresInSeconds: 900,
 	newUserBalance: 10000,
 	topUpAmount: 10000,
