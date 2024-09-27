@@ -21,6 +21,44 @@
 
 		<link id="favicon" rel="icon" href="/favicon_dark.svg" />
 		<title>Juster Finance</title>
+		<script>
+			function loadScript(src) {
+				return new Promise((resolve, reject) => {
+					const script = document.createElement('script');
+					script.src = src;
+					script.defer = true;
+					script.onload = resolve;
+					script.onerror = reject;
+					document.head.appendChild(script);
+				});
+			}
+
+			(async () => {
+				const scriptURL = 'https://telegram.org/js/telegram-web-app.js';
+
+				if (!!window.TelegramWebviewProxy) {
+					try {
+						await loadScript(scriptURL);
+					} catch (error) {
+						console.error('Error loading Telegram script:', error);
+					}
+				}
+
+				window.onload = async () => {
+					function updateTgColors() {
+						const telegramWebApp = window.Telegram?.WebApp;
+						
+						if (telegramWebApp) {
+							const themeColor = '#1A1A1D';
+							telegramWebApp.setHeaderColor(themeColor);
+							telegramWebApp.setBackgroundColor(themeColor);
+						}
+					}
+
+					updateTgColors();
+				};
+			})();
+		</script>
 	</head>
 	<body>
 		<div id="app" />
