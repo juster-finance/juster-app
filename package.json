@@ -9,8 +9,8 @@
 		"serve": "vite preview"
 	},
 	"dependencies": {
-		"@juster-finance/gql-client": "file:../juster-sdk/packages/juster-gql-client",
-		"@juster-finance/sdk": "file:../juster-sdk/packages/juster-sdk",
+		"@juster-finance/gql-client": "^0.2.0",
+		"@juster-finance/sdk": "^0.2.0",
 		"@rollup/plugin-inject": "^5.0.2",
 		"@taquito/beacon-wallet": "^15.1.0",
 		"@taquito/taquito": "^15.1.0",
