@@ -71,12 +71,12 @@ onMounted(async () => {
 })
 
 /** Network Watcher */
-watch(
-	() => currentNetwork.value,
-	() => {
-		// setupPools()
-	},
-)
+// watch(
+// 	() => currentNetwork.value,
+// 	() => {
+// 		// setupPools()
+// 	},
+// )
 
 // const setupPools = async () => {
 // 	marketStore.pools = await fetchAllPools()
