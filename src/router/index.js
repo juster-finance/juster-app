@@ -28,11 +28,11 @@ const routes = [
 		name: "Connect",
 		component: () => import("@views/ConnectPage.vue"),
 	},
-	{
-		path: "/landing",
-		name: "Landing",
-		component: () => import("@views/LandingPage.vue"),
-	},
+	// {
+	// 	path: "/landing",
+	// 	name: "Landing",
+	// 	component: () => import("@views/LandingPage.vue"),
+	// },
 	// TODO: #3
 	// {
 	// 	path: "/launch",
