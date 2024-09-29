@@ -1,20 +1,26 @@
+import { getEnvVariable } from "@/services/utils/env"
+
 export const dipdup = {
 	mainnet: {
-		graphq: import.meta.env.VITE_DIPDUP_GRAPHQ_MAINNET,
-		ws: import.meta.env.VITE_DIPDUP_WS_MAINNET,
+		graphq: getEnvVariable('VITE_DIPDUP_GRAPHQ_MAINNET'),
+		ws: getEnvVariable('VITE_DIPDUP_WS_MAINNET'),
 	},
 	testnet: {
-		graphq: import.meta.env.VITE_DIPDUP_GRAPHQ_TESTNET,
-		ws: import.meta.env.VITE_DIPDUP_WS_TESTNET,
+		graphq: getEnvVariable('VITE_DIPDUP_GRAPHQ_TESTNET'),
+		ws: getEnvVariable('VITE_DIPDUP_WS_TESTNET'),
 	}
 }
 
 export const demoMode = {
-	baseUrl: import.meta.env.VITE_DEMO_MODE_BASE_URL,
+	baseUrl: getEnvVariable('VITE_DEMO_MODE_BACKEND_BASE_URL'),
 	walletPayloadTokenExpiresInSeconds: 900,
 	newUserBalance: 10000,
 	topUpAmount: 10000,
 	minBalanceToTopUp: 10,
+}
+
+export const tonConnect = {
+	tonConnectManifestUrl: `${getEnvVariable('VITE_APP_BASE_URL')}/tonconnect-manifest.json`,
 }
 
 export const token = {

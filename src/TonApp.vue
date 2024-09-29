@@ -3,6 +3,7 @@
  * Vendor
  */
 import { TonConnectUIProvider  } from '@townsquarelabs/ui-vue';
+import { tonConnect } from '@config'
 
 /**
  * Base
@@ -10,7 +11,7 @@ import { TonConnectUIProvider  } from '@townsquarelabs/ui-vue';
 import App from "@/App.vue"
 
 const tonConnectOptions = {
-	manifestUrl:"https://juster.io/tonconnect-manifest.json",
+	manifestUrl: tonConnect.tonConnectManifestUrl,
 };
 </script>
 
