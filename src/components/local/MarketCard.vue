@@ -143,12 +143,13 @@ export default defineComponent({
 		})
 
 		watch(change, () => {
-			if (change.value.text == "Loading") return
+			if (change.value.text == "Loading") 
+				return
 
 			draw()
 		})
 
-		watch(quotes.value, () => {
+		watch([marketStore.markets[market.value.symbol], quotes.value], () => {
 			if (quotes.value.length) {
 				draw()
 			}
