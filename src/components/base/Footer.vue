@@ -215,7 +215,7 @@ onBeforeUnmount(() => {
 							Telegram
 							<Icon name="arrowrighttop" size="16" color="tertiary" />
 						</Button>
-						<Button type="secondary" size="small" link="https://twitter.com/Juster_fi" :class="$style.footer_btn">
+						<Button type="secondary" size="small" link="https://x.com/juster_io" :class="$style.footer_btn">
 							Twitter
 							<Icon name="arrowrighttop" size="16" color="tertiary" />
 						</Button>

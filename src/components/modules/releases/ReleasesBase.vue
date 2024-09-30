@@ -51,7 +51,7 @@ onMounted(async () => {
 						<Icon name="telegram" size="16" />Telegram
 					</Button>
 				</a>
-				<a href="https://twitter.com/Juster_fi" target="_blank">
+				<a href="https://x.com/juster_io" target="_blank">
 					<Button type="secondary" size="small">
 						<Icon name="twitter" size="16" />Twitter
 					</Button>

@@ -207,7 +207,7 @@ const handleNetworkDblClick = () => {
 
 								<div :class="$style.mobile_menu__description">Communication and discussion</div>
 							</a>
-							<a href="https://twitter.com/Juster_fi" target="_blank" :class="$style.mobile_menu__link">
+							<a href="https://x.com/juster_io" target="_blank" :class="$style.mobile_menu__link">
 								<div :class="$style.left">
 									<Icon name="twitter" size="14" />
 									<span>Twitter</span>
