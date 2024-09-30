@@ -34,7 +34,6 @@ const props = defineProps({
 const showMore = ref(false)
 
 const prevQuotePrice = ref(0)
-const startQuote = ref({})
 
 /**
  * ------{ prevQuotePrice }---< measurePeriod >---{ startQuote }-------
@@ -54,7 +53,7 @@ onMounted(async () => {
 			: DateTime.fromISO(props.event.betsCloseTime)
 
 	prevDt = prevDt
-		.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+		.set({ second: 0, millisecond: 0 })
 		.minus({ hour: props.event.measurePeriod / 3600 })
 
 	const [targetedRawQuote] = await fetchQuoteByTimestamp({
@@ -75,11 +74,6 @@ onMounted(async () => {
 	prevQuotePrice.value = targetedRawQuote
 		? targetedRawQuote.price
 		: avgRaqQuotePrice
-
-	/** Last Quote (to compare) */
-	if (["STARTED", "FINISHED"].includes(props.event.status)) {
-		startQuote.value.price = props.event.startRate
-	}
 })
 
 /**
@@ -105,7 +99,7 @@ const priceDetails = computed(() => {
 	}
 
 	const priceToCompare = ["STARTED", "FINISHED"].includes(props.event.status)
-		? startQuote.value.price
+		? props.event.startRate
 		: quotes.value[0].price
 
 	return {
