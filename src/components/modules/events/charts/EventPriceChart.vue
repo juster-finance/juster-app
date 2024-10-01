@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, useCssModule, computed, nextTick, watch } from "vue"
+import { ref, reactive, onMounted, onBeforeUnmount, useCssModule, useTemplateRef, nextTick, watch } from "vue"
 import * as d3 from "d3"
 import { DateTime } from "luxon"
 
@@ -21,6 +21,8 @@ import { juster } from "@sdk"
 import Banner from "@ui/Banner.vue"
 import LoadingDots from "@ui/LoadingDots.vue"
 
+import { useOnResize } from "@/composable/onResize"
+
 const props = defineProps({ event: { type: Object, default: () => {} }, priceDynamics: { type: Object } })
 
 const classes = useCssModule()
@@ -37,6 +39,7 @@ const scale = reactive({
 })
 const startData = ref([])
 const currentQuote = ref({})
+const chartEl = useTemplateRef('chartEl')
 
 // const priceDynamics = computed(() => {
 // 	const startRate = props.event.startRate
@@ -529,6 +532,9 @@ onMounted(async () => {
 			})
 	}
 })
+
+useOnResize(chartEl, draw)
+
 onBeforeUnmount(() => {
 	if (subscription.value.hasOwnProperty("_state") && !subscription.value?.closed) {
 		subscription.value.unsubscribe()
@@ -551,7 +557,7 @@ onBeforeUnmount(() => {
 
 		<template v-else>
 			<!-- Chart -->
-			<div @mousemove="onMouseMove" @mouseleave="onMouseLeave" id="price_chart" :class="$style.chart" />
+			<div @mousemove="onMouseMove" @mouseleave="onMouseLeave" id="price_chart" :class="$style.chart" ref="chartEl" />
 
 			<!-- Elements -->
 			<div v-if="scale.x" :class="$style.price_axis">
