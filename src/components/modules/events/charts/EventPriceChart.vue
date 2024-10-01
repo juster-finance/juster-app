@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, useCssModule, useTemplateRef, nextTick, watch } from "vue"
+import { ref, reactive, onMounted, onBeforeUnmount, useCssModule, useTemplateRef, nextTick, watch, computed } from "vue"
 import * as d3 from "d3"
 import { DateTime } from "luxon"
 
@@ -21,7 +21,7 @@ import { juster } from "@sdk"
 import Banner from "@ui/Banner.vue"
 import LoadingDots from "@ui/LoadingDots.vue"
 
-import { useOnResize } from "@/composable/onResize"
+import { useOnSizeChanged } from "@/composable/onSizeChanged"
 
 const props = defineProps({ event: { type: Object, default: () => {} }, priceDynamics: { type: Object } })
 
@@ -40,6 +40,9 @@ const scale = reactive({
 const startData = ref([])
 const currentQuote = ref({})
 const chartEl = useTemplateRef('chartEl')
+const { width: chartWidth, height: chartHeight } = useOnSizeChanged(chartEl)
+const isSmallChart = computed(() => chartWidth.value < 400)
+
 
 // const priceDynamics = computed(() => {
 // 	const startRate = props.event.startRate
@@ -120,6 +123,8 @@ const draw = () => {
 		width = `100%`,
 		height = 240 - margin.top - margin.bottom
 
+	const pricePanelWidth = isSmallChart.value ? 18 : 130
+
 	d3.select(`#price_chart > *`).remove()
 
 	const canvas = d3
@@ -161,7 +166,7 @@ const draw = () => {
 	scale.x = d3
 		.scaleTime()
 		.domain(d3.extent(eventPeriod, (d) => d.date))
-		.range([0, canvas.node().getBoundingClientRect().width - 130])
+		.range([0, canvas.node().getBoundingClientRect().width - pricePanelWidth])
 	scale.y = d3
 		.scaleLinear()
 		.domain([d3.min(data, (d) => +d.value), d3.max(data, (d) => +d.value)])
@@ -170,7 +175,7 @@ const draw = () => {
 	/** Price line */
 	startData.value = data.find((d) => new Date(d.date).getTime() == new Date(props.event.betsCloseTime).getTime())
 
-	if (startData.value) {
+	if (startData.value && !isSmallChart.value) {
 		const startLine = canvas
 			.append("g")
 			.attr("transform", `translate(${scale.x(new Date(props.event.betsCloseTime))}, ${scale.y(startData.value.value) + margin.top})`)
@@ -533,7 +538,7 @@ onMounted(async () => {
 	}
 })
 
-useOnResize(chartEl, draw)
+watch([chartWidth, chartHeight], draw)
 
 onBeforeUnmount(() => {
 	if (subscription.value.hasOwnProperty("_state") && !subscription.value?.closed) {
@@ -556,11 +561,39 @@ onBeforeUnmount(() => {
 		</Banner>
 
 		<template v-else>
+			<Flex v-if="isSmallChart" justify="between" :class="$style.top_price_block" gap="14">
+				<Flex align="center" gap="6" wrap="wrap" justify="start">
+					<Text size="11" weight="600" color="tertiary">Start price:</Text>
+					<Flex v-if="startData && event.startRate" align="center">
+						<Text size="11" weight="600" color="secondary">
+							{{ disaggregate(event.startRate)[0] }}
+						</Text>
+						<Text size="11" weight="600" color="tertiary"> .{{ disaggregate(event.startRate)[1] }} </Text>
+					</Flex>
+					<Text v-else size="11" weight="600" color="tertiary">TBD</Text>
+				</Flex>
+				<Flex align="center" gap="6" wrap="wrap" justify="end">
+					<Text size="11" weight="600" color="tertiary" align="right">{{ `${event.status === 'FINISHED' ? 'Closed' : 'Current'} price:` }}</Text>
+					<Flex v-if="currentQuote.value" align="center" gap="6">
+						<Flex>
+							<Text size="11" weight="600" color="secondary">
+								{{ disaggregate(event.status === 'FINISHED' ? event.closedRate : currentQuote.value)[0] }}
+							</Text>
+							<Text size="11" weight="600" color="tertiary"> .{{ disaggregate(event.status === 'FINISHED' ? event.closedRate : currentQuote.value)[1] }} </Text>
+						</Flex>
+						<Text v-if="['STARTED', 'FINISHED'].includes(event.status)" size="11" weight="600" :color="priceDynamics.diff < 0 ? 'red' : 'green'">
+							({{ priceDynamics.percent.toFixed(2) }}%)
+						</Text>
+					</Flex>
+					<Text v-else size="11" weight="600" color="tertiary">TBD</Text>
+				</Flex>
+			</Flex>
+
 			<!-- Chart -->
 			<div @mousemove="onMouseMove" @mouseleave="onMouseLeave" id="price_chart" :class="$style.chart" ref="chartEl" />
 
 			<!-- Elements -->
-			<div v-if="scale.x" :class="$style.price_axis">
+			<div v-if="scale.x && !isSmallChart" :class="$style.price_axis">
 				<!-- Current Price -->
 				<Flex
 					v-if="currentQuote.value"
@@ -577,17 +610,11 @@ onBeforeUnmount(() => {
 					/>
 
 					<Flex direction="column" gap="6" align="end">
-						<Flex v-if="event.status === 'FINISHED'" align="center">
+						<Flex align="center">
 							<Text size="12" weight="600" color="secondary">
-								{{ disaggregate(event.closedRate)[0] }}
+								{{ disaggregate(event.status === 'FINISHED' ? event.closedRate : currentQuote.value)[0] }}
 							</Text>
-							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.closedRate)[1] }} </Text>
-						</Flex>
-						<Flex v-else align="center">
-							<Text size="12" weight="600" color="secondary">
-								{{ disaggregate(currentQuote.value)[0] }}
-							</Text>
-							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(currentQuote.value)[1] }} </Text>
+							<Text size="12" weight="600" color="tertiary"> .{{ disaggregate(event.status === 'FINISHED' ? event.closedRate : currentQuote.value)[1] }} </Text>
 						</Flex>
 
 						<Flex v-if="['STARTED', 'FINISHED'].includes(event.status)" align="center" gap="4">
@@ -732,5 +759,9 @@ onBeforeUnmount(() => {
 
 .loading_block {
 	height: 240px;
+}
+
+.top_price_block {
+	margin-bottom: 10px;
 }
 </style>

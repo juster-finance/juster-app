@@ -1,9 +1,13 @@
-import { watch, onBeforeUnmount } from "vue"
+import { watch, onBeforeUnmount, ref } from "vue"
 
-export const useOnResize = (elRef, onResize) => {
+export const useOnSizeChanged = (elRef) => {
+    const width = ref(null)
+    const height = ref(null)
+
     const observer = new ResizeObserver((entries) => {
         const entry = entries[0]
-        onResize(entry.contentRect.width, entry.contentRect.height)
+        width.value = entry.contentRect.width
+        height.value = entry.contentRect.height
     })
 
     watch(elRef, () => {
@@ -16,4 +20,6 @@ export const useOnResize = (elRef, onResize) => {
     onBeforeUnmount(() => {
         observer.disconnect()
     })
+
+    return { width, height }
 }
