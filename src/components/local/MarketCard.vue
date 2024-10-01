@@ -70,7 +70,7 @@ export default defineComponent({
 		})
 
 		const margin = { top: 20, right: 20, bottom: 20, left: 0 }
-		const width = 500 - margin.left - margin.right
+		const width = 750 - margin.left - margin.right
 		const height = 140 - margin.top - margin.bottom
 
 		const draw = () => {
