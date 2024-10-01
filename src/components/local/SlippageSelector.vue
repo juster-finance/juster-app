@@ -10,7 +10,7 @@ export default defineComponent({
 	setup(props, context) {
 		const { modelValue: selectedSlippage } = toRefs(props)
 
-		const slippages = reactive([0.0, 2.5, 5.0, 10.0, 15.0])
+		const slippages = reactive([0.0, 2.5, 5.0])
 		const customSlippage = ref(0)
 
 		const handleInput = (e) => {

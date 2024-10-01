@@ -12,6 +12,7 @@ import { toUserFriendlyAddress } from "@utils/address"
  * Services
  */
 import { supportedMarkets } from "@config"
+import { shorten } from "@/services/utils/misc"
 
 const props = defineProps(["event", "amount", "countdown"])
 
@@ -65,13 +66,7 @@ const timing = computed(() => {
 			<div :class="$style.meta">
 				<div :class="$style.name">
 					{{
-						`${userFriendlyAddress.slice(
-							0,
-							6,
-						)}..${userFriendlyAddress.slice(
-							userFriendlyAddress.length - 4,
-							userFriendlyAddress.length,
-						)}`
+						shorten(userFriendlyAddress)
 					}}
 				</div>
 				<Flex align="end" gap="2" :class="$style.subname">
@@ -132,6 +127,12 @@ const timing = computed(() => {
 	border-radius: 50%;
 	background: var(--opacity-05);
 	overflow: hidden;
+}
+
+@media (max-width: 500px) {
+	.crc {
+		display: none;
+	}
 }
 
 .crc img {
