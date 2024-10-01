@@ -357,18 +357,20 @@ export default defineComponent({
 
 .header {
 	display: flex;
+	flex-wrap: wrap;
+	row-gap: 20px;
+	column-gap: 16px;
 }
 
 .profile {
 	min-width: 300px;
+	flex-grow: 1;
 	height: 330px;
 	border-radius: 8px;
 	border: 1px solid var(--border);
 	background: var(--card-bg);
 
 	padding: 26px;
-
-	margin-right: 16px;
 }
 
 .avatar {
@@ -469,8 +471,9 @@ export default defineComponent({
 }
 
 .statistics {
-	width: 100%;
-	height: 330px;
+	flex-grow: 6;
+	flex-shrink: 1;
+	min-height: 330px;
 	border-radius: 8px;
 	border: 1px solid var(--border);
 	background: var(--card-bg);
@@ -485,6 +488,8 @@ export default defineComponent({
 .block {
 	display: flex;
 	flex-wrap: wrap;
+	column-gap: 40px;
+	row-gap: 16px;
 }
 
 .divider {
@@ -495,7 +500,7 @@ export default defineComponent({
 }
 
 .stat {
-	margin-right: 100px;
+	min-width: 120px
 }
 
 .key {
@@ -561,10 +566,15 @@ export default defineComponent({
 
 .items {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
 	grid-gap: 16px;
 
 	margin-top: 24px;
+}
+@media (max-width: 420px) {
+	.items {
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	}
 }
 
 .description {
