@@ -111,20 +111,10 @@ const returnForLiquidity = computed(() => {
 		<!-- Mobile Template -->
 		<div :class="$style.mobile">
 			<div :class="[$style.param, $style.up]">
-				<div :class="$style.key">Rise</div>
+				<div :class="$style.key">Amount</div>
 
 				<div :class="$style.value">
-					<Icon name="arrow_circle_top_right" size="12" />{{ numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",") }}&nbsp;<span
-						>{{token.symbol}}</span
-					>
-				</div>
-			</div>
-
-			<div :class="[$style.param, $style.down]">
-				<div :class="$style.key">Rise</div>
-
-				<div :class="$style.value">
-					<Icon name="arrow_circle_top_right" size="12" />{{ numberWithSymbol(deposit.amountBelow.toFixed(0), ",") }}&nbsp;<span
+					{{ numberWithSymbol(deposit.amountAboveEq.toFixed(0), ",") }}&nbsp;<span
 						>{{token.symbol}}</span
 					>
 				</div>
