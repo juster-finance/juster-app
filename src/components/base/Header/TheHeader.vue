@@ -129,14 +129,15 @@ const handleNetworkDblClick = () => {
 
 								<div :class="$style.mobile_menu__description">All events with advanced filters</div>
 							</router-link>
-							<router-link to="/pools" :class="$style.mobile_menu__link">
+							<!-- TODO: #3 -->
+							<!-- <router-link to="/pools" :class="$style.mobile_menu__link">
 								<div :class="$style.left">
 									<Icon name="server" size="14" />
 									<span>Pools</span>
 								</div>
 
 								<div :class="$style.mobile_menu__description">Provide liquidity to events</div>
-							</router-link>
+							</router-link> -->
 							<router-link to="/markets" :class="$style.mobile_menu__link">
 								<div :class="$style.left">
 									<Icon name="collection" size="14" />
