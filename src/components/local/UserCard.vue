@@ -189,8 +189,7 @@ const handleCopy = (target) => {
 
 	border-radius: 8px;
 	background: rgba(255, 255, 255, 0.05);
-	min-height: 56px;
-	padding: 0 10px;
+	padding: 8px 10px;
 }
 
 .left {
@@ -255,8 +254,10 @@ const handleCopy = (target) => {
 
 .params {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	gap: 8px;
+	column-gap: 8px;
+	row-gap: 4px;
 }
 
 .param {
