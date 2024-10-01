@@ -179,23 +179,25 @@ const selectPost = (post) => {
 				</template>
 
 				<template #dropdown>
-					<router-link v-for="link in generalLinks" :to="`/docs/${link.slug.current}`">
-						<DropdownItem>
-							<Icon :name="link.icon" size="16" color="secondary" />
-							{{ link.title }}
-						</DropdownItem>
-					</router-link>
-					<DropdownDivider />
-
-					<template v-for="(section, sectionName) in docsStore.sections">
-						<DropdownTitle>{{ sectionName }}</DropdownTitle>
-						<router-link v-for="link in section" :to="`/docs/${link.slug.current}`">
+					<div :class="$style.dropdown_content">
+						<router-link v-for="link in generalLinks" :key="link.slug.current" :to="`/docs/${link.slug.current}`">
 							<DropdownItem>
+								<Icon :name="link.icon" size="16" color="secondary" />
 								{{ link.title }}
 							</DropdownItem>
 						</router-link>
 						<DropdownDivider />
-					</template>
+						
+						<template v-for="(section, sectionName) in docsStore.sections" :key="sectionName">
+							<DropdownTitle >{{ sectionName }}</DropdownTitle>
+							<router-link v-for="link in section" :key="link.slug.current" :to="`/docs/${link.slug.current}`">
+								<DropdownItem>
+									{{ link.title }}
+								</DropdownItem>
+							</router-link>
+							<DropdownDivider />
+						</template>
+					</div>
 				</template>
 			</Dropdown>
 
@@ -365,5 +367,10 @@ const selectPost = (post) => {
 	.nav {
 		display: none;
 	}
+}
+
+.dropdown_content {
+	overflow: auto;
+    max-height: 50vh;
 }
 </style>
