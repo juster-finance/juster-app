@@ -350,7 +350,7 @@ useMeta({
 			<div :class="$style.withdrawboard">
 				<table v-if="withdrawalsHistory.length">
 					<tr>
-						<th @click="sortBy('date')">
+						<th @click="sortBy('date')" :class="$style.hidable_column">
 							withdraw
 							<Icon
 								v-if="sort.date !== 'default'"
@@ -375,7 +375,7 @@ useMeta({
 							/>
 						</th>
 						<th>event</th>
-						<th>type</th>
+						<th :class="$style.hidable_column">type</th>
 					</tr>
 
 					<tr
@@ -384,7 +384,7 @@ useMeta({
 						@click="handleSelectWithdraw(withdraw)"
 						:class="$style.row"
 					>
-						<td>
+						<td :class="$style.hidable_column">
 							<div :class="$style.user">
 								<div :class="$style.money_icon">
 									<Icon name="money" size="16" />
@@ -429,7 +429,7 @@ useMeta({
 								<span>#{{ withdraw.event.id }}</span>
 							</router-link>
 						</td>
-						<td>
+						<td :class="$style.hidable_column">
 							{{
 								withdraw.type == "MANUAL"
 									? "Manual"
@@ -500,9 +500,17 @@ useMeta({
 
 .stats {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
 	gap: 24px;
+}
+
+@media (max-width: 600px) {
+	.stats {
+		flex-direction: column;
+		align-items: stretch;
+	}
 }
 
 .stat {
@@ -599,6 +607,12 @@ useMeta({
 	padding: 0;
 }
 
+@media (max-width: 620px) {
+	.withdrawboard .hidable_column {
+		display: none;
+	}
+}
+
 .withdrawboard td span,
 .withdrawboard td svg {
 	color: var(--text-tertiary);
@@ -641,10 +655,21 @@ useMeta({
 	border-radius: 8px;
 	background: rgba(255, 255, 255, 0.05);
 	fill: var(--icon);
+	flex-shrink: 0	;
 
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+@media (max-width: 820px) {
+	.money_icon {
+		display: none;
+	}
+}
+
+.info {
+	flex-shrink: 0;
 }
 
 .name {
@@ -677,8 +702,10 @@ useMeta({
 
 .hint {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	gap: 8px;
+	column-gap: 8px;
+	row-gap: 2px;
 
 	font-size: 12px;
 	font-weight: 500;
