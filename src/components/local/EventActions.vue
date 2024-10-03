@@ -2,7 +2,7 @@
 /**
  * Vendor
  */
-import { computed } from "vue"
+import { computed, watch, ref } from "vue"
 
 /**
  * UI
@@ -15,6 +15,7 @@ import LoadingBar from "@ui/LoadingBar.vue"
  */
 import { f, numberWithSymbol } from "@utils/amounts"
 import { token } from "@config"
+import { fetchUserWithdrawalByEvent } from "@/api/users"
 
 /**
  * Store
@@ -28,6 +29,7 @@ const props = defineProps({
 	event: Object,
 	isWon: Boolean,
 	positionForWithdraw: Object,
+	accountAddress: String,
 	disabled: Boolean,
 	isWithdrawing: Boolean,
 	isInvolved: Boolean,
@@ -61,7 +63,14 @@ const ratio = computed(() => {
 	}
 })
 
-const successfulWithdrawal = computed(() => accountStore.withdrawals.find((withdrawal) => withdrawal.event.id == props.event.id))
+const accountAddress = computed(() => props.accountAddress || accountStore.pkh)
+const successfulWithdrawal = ref(null)
+watch(accountAddress, async () => {
+	if (accountAddress === accountStore.pkh)
+		successfulWithdrawal.value = accountStore.withdrawals.find((withdrawal) => withdrawal.event.id == props.event.id)
+	else 
+		successfulWithdrawal.value = await fetchUserWithdrawalByEvent({ address: accountAddress.value, eventId: props.event.id })
+}, { immediate: true} )
 
 const btnType = computed(() => {
 	if (props.isWithdrawing || accountStore.pendingTransaction.awaiting) {

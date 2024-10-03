@@ -28,6 +28,7 @@ import { juster, analytics, currentNetwork } from "@sdk"
 import { abbreviateNumber } from "@utils/amounts"
 import { supportedMarkets, verifiedMakers, token } from "@config"
 import { toReadableDuration } from "@utils/date"
+import { fetchUserPositionsForWithdrawByEvent } from "@/api/positions"
 
 /**
  * Composable
@@ -46,6 +47,7 @@ import { useNotificationsStore } from "@store/notifications"
 // eslint-disable-next-line no-undef
 const props = defineProps({
 	event: { type: Object, default: () => {} },
+	accountAddress: { type: String },
 	disableSub: { type: Boolean },
 })
 
@@ -70,6 +72,8 @@ const showParticipantsModal = ref(false)
 const showNotifyMeModal = ref(false)
 
 const subscription = ref({})
+
+const accountAddress = computed(() => props.accountAddress || accountStore.pkh)
 
 const symbol = computed(() => props.event.currencyPair.symbol)
 
@@ -120,8 +124,8 @@ const participants = computed(() => {
 const userTVL = computed(() => {
 	let tvl = 0
 
-	tvl += props.event.deposits.filter((deposit) => deposit.userId == accountStore.pkh).reduce((a, { amountBelow }) => a + amountBelow, 0)
-	tvl += props.event.bets.filter((bet) => bet.userId == accountStore.pkh).reduce((a, { amount }) => a + amount, 0)
+	tvl += props.event.deposits.filter((deposit) => deposit.userId == accountAddress).reduce((a, { amountBelow }) => a + amountBelow, 0)
+	tvl += props.event.bets.filter((bet) => bet.userId == accountAddress).reduce((a, { amount }) => a + amount, 0)
 
 	return tvl
 })
@@ -130,11 +134,16 @@ const userTVL = computed(() => {
 const hasWonBet = computed(() => {
 	if (!props.event) return
 
-	return !!props.event.bets.filter((bet) => bet.userId == accountStore.pkh).filter((bet) => bet.side == props.event.winnerBets).length
+	return !!props.event.bets.filter((bet) => bet.userId == accountAddress).filter((bet) => bet.side == props.event.winnerBets).length
 })
-const positionForWithdraw = computed(() => {
-	return accountStore.wonPositions.find((position) => position.event.id == props.event.id)
-})
+
+const positionForWithdraw = ref(null)
+watch (accountAddress, async () => {
+	if (accountAddress === accountStore.pkh)
+		positionForWithdraw.value = accountStore.wonPositions.find((position) => position.event.id == props.event.id)
+	else 
+		positionForWithdraw.value = await fetchUserPositionsForWithdrawByEvent({ address: accountAddress.value, eventId: props.event.id })
+}, { immediate: true })
 
 const progressPercentage = ref(0)
 const updateProgressPercentage = () => {
@@ -194,7 +203,7 @@ const handleWithdraw = () => {
 
 	// TODO: #2
 	juster.sdk
-		.withdraw(props.event.id, accountStore.pkh)
+		.withdraw(props.event.id, accountAddress)
 		.then((op) => {
 			/** Pending transaction label */
 			accountStore.pendingTransaction.awaiting = true
@@ -564,7 +573,7 @@ onUnmounted(() => {
 				<!-- <Tooltip placement="bottom-end">
 					<Badge v-if="userTVL" color="gray" :class="$style.badge">
 						<img
-							:src="`https://services.tzkt.io/v1/avatars/${accountStore.pkh}`"
+							:src="`https://services.tzkt.io/v1/avatars/${accountAddress}`"
 							:class="$style.my_avatar"
 							alt="avatar"
 						/>
@@ -683,6 +692,7 @@ onUnmounted(() => {
 			<EventActions
 				@onBet="handleJoin"
 				@onWithdraw="handleWithdraw"
+				:accountAddress="accountAddress"
 				:event="event"
 				:is-won="hasWonBet"
 				:position-for-withdraw="positionForWithdraw"

@@ -302,17 +302,17 @@ export default defineComponent({
 			</div>
 		</div>
 
-		<div v-if="isMyProfile && events.length" :class="$style.submissions">
+		<div v-if="events.length" :class="$style.submissions">
 			<div :class="$style.top">
 				<div>
-					<h2>My submissions</h2>
+					<h2>{{ isMyProfile ? 'My submissions' : 'Submissions' }}</h2>
 
 					<div :class="$style.description">List of all current and archived events</div>
 				</div>
 			</div>
 
 			<div :class="$style.items">
-				<EventCard v-for="event in paginatedEvents" :key="event.id" :event="event" />
+				<EventCard v-for="event in paginatedEvents" :key="event.id" :event="event" :accountAddress="rawAddress" />
 			</div>
 
 			<Pagination

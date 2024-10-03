@@ -69,6 +69,30 @@ export const fetchUserWithdrawals = async ({ address }) => {
 	}
 }
 
+export const fetchUserWithdrawalByEvent = async ({ address, eventId }) => {
+	try {
+		const { withdrawal } = await juster.gql.query({
+			withdrawal: [
+				{
+					where: { 
+						userId: { _eq: address },
+						event: { id: { _eq: eventId } },
+					},
+					order_by: { id: "desc" },
+				},
+				userWithdrawalModel,
+			],
+		})
+
+		return withdrawal[0]
+	} catch (error) {
+		console.error(
+			`Error during fetching user withdrawals by event \n\n ${error.name}: ${error.message}`,
+		)
+		return []
+	}
+}
+
 export const fetchTopLiquidityProviders = async () => {
 	try {
 		const { user } = await juster.gql.query({
