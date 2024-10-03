@@ -107,7 +107,7 @@ export default defineComponent({
 		}
 
 		watch(router.currentRoute, () => {
-			getUserData()
+			init()
 		})
 
 		watch(isConnectionRestored, (isConnectionRestored) => {
