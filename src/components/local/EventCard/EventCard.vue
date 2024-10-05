@@ -28,7 +28,7 @@ import { juster, analytics, currentNetwork } from "@sdk"
 import { abbreviateNumber } from "@utils/amounts"
 import { supportedMarkets, verifiedMakers, token } from "@config"
 import { toReadableDuration } from "@utils/date"
-import { fetchUserPositionsForWithdrawByEvent } from "@/api/positions"
+import { fetchUserPositionForWithdrawByEvent } from "@/api/positions"
 
 /**
  * Composable
@@ -139,10 +139,10 @@ const hasWonBet = computed(() => {
 
 const positionForWithdraw = ref(null)
 watch (accountAddress, async () => {
-	if (accountAddress === accountStore.pkh)
+	if (accountAddress.value === accountStore.pkh)
 		positionForWithdraw.value = accountStore.wonPositions.find((position) => position.event.id == props.event.id)
 	else 
-		positionForWithdraw.value = await fetchUserPositionsForWithdrawByEvent({ address: accountAddress.value, eventId: props.event.id })
+		positionForWithdraw.value = await fetchUserPositionForWithdrawByEvent({ address: accountAddress.value, eventId: props.event.id })
 }, { immediate: true })
 
 const progressPercentage = ref(0)

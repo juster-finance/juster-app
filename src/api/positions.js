@@ -67,7 +67,7 @@ export const fetchUserPositionsForWithdraw = async ({ address }) => {
 	}
 }
 
-export const fetchUserPositionsForWithdrawByEvent = async ({ address, eventId }) => {
+export const fetchUserPositionForWithdrawByEvent = async ({ address, eventId }) => {
 	try {
 		const { position } = await juster.gql.query({
 			position: [
@@ -88,7 +88,7 @@ export const fetchUserPositionsForWithdrawByEvent = async ({ address, eventId })
 			],
 		})
 
-		return cloneDeep(position)
+		return cloneDeep(position[0])
 	} catch (error) {
 		console.error(
 			`Error during fetching user positions by event \n\n ${error.name}: ${error.message}`,

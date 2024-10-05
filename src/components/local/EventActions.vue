@@ -66,7 +66,7 @@ const ratio = computed(() => {
 const accountAddress = computed(() => props.accountAddress || accountStore.pkh)
 const successfulWithdrawal = ref(null)
 watch(accountAddress, async () => {
-	if (accountAddress === accountStore.pkh)
+	if (accountAddress.value === accountStore.pkh)
 		successfulWithdrawal.value = accountStore.withdrawals.find((withdrawal) => withdrawal.event.id == props.event.id)
 	else 
 		successfulWithdrawal.value = await fetchUserWithdrawalByEvent({ address: accountAddress.value, eventId: props.event.id })
