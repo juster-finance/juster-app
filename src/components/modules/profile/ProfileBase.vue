@@ -238,17 +238,26 @@ export default defineComponent({
 						<div :class="$style.key">Liquidity provided</div>
 
 						<Flex align="end" gap="2" :class="$style.value">
-							{{ abbreviateNumber(user.totalLiquidityProvided) }}
+							{{ user.totalLiquidityProvided.toFixed(2) }}
 
 							<TokenSymbol size="16"/>
 						</Flex>
 					</div>
 
 					<div :class="$style.stat">
-						<div :class="$style.key">Net return</div>
+						<div :class="$style.key">Withdrawn</div>
 
 						<Flex align="end" gap="2" :class="$style.value">
-							{{ abbreviateNumber(user.totalProviderReward) }}
+							{{ user.totalProviderReward.toFixed(2) }}
+							<TokenSymbol size="16"/>
+						</Flex>
+					</div>
+
+					<div :class="$style.stat">
+						<div :class="$style.key">Profit</div>
+
+						<Flex align="end" gap="2" :class="$style.value">
+							{{ (user.totalProviderReward - user.totalLiquidityProvided).toFixed(2) }}
 							<TokenSymbol size="16"/>
 						</Flex>
 					</div>
@@ -257,7 +266,7 @@ export default defineComponent({
 						<div :class="$style.key">Fees collected</div>
 
 						<Flex align="end" gap="2" :class="$style.value">
-							{{ user.totalFeesCollected.toFixed(0) }}
+							{{ user.totalFeesCollected.toFixed(2) }}
 							<TokenSymbol size="16"/>
 						</Flex>
 					</div>
@@ -270,7 +279,7 @@ export default defineComponent({
 						<div :class="$style.key">Bets value</div>
 
 						<Flex align="end" gap="2" :class="$style.value">
-							{{ user.totalBetsAmount }}
+							{{ user.totalBetsAmount.toFixed(2) }}
 							<TokenSymbol size="16"/>
 						</Flex>
 					</div>
@@ -279,7 +288,16 @@ export default defineComponent({
 						<div :class="$style.key">Withdrawn</div>
 
 						<Flex align="end" gap="2" :class="$style.value">
-							{{ abbreviateNumber(user.totalWithdrawn) }}
+							{{ user.totalWithdrawn.toFixed(2) }}
+							<TokenSymbol size="16"/>
+						</Flex>
+					</div>
+
+					<div v-if="user.totalWithdrawn" :class="$style.stat">
+						<div :class="$style.key">Profit</div>
+
+						<Flex align="end" gap="2" :class="$style.value">
+							{{ (user.totalWithdrawn - user.totalBetsAmount).toFixed(2) }}
 							<TokenSymbol size="16"/>
 						</Flex>
 					</div>
@@ -292,11 +310,12 @@ export default defineComponent({
 						</div>
 					</div>
 
-					<div :class="$style.stat">
+					<!-- TODO: #3 -->
+					<!-- <div :class="$style.stat">
 						<div :class="$style.key">Favorite Market</div>
 
 						<div :class="$style.value">TBD</div>
-					</div>
+					</div> -->
 				</div>
 
 				<div :class="$style.divider" />
