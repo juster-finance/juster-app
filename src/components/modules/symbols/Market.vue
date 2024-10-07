@@ -25,6 +25,7 @@ const router = useRouter()
 
 const props = defineProps({
 	market: Object,
+	isShowEventsButtonVisible: Boolean,
 })
 
 const emit = defineEmits(["onJoin"])
@@ -75,7 +76,7 @@ const handleJoin = () => {
 			</div>
 
 			<div :class="$style.right">
-				<Button @click="handleJoin" size="medium" type="secondary" :class="$style.btn">
+				<Button v-if="isShowEventsButtonVisible" @click="handleJoin" size="medium" type="secondary" :class="$style.btn">
 					<Icon name="collection" size="16" />
 					View events
 				</Button>

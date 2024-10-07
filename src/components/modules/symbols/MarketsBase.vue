@@ -64,6 +64,7 @@ useMeta({
 					v-for="market in marketStore.markets"
 					:key="market.id"
 					:market="market"
+					isShowEventsButtonVisible
 				/>
 			</div>
 		</transition>
