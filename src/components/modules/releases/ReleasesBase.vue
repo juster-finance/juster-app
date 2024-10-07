@@ -42,7 +42,7 @@ onMounted(async () => {
 		<div :class="$style.base">
 			<h1 :class="$style.title">What's New</h1>
 			<div :class="$style.description">
-				Join our Telegram or Twitter to keep up with new updates
+				Join our Telegram or X (Twitter) to keep up with new updates
 			</div>
 
 			<div :class="$style.buttons">
@@ -53,7 +53,7 @@ onMounted(async () => {
 				</a>
 				<a href="https://x.com/juster_io" target="_blank">
 					<Button type="secondary" size="small">
-						<Icon name="twitter" size="16" />Twitter
+						<Icon name="x" size="16" />X (Twitter)
 					</Button>
 				</a>
 			</div>

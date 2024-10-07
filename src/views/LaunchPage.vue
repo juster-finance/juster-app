@@ -144,7 +144,7 @@ const handleSwitch = () => {
 			>
 			<a href="https://x.com/juster_io" target="_blank">
 				<Button type="secondary" size="small"
-					><Icon name="twitter" size="16" />Read our Twitter</Button
+					><Icon name="x" size="16" />Read our X (Twitter)</Button
 				>
 			</a>
 		</div>

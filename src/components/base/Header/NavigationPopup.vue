@@ -91,8 +91,8 @@ const communityLinks = ref([
 		url: "https://t.me/juster_io",
 	},
 	{
-		icon: "twitter",
-		title: "Twitter",
+		icon: "x",
+		title: "X (Twitter)",
 		description: "Latest news and updates",
 		url: "https://x.com/juster_io",
 	},

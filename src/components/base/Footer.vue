@@ -212,16 +212,16 @@ onBeforeUnmount(() => {
 
 					<div :class="$style.right">
 						<Button type="secondary" size="small" link="https://t.me/juster_io" :class="$style.footer_btn">
+							<Icon name="telegram" size="16" color="tertiary" />
 							Telegram
-							<Icon name="arrowrighttop" size="16" color="tertiary" />
 						</Button>
 						<Button type="secondary" size="small" link="https://x.com/juster_io" :class="$style.footer_btn">
-							Twitter
-							<Icon name="arrowrighttop" size="16" color="tertiary" />
+							<Icon name="x" size="16" color="tertiary" />
+							@juster_io
 						</Button>
 						<Button type="secondary" size="small" link="https://github.com/juster-finance" :class="$style.footer_btn">
+							<Icon name="github" size="16" color="tertiary" />
 							GitHub
-							<Icon name="arrowrighttop" size="16" color="tertiary" />
 						</Button>
 					</div>
 				</div>
