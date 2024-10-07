@@ -200,17 +200,17 @@ const routes = [
 		name: "Withdrawals",
 		component: () => import("@views/WithdrawalsPage.vue"),
 	},
-
-	{
-		path: "/blog",
-		name: "Blog",
-		component: () => import("@views/Other/BlogPage.vue"),
-	},
-	{
-		path: "/blog/:slug",
-		name: "Article",
-		component: () => import("@views/Other/ArticlePage.vue"),
-	},
+	// TODO: #3
+	// {
+	// 	path: "/blog",
+	// 	name: "Blog",
+	// 	component: () => import("@views/Other/BlogPage.vue"),
+	// },
+	// {
+	// 	path: "/blog/:slug",
+	// 	name: "Article",
+	// 	component: () => import("@views/Other/ArticlePage.vue"),
+	// },
 
 	{
 		path: "/terms",
@@ -242,12 +242,12 @@ const routes = [
 		],
 	},
 
-	/** Releases */
-	{
-		path: "/releases",
-		name: "Releases",
-		component: () => import("@views/ReleasesPage.vue"),
-	},
+	// TODO: #3
+	// {
+	// 	path: "/releases",
+	// 	name: "Releases",
+	// 	component: () => import("@views/ReleasesPage.vue"),
+	// },
 ]
 
 const router = createRouter({

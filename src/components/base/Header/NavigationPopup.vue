@@ -77,12 +77,14 @@ const communityLinks = ref([
 		title: "Blog",
 		description: "Guides & articles from the team",
 		url: "/blog",
+		disabled: true,
 	},
 	{
 		icon: "asterisk",
 		title: "Releases",
 		description: "Detailed list of all changes",
 		url: "/releases",
+		disabled: true,
 	},
 	{
 		icon: "telegram",
@@ -310,7 +312,7 @@ watch(
 									:to="link.url"
 									:href="link.url"
 									:target="link.url.startsWith('https://') && '_blank'"
-									:class="$style.item"
+									:class="[$style.item, link.disabled && $style.disabled]"
 								>
 									<div :class="$style.icon_wrapper">
 										<Icon :name="link.icon" size="20" />
