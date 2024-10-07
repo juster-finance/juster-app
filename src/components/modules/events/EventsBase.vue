@@ -21,7 +21,7 @@ import { verifiedMakers } from "@config"
 /**
  * API
  */
-import { useFilteredEvents } from "@/composable/events"
+import { useFilteredEvents, useTotalEventsCount } from "@/composable/events"
 
 /**
  * UI
@@ -150,16 +150,14 @@ const breadcrumbs = reactive([
 		path: "/events",
 	},
 ])
-
-// TODO: Implement remote filtering and paging
-const {events: rawEvents, start: startEventsSubscription, stop: stopEventsSubscription} = useFilteredEvents()
-
-const subscription = ref(null)
+const {totalCount: totalEventsCount, start: startTotalEventsCountSubscription, stop: stopTotalEventsCountSubscription} = useTotalEventsCount()
+const {events: filteredEvents, totalCount: filteredEventsCount, start: startEventsSubscription, stop: stopEventsSubscription} = useFilteredEvents()
 
 const isNewEventsLoaded = ref(true)
 const isFinishedEventsLoaded = ref(true)
 
 const currentPage = ref(1)
+const pageSize = 6
 
 let filters = ref(cloneDeep(defaultFilters))
 
@@ -169,14 +167,6 @@ const isFinishedEventsToggled = computed(() =>
 
 const showFilters = ref(false)
 
-/** reset "currentPage" when changing filters */
-watch(
-	filters.value,
-	() => {
-		currentPage.value = 1
-	},
-	{ deep: true },
-)
 
 const liquidityFilters = reactive({
 	min: 0,
@@ -223,151 +213,217 @@ const handleManageParticipant = ({ address, action }) => {
 	}
 }
 
-/** Events */
-const filteredEvents = computed(() => {
-	/** Filter by Symbol */
-	let events = rawEvents.value
-	if (filters.value.symbols.some((symbol) => symbol.active)) {
-		const selectedSymbols = filters.value.symbols
-			.filter((symbol) => symbol.active)
-			.map((symbol) => symbol.name)
+watch(filters.value, () => {
+	currentPage.value = 1
+})
 
-		events = events.filter((event) =>
-			selectedSymbols.includes(event.currencyPair.symbol),
+watch([filters.value, liquidityFilters, currentPage], () => {
+	const symbols = filters.value.symbols
+		.filter((symbol) => symbol.active)
+		.map((symbol) => symbol.name)
+
+	const statuses = filters.value.statuses
+		.filter((status) => status.active)
+		.map((status) => {
+			if (status.name == "New") return "NEW"
+			if (status.name == "Running") return "STARTED"
+			if (status.name == "Finished") return "FINISHED"
+			if (status.name == "Canceled") return "CANCELED"
+		})
+
+	const periods = filters.value.periods
+		.filter((period) => period.active)
+		.map(
+			(period) =>
+				(period.name == "5m" && 300) ||
+				(period.name == "1h" && 3600) ||
+				(period.name == "6h" && 21600) ||
+				(period.name == "24h" && 86400) ||
+				(period.name == "7d" && 604800),
 		)
-	} else {
-		return []
-	}
 
-	/** Filter by Liquidity */
-	events = events.filter(
-		(event) => event.totalLiquidityProvided >= liquidityFilters.min,
-	)
-	events = events.filter(
-		(event) => event.totalLiquidityProvided <= liquidityFilters.max,
-	)
-
-	/** Filter by Status */
-	if (filters.value.statuses.length) {
-		const statuses = filters.value.statuses
-			.filter((status) => status.active)
-			.map((status) => {
-				if (status.name == "New") return "NEW"
-				if (status.name == "Running") return "STARTED"
-				if (status.name == "Finished") return "FINISHED"
-				if (status.name == "Canceled") return "CANCELED"
-			})
-
-		events = events.filter((event) => statuses.includes(event.status))
-	}
-
-	/** Filter by Period */
-	if (filters.value.periods.length) {
-		const periods = filters.value.periods
-			.filter((period) => period.active)
-			.map(
-				(period) =>
-					(period.name == "5m" && 300) ||
-					(period.name == "1h" && 3600) ||
-					(period.name == "6h" && 21600) ||
-					(period.name == "24h" && 86400) ||
-					(period.name == "7d" && 604800),
-			)
-
-		if (periods.length) {
-			events = events.filter((event) =>
-				periods.includes(event.measurePeriod),
+	let minBetsCloseDate = undefined
+	let maxBetsCloseDate = undefined
+	if (filters.value.advanced.period || filters.value.misc.startingToday.active) {
+		if (filters.value.advanced.period) {
+			minBetsCloseDate = DateTime.fromFormat(
+				filters.value.advanced.period,
+				"yyyy-MM-dd"
 			)
 		} else {
-			events = []
+			minBetsCloseDate = DateTime.local().set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
 		}
+		minBetsCloseDate
+		maxBetsCloseDate = minBetsCloseDate.plus({ days: 1 })
+		console.log(minBetsCloseDate.toISO(), maxBetsCloseDate.toISO())
 	}
 
-	/** Advanced */
-	if (filters.value.advanced.period) {
-		events = events.filter((event) =>
-			DateTime.fromISO(event.betsCloseTime).hasSame(
-				DateTime.fromFormat(
-					filters.value.advanced.period,
-					"yyyy-mm-dd",
-				),
-				"day",
-			),
-		)
-	}
 
-	if (filters.value.advanced.participants.length) {
-		events = events.filter((event) => {
-			const hasBet = event.bets
-				.map((bet) => bet.userId)
-				.some((userId) =>
-					filters.value.advanced.participants.includes(userId),
-				)
-			const hasDeposit = event.deposits
-				.map((deposit) => deposit.userId)
-				.some((userId) =>
-					filters.value.advanced.participants.includes(userId),
-				)
+	stopEventsSubscription()
+	startEventsSubscription({
+		pageNumber: currentPage.value,
+		pageSize: pageSize,
+		symbols,
+		statuses,
+		periods,
+		minLiquidity: liquidityFilters.min,
+		maxLiquidity: liquidityFilters.max,
+		minBetsCloseDate,
+		maxBetsCloseDate,
+		participants: filters.value.advanced.participants,
+		createdByJuster: filters.value.author[0].active,
+		createdByUsers: filters.value.author[1].active,
+		customTargetDynamics: filters.value.misc.targetDynamics.active,
+		moreThanTwoParticipants: filters.value.misc.moreThan.active
+	})
+}, { deep: true, immediate: true })
 
-			return hasBet || hasDeposit
-		})
-	}
+/** Events */
+// const filteredEvents = computed(() => {
+// 	/** Filter by Symbol */
+// 	let events = rawEvents.value
+// 	if (filters.value.symbols.some((symbol) => symbol.active)) {
+// 		const selectedSymbols = filters.value.symbols
+// 			.filter((symbol) => symbol.active)
+// 			.map((symbol) => symbol.name)
 
-	/** Filter by Author */
-	if (!filters.value.author[0].active) {
-		/** juster */
-		events = events.filter(
-			(event) =>
-				!verifiedMakers[currentNetwork.value].includes(event.creatorId),
-		)
-	}
-	if (!filters.value.author[1].active) {
-		/** other users */
-		events = events.filter((event) =>
-			verifiedMakers[currentNetwork.value].includes(event.creatorId),
-		)
-	}
+// 		events = events.filter((event) =>
+// 			selectedSymbols.includes(event.currencyPair.symbol),
+// 		)
+// 	} else {
+// 		return []
+// 	}
 
-	/** Filter by Misc */
-	if (filters.value.misc.startingToday.active) {
-		events = events.filter((event) =>
-			DateTime.fromISO(event.betsCloseTime).hasSame(
-				DateTime.local(),
-				"day",
-			),
-		)
-	}
+// 	/** Filter by Liquidity */
+// 	events = events.filter(
+// 		(event) => event.totalLiquidityProvided >= liquidityFilters.min,
+// 	)
+// 	events = events.filter(
+// 		(event) => event.totalLiquidityProvided <= liquidityFilters.max,
+// 	)
 
-	if (filters.value.misc.moreThan.active) {
-		events = events.filter((event) => {
-			let participants = [
-				...event.bets.map((bet) => bet.userId),
-				...event.deposits.map((deposit) => deposit.userId),
-			]
+// 	/** Filter by Status */
+// 	if (filters.value.statuses.length) {
+// 		const statuses = filters.value.statuses
+// 			.filter((status) => status.active)
+// 			.map((status) => {
+// 				if (status.name == "New") return "NEW"
+// 				if (status.name == "Running") return "STARTED"
+// 				if (status.name == "Finished") return "FINISHED"
+// 				if (status.name == "Canceled") return "CANCELED"
+// 			})
 
-			/** remove duplicates */
-			participants = [...new Set(participants)]
+// 		events = events.filter((event) => statuses.includes(event.status))
+// 	}
 
-			return participants.length > 1
-		})
-	}
+// 	/** Filter by Period */
+// 	if (filters.value.periods.length) {
+// 		const periods = filters.value.periods
+// 			.filter((period) => period.active)
+// 			.map(
+// 				(period) =>
+// 					(period.name == "5m" && 300) ||
+// 					(period.name == "1h" && 3600) ||
+// 					(period.name == "6h" && 21600) ||
+// 					(period.name == "24h" && 86400) ||
+// 					(period.name == "7d" && 604800),
+// 			)
 
-	if (!filters.value.misc.targetDynamics.active) {
-		events = events.filter((event) => event.targetDynamics == 1)
-	} else {
-		events = events.filter((event) => event.targetDynamics !== 1)
-	}
+// 		if (periods.length) {
+// 			events = events.filter((event) =>
+// 				periods.includes(event.measurePeriod),
+// 			)
+// 		} else {
+// 			events = []
+// 		}
+// 	}
 
-	return events
-})
+// 	/** Advanced */
+// 	if (filters.value.advanced.period) {
+// 		events = events.filter((event) =>
+// 			DateTime.fromISO(event.betsCloseTime).hasSame(
+// 				DateTime.fromFormat(
+// 					filters.value.advanced.period,
+// 					"yyyy-mm-dd",
+// 				),
+// 				"day",
+// 			),
+// 		)
+// 	}
+
+// 	if (filters.value.advanced.participants.length) {
+// 		events = events.filter((event) => {
+// 			const hasBet = event.bets
+// 				.map((bet) => bet.userId)
+// 				.some((userId) =>
+// 					filters.value.advanced.participants.includes(userId),
+// 				)
+// 			const hasDeposit = event.deposits
+// 				.map((deposit) => deposit.userId)
+// 				.some((userId) =>
+// 					filters.value.advanced.participants.includes(userId),
+// 				)
+
+// 			return hasBet || hasDeposit
+// 		})
+// 	}
+
+// 	/** Filter by Author */
+// 	if (!filters.value.author[0].active) {
+// 		/** juster */
+// 		events = events.filter(
+// 			(event) =>
+// 				!verifiedMakers[currentNetwork.value].includes(event.creatorId),
+// 		)
+// 	}
+// 	if (!filters.value.author[1].active) {
+// 		/** other users */
+// 		events = events.filter((event) =>
+// 			verifiedMakers[currentNetwork.value].includes(event.creatorId),
+// 		)
+// 	}
+
+// 	/** Filter by Misc */
+// 	if (filters.value.misc.startingToday.active) {
+// 		events = events.filter((event) =>
+// 			DateTime.fromISO(event.betsCloseTime).hasSame(
+// 				DateTime.local(),
+// 				"day",
+// 			),
+// 		)
+// 	}
+
+// 	if (filters.value.misc.moreThan.active) {
+// 		events = events.filter((event) => {
+// 			let participants = [
+// 				...event.bets.map((bet) => bet.userId),
+// 				...event.deposits.map((deposit) => deposit.userId),
+// 			]
+
+// 			/** remove duplicates */
+// 			participants = [...new Set(participants)]
+
+// 			return participants.length > 1
+// 		})
+// 	}
+
+// 	if (!filters.value.misc.targetDynamics.active) {
+// 		events = events.filter((event) => event.targetDynamics == 1)
+// 	} else {
+// 		events = events.filter((event) => event.targetDynamics !== 1)
+// 	}
+
+// 	return events
+// })
 
 onMounted(async () => {
 	analytics.log("onPage", { name: "AllEvents" })
-	startEventsSubscription()
+	startTotalEventsCountSubscription()
 })
 
 onBeforeUnmount(() => {
 	stopEventsSubscription()
+	stopTotalEventsCountSubscription()
 })
 
 /** Meta */
@@ -408,8 +464,8 @@ useMeta({
 				<EventsFilters
 					:filters="filters"
 					:liquidity-filters="liquidityFilters"
-					:events="rawEvents"
-					:filtered-events-count="filteredEvents.length"
+					:total-events-count="totalEventsCount"
+					:filtered-events-count="filteredEventsCount"
 					@onNewMin="handleNewMin"
 					@onNewMax="handleNewMax"
 					@onSelect="handleSelect"
@@ -438,20 +494,17 @@ useMeta({
 						>
 							<div :class="$style.events">
 								<EventCard
-									v-for="event in filteredEvents.slice(
-										(currentPage - 1) * 6,
-										currentPage * 6,
-									)"
+									v-for="event in filteredEvents"
 									:key="event.id"
 									:event="event"
 								/>
 							</div>
 
 							<Pagination
-								v-if="filteredEvents.length > 6"
+								v-if="filteredEventsCount > pageSize"
 								v-model="currentPage"
-								:total="filteredEvents.length"
-								:limit="6"
+								:total="filteredEventsCount"
+								:limit="pageSize"
 								:class="$style.pagination"
 							/>
 						</Flex>
@@ -467,7 +520,7 @@ useMeta({
 
 						<Banner
 							v-else-if="
-								!filteredEvents.length &&
+								!filteredEventsCount &&
 								isNewEventsLoaded &&
 								isFinishedEventsLoaded
 							"

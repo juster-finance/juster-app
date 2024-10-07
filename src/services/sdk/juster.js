@@ -8,6 +8,7 @@ import { BeaconWallet } from "@taquito/beacon-wallet"
 import { TezosToolkit } from "@taquito/taquito"
 
 import { dipdup, rpcNodes, demoMode, localStorageKeys } from "@config"
+import axios from "axios"
 
 /**
  * Services.Constants
@@ -85,6 +86,18 @@ const switchNetwork = (network, router) => {
 	init()
 
 	router.push("/")
+}
+
+export const executeGqlQuery = async (query) => {
+    const result = await axios({
+        url: dipdup[currentNetwork.value].graphq,
+        method: "POST",
+        data: {
+          query,
+        },
+      });
+
+    return result.data.data
 }
 
 /**

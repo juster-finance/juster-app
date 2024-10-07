@@ -27,7 +27,7 @@ import { toUserFriendlyAddress } from "@utils/address"
 const props = defineProps({
 	filters: { type: Object },
 	liquidityFilters: { type: Object },
-	events: { type: Array },
+	totalEventsCount: { type: Array },
 	filteredEventsCount: { type: Number },
 })
 const emit = defineEmits([
@@ -425,7 +425,7 @@ const handleKeydown = (e) => {
 					</div>
 
 					<div :class="$style.counter__value">
-						{{ events.length }}
+						{{ totalEventsCount }}
 					</div>
 				</div>
 				<div :class="$style.counter">

@@ -43,6 +43,7 @@ const breadcrumbs = reactive([
 ])
 
 const currentPage = ref(1)
+const pageSize = 8
 
 /** Market */
 const route = useRoute()
@@ -61,12 +62,16 @@ const selectTab = (tab) => {
 	selectedTab.value = tab
 }
 
-// TODO: Implement remote filtering and paging
-const {events, start: startEventsSubscription, stop: stopEventsSubscription} = useFilteredEvents()
+const {events, totalCount, start: startEventsSubscription, stop: stopEventsSubscription} = useFilteredEvents()
 
 const getEvents = async ({ status }) => {
 	stopEventsSubscription()
-	startEventsSubscription({currencyPairId: market.value.id, status})
+	startEventsSubscription({
+		currencyPairId: market.value.id, 
+		statuses: [status], 
+		pageNumber: currentPage.value, 
+		pageSize: pageSize 
+	})
 }
 
 if (market.value) {
@@ -87,7 +92,7 @@ watch(market, () => {
 
 	getEvents({ status: "NEW" })
 })
-watch(selectedTab, () => {
+watch([selectedTab, currentPage], () => {
 	if (selectedTab.value == "Available") {
 		getEvents({ status: "NEW" })
 	}
@@ -177,8 +182,8 @@ const { meta } = useMeta({
 		</div>
 
 		<transition name="fastfade" mode="out-in">
-			<div v-if="events.length" :class="$style.events">
-				<EventCard v-for="event in events.slice((currentPage - 1) * 8, currentPage * 8)" :key="event.id" :event="event" />
+			<div v-if="totalCount" :class="$style.events">
+				<EventCard v-for="event in events" :key="event.id" :event="event" />
 			</div>
 
 			<div v-else :class="$style.events">
@@ -188,7 +193,7 @@ const { meta } = useMeta({
 			</div>
 		</transition>
 
-		<Pagination v-if="events && events.length > 8" v-model="currentPage" :total="events.length" :limit="8" :class="$style.pagination" />
+		<Pagination v-if="events && totalCount > pageSize" v-model="currentPage" :total="totalCount" :limit="pageSize" :class="$style.pagination" />
 	</div>
 </template>
 

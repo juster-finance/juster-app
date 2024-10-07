@@ -54,24 +54,38 @@ export default defineComponent({
 		const balance = ref(0)
 		const rawAddress = ref('')
 		const userFriendlyAddress = ref('')
+		const pageSize = 6
+		const selectedPageForEvents = ref(1)
 
-		const { events, start: startEventsSubscription, stop: stopEventsSubscription } = useParticipatedEvents()
+		const { 
+			events: paginatedEvents,
+			totalCount: eventsTotalCount,
+			start: startEventsSubscription, 
+			stop: stopEventsSubscription 
+		} = useParticipatedEvents()
 
 		/** pagination */
-		const selectedPageForEvents = ref(1)
-		const paginatedEvents = computed(() => events.value.slice((selectedPageForEvents.value - 1) * 6, selectedPageForEvents.value * 6))
-
 		const isProfileLoaded = ref(false)
+
+		const subscribeToEvents = () => {
+			stopEventsSubscription()
+			startEventsSubscription({ 
+				userId: rawAddress.value, 
+				pageNumber: selectedPageForEvents.value, 
+				pageSize: pageSize 
+			})
+		}
+
+		watch(selectedPageForEvents, () => {
+			subscribeToEvents()
+		})
 
 		const getUserData = async () => {
 			user.value = await fetchUser({ address: rawAddress.value })
 
 			isProfileLoaded.value = true
 
-			stopEventsSubscription()
-			events.value = []
-			if (isMyProfile)
-				startEventsSubscription(rawAddress.value)
+			subscribeToEvents()
 		}
 
 		const init = async () => {
@@ -152,9 +166,10 @@ export default defineComponent({
 			isMyProfile,
 			rawAddress,
 			userFriendlyAddress,
-			events,
 			selectedPageForEvents,
+			pageSize,
 			paginatedEvents,
+			eventsTotalCount,
 			abbreviateNumber,
 			currentNetwork,
 		}
@@ -301,8 +316,7 @@ export default defineComponent({
 				</div>
 			</div>
 		</div>
-
-		<div v-if="events.length" :class="$style.submissions">
+		<div v-if="eventsTotalCount" :class="$style.submissions">
 			<div :class="$style.top">
 				<div>
 					<h2>{{ isMyProfile ? 'My submissions' : 'Submissions' }}</h2>
@@ -316,10 +330,10 @@ export default defineComponent({
 			</div>
 
 			<Pagination
-				v-if="events.length > 6"
+				v-if="eventsTotalCount > pageSize"
 				v-model="selectedPageForEvents"
-				:total="events.length"
-				:limit="6"
+				:total="eventsTotalCount"
+				:limit="pageSize"
 				:class="$style.pagination"
 			/>
 		</div>
