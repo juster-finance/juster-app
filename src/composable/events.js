@@ -134,8 +134,6 @@ export const useFilteredEvents = () => {
                 ? { _neq: 1 } 
                 : { _eq: 1 }
 
-        // TODO: implement filtering by moreThanTwoParticipants
-        
         const filter = {
             currencyPairId: currencyPairId !== undefined ? { _eq: currencyPairId } : undefined,
             status: statuses !== undefined ? { _in: statuses } : undefined,
@@ -145,6 +143,7 @@ export const useFilteredEvents = () => {
             currencyPair: symbols !== undefined ? { symbol: {_in: symbols} } : undefined,
             creatorId,
             targetDynamics,
+            participantsCount: moreThanTwoParticipants ? { _gt: 2 } : undefined,
             _or: [{
                 bets: participants?.length ? { userId: {_in: participants } } : undefined,
             }, {

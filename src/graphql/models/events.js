@@ -6,6 +6,7 @@ export const event = {
 	poolAboveEq: true,
 	poolBelow: true,
 	totalBetsAmount: true,
+	participantsCount: true,
 	totalLiquidityProvided: true,
 	totalLiquidityShares: true,
 	totalValueLocked: true,
