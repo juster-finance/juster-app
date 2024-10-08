@@ -17,7 +17,7 @@ export const useTopNEvents = (count) => {
 	    		event: [
 	    			{
 	    				where: { status: { _eq: "NEW" } },
-	    				order_by: [{ bets_aggregate: {count: "desc"}}, {id: "desc"}],
+	    				order_by: [{participantsCount: "desc"}, {id: "desc"}],
 	    				limit: count,
 	    			},
 	    			eventModel,
@@ -144,11 +144,11 @@ export const useFilteredEvents = () => {
             creatorId,
             targetDynamics,
             participantsCount: moreThanTwoParticipants ? { _gt: 2 } : undefined,
-            _or: [{
-                bets: participants?.length ? { userId: {_in: participants } } : undefined,
+            _or: participants?.length ? [{
+                bets:{ userId: {_in: participants } },
             }, {
-                deposits: participants?.length ? { userId: {_in: participants } } : undefined,
-            }]
+                deposits:{ userId: {_in: participants } } ,
+            }] : undefined
         }
 
         subToEvents.value = await juster.gql
@@ -156,7 +156,7 @@ export const useFilteredEvents = () => {
                 event: [
                     {
                         where: filter,
-                        order_by: { createdTime: "desc" },
+                        order_by: { id: "desc" },
                         limit: pageSize,
                         offset: pageSize * (pageNumber - 1),
                     },
