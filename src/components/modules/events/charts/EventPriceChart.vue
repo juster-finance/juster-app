@@ -22,6 +22,7 @@ import Banner from "@ui/Banner.vue"
 import LoadingDots from "@ui/LoadingDots.vue"
 
 import { useOnSizeChanged } from "@/composable/onSizeChanged"
+import { useOnPageVisibilityChanged } from "@/composable/onPageVisibilityChanged"
 
 const props = defineProps({ event: { type: Object, default: () => {} }, priceDynamics: { type: Object } })
 
@@ -426,7 +427,7 @@ const fillQuotes = async (tsGt) => {
 	}
 }
 
-onMounted(async () => {
+const init = async () => {
 	const chartEars = {
 		hour: 0,
 		minute: 0,
@@ -536,17 +537,34 @@ onMounted(async () => {
 				error: console.error,
 			})
 	}
+}
+
+onMounted(() => {
+	init()
 })
 
 watch([chartWidth, chartHeight], draw)
 
-onBeforeUnmount(() => {
+const dispose = () => {
 	if (subscription.value.hasOwnProperty("_state") && !subscription.value?.closed) {
 		subscription.value.unsubscribe()
 	}
 
 	d3.select(`#price_chart > *`).remove()
+}
+
+onBeforeUnmount(() => {
+	dispose()
 })
+
+useOnPageVisibilityChanged((isPageVisible) => {
+	if(!isPageVisible)
+		return;
+	
+	dispose()
+	init()
+})
+
 </script>
 
 <template>
