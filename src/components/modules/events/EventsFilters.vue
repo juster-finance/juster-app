@@ -360,7 +360,8 @@ const handleKeydown = (e) => {
 				</div>
 			</div>
 
-			<div :class="$style.block">
+			<!-- TODO: #3 -->
+			<!-- <div :class="$style.block">
 				<div :class="$style.subtitle">Created by</div>
 
 				<div :class="$style.badges">
@@ -380,7 +381,7 @@ const handleKeydown = (e) => {
 						{{ author.name }}
 					</div>
 				</div>
-			</div>
+			</div> -->
 
 			<div :class="$style.block">
 				<div :class="$style.subtitle">Misc</div>
@@ -400,13 +401,14 @@ const handleKeydown = (e) => {
 							:disabled="filters.misc.moreThan.disabled"
 						/>
 					</div>
-					<div :class="$style.toggle_filter">
+					<!-- TODO: #3 -->
+					<!-- <div :class="$style.toggle_filter">
 						<div :class="$style.left">Custom Target Dynamics</div>
 						<Toggle
 							v-model="filters.misc.targetDynamics.active"
 							:disabled="filters.misc.targetDynamics.disabled"
 						/>
-					</div>
+					</div> -->
 				</div>
 			</div>
 		</template>

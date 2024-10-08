@@ -218,18 +218,23 @@ watch(filters.value, () => {
 })
 
 watch([filters.value, liquidityFilters, currentPage], () => {
-	const symbols = filters.value.symbols
-		.filter((symbol) => symbol.active)
-		.map((symbol) => symbol.name)
+	const symbols = filters.value.symbols.every((symbol) => symbol.active)
+		? undefined
+		: filters.value.symbols
+			.filter((symbol) => symbol.active)
+			.map((symbol) => symbol.name)
 
-	const statuses = filters.value.statuses
-		.filter((status) => status.active)
-		.map((status) => {
-			if (status.name == "New") return "NEW"
-			if (status.name == "Running") return "STARTED"
-			if (status.name == "Finished") return "FINISHED"
-			if (status.name == "Canceled") return "CANCELED"
-		})
+	
+	const statuses = filters.value.statuses.every((symbol) => symbol.active)
+		? undefined
+		:filters.value.statuses
+			.filter((status) => status.active)
+			.map((status) => {
+				if (status.name == "New") return "NEW"
+				if (status.name == "Running") return "STARTED"
+				if (status.name == "Finished") return "FINISHED"
+				if (status.name == "Canceled") return "CANCELED"
+			})
 
 	const periods = filters.value.periods
 		.filter((period) => period.active)
@@ -265,15 +270,15 @@ watch([filters.value, liquidityFilters, currentPage], () => {
 		pageSize: pageSize,
 		symbols,
 		statuses,
-		periods,
+		// periods,
 		minLiquidity: liquidityFilters.min,
 		maxLiquidity: liquidityFilters.max,
 		minBetsCloseDate,
 		maxBetsCloseDate,
 		participants: filters.value.advanced.participants,
-		createdByJuster: filters.value.author[0].active,
-		createdByUsers: filters.value.author[1].active,
-		customTargetDynamics: filters.value.misc.targetDynamics.active,
+		// createdByJuster: filters.value.author[0].active,
+		// createdByUsers: filters.value.author[1].active,
+		// customTargetDynamics: filters.value.misc.targetDynamics.active,
 		moreThanTwoParticipants: filters.value.misc.moreThan.active
 	})
 }, { deep: true, immediate: true })
