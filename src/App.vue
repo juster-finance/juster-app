@@ -43,8 +43,9 @@ import { useAppStore } from "@store/app"
  */
 import { useMarket } from "@/composable/market"
 import { useAuth } from "@/composable/auth"
+import { useOnPageVisibilityChanged } from "@/composable/onPageVisibilityChanged"
 
-const { setupMarket } = useMarket()
+const { setupMarket, subscribeToQuotes, closeQuotesSubscriptions } = useMarket()
 
 /** Favicon */
 const favicon = document.getElementById("favicon")
@@ -89,6 +90,15 @@ onMounted(async () => {
  * Setup Market (Markets & Quotes & Subscriptinos)
  */
 setupMarket()
+
+useOnPageVisibilityChanged((isPageVisible) => {
+	if (!isPageVisible)
+		return
+
+	closeQuotesSubscriptions()
+	subscribeToQuotes()
+})
+
 </script>
 
 <template>

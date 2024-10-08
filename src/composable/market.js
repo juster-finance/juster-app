@@ -37,7 +37,7 @@ export const useMarket = () => {
 	const updateBalanceSubscription = ref({})
 	const updateWithdrawalsSubscription = ref({})
 	const newWithdrawnPositionsSubscription = ref({})
-	const quotesSubscription = ref({})
+	const quotesSubscriptions = ref([])
 
 	const setupUser = async () => {
 		/** All positions for withdraw */
@@ -186,6 +186,45 @@ export const useMarket = () => {
 		})
 	}
 
+	/**
+	 * Subscriptions
+	 */
+
+	/** Quotes */
+	const subscribeToQuotes = async () => {
+		markets.value.forEach(async market => {
+			const subscription = await juster.gql
+				.subscription({
+					quotesWma: [
+						{
+							where: {
+								currencyPairId: { _eq: market.id },
+							},
+							order_by: { timestamp: "desc" },
+							limit: 1,
+						},
+						{
+							currencyPairId: true,
+							price: true,
+							timestamp: true,
+						},
+					],
+				})
+				.subscribe({
+					next: (data) => {
+						const quote = data.quotesWma[0]
+						marketStore.updateQuotes({
+							target: market.symbol,
+							quote,
+						})
+					},
+					error: console.error,
+				})
+
+			quotesSubscriptions.value.push(subscription)
+		})
+	}
+
 	const setupMarket = async () => {
 		const allMarkets = await fetchMarkets()
 
@@ -221,39 +260,13 @@ export const useMarket = () => {
 				target: market.symbol,
 				price: historyQuote[0] ? historyQuote[0].price : 0,
 			})
+		})
+		subscribeToQuotes()
+	}
 
-			/**
-			 * Subscriptions
-			 */
-
-			/** Quotes */
-			quotesSubscription.value = await juster.gql
-				.subscription({
-					quotesWma: [
-						{
-							where: {
-								currencyPairId: { _eq: market.id },
-							},
-							order_by: { timestamp: "desc" },
-							limit: 1,
-						},
-						{
-							currencyPairId: true,
-							price: true,
-							timestamp: true,
-						},
-					],
-				})
-				.subscribe({
-					next: (data) => {
-						const quote = data.quotesWma[0]
-						marketStore.updateQuotes({
-							target: market.symbol,
-							quote,
-						})
-					},
-					error: console.error,
-				})
+	const closeQuotesSubscriptions = () => {
+		quotesSubscriptions.value.forEach((subscription) => {
+			destroySubscription(subscription)
 		})
 	}
 
@@ -261,9 +274,9 @@ export const useMarket = () => {
 		destroySubscription(updateBalanceSubscription.value)
 		destroySubscription(newPositionsSubscription.value)
 		destroySubscription(newWithdrawnPositionsSubscription.value)
-		destroySubscription(quotesSubscription.value)
+		closeQuotesSubscriptions()
 		destroySubscription(updateWithdrawalsSubscription.value)
 	})
 
-	return { setupMarket, setupUser, updateWithdrawals, markets }
+	return { setupMarket, subscribeToQuotes, closeQuotesSubscriptions, setupUser, updateWithdrawals, markets }
 }

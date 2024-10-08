@@ -74,6 +74,9 @@ export default defineComponent({
 		const height = 140 - margin.top - margin.bottom
 
 		const draw = () => {
+			if (!quotes.value.length)
+				return
+
 			d3.select(`#chart_${market.value.id} > *`).remove()
 
 			const svg = d3
@@ -137,9 +140,7 @@ export default defineComponent({
 		}
 
 		onMounted(() => {
-			if (quotes.value.length) {
-				draw()
-			}
+			draw()
 		})
 
 		watch(change, () => {
@@ -150,9 +151,7 @@ export default defineComponent({
 		})
 
 		watch([marketStore.markets[market.value.symbol], quotes.value], () => {
-			if (quotes.value.length) {
-				draw()
-			}
+			draw()
 		})
 
 		/**
