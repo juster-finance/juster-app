@@ -203,10 +203,10 @@ useMeta({
 			</metainfo>
 
 			<transition-group name="fade" mode="out-in">
-				<FreshAccountBanner
+				<!-- <FreshAccountBanner
 					v-if="isConnectionRestored && accountStore.pkh && !hasPositions"
 					:class="$style.block"
-				/>
+				/> -->
 				<!-- TODO: #3 -->
 				<!-- <Flex
 					justify="between"
@@ -245,6 +245,43 @@ useMeta({
 					</Button>
 				</Flex> -->
 
+				<!-- Hot events -->
+				<div :class="$style.block">
+					<div :class="$style.head">
+						<div :class="$style.left">
+							<h2>Starting Soon</h2>
+							<div :class="$style.description">
+								Join the events that are about to start
+							</div>
+						</div>
+
+						<!-- <Button
+							@click="handleViewTopEvents"
+							size="small"
+							type="secondary"
+						>
+							<Icon name="collection" size="16" />View all
+						</Button> -->
+					</div>
+
+					<transition name="fastfade" mode="out-in">
+						<div v-if="topEvents.length" :class="$style.items">
+							<EventCard
+								v-for="event in topEvents"
+								:key="event.id"
+								:event="event"
+								data-cy="event-card"
+							/>
+						</div>
+
+						<div v-else :class="$style.items">
+							<EventCardLoading />
+							<EventCardLoading />
+							<EventCardLoading />
+						</div>
+					</transition>
+				</div>
+
 				<!-- My Positions -->
 				<div v-if="myPositions.length" :class="$style.block">
 					<h2>My Positions</h2>
@@ -278,6 +315,23 @@ useMeta({
 					</div>
 				</div>
 			</transition-group>
+			
+			<!-- Top Bettors -->
+			<div :class="$style.block">
+				<h2>Top Bettors</h2>
+				<div :class="$style.description">
+					Rating of users placing bets
+				</div>
+
+				<RatingCard
+					v-if="!isTopBettorsLoading"
+					:users="topBettors"
+					suffix="Bets"
+					data-cy="rating-card-bettors"
+					:class="$style.rating_card"
+				/>
+				<RatingCardLoading v-else :class="$style.rating_card" />
+			</div>
 
 			<!-- Top Liquidity -->
 			<div :class="$style.block">
@@ -291,60 +345,6 @@ useMeta({
 					:users="topProviders"
 					isTokenSuffix
 					data-cy="rating-card-liquidity"
-					:class="$style.rating_card"
-				/>
-				<RatingCardLoading v-else :class="$style.rating_card" />
-			</div>
-
-			<!-- Hot events -->
-			<div :class="$style.block">
-				<div :class="$style.head">
-					<div :class="$style.left">
-						<h2>Starting Soon</h2>
-						<div :class="$style.description">
-							Join the events that are about to start
-						</div>
-					</div>
-
-					<Button
-						@click="handleViewTopEvents"
-						size="small"
-						type="secondary"
-					>
-						<Icon name="collection" size="16" />View all
-					</Button>
-				</div>
-
-				<transition name="fastfade" mode="out-in">
-					<div v-if="topEvents.length" :class="$style.items">
-						<EventCard
-							v-for="event in topEvents"
-							:key="event.id"
-							:event="event"
-							data-cy="event-card"
-						/>
-					</div>
-
-					<div v-else :class="$style.items">
-						<EventCardLoading />
-						<EventCardLoading />
-						<EventCardLoading />
-					</div>
-				</transition>
-			</div>
-
-			<!-- Top Bettors -->
-			<div :class="$style.block">
-				<h2>Top Bettors</h2>
-				<div :class="$style.description">
-					Rating of users placing bets
-				</div>
-
-				<RatingCard
-					v-if="!isTopBettorsLoading"
-					:users="topBettors"
-					suffix="Bets"
-					data-cy="rating-card-bettors"
 					:class="$style.rating_card"
 				/>
 				<RatingCardLoading v-else :class="$style.rating_card" />
