@@ -31,7 +31,8 @@ export const useAuth = () => {
         setupUser()
 
         /** Onboarding redirect */
-		if (!localStorage.getItem(localStorageKeys.IS_ONBOARDING_SHOWN)) {
+		// if (!localStorage.getItem(localStorageKeys.IS_ONBOARDING_SHOWN)) {
+		if (false) {
 			router.push("/welcome")
 
 			notificationsStore.create({
