@@ -148,7 +148,7 @@ const handleNetworkDblClick = () => {
 							</router-link>
 						</div>
 					</Flex>
-					<div :class="$style.divider" />
+					<!-- <div :class="$style.divider" />
 					<Flex direction="column" gap="16">
 						<div :class="$style.mobile_menu__title">Resources</div>
 
@@ -178,7 +178,7 @@ const handleNetworkDblClick = () => {
 								<div :class="$style.mobile_menu__description">Explore our code & contribute</div>
 							</a>
 						</div>
-					</Flex>
+					</Flex> -->
 					<div :class="$style.divider" />
 					<Flex direction="column" gap="16">
 						<div :class="$style.mobile_menu__title">Community</div>

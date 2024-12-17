@@ -49,6 +49,7 @@ const resourcesLinks = ref([
 		title: "Documentation",
 		description: "Everything you need is here",
 		url: "/docs",
+		disabled: true
 	},
 	{
 		icon: "code_circle",
@@ -62,12 +63,14 @@ const resourcesLinks = ref([
 		title: "Roadmap",
 		description: "Explore the product path",
 		url: "/docs/roadmap",
+		disabled: true
 	},
 	{
 		icon: "github",
 		title: "Source Code",
 		description: "Explore our code & Contribute",
 		url: "https://github.com/juster-finance",
+		disabled: true
 	},
 ])
 
@@ -186,7 +189,7 @@ watch(
 								</router-link>
 							</div>
 
-							<Flex direction="column" gap="16" :class="$style.guides_block">
+							<!-- <Flex direction="column" gap="16" :class="$style.guides_block">
 								<Text size="11" weight="700" color="support">FEATURED GUIDES</Text>
 
 								<router-link to="/blog/liquidity-pools-introduction">
@@ -195,7 +198,7 @@ watch(
 										<Text size="12" weight="600" color="tertiary">Advanced</Text>
 									</Flex>
 								</router-link>
-							</Flex>
+							</Flex> -->
 						</Flex>
 					</Flex>
 
@@ -245,7 +248,7 @@ watch(
 							</div>
 						</Flex>
 
-						<div :class="$style.divider" />
+						<!--<div :class="$style.divider" />
 
 						<Flex direction="column" gap="24" :class="$style.column">
 							<Flex direction="column" gap="16" :class="$style.guides_block">
@@ -270,7 +273,7 @@ watch(
 									</Flex>
 								</router-link>
 							</Flex>
-						</Flex>
+						</Flex>-->
 					</Flex>
 
 					<!-- <Flex align="center" justify="between" :class="$style.bottom">
@@ -326,7 +329,7 @@ watch(
 							</div>
 						</Flex>
 
-						<div :class="$style.divider" />
+						<!--<div :class="$style.divider" />
 
 						<Flex direction="column" gap="24" :class="$style.column">
 							<Flex direction="column" gap="16" :class="$style.guides_block">
@@ -357,7 +360,7 @@ watch(
 									</Flex>
 								</router-link>
 							</Flex>
-						</Flex>
+						</Flex>-->
 					</Flex>
 
 					<!-- <Flex align="center" justify="between" :class="$style.bottom">
